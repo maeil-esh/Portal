@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EISS — ESH Intelligent Support System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #F5F6FA;
+  --bg-white: #FFFFFF;
+  --blue:   #2563EB;
+  --blue-lt: #EFF4FF;
+  --blue-mid: #DBEAFE;
+  --teal:   #0D9488;
+  --teal-lt: #EFFAF8;
+  --teal-mid: #CCFBF1;
+  --amber:  #D97706;
+  --amber-lt: #FFFBEB;
+  --amber-mid: #FDE68A;
+  --text-h:  #0F172A;
+  --text-b:  #334155;
+  --text-m:  #64748B;
+  --text-s:  #94A3B8;
+  --border:  #E2E8F0;
+  --radius:  22px;
+  --shadow-card: 0 2px 16px rgba(15,23,42,0.06), 0 1px 3px rgba(15,23,42,0.04);
+  --shadow-hover: 0 16px 48px rgba(15,23,42,0.12), 0 4px 12px rgba(15,23,42,0.06);
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--bg);
+  font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+  color: var(--text-b);
+  overflow-x: hidden;
+}
+
+.bg-blob {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.bg-blob::before {
+  content: '';
+  position: absolute;
+  width: 700px; height: 700px;
+  top: -200px; left: -150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37,99,235,0.07) 0%, transparent 70%);
+}
+.bg-blob::after {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  bottom: -150px; right: -100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(13,148,136,0.07) 0%, transparent 70%);
+}
+
+.bg-dots {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle, rgba(15,23,42,0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.wrapper {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 24px 56px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 60px;
+  animation: fadeDown 0.75s cubic-bezier(.22,1,.36,1) both;
+}
+
+.logo-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.logo-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--blue);
+}
+.logo-mark svg { width: 18px; height: 18px; }
+
+.logo-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-h);
+}
+.logo-name span {
+  font-weight: 300;
+  color: var(--text-m);
+  margin-left: 6px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.divider {
+  width: 1px; height: 20px;
+  background: var(--border);
+}
+
+.header-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--blue-lt);
+  border: 1px solid var(--blue-mid);
+  border-radius: 100px;
+  padding: 4px 14px 4px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--blue);
+  letter-spacing: 0.03em;
+}
+.pill-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  animation: blink 2.4s ease-in-out infinite;
+}
+
+.header h1 {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--text-h);
+  margin-bottom: 14px;
+}
+.header h1 em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--blue);
+}
+
+.header-sub {
+  font-size: 15px;
+  color: var(--text-m);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+.header-sub b {
+  font-weight: 500;
+  color: var(--text-b);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 320px);
+  gap: 20px;
+  width: 100%;
+  max-width: 1020px;
+}
+@media (max-width: 1060px) {
+  .grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+}
+
+.card {
+  position: relative;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px 28px 26px;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.28s cubic-bezier(.22,1,.36,1),
+              box-shadow 0.28s cubic-bezier(.22,1,.36,1),
+              border-color 0.2s ease;
+  overflow: hidden;
+  animation: fadeUp 0.65s cubic-bezier(.22,1,.36,1) both;
+}
+.card:nth-child(1) { animation-delay: 0.08s; }
+.card:nth-child(2) { animation-delay: 0.16s; }
+.card:nth-child(3) { animation-delay: 0.24s; }
+
+.card:hover {
+  transform: translateY(-7px);
+  box-shadow: var(--shadow-hover);
+}
+.card-b:hover { border-color: #BFDBFE; }
+.card-t:hover { border-color: #99F6E4; }
+.card-a:hover { border-color: #FCD34D; }
+
+.card-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.card-b .card-bar { background: linear-gradient(90deg, #2563EB 0%, #60A5FA 100%); }
+.card-t .card-bar { background: linear-gradient(90deg, #0D9488 0%, #34D399 100%); }
+.card-a .card-bar { background: linear-gradient(90deg, #D97706 0%, #FCD34D 100%); }
+
+.card-no {
+  position: absolute;
+  top: 22px; right: 24px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text-s);
+}
+
+.icon-box {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 22px;
+  flex-shrink: 0;
+}
+.card-b .icon-box { background: var(--blue-lt); border: 1px solid var(--blue-mid); }
+.card-t .icon-box { background: var(--teal-lt); border: 1px solid var(--teal-mid); }
+.card-a .icon-box { background: var(--amber-lt); border: 1px solid var(--amber-mid); }
+.icon-box svg { width: 22px; height: 22px; }
+
+.card-tag {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.card-b .card-tag { color: var(--blue); }
+.card-t .card-tag { color: var(--teal); }
+.card-a .card-tag { color: var(--amber); }
+
+.card-title {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--text-h);
+  margin-bottom: 10px;
+  word-break: keep-all;
+}
+
+.card-desc {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-m);
+  line-height: 1.75;
+  word-break: keep-all;
+  flex: 1;
+}
+
+.card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-m);
+}
+.s-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 0 2px rgba(16,185,129,0.2);
+  animation: blink 2.4s ease-in-out infinite;
+}
+
+.arrow-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px 6px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  transition: all 0.22s ease;
+  color: var(--text-m);
+}
+.arrow-btn svg { width: 13px; height: 13px; transition: transform 0.22s ease; }
+
+.card-b:hover .arrow-btn { background: var(--blue-lt); border-color: #BFDBFE; color: var(--blue); }
+.card-t:hover .arrow-btn { background: var(--teal-lt); border-color: #99F6E4; color: var(--teal); }
+.card-a:hover .arrow-btn { background: var(--amber-lt); border-color: #FCD34D; color: var(--amber); }
+.card:hover .arrow-btn svg { transform: translate(2px, -2px); }
+
+.footer {
+  margin-top: 52px;
+  text-align: center;
+  animation: fadeUp 0.7s 0.4s cubic-bezier(.22,1,.36,1) both;
+}
+
+.footer-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 10px 22px;
+  box-shadow: var(--shadow-card);
+}
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.footer-logo-mark {
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  background: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+}
+.footer-logo-mark svg { width: 11px; height: 11px; }
+.footer-logo-text {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-h);
+}
+.footer-sep { width: 1px; height: 14px; background: var(--border); }
+.footer-copy {
+  font-size: 11.5px;
+  color: var(--text-s);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+.footer-contact {
+  margin-top: 14px;
+  font-size: 11px;
+  color: var(--text-s);
+  letter-spacing: 0.01em;
+}
+.footer-contact a {
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 500;
+}
+.footer-contact a:hover {
+  text-decoration: underline;
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-blob"></div>
+<div class="bg-dots"></div>
+
+<div class="wrapper">
+
+  <header class="header">
+    <div class="logo-row">
+      <div class="logo-mark">
+        <svg viewBox="0 0 18 18" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 2L15.5 5.5V12.5L9 16L2.5 12.5V5.5L9 2Z"/>
+          <path d="M9 2V16M2.5 5.5L15.5 12.5M15.5 5.5L2.5 12.5"/>
+        </svg>
+      </div>
+      <span class="logo-name">EISS <span>ESH Intelligent Support System</span></span>
+      <div class="divider"></div>
+      <div class="header-pill">
+        <span class="pill-dot"></span>
+        3 Services Active
+      </div>
+    </div>
+
+    <h1>스마트 안전보건<br><em>통합 디지털 플랫폼</em></h1>
+    <p class="header-sub"><b>매일유업 ESH팀</b> · Environment · Safety · Health</p>
+  </header>
+
+  <main class="grid">
+
+    <a class="card card-b" href="https://maeil-esh.github.io/esh-kpi-dashboard/" target="_blank" rel="noopener">
+      <div class="card-bar"></div>
+      <span class="card-no">01</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+          <path d="M14 17.5h7M17.5 14v7"/>
+        </svg>
+      </div>
+      <span class="card-tag">KPI Dashboard</span>
+      <h2 class="card-title">ESH 전산화시스템<br>모니터링</h2>
+      <p class="card-desc">사업장별 안전보건 KPI 현황 및 접속 이력을 실시간으로 모니터링합니다.</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">
+          바로가기
+          <svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M2 11 L11 2 M4.5 2 H11 V8.5"/>
+          </svg>
+        </div>
+      </div>
+    </a>
+
+    <a class="card card-t" href="https://maeil-esh.github.io/schedule-calendar/" target="_blank" rel="noopener">
+      <div class="card-bar"></div>
+      <span class="card-no">02</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="17" rx="2"/>
+          <path d="M16 2v4M8 2v4M3 10h18"/>
+          <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+        </svg>
+      </div>
+      <span class="card-tag">Audit Schedule</span>
+      <h2 class="card-title">MESH 내부심사<br>스케줄</h2>
+      <p class="card-desc">ISO 45001 기반 MESH 내부심사 일정 및 사업장별 감사 계획을 확인합니다.</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">
+          바로가기
+          <svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M2 11 L11 2 M4.5 2 H11 V8.5"/>
+          </svg>
+        </div>
+      </div>
+    </a>
+
+    <a class="card card-a" href="https://script.google.com/macros/s/AKfycbwDi67lm6pgonJ-cjV1KSKPjWv1OKY8bXnTTq45pCzflzgo6pmnrgzRkUUAjbW4ltl-sw/exec" target="_blank" rel="noopener">
+      <div class="card-bar"></div>
+      <span class="card-no">03</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+      </div>
+      <span class="card-tag">Weekly Insight</span>
+      <h2 class="card-title">안전보건환경<br>인사이트 뉴스레터</h2>
+      <p class="card-desc">AI 기반 ESH 인사이트를 매주 월요일 자동 발송합니다. 구독 신청 및 관리.</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">
+          바로가기
+          <svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <path d="M2 11 L11 2 M4.5 2 H11 V8.5"/>
+          </svg>
+        </div>
+      </div>
+    </a>
+
+  </main>
+
+  <footer class="footer">
+    <p class="footer-contact">※ 해당 사이트 문의: 산업안전팀 정민혁 (<a href="mailto:minhyug7@maeil.com?subject=EISS 사이트 문의">minhyug7@maeil.com</a>)</p>
+  </footer>
+
+</div>
+</body>
+</html>
