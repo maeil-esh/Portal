@@ -176,16 +176,19 @@ html, body {
   color: var(--text-b);
 }
 
-/* ── 2×2 grid for 4 cards ── */
+/* ── 4-column single row ── */
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 320px);
-  gap: 20px;
+  grid-template-columns: repeat(4, 288px);
+  gap: 16px;
   width: 100%;
-  max-width: 680px;
+  max-width: 1210px;
 }
-@media (max-width: 700px) {
-  .grid { grid-template-columns: 1fr; max-width: 400px; }
+@media (max-width: 1224px) {
+  .grid { grid-template-columns: repeat(2, 1fr); max-width: 620px; }
+}
+@media (max-width: 560px) {
+  .grid { grid-template-columns: 1fr; max-width: 320px; }
 }
 
 .card {
@@ -193,7 +196,7 @@ html, body {
   background: var(--bg-white);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 32px 28px 26px;
+  padding: 26px 22px 22px;
   text-decoration: none;
   color: inherit;
   display: flex;
@@ -244,7 +247,7 @@ html, body {
 
 .card-no {
   position: absolute;
-  top: 22px; right: 24px;
+  top: 16px; right: 18px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -252,26 +255,26 @@ html, body {
 }
 
 .icon-box {
-  width: 48px; height: 48px;
-  border-radius: 14px;
+  width: 38px; height: 38px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
   flex-shrink: 0;
 }
 .card-b .icon-box { background: var(--blue-lt); border: 1px solid var(--blue-mid); }
 .card-t .icon-box { background: var(--teal-lt); border: 1px solid var(--teal-mid); }
 .card-a .icon-box { background: var(--amber-lt); border: 1px solid var(--amber-mid); }
 .card-dev .icon-box { background: var(--violet-lt); border: 1px solid var(--violet-mid); }
-.icon-box svg { width: 22px; height: 22px; }
+.icon-box svg { width: 17px; height: 17px; }
 
 .card-tag {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
 }
 .card-b .card-tag { color: var(--blue); }
 .card-t .card-tag { color: var(--teal); }
@@ -280,20 +283,20 @@ html, body {
 
 .card-title {
   font-family: 'Noto Sans KR', sans-serif;
-  font-size: 17px;
+  font-size: 14px;
   font-weight: 700;
   line-height: 1.45;
   color: var(--text-h);
-  margin-bottom: 10px;
+  margin-bottom: 7px;
   word-break: keep-all;
 }
 
 .card-desc {
   font-family: 'Noto Sans KR', sans-serif;
-  font-size: 13px;
+  font-size: 11.5px;
   font-weight: 400;
   color: var(--text-m);
-  line-height: 1.75;
+  line-height: 1.7;
   word-break: keep-all;
   flex: 1;
 }
@@ -302,8 +305,8 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 22px;
-  padding-top: 16px;
+  margin-top: 14px;
+  padding-top: 12px;
   border-top: 1px solid var(--border);
 }
 
@@ -353,7 +356,7 @@ html, body {
 
 /* ── Progress bar inside dev card ── */
 .dev-progress-wrap {
-  margin-top: 14px;
+  margin-top: 10px;
   margin-bottom: 2px;
 }
 .dev-progress-label {
