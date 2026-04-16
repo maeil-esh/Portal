@@ -22,6 +22,9 @@
   --amber:  #D97706;
   --amber-lt: #FFFBEB;
   --amber-mid: #FDE68A;
+  --violet: #7C3AED;
+  --violet-lt: #F5F3FF;
+  --violet-mid: #DDD6FE;
   --text-h:  #0F172A;
   --text-b:  #334155;
   --text-m:  #64748B;
@@ -173,15 +176,16 @@ html, body {
   color: var(--text-b);
 }
 
+/* ── 2×2 grid for 4 cards ── */
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 320px);
+  grid-template-columns: repeat(2, 320px);
   gap: 20px;
   width: 100%;
-  max-width: 1020px;
+  max-width: 680px;
 }
-@media (max-width: 1060px) {
-  .grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+@media (max-width: 700px) {
+  .grid { grid-template-columns: 1fr; max-width: 400px; }
 }
 
 .card {
@@ -204,14 +208,23 @@ html, body {
 .card:nth-child(1) { animation-delay: 0.08s; }
 .card:nth-child(2) { animation-delay: 0.16s; }
 .card:nth-child(3) { animation-delay: 0.24s; }
+.card:nth-child(4) { animation-delay: 0.32s; }
 
-.card:hover {
+/* Dev card is not a link — no pointer cursor by default */
+.card-dev { cursor: default; }
+
+.card-b:hover, .card-t:hover, .card-a:hover {
   transform: translateY(-7px);
   box-shadow: var(--shadow-hover);
 }
 .card-b:hover { border-color: #BFDBFE; }
 .card-t:hover { border-color: #99F6E4; }
 .card-a:hover { border-color: #FCD34D; }
+.card-dev:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--violet-mid);
+}
 
 .card-bar {
   position: absolute;
@@ -222,6 +235,12 @@ html, body {
 .card-b .card-bar { background: linear-gradient(90deg, #2563EB 0%, #60A5FA 100%); }
 .card-t .card-bar { background: linear-gradient(90deg, #0D9488 0%, #34D399 100%); }
 .card-a .card-bar { background: linear-gradient(90deg, #D97706 0%, #FCD34D 100%); }
+.card-dev .card-bar {
+  background: linear-gradient(90deg, #7C3AED 0%, #A78BFA 100%);
+  /* animated shimmer to indicate dev progress */
+  background-size: 200% 100%;
+  animation: shimmer 2.2s linear infinite;
+}
 
 .card-no {
   position: absolute;
@@ -244,6 +263,7 @@ html, body {
 .card-b .icon-box { background: var(--blue-lt); border: 1px solid var(--blue-mid); }
 .card-t .icon-box { background: var(--teal-lt); border: 1px solid var(--teal-mid); }
 .card-a .icon-box { background: var(--amber-lt); border: 1px solid var(--amber-mid); }
+.card-dev .icon-box { background: var(--violet-lt); border: 1px solid var(--violet-mid); }
 .icon-box svg { width: 22px; height: 22px; }
 
 .card-tag {
@@ -256,6 +276,7 @@ html, body {
 .card-b .card-tag { color: var(--blue); }
 .card-t .card-tag { color: var(--teal); }
 .card-a .card-tag { color: var(--amber); }
+.card-dev .card-tag { color: var(--violet); }
 
 .card-title {
   font-family: 'Noto Sans KR', sans-serif;
@@ -286,6 +307,7 @@ html, body {
   border-top: 1px solid var(--border);
 }
 
+/* ── Status dots ── */
 .status {
   display: flex;
   align-items: center;
@@ -301,7 +323,62 @@ html, body {
   box-shadow: 0 0 0 2px rgba(16,185,129,0.2);
   animation: blink 2.4s ease-in-out infinite;
 }
+.s-dot-dev {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--violet);
+  box-shadow: 0 0 0 2px rgba(124,58,237,0.2);
+  animation: blink 1.8s ease-in-out infinite;
+}
 
+/* ── D-Day badge ── */
+.dday-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--violet-lt);
+  border: 1px solid var(--violet-mid);
+  border-radius: 100px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--violet);
+  letter-spacing: 0.04em;
+  font-family: 'Outfit', monospace;
+}
+.dday-badge .dday-num {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Progress bar inside dev card ── */
+.dev-progress-wrap {
+  margin-top: 14px;
+  margin-bottom: 2px;
+}
+.dev-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--text-s);
+  margin-bottom: 6px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.dev-progress-track {
+  height: 4px;
+  background: var(--violet-mid);
+  border-radius: 100px;
+  overflow: hidden;
+}
+.dev-progress-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, #7C3AED 0%, #A78BFA 100%);
+  transition: width 0.4s ease;
+}
+
+/* ── Arrow button ── */
 .arrow-btn {
   display: flex;
   align-items: center;
@@ -321,46 +398,11 @@ html, body {
 .card-a:hover .arrow-btn { background: var(--amber-lt); border-color: #FCD34D; color: var(--amber); }
 .card:hover .arrow-btn svg { transform: translate(2px, -2px); }
 
+/* ── Footer ── */
 .footer {
   margin-top: 52px;
   text-align: center;
-  animation: fadeUp 0.7s 0.4s cubic-bezier(.22,1,.36,1) both;
-}
-
-.footer-inner {
-  display: inline-flex;
-  align-items: center;
-  gap: 16px;
-  background: var(--bg-white);
-  border: 1px solid var(--border);
-  border-radius: 100px;
-  padding: 10px 22px;
-  box-shadow: var(--shadow-card);
-}
-.footer-logo {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-.footer-logo-mark {
-  width: 20px; height: 20px;
-  border-radius: 6px;
-  background: var(--blue);
-  display: flex; align-items: center; justify-content: center;
-}
-.footer-logo-mark svg { width: 11px; height: 11px; }
-.footer-logo-text {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--text-h);
-}
-.footer-sep { width: 1px; height: 14px; background: var(--border); }
-.footer-copy {
-  font-size: 11.5px;
-  color: var(--text-s);
-  font-weight: 400;
-  letter-spacing: 0.02em;
+  animation: fadeUp 0.7s 0.45s cubic-bezier(.22,1,.36,1) both;
 }
 .footer-contact {
   margin-top: 14px;
@@ -373,10 +415,9 @@ html, body {
   text-decoration: none;
   font-weight: 500;
 }
-.footer-contact a:hover {
-  text-decoration: underline;
-}
+.footer-contact a:hover { text-decoration: underline; }
 
+/* ── Keyframes ── */
 @keyframes fadeDown {
   from { opacity: 0; transform: translateY(-18px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -388,6 +429,10 @@ html, body {
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.4; }
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .card:focus-visible {
@@ -412,10 +457,10 @@ html, body {
         </svg>
       </div>
       <span class="logo-name">IESS <span>Intelligent ESH Support System</span></span>
-      <div class="divider"></div>
+      <div class="divider" style="width:1px;height:20px;background:var(--border);"></div>
       <div class="header-pill">
         <span class="pill-dot"></span>
-        3 Services Active
+        3 Services Active · 1 Coming Soon
       </div>
     </div>
 
@@ -425,6 +470,7 @@ html, body {
 
   <main class="grid">
 
+    <!-- 01 KPI Dashboard -->
     <a class="card card-b" href="https://maeil-esh.github.io/esh-kpi-dashboard/" target="_blank" rel="noopener">
       <div class="card-bar"></div>
       <span class="card-no">01</span>
@@ -450,6 +496,7 @@ html, body {
       </div>
     </a>
 
+    <!-- 02 Audit Schedule -->
     <a class="card card-t" href="https://maeil-esh.github.io/schedule-calendar/" target="_blank" rel="noopener">
       <div class="card-bar"></div>
       <span class="card-no">02</span>
@@ -474,6 +521,7 @@ html, body {
       </div>
     </a>
 
+    <!-- 03 Newsletter -->
     <a class="card card-a" href="https://script.google.com/macros/s/AKfycbwDi67lm6pgonJ-cjV1KSKPjWv1OKY8bXnTTq45pCzflzgo6pmnrgzRkUUAjbW4ltl-sw/exec" target="_blank" rel="noopener">
       <div class="card-bar"></div>
       <span class="card-no">03</span>
@@ -497,6 +545,44 @@ html, body {
       </div>
     </a>
 
+    <!-- 04 AI-JSA (개발중) -->
+    <div class="card card-dev" id="card-jsa">
+      <div class="card-bar"></div>
+      <span class="card-no">04</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      </div>
+      <span class="card-tag">AI Risk Assessment</span>
+      <h2 class="card-title">AI-JSA<br>위험성평가</h2>
+      <p class="card-desc">작업 내용을 입력하면 AI가 유해·위험요인을 자동 도출하고 감소대책을 제안합니다. (작업안전분석 기반)</p>
+
+      <!-- Progress bar -->
+      <div class="dev-progress-wrap">
+        <div class="dev-progress-label">
+          <span>개발 진행률</span>
+          <span id="progress-pct">—</span>
+        </div>
+        <div class="dev-progress-track">
+          <div class="dev-progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="card-foot">
+        <span class="status">
+          <span class="s-dot-dev"></span>개발 중
+        </span>
+        <div class="dday-badge">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span id="dday-text" class="dday-num">D-?</span>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <footer class="footer">
@@ -504,5 +590,46 @@ html, body {
   </footer>
 
 </div>
+
+<script>
+  // ── D-Day Countdown ──────────────────────────────────────────
+  // Launch date: May 16, 2026  (D-0)
+  // Start date:  April 16, 2026 (D-30)
+  // Total development window: 30 days
+
+  const START_DATE  = new Date('2026-04-16T00:00:00+09:00'); // D-30 시작일 (KST)
+  const LAUNCH_DATE = new Date('2026-05-16T00:00:00+09:00'); // D-0  오픈일 (KST)
+  const MS_TOTAL    = LAUNCH_DATE - START_DATE;              // 전체 기간(ms)
+
+  function updateDday() {
+    const now    = new Date();
+    const msLeft = LAUNCH_DATE - now;
+    const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+
+    const ddayEl = document.getElementById('dday-text');
+    const fillEl = document.getElementById('progress-fill');
+    const pctEl  = document.getElementById('progress-pct');
+
+    if (msLeft > 0) {
+      // D-? 표시: 자정 기준 남은 일수
+      ddayEl.textContent = `D-${daysLeft}`;
+
+      // 진행률: 시작일로부터 현재까지 경과 시간 기반 (소수점 1자리)
+      const msElapsed = now - START_DATE;
+      const pct = Math.min(100, Math.max(0, (msElapsed / MS_TOTAL * 100).toFixed(1)));
+      fillEl.style.width = pct + '%';
+      pctEl.textContent  = pct + '%';
+    } else {
+      ddayEl.textContent = 'D-Day';
+      fillEl.style.width = '100%';
+      pctEl.textContent  = '100%';
+    }
+  }
+
+  updateDday();
+  // Refresh every hour to keep it live
+  setInterval(updateDday, 1000 * 60 * 60);
+</script>
+
 </body>
 </html>
