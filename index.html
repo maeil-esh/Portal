@@ -97,6 +97,21 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 .card:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+/* ── Ver2.0 빨간 깜빡이 ── */
+.ver-blink {
+  color: #E11D48;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Outfit', monospace;
+  letter-spacing: 0.06em;
+  margin-left: 5px;
+  animation: verBlink 3.5s ease-in-out infinite;
+}
+@keyframes verBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
 </style>
 </head>
 <body>
@@ -130,7 +145,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
         </svg>
       </div>
       <span class="card-tag">KPI Dashboard</span>
-      <h2 class="card-title">ESH 전산화시스템<br>모니터링</h2>
+      <h2 class="card-title">ESH 전산화시스템<br>모니터링<span class="ver-blink">Ver2.0</span></h2>
       <p class="card-desc">사업장 관리감독자 접속 현황 및 이력을 실시간으로 모니터링합니다.</p>
       <div class="card-foot">
         <span class="status"><span class="s-dot"></span>운영 중</span>
@@ -206,10 +221,6 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 
 <script>
   // ── D-Day Countdown ──────────────────────────────────────────
-  // 시작일: 2026-04-16 (D-50)
-  // 오픈일: 2026-06-05 (D-0)
-  // 전체 개발 기간: 50일
-
   const START_DATE  = new Date('2026-04-16T00:00:00+09:00');
   const LAUNCH_DATE = new Date('2026-06-05T00:00:00+09:00');
   const MS_TOTAL    = LAUNCH_DATE - START_DATE;
