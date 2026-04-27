@@ -268,15 +268,12 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
     const now      = new Date();
     const msLeft   = LAUNCH_DATE - now;
     const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
-
-    const ddayEl = document.getElementById('dday-text');
-    const fillEl = document.getElementById('progress-fill');
-    const pctEl  = document.getElementById('progress-pct');
-
+    const ddayEl   = document.getElementById('dday-text');
+    const fillEl   = document.getElementById('progress-fill');
+    const pctEl    = document.getElementById('progress-pct');
     if (msLeft > 0) {
       ddayEl.textContent = `D-${daysLeft}`;
-      const msElapsed = now - START_DATE;
-      const pct = Math.min(100, Math.max(0, (msElapsed / MS_TOTAL * 100).toFixed(1)));
+      const pct = Math.min(100, Math.max(0, (((now - START_DATE) / MS_TOTAL) * 100).toFixed(1)));
       fillEl.style.width = pct + '%';
       pctEl.textContent  = pct + '%';
     } else {
@@ -285,207 +282,88 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       pctEl.textContent  = '100%';
     }
   }
-
   updateDday();
   setInterval(updateDday, 1000 * 60 * 60);
 
-  // ══════════════════════════════════════════════════════
-  //  안전보건 전광판 뉴스 티커
-  //  · rss2json 무료 API로 실제 RSS 피드 수집
-  //  · 실패 시 내장 풀(pool)로 즉시 대체
-  // ══════════════════════════════════════════════════════
+  // ── 전광판 티커 (RSS 실시간만) ───────────────────────────────
   const TK = {
-    inner: document.getElementById('tk-inner'),
-    timeEl: document.getElementById('tk-time'),
+    inner:      document.getElementById('tk-inner'),
+    timeEl:     document.getElementById('tk-time'),
     refreshBtn: document.getElementById('tk-refresh-btn'),
-
-    // ── 내장 뉴스 풀 (오늘 날짜 기반으로 표시) ──────────
-    pool: [
-      {cat:'노동부', cls:'bd-moel', text:'고용노동부, 건설업 추락재해 예방 현장점검 강화 실시'},
-      {cat:'노동부', cls:'bd-moel', text:'중대재해처벌법 시행 3년 — 사망사고 감소 추이 분석 발표'},
-      {cat:'노동부', cls:'bd-moel', text:'2026년 산업안전보건 감독 계획 공개 — 제조·건설 중점'},
-      {cat:'노동부', cls:'bd-moel', text:'고용부, 화학물질 노출 기준 개정안 입법예고'},
-      {cat:'노동부', cls:'bd-moel', text:'근로감독관 직무집행규정 개정 — 안전 분야 권한 강화'},
-      {cat:'KOSHA', cls:'bd-kosha', text:'안전보건공단, ISO 45001 인증 지원 기업 모집 공고'},
-      {cat:'KOSHA', cls:'bd-kosha', text:'KOSHA, 2026년 상반기 안전보건 교육 일정 공지'},
-      {cat:'KOSHA', cls:'bd-kosha', text:'근골격계 질환 예방 프로그램 — 제조업 사업장 신청 접수'},
-      {cat:'KOSHA', cls:'bd-kosha', text:'안전보건공단, 화학물질 GHS MSDS 데이터베이스 업데이트'},
-      {cat:'KOSHA', cls:'bd-kosha', text:'KOSHA 가이드 — 밀폐공간 작업 안전수칙 개정판 배포'},
-      {cat:'KOSHA', cls:'bd-kosha', text:'위험성평가 우수사례 공모전 결과 발표 — 참여기업 인센티브 제공'},
-      {cat:'사고',  cls:'bd-news',  text:'경기 시흥 물류센터 지게차 충돌 1명 골절 — 안전통로 미설치'},
-      {cat:'사고',  cls:'bd-news',  text:'충남 화학공장 가스 누출 감지 — 인근 대피 후 신속 복구'},
-      {cat:'사고',  cls:'bd-news',  text:'부산 조선소 용접 작업 중 화재 발생 — 인명피해 없이 진화'},
-      {cat:'사고',  cls:'bd-news',  text:'건설현장 비계 붕괴 예방을 위한 긴급 안전점검 실시 예정'},
-      {cat:'사고',  cls:'bd-news',  text:'인천 냉동창고 암모니아 소량 누출 — 마스크 착용 후 복구 완료'},
-      {cat:'법령',  cls:'bd-rule',  text:'산업안전보건법 시행규칙 개정 — 특수형태근로종사자 안전조치 확대'},
-      {cat:'법령',  cls:'bd-rule',  text:'위험물안전관리법 개정안 국회 통과 — 2026.7 시행 예정'},
-      {cat:'법령',  cls:'bd-rule',  text:'도급인 안전보건 조치 의무 범위 확대 — 하청업체 보호 강화'},
-      {cat:'법령',  cls:'bd-rule',  text:'안전보건관리체계 구축 의무 — 50인 미만 사업장 유예기간 종료'},
-      {cat:'법령',  cls:'bd-rule',  text:'고압가스 안전관리법 시행령 일부개정령안 입법예고 완료'},
-      {cat:'환경부', cls:'bd-env',  text:'환경부, 화학물질 배출·이동량 정보 공개 확대 — 사업장 보고 의무 강화'},
-      {cat:'환경부', cls:'bd-env',  text:'2026년 화학물질관리법 개정 — 유해화학물질 취급시설 검사 주기 단축'},
-      {cat:'환경부', cls:'bd-env',  text:'환경부, 온실가스 배출권거래제 3차 계획기간 할당계획 발표'},
-      {cat:'환경부', cls:'bd-env',  text:'화학물질안전원, 화학사고 대응 전문인력 양성 교육 신청 접수'},
-      {cat:'환경부', cls:'bd-env',  text:'환경부, 사업장 대기오염물질 총량관리제 적용 범위 확대 예고'},
-      {cat:'환경부', cls:'bd-env',  text:'유해화학물질 영업허가 갱신 의무화 — 2026년 하반기 시행'},
-    ],
-
-    // ── RSS 피드 목록 (rss2json 무료 프록시 사용) ──────────
     feeds: [
-      {
-        url: 'https://api.rss2json.com/v1/api.json?rss_url=' +
-             encodeURIComponent('https://www.moel.go.kr/news/enews/report/rss.do'),
-        cat: '노동부', cls: 'bd-moel'
-      },
-      {
-        url: 'https://api.rss2json.com/v1/api.json?rss_url=' +
-             encodeURIComponent('https://www.kosha.or.kr/kosha/data/rssCenter.do?gubun=A'),
-        cat: 'KOSHA', cls: 'bd-kosha'
-      },
-      {
-        url: 'https://api.rss2json.com/v1/api.json?rss_url=' +
-             encodeURIComponent('http://www.anjunj.com/rss/allArticle.xml'),
-        cat: '안전저널', cls: 'bd-news'
-      },
-      {
-        url: 'https://api.rss2json.com/v1/api.json?rss_url=' +
-             encodeURIComponent('https://www.me.go.kr/home/web/rss/rss.do?menuId=10257'),
-        cat: '환경부', cls: 'bd-env'
-      },
+      { url: 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://www.moel.go.kr/news/enews/report/rss.do'),        cat: '노동부',   cls: 'bd-moel'  },
+      { url: 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://www.kosha.or.kr/kosha/data/rssCenter.do?gubun=A'), cat: 'KOSHA',   cls: 'bd-kosha' },
+      { url: 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('http://www.anjunj.com/rss/allArticle.xml'),               cat: '안전저널', cls: 'bd-news'  },
+      { url: 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://www.me.go.kr/home/web/rss/rss.do?menuId=10257'),  cat: '환경부',   cls: 'bd-env'   },
     ],
-
-    items: [],   // 최종 렌더링할 아이템
-    loaded: false,
-
-    // ── 시간 표시 ─────────────────────────────────────────
     updateTime() {
-      const now = new Date();
-      const hh = String(now.getHours()).padStart(2,'0');
-      const mm = String(now.getMinutes()).padStart(2,'0');
-      this.timeEl.textContent = `${hh}:${mm} 기준`;
+      const n = new Date();
+      this.timeEl.textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0') + ' 기준';
     },
-
-    // ── 아이템 → HTML ────────────────────────────────────
     buildItem(cat, cls, text, link) {
-      const inner = link
-        ? `<a href="${link}" target="_blank" rel="noopener">${text}</a>`
-        : text;
-      return `<span class="tk-item">
-        <span class="tk-badge ${cls}">${cat}</span>${inner}
-      </span><span class="tk-dot"></span>`;
+      const inner = link ? `<a href="${link}" target="_blank" rel="noopener">${text}</a>` : text;
+      return `<span class="tk-item"><span class="tk-badge ${cls}">${cat}</span>${inner}</span><span class="tk-dot"></span>`;
     },
-
-    // ── 티커 렌더링 ──────────────────────────────────────
     render(items) {
       if (!items.length) return;
-      // 스크롤 속도: 아이템 수 × 5초, 최소30 최대120
       const dur = Math.min(240, Math.max(90, items.length * 10));
-      let html = items.map(i => this.buildItem(i.cat, i.cls, i.text, i.link)).join('');
-      // 끊김 없이 무한 루프: 두 번 반복
-      this.inner.innerHTML = html + html;
+      this.inner.innerHTML = items.map(i => this.buildItem(i.cat, i.cls, i.text, i.link)).join('')
+                           + items.map(i => this.buildItem(i.cat, i.cls, i.text, i.link)).join('');
       this.inner.style.setProperty('--tk-dur', dur + 's');
-      // 애니메이션 재시작
       this.inner.classList.remove('running');
-      void this.inner.offsetWidth; // reflow
+      void this.inner.offsetWidth;
       this.inner.classList.add('running');
       this.updateTime();
-      this.loaded = true;
     },
-
-    // ── 내장 풀로 즉시 표시 ──────────────────────────────
-    showPool() {
-      // 풀을 랜덤 셔플
-      const shuffled = [...this.pool].sort(() => Math.random() - 0.5);
-      this.items = shuffled;
-      this.render(shuffled);
-    },
-
-    // ── RSS 피드 패치 ────────────────────────────────────
     async fetchFeed(feed) {
       try {
-        const res = await fetch(feed.url, {signal: AbortSignal.timeout(5000)});
+        const res  = await fetch(feed.url, { signal: AbortSignal.timeout(5000) });
         if (!res.ok) return [];
         const data = await res.json();
         if (data.status !== 'ok' || !Array.isArray(data.items)) return [];
         return data.items.slice(0, 5).map(item => ({
-          cat: feed.cat,
-          cls: feed.cls,
+          cat: feed.cat, cls: feed.cls,
           text: (item.title || '').replace(/<[^>]+>/g, '').trim().slice(0, 60),
           link: item.link || null,
         })).filter(i => i.text.length > 4);
-      } catch {
-        return [];
-      }
+      } catch { return []; }
     },
-
-    // ── 모든 피드 병렬 패치 후 풀과 합치기 ───────────────
+    fallback: [
+      { cat: '노동부',   cls: 'bd-moel',  text: '고용노동부 산업안전보건 정책 · 보도자료',          link: 'https://www.moel.go.kr/news/enews/report/enewsView.do' },
+      { cat: 'KOSHA',   cls: 'bd-kosha', text: '안전보건공단 공지사항 · 안전보건 자료실',          link: 'https://www.kosha.or.kr/kosha/data/notice.do' },
+      { cat: '안전저널', cls: 'bd-news',  text: '안전저널 최신 산업재해 · 안전보건 뉴스',          link: 'http://www.anjunj.com' },
+      { cat: '환경부',   cls: 'bd-env',   text: '환경부 화학물질 · 환경안전 최신 공지',            link: 'https://www.me.go.kr/home/web/main.do' },
+      { cat: '법령',     cls: 'bd-rule',  text: '국가법령정보센터 산업안전보건법 · 중대재해처벌법', link: 'https://www.law.go.kr' },
+    ],
     async fetchAll() {
       const results = await Promise.allSettled(this.feeds.map(f => this.fetchFeed(f)));
-      const fetched = results
-        .filter(r => r.status === 'fulfilled')
-        .flatMap(r => r.value);
-
-      if (fetched.length > 0) {
-        // RSS 실기사 + 내장 풀 혼합 (RSS 우선, 풀 후반)
-        const poolShuffled = [...this.pool].sort(() => Math.random() - 0.5).slice(0, 10);
-        this.items = [...fetched, ...poolShuffled];
-        this.render(this.items);
-      }
-      // 실패해도 이미 showPool()이 표시 중이므로 무시
+      const items   = results.filter(r => r.status === 'fulfilled').flatMap(r => r.value);
+      this.render(items.length ? items : this.fallback);
     },
-
-    // ── 새로고침 버튼 ────────────────────────────────────
     refresh() {
       this.inner.innerHTML = '<div class="tk-load"><div class="tk-spin"></div>새로고침 중...</div>';
       this.inner.classList.remove('running');
-      this.showPool();
       this.fetchAll();
     },
-
-    // ── 초기화 ──────────────────────────────────────────
     init() {
-      this.showPool();         // 즉시 내장 풀 표시
-      this.fetchAll();         // 백그라운드 RSS 패치
-      setInterval(() => this.fetchAll(), 10 * 60 * 1000); // 10분마다 갱신
+      this.fetchAll();
+      setInterval(() => this.fetchAll(), 10 * 60 * 1000);
       setInterval(() => this.updateTime(), 60 * 1000);
       this.refreshBtn.addEventListener('click', () => this.refresh());
     }
   };
-
   TK.init();
 
-  // ══════════════════════════════════════════════════════
-  //  보안: 우클릭 · 개발자도구 · 단축키 차단
-  // ══════════════════════════════════════════════════════
+  // ── 보안: 우클릭·개발자도구·단축키 차단 ─────────────────────
   (function() {
-    // 1. 우클릭 차단
-    document.addEventListener('contextmenu', function(e){ e.preventDefault(); return false; });
-
-    // 2. 드래그 선택 방지
-    document.addEventListener('selectstart', function(e){ e.preventDefault(); return false; });
-
-    // 3. 복사·잘라내기 차단
-    document.addEventListener('copy', function(e){ e.preventDefault(); });
-    document.addEventListener('cut',  function(e){ e.preventDefault(); });
-
-    // 4. 키보드 단축키 차단
-    document.addEventListener('keydown', function(e) {
-      const k = e.key;
-      if (k === 'F12') { e.preventDefault(); return false; }
-      if ((e.ctrlKey||e.metaKey) && e.shiftKey && ['i','I','j','J','c','C','k','K'].includes(k)) { e.preventDefault(); return false; }
-      if ((e.ctrlKey||e.metaKey) && ['u','U','s','S','a','A','p','P'].includes(k)) { e.preventDefault(); return false; }
-    });
-
-    // 5. 개발자도구 감지 — console 객체 toString 오버라이드 방식
-    // (창 크기 비교는 iframe/미리보기에서 오탐이 많아 제거)
-    var _devDetected = false;
-    var _con = new Proxy(console, {
-      get: function(t, p) {
-        if (!_devDetected && (p === 'log' || p === 'warn' || p === 'error')) {
-          // 콘솔이 실제 사용될 때만 감지 (열려있어도 수동 입력 없으면 무반응)
-        }
-        return t[p];
-      }
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('selectstart', e => e.preventDefault());
+    document.addEventListener('copy',  e => e.preventDefault());
+    document.addEventListener('cut',   e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F12') { e.preventDefault(); return false; }
+      if ((e.ctrlKey||e.metaKey) && e.shiftKey && ['i','I','j','J','c','C','k','K'].includes(e.key)) { e.preventDefault(); return false; }
+      if ((e.ctrlKey||e.metaKey) && ['u','U','s','S','a','A','p','P'].includes(e.key)) { e.preventDefault(); return false; }
     });
   })();
 </script>
