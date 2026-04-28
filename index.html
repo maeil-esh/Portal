@@ -291,10 +291,12 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
     timeEl:     document.getElementById('tk-time'),
     refreshBtn: document.getElementById('tk-refresh-btn'),
     feeds: [
-      { url: 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://www.moel.go.kr/news/enews/report/rss.do'),        cat: '노동부',   cls: 'bd-moel'  },
-      { url: 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://www.kosha.or.kr/kosha/data/rssCenter.do?gubun=A'), cat: 'KOSHA',   cls: 'bd-kosha' },
-      { url: 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('http://www.anjunj.com/rss/allArticle.xml'),               cat: '안전저널', cls: 'bd-news'  },
-      { url: 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent('https://www.me.go.kr/home/web/rss/rss.do?menuId=10257'),  cat: '환경부',   cls: 'bd-env'   },
+      { url: 'https://api.rss2json.com/v1/api.json?count=10&rss_url=' + encodeURIComponent('https://www.moel.go.kr/news/enews/report/rss.do'),        cat: '노동부',   cls: 'bd-moel'  },
+      { url: 'https://api.rss2json.com/v1/api.json?count=10&rss_url=' + encodeURIComponent('https://www.kosha.or.kr/kosha/data/rssCenter.do?gubun=A'), cat: 'KOSHA',   cls: 'bd-kosha' },
+      { url: 'https://api.rss2json.com/v1/api.json?count=10&rss_url=' + encodeURIComponent('http://www.anjunj.com/rss/allArticle.xml'),               cat: '안전저널', cls: 'bd-news'  },
+      { url: 'https://api.rss2json.com/v1/api.json?count=10&rss_url=' + encodeURIComponent('https://www.me.go.kr/home/web/rss/rss.do?menuId=10257'),  cat: '환경부',   cls: 'bd-env'   },
+      { url: 'https://api.rss2json.com/v1/api.json?count=10&rss_url=' + encodeURIComponent('https://www.law.go.kr/LSW/rss/rssBoardList.do?bbsId=1'),  cat: '법령',     cls: 'bd-rule'  },
+      { url: 'https://api.rss2json.com/v1/api.json?count=10&rss_url=' + encodeURIComponent('https://www.kosha.or.kr/kosha/data/rssCenter.do?gubun=B'), cat: 'KOSHA',   cls: 'bd-kosha' },
     ],
     updateTime() {
       const n = new Date();
@@ -317,14 +319,19 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
     },
     async fetchFeed(feed) {
       try {
-        const res  = await fetch(feed.url, { signal: AbortSignal.timeout(5000) });
+        // 캐시 버스팅: 10분 단위 타임스탬프로 rss2json 캐시 우회
+        const ts   = Math.floor(Date.now() / (10 * 60 * 1000));
+        const url  = feed.url + '&_t=' + ts;
+        const res  = await fetch(url, { signal: AbortSignal.timeout(6000), cache: 'no-store' });
         if (!res.ok) return [];
         const data = await res.json();
         if (data.status !== 'ok' || !Array.isArray(data.items)) return [];
-        return data.items.slice(0, 5).map(item => ({
-          cat: feed.cat, cls: feed.cls,
+        return data.items.slice(0, 6).map(item => ({
+          cat:  feed.cat,
+          cls:  feed.cls,
           text: (item.title || '').replace(/<[^>]+>/g, '').trim().slice(0, 60),
           link: item.link || null,
+          date: item.pubDate ? new Date(item.pubDate) : null,
         })).filter(i => i.text.length > 4);
       } catch { return []; }
     },
@@ -338,6 +345,13 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
     async fetchAll() {
       const results = await Promise.allSettled(this.feeds.map(f => this.fetchFeed(f)));
       const items   = results.filter(r => r.status === 'fulfilled').flatMap(r => r.value);
+      // 최신순 정렬
+      items.sort((a, b) => {
+        if (!a.date && !b.date) return 0;
+        if (!a.date) return 1;
+        if (!b.date) return -1;
+        return b.date - a.date;
+      });
       this.render(items.length ? items : this.fallback);
     },
     refresh() {
@@ -347,7 +361,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
     },
     init() {
       this.fetchAll();
-      setInterval(() => this.fetchAll(), 10 * 60 * 1000);
+      setInterval(() => this.fetchAll(), 5 * 60 * 1000); // 5분마다 갱신
       setInterval(() => this.updateTime(), 60 * 1000);
       this.refreshBtn.addEventListener('click', () => this.refresh());
     }
