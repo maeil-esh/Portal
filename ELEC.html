@@ -171,6 +171,15 @@
     </div>
   </div>
 
+  <!-- 시설명 -->
+  <div class="card">
+    <div class="card-title">시설 상세</div>
+    <div class="field">
+      <label>시설명</label>
+      <input type="text" id="facilityName" placeholder="예) MCC-1, PDP-3A 등">
+    </div>
+  </div>
+
   <!-- 조치 내용 -->
   <div class="card">
     <div class="card-title">조치 내용</div>
@@ -180,8 +189,13 @@
     </div>
     <div class="divider"></div>
     <div class="field">
-      <label>작성자 및 비고</label>
-      <input type="text" id="note" placeholder="작성자(필수) 및 추가 메모 (선택)">
+      <label>작성자 <span class="req">*</span></label>
+      <input type="text" id="author" placeholder="성명 입력">
+    </div>
+    <div class="divider"></div>
+    <div class="field">
+      <label>비고</label>
+      <input type="text" id="note" placeholder="추가 메모 (선택)">
     </div>
   </div>
 
@@ -304,7 +318,7 @@ function showToast(msg, type) {
 async function submitForm() {
   const site = document.getElementById('site').value;
   const year = document.getElementById('year').value;
-  if (!site || !year || !state.facility || !state.situation) {
+  if (!site || !year || !state.facility || !state.situation || !document.getElementById('author').value.trim()) {
     showToast('필수 항목을 모두 입력해주세요', 'error'); return;
   }
   const btn = document.getElementById('submitBtn');
@@ -316,8 +330,10 @@ async function submitForm() {
     부서: document.getElementById('dept').value,
     연도: year,
     시설: state.facility,
+    시설명: document.getElementById('facilityName').value,
     발생상황: state.situation,
     조치: document.getElementById('action').value,
+    작성자: document.getElementById('author').value,
     비고: document.getElementById('note').value,
     제출일시: new Date().toLocaleString('ko-KR'),
     photos: photos.map((p, i) => ({
@@ -350,7 +366,7 @@ async function submitForm() {
 }
 
 function resetForm() {
-  ['site','year','dept','action','note'].forEach(id => { document.getElementById(id).value = ''; });
+  ['site','year','dept','facilityName','action','author','note'].forEach(id => { document.getElementById(id).value = ''; });
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
   state.facility = null; state.situation = null;
   photos.length = 0; renderGrid();
