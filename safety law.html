@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산업안전보건법 타이핑 대결</title>
+<title>산업안전보건 타이핑 도장</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 @font-face{
@@ -661,8 +661,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 </head>
 <body>
 <!-- 폰트 강제 프리로드 -->
-<span style="position:fixed;top:-999px;left:-999px;font-family:'DOSGothic',monospace;font-size:1px;opacity:0;">산업안전보건법타이핑대결가나다라마바사아자차카타파하</span>
-<span style="position:fixed;top:-999px;left:-999px;font-family:'DungGeunMo',monospace;font-size:1px;opacity:0;">산업안전보건법타이핑대결</span>
+<span style="position:fixed;top:-999px;left:-999px;font-family:'DOSGothic',monospace;font-size:1px;opacity:0;">산업안전보건타이핑도장가나다라마바사아자차카타파하</span>
+<span style="position:fixed;top:-999px;left:-999px;font-family:'DungGeunMo',monospace;font-size:1px;opacity:0;">산업안전보건타이핑도장</span>
 <div id="particles"></div>
 
 <!-- ══════════════════════════════════════════════
@@ -710,7 +710,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <div class="im-title-section">
           <div class="im-title-left">
             <div class="im-deco-stars">★ ★ ★ HIGH SCORE ★ ★ ★</div>
-            <div class="im-title">산업안전보건법 타이핑 대결</div>
+            <div class="im-title">산업안전보건 타이핑 도장</div>
             <div class="im-sub">SAFETY LAW TYPING ARENA</div>
           </div>
           <div class="im-title-right">
@@ -960,7 +960,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <div class="result-content">
           <div class="result-arcade-hd">
             <div class="rah-main">GAME OVER</div>
-            <div class="rah-sub" id="rah-sub">산업안전보건법 타이핑 대결</div>
+            <div class="rah-sub" id="rah-sub">산업안전보건 타이핑 도장</div>
           </div>
           <div class="result-player-row">
             <div class="result-avatar" id="res-avatar">⛑️</div>
@@ -1138,7 +1138,7 @@ const DOT_CHARS=[
     <rect x="6" y="4" width="4" height="4" fill="#FF4444"/>
     <rect x="7" y="5" width="2" height="2" fill="#fff"/>
   </svg>`},
-  ,{name:'작업반장', svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%">
+  {name:'작업반장', svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%">
     <rect x="5" y="1" width="6" height="4" fill="#FDDBB4"/>
     <rect x="4" y="2" width="1" height="2" fill="#FDDBB4"/>
     <rect x="11" y="2" width="1" height="2" fill="#FDDBB4"/>
@@ -1250,12 +1250,12 @@ function shortPassage(p){
 }
 
 const SAMPLE=[
-  {nickname:'안전왕',char:'⛑️',wpm:180,acc:96,score:173,passage:'제1조, 제2조 목적 및 정의'},
-  {nickname:'현장달인',char:'👷',wpm:155,acc:94,score:146,passage:'제36조, 제38조 위험성평가, 안전조치'},
-  {nickname:'보건마스터',char:'👩‍⚕️',wpm:142,acc:91,score:129,passage:'제51조, 제52조, 제54조 작업중지, 중대재해'},
-  {nickname:'소방영웅',char:'🚒',wpm:130,acc:88,score:114,passage:'제63조, 제167조 도급인 의무, 벌칙'},
-  {nickname:'안전조끼',char:'🦺',wpm:118,acc:85,score:100,passage:'제5조, 제6조 사업주, 근로자 의무'},
-  {nickname:'정비달인',char:'🔧',wpm:108,acc:83,score:90,passage:'제16조, 제17조 관리감독자, 안전관리자'},
+  {nickname:'안전왕',char:'안전모',wpm:180,acc:96,score:173,passage:'제1조, 제2조 목적 및 정의'},
+  {nickname:'현장달인',char:'현장반장',wpm:155,acc:94,score:146,passage:'제36조, 제38조 위험성평가, 안전조치'},
+  {nickname:'보건마스터',char:'보건관리자',wpm:142,acc:91,score:129,passage:'제51조, 제52조, 제54조 작업중지, 중대재해'},
+  {nickname:'소방영웅',char:'소방관',wpm:130,acc:88,score:114,passage:'제63조, 제167조 도급인 의무, 벌칙'},
+  {nickname:'안전조끼',char:'안전조끼',wpm:118,acc:85,score:100,passage:'제5조, 제6조 사업주, 근로자 의무'},
+  {nickname:'정비달인',char:'정비사',wpm:108,acc:83,score:90,passage:'제16조, 제17조 관리감독자, 안전관리자'},
 ];
 
 let selChar=0,selPassage=0,nickname='';
@@ -1481,7 +1481,7 @@ function renderMainRanking(data){
     const row=document.createElement('div');
     row.className='im-rank-row'+(i<3?' top3':'')+(r.nickname===nickname?' mine':'');
     const nc=i<3?`im-rr-no n${i+1}`:'im-rr-no';
-    const charSvg=DOT_CHARS.find(d=>d.name===(r.char||r.charName||''))?.svg||
+    const charSvg=(typeof DOT_CHARS!=='undefined'&&DOT_CHARS.find(d=>d&&d.name===(r.char||r.charName||'')))?.svg||
       `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="4" y="1" width="8" height="14" fill="#555"/></svg>`;
     row.innerHTML=`
       <span class="${nc}">${medals[i]||i+1}</span>
@@ -1497,6 +1497,7 @@ function renderMainRanking(data){
 
 function renderRanking(data,myNick,bodyId){
   const body=document.getElementById(bodyId);if(!body)return;
+  if(typeof DOT_CHARS==='undefined'){console.warn('DOT_CHARS not ready');return;}
   if(!data||!data.length){body.innerHTML='<div class="rank-loading">NO RECORD</div>';return;}
   body.innerHTML='';
   const medals=['🥇','🥈','🥉'];
@@ -1504,7 +1505,7 @@ function renderRanking(data,myNick,bodyId){
     const row=document.createElement('div');
     row.className='rank-row'+(r.nickname===myNick?' mine':'');
     const nc=i<3?`rr-no n${i+1}`:'rr-no';
-    const cSvg=DOT_CHARS.find(d=>d.name===(r.char||r.charName||''))?.svg||DOT_CHARS[0].svg;
+    const cSvg=(typeof DOT_CHARS!=='undefined'&&DOT_CHARS.find(d=>d&&d.name===(r.char||r.charName||'')))?.svg||(typeof DOT_CHARS!=='undefined'?DOT_CHARS[0].svg:'');
     row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="rr-ch" style="width:20px;height:20px;display:inline-block;">${cSvg}</span><span class="rr-nick${i===0?' top':''}">${r.nickname}</span><span class="rr-sc">${r.score}</span><span class="rr-wpm">${r.wpm}</span>`;
     body.appendChild(row);
   });
