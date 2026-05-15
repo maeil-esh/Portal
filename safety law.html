@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>산업안전보건 타이핑 도장</title>
+<!-- fixed: GAS JSONP callback / ranking fallback / DOM error patch -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 @font-face{
@@ -1265,6 +1266,118 @@ let startTime=null,timerIv=null;
 const TIME_LIMIT=60;
 let timeLeft=TIME_LIMIT,gameEnded=false;
 
+/* ═══════════════════════════════════════
+   GAS/시트 연동 안정화 유틸
+   - HTML은 JSONP 방식으로 GAS를 호출합니다.
+   - GAS doGet은 callback 파라미터가 있을 때 반드시 callback({...}) 형태로 응답해야 합니다.
+═══════════════════════════════════════ */
+const GAS_TIMEOUT_MS = 8000;
+
+function esc(v){
+  return String(v ?? '').replace(/[&<>"']/g, m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[m]));
+}
+function escChar(ch){
+  return ch === ' ' ? '&nbsp;' : esc(ch);
+}
+function nvl(v, fallback=''){
+  return v === undefined || v === null || v === '' ? fallback : v;
+}
+function num(v, fallback=0){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+function safeCharSvg(charName){
+  const key = String(charName || '').trim();
+  const found = DOT_CHARS.find(d => d && d.name === key);
+  return (found || DOT_CHARS[0]).svg;
+}
+function normalizeRankRows(payload){
+  let rows = payload;
+
+  if(payload && !Array.isArray(payload)){
+    rows = payload.data || payload.rows || payload.list || payload.rank || payload.ranking || payload.result || [];
+  }
+  if(!Array.isArray(rows)) rows = [];
+
+  return rows.map(r => ({
+    nickname: String(nvl(r.nickname, nvl(r.name, nvl(r.player, 'PLAYER')))).trim().slice(0, 20),
+    char: String(nvl(r.char, nvl(r.charName, nvl(r.character, '안전모')))).trim(),
+    wpm: num(nvl(r.wpm, r.WPM), 0),
+    acc: num(nvl(r.acc, nvl(r.accuracy, r.ACC)), 0),
+    score: num(nvl(r.score, r.SCORE), 0),
+    passage: String(nvl(r.passage, nvl(r.stage, nvl(r.title, '')))).trim()
+  }))
+  .filter(r => r.nickname && Number.isFinite(r.score))
+  .sort((a,b) => b.score - a.score || b.wpm - a.wpm || b.acc - a.acc);
+}
+function buildQuery(params){
+  return Object.entries(params)
+    .filter(([,v]) => v !== undefined && v !== null)
+    .map(([k,v]) => encodeURIComponent(k) + '=' + encodeURIComponent(String(v)))
+    .join('&');
+}
+function requestGas(action, params={}, onSuccess=()=>{}, onFail=()=>{}){
+  if(!GAS_URL || GAS_URL.includes('YOUR_GAS')){
+    onFail(new Error('GAS_URL이 설정되지 않았습니다.'));
+    return;
+  }
+
+  const cbName = 'gas_cb_' + action + '_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+  let done = false;
+  let scriptEl = null;
+
+  const cleanup = () => {
+    try{ delete window[cbName]; }catch(e){ window[cbName] = undefined; }
+    if(scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
+  };
+  const timer = setTimeout(() => {
+    if(done) return;
+    done = true;
+    cleanup();
+    onFail(new Error('GAS 응답 시간 초과: GAS doGet에서 callback JSONP 응답을 확인하세요.'));
+  }, GAS_TIMEOUT_MS);
+
+  window[cbName] = payload => {
+    if(done) return;
+    done = true;
+    clearTimeout(timer);
+    cleanup();
+    onSuccess(payload);
+  };
+
+  const qs = buildQuery({
+    action,
+    callback: cbName,
+    _ts: Date.now(),
+    ...params
+  });
+
+  scriptEl = document.createElement('script');
+  scriptEl.src = GAS_URL + (GAS_URL.includes('?') ? '&' : '?') + qs;
+  scriptEl.onerror = () => {
+    if(done) return;
+    done = true;
+    clearTimeout(timer);
+    cleanup();
+    onFail(new Error('GAS 스크립트 로드 실패: 배포 권한/URL을 확인하세요.'));
+  };
+  document.head.appendChild(scriptEl);
+}
+function renderFallbackRanking(reason){
+  console.warn('[GAS 랭킹 불러오기 실패]', reason);
+  renderRanking(SAMPLE, null, 'rank-list-body');
+  renderRanking(SAMPLE, null, 'rank-list-body-game');
+  renderRanking(SAMPLE, null, 'rank-list-body-result');
+  updateTop1(SAMPLE);
+}
+
+
 window.onload=()=>{
   buildCharGrid();buildPassageList();loadRankingAll();
   document.addEventListener('click',()=>{
@@ -1397,14 +1510,17 @@ function closeSetupPopup(){document.getElementById('setup-popup').classList.remo
 
 /* 빌드 */
 function buildCharGrid(){
-  const g=document.getElementById('char-grid');
-  CHARS.forEach((c,i)=>{
-    const b=document.createElement('button');
-    b.className='char-btn'+(i===0?' selected':'');
-    b.innerHTML=`<span class="char-emoji">${c.svg}</span><span class="char-name">${c.name}</span>`;
-    b.onclick=()=>{
-      document.querySelectorAll('.char-btn').forEach(e=>e.classList.remove('selected'));
-      b.classList.add('selected');selChar=i;
+  const g = document.getElementById('char-grid');
+  g.innerHTML = '';
+
+  CHARS.forEach((c,i) => {
+    const b = document.createElement('button');
+    b.className = 'char-btn' + (i === selChar ? ' selected' : '');
+    b.innerHTML = `<span class="char-emoji">${c.svg}</span><span class="char-name">${esc(c.name)}</span>`;
+    b.onclick = () => {
+      document.querySelectorAll('.char-btn').forEach(e => e.classList.remove('selected'));
+      b.classList.add('selected');
+      selChar = i;
       updateSidebarSummary();
     };
     g.appendChild(b);
@@ -1412,18 +1528,30 @@ function buildCharGrid(){
 }
 
 function buildPassageList(){
-  const g=document.getElementById('passage-list');
-  PASSAGES.forEach((p,i)=>{
-    const b=document.createElement('button');
-    b.className='passage-btn'+(i===0?' selected':'');
-    b.innerHTML=`<div class="pb-title${i===0?' sel':''}">${p.title}</div><div class="pb-meta">${p.lines.join('').length}자</div>`;
-    b.onclick=()=>{
-      document.querySelectorAll('.passage-btn').forEach(e=>{e.classList.remove('selected');e.querySelector('.pb-title').classList.remove('sel');});
-      b.classList.add('selected');b.querySelector('.pb-title').classList.add('sel');
-      selPassage=i;updateSidebarSummary();
+  const g = document.getElementById('passage-list');
+  g.innerHTML = '';
+
+  PASSAGES.forEach((p,i) => {
+    const b = document.createElement('button');
+    b.className = 'passage-btn' + (i === selPassage ? ' selected' : '');
+    b.innerHTML =
+      `<div class="pb-title${i === selPassage ? ' sel' : ''}">${esc(p.title)}</div>` +
+      `<div class="pb-meta">${esc(p.lines.join('').length)}자</div>`;
+    b.onclick = () => {
+      document.querySelectorAll('.passage-btn').forEach(e => {
+        e.classList.remove('selected');
+        const title = e.querySelector('.pb-title');
+        if(title) title.classList.remove('sel');
+      });
+      b.classList.add('selected');
+      const title = b.querySelector('.pb-title');
+      if(title) title.classList.add('sel');
+      selPassage = i;
+      updateSidebarSummary();
     };
     g.appendChild(b);
   });
+
   updateSidebarSummary();
 }
 
@@ -1450,82 +1578,145 @@ function onNickChange(){updateSidebarSummary();}
 
 /* 랭킹 로드 */
 function loadRankingAll(){
-  if(!GAS_URL||GAS_URL.includes('YOUR_GAS')){renderRanking(SAMPLE,null,'rank-list-body');renderRanking(SAMPLE,null,'rank-list-body-game');renderRanking(SAMPLE,null,'rank-list-body-result');updateTop1(SAMPLE);return;}
-  window['cb_all']=d=>{renderRanking(d,null,'rank-list-body');renderRanking(d,null,'rank-list-body-game');renderRanking(d,null,'rank-list-body-result');updateTop1(d);};
-  const s=document.createElement('script');
-  s.src=`${GAS_URL}?action=rank&callback=cb_all`;
-  s.onerror=()=>{renderRanking(SAMPLE,null,'rank-list-body');updateTop1(SAMPLE);};
-  document.head.appendChild(s);
-  setTimeout(()=>{if(document.getElementById('rank-list-body').querySelector('.rank-loading')){renderRanking(SAMPLE,null,'rank-list-body');renderRanking(SAMPLE,null,'rank-list-body-game');renderRanking(SAMPLE,null,'rank-list-body-result');updateTop1(SAMPLE);}},6000);
+  const fallback = err => renderFallbackRanking(err && err.message ? err.message : err);
+
+  requestGas('rank', {}, payload => {
+    const rows = normalizeRankRows(payload);
+    if(!rows.length){
+      fallback('시트에서 랭킹 데이터가 비어 있거나 응답 필드명이 맞지 않습니다.');
+      return;
+    }
+    renderRanking(rows, null, 'rank-list-body');
+    renderRanking(rows, null, 'rank-list-body-game');
+    renderRanking(rows, null, 'rank-list-body-result');
+    updateTop1(rows);
+  }, fallback);
 }
 
 function updateTop1(data){
-  if(!data||!data.length)return;
-  const top=data[0];
-  document.getElementById('top1-name').textContent=top.nickname;
-  document.getElementById('top1-score').textContent=top.score;
-  document.getElementById('challenge-msg').innerHTML=`<em>${top.nickname}</em>님의 ${top.score}점을 넘을 수 있을까요?`;
-  document.getElementById('ic-total').textContent=data.length;
-  document.getElementById('ic-top').textContent=Math.max(...data.map(r=>r.score||0));
-  document.getElementById('ic-avg').textContent=Math.round(data.reduce((s,r)=>s+(r.wpm||0),0)/data.length);
-  renderMainRanking(data);
+  const rows = normalizeRankRows(data);
+  if(!rows.length){
+    document.getElementById('top1-name').textContent='NO RECORD';
+    document.getElementById('top1-score').textContent='0';
+    document.getElementById('challenge-msg').innerHTML='<em>도전하시겠어요?</em>';
+    document.getElementById('ic-total').textContent='0';
+    document.getElementById('ic-top').textContent='0';
+    document.getElementById('ic-avg').textContent='0';
+    renderMainRanking([]);
+    return;
+  }
+
+  const top = rows[0];
+  document.getElementById('top1-name').textContent = top.nickname;
+  document.getElementById('top1-score').textContent = top.score;
+  document.getElementById('challenge-msg').innerHTML =
+    `<em>${esc(top.nickname)}</em>님의 ${esc(top.score)}점을 넘을 수 있을까요?`;
+
+  document.getElementById('ic-total').textContent = rows.length;
+  document.getElementById('ic-top').textContent = Math.max(...rows.map(r => num(r.score, 0)));
+  document.getElementById('ic-avg').textContent =
+    Math.round(rows.reduce((s,r) => s + num(r.wpm, 0), 0) / rows.length);
+
+  renderMainRanking(rows);
 }
 
 function renderMainRanking(data){
-  const body=document.getElementById('im-rank-body');
-  if(!body)return;
-  if(!data||!data.length){body.innerHTML='<div class="im-rank-loading">NO RECORD YET</div>';return;}
-  body.innerHTML='';
-  const medals=['🥇','🥈','🥉'];
-  data.slice(0,20).forEach((r,i)=>{
-    const row=document.createElement('div');
-    row.className='im-rank-row'+(i<3?' top3':'')+(r.nickname===nickname?' mine':'');
-    const nc=i<3?`im-rr-no n${i+1}`:'im-rr-no';
-    const charSvg=(typeof DOT_CHARS!=='undefined'&&DOT_CHARS.find(d=>d&&d.name===(r.char||r.charName||'')))?.svg||
-      `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="4" y="1" width="8" height="14" fill="#555"/></svg>`;
-    row.innerHTML=`
-      <span class="${nc}">${medals[i]||i+1}</span>
+  const body = document.getElementById('im-rank-body');
+  if(!body) return;
+
+  const rows = normalizeRankRows(data);
+  if(!rows.length){
+    body.innerHTML = '<div class="im-rank-loading">NO RECORD YET</div>';
+    return;
+  }
+
+  body.innerHTML = '';
+  const medals = ['🥇','🥈','🥉'];
+
+  rows.slice(0,20).forEach((r,i) => {
+    const row = document.createElement('div');
+    row.className = 'im-rank-row' + (i < 3 ? ' top3' : '') + (r.nickname === nickname ? ' mine' : '');
+    const nc = i < 3 ? `im-rr-no n${i+1}` : 'im-rr-no';
+    const charSvg = safeCharSvg(r.char);
+
+    row.innerHTML = `
+      <span class="${nc}">${medals[i] || i + 1}</span>
       <span class="im-rr-ch" style="width:28px;height:28px;display:inline-block;">${charSvg}</span>
-      <span class="im-rr-nick${i===0?' top':''}">${r.nickname}</span>
-      <span class="im-rr-stage">${shortPassage(r.passage)}</span>
-      <span class="im-rr-sc">${r.score}</span>
-      <span class="im-rr-wpm">${r.wpm}</span>
-      <span class="im-rr-acc">${r.acc||'—'}%</span>`;
+      <span class="im-rr-nick${i === 0 ? ' top' : ''}">${esc(r.nickname)}</span>
+      <span class="im-rr-stage">${esc(shortPassage(r.passage))}</span>
+      <span class="im-rr-sc">${esc(r.score)}</span>
+      <span class="im-rr-wpm">${esc(r.wpm)}</span>
+      <span class="im-rr-acc">${r.acc ? esc(r.acc) : '—'}%</span>`;
     body.appendChild(row);
   });
 }
 
-function renderRanking(data,myNick,bodyId){
-  const body=document.getElementById(bodyId);if(!body)return;
-  if(typeof DOT_CHARS==='undefined'){console.warn('DOT_CHARS not ready');return;}
-  if(!data||!data.length){body.innerHTML='<div class="rank-loading">NO RECORD</div>';return;}
-  body.innerHTML='';
-  const medals=['🥇','🥈','🥉'];
-  data.slice(0,20).forEach((r,i)=>{
-    const row=document.createElement('div');
-    row.className='rank-row'+(r.nickname===myNick?' mine':'');
-    const nc=i<3?`rr-no n${i+1}`:'rr-no';
-    const cSvg=(typeof DOT_CHARS!=='undefined'&&DOT_CHARS.find(d=>d&&d.name===(r.char||r.charName||'')))?.svg||(typeof DOT_CHARS!=='undefined'?DOT_CHARS[0].svg:'');
-    row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="rr-ch" style="width:20px;height:20px;display:inline-block;">${cSvg}</span><span class="rr-nick${i===0?' top':''}">${r.nickname}</span><span class="rr-sc">${r.score}</span><span class="rr-wpm">${r.wpm}</span>`;
+function renderRanking(data, myNick, bodyId){
+  const body = document.getElementById(bodyId);
+  if(!body) return;
+
+  const rows = normalizeRankRows(data);
+  if(!rows.length){
+    body.innerHTML = '<div class="rank-loading">NO RECORD</div>';
+    return;
+  }
+
+  body.innerHTML = '';
+  const medals = ['🥇','🥈','🥉'];
+
+  rows.slice(0,20).forEach((r,i) => {
+    const row = document.createElement('div');
+    row.className = 'rank-row' + (r.nickname === myNick ? ' mine' : '');
+    const nc = i < 3 ? `rr-no n${i+1}` : 'rr-no';
+    const cSvg = safeCharSvg(r.char);
+
+    row.innerHTML =
+      `<span class="${nc}">${medals[i] || i + 1}</span>` +
+      `<span class="rr-ch" style="width:20px;height:20px;display:inline-block;">${cSvg}</span>` +
+      `<span class="rr-nick${i === 0 ? ' top' : ''}">${esc(r.nickname)}</span>` +
+      `<span class="rr-sc">${esc(r.score)}</span>` +
+      `<span class="rr-wpm">${esc(r.wpm)}</span>`;
     body.appendChild(row);
   });
 }
 
 /* 게임 시작 */
 function startGame(){
-  nickname=document.getElementById('nick-input').value.trim()||'PLAYER';
+  clearInterval(demoTimerIv);
+  clearInterval(demoTypeIv);
+
+  nickname = document.getElementById('nick-input').value.trim() || 'PLAYER';
   updateSidebarSummary();
   closeSetupPopup();
-  const char=CHARS[selChar],passage=PASSAGES[selPassage];
-  lines=[...passage.lines];curLine=0;lineTyped='';
-  correctChars=0;totalTyped=0;startTime=null;timeLeft=TIME_LIMIT;gameEnded=false;
-  document.getElementById('gt-sub').textContent=passage.title;
-  document.getElementById('res-avatar').innerHTML=char.svg||char.emoji;
-  buildLines();showScreen('game-screen');
-  clearInterval(timerIv);updateTimerDisplay();
-  const inp=document.getElementById('hidden-input');
-  inp.value='';inp.disabled=false;inp.oninput=onInput;inp.onkeydown=onKeyDown;
-  inp.focus();setTimeout(()=>inp.focus(),100);setTimeout(()=>inp.focus(),300);
+
+  const char = CHARS[selChar];
+  const passage = PASSAGES[selPassage];
+
+  lines = [...passage.lines];
+  curLine = 0;
+  lineTyped = '';
+  correctChars = 0;
+  totalTyped = 0;
+  startTime = null;
+  timeLeft = TIME_LIMIT;
+  gameEnded = false;
+
+  document.getElementById('gt-sub').textContent = passage.title;
+  document.getElementById('res-avatar').innerHTML = char.svg || char.emoji;
+
+  buildLines();
+  showScreen('game-screen');
+  clearInterval(timerIv);
+  updateTimerDisplay();
+
+  const inp = document.getElementById('hidden-input');
+  inp.value = '';
+  inp.disabled = false;
+  inp.oninput = onInput;
+  inp.onkeydown = onKeyDown;
+  inp.focus();
+  setTimeout(() => inp.focus(), 100);
+  setTimeout(() => inp.focus(), 300);
 }
 
 function buildLines(){
@@ -1547,34 +1738,35 @@ function buildLines(){
   document.getElementById('stat-page').textContent=`${curLine+1} / ${lines.length}`;
 }
 
-function renderActiveLine(el,typed,target){
-  let h='';
-  for(let i=0;i<target.length;i++){
-    const tch=target[i]===' '?'&nbsp;':target[i]; // 원문 글자
-    if(i<typed.length){
-      const correct=typed[i]===target[i];
-      const uch=typed[i]===' '?'&nbsp;':typed[i]; // 실제 입력한 글자
+function renderActiveLine(el, typed, target){
+  let h = '';
+
+  for(let i = 0; i < target.length; i++){
+    const tch = escChar(target[i]);
+
+    if(i < typed.length){
+      const correct = typed[i] === target[i];
+      const uch = escChar(typed[i]);
+
       if(correct){
-        // 정타: 원문 글자를 녹색으로
-        h+=`<span class="ch-ok">${tch}</span>`;
-      } else {
-        // 오타: 실제 입력한 글자를 빨간색으로 보여줌
-        h+=`<span class="ch-err" title="${tch}">${uch}</span>`;
+        h += `<span class="ch-ok">${tch}</span>`;
+      }else{
+        h += `<span class="ch-err" title="${tch}">${uch}</span>`;
       }
-    } else if(i===typed.length){
-      h+=`<span class="ch-cur">${tch}</span>`;
-    } else {
-      h+=`<span class="ch-pend">${tch}</span>`;
+    }else if(i === typed.length){
+      h += `<span class="ch-cur">${tch}</span>`;
+    }else{
+      h += `<span class="ch-pend">${tch}</span>`;
     }
   }
-  // 목표 길이 초과 입력 (빨간색)
-  if(typed.length>target.length){
-    for(let i=target.length;i<typed.length;i++){
-      const uch=typed[i]===' '?'&nbsp;':typed[i];
-      h+=`<span class="ch-err">${uch}</span>`;
+
+  if(typed.length > target.length){
+    for(let i = target.length; i < typed.length; i++){
+      h += `<span class="ch-err">${escChar(typed[i])}</span>`;
     }
   }
-  el.innerHTML=h;
+
+  el.innerHTML = h;
 }
 
 function onInput(){
@@ -1622,84 +1814,136 @@ function updateTimerDisplay(){
 }
 
 function endGame(){
-  if(gameEnded)return;
-  gameEnded=true;clearInterval(timerIv);
-  document.getElementById('hidden-input').disabled=true;
-  const el=startTime?(Date.now()-startTime)/60000:TIME_LIMIT/60;
-  const wpm=el>0?Math.round((correctChars/2)/el):0;
-  const acc=totalTyped>0?Math.round((correctChars/totalTyped)*100):0;
-  const score=Math.round(wpm*(acc/100));
-  const comment=score>=150?'PERFECT! SAFETY LAW MASTER!':score>=100?'EXCELLENT! TOP RANKER!':score>=60?'GOOD JOB! KEEP IT UP!':score>=30?'NICE TRY! STUDY MORE!':'GAME OVER. TRY AGAIN!';
-  document.getElementById('res-name').textContent=nickname;
-  document.getElementById('res-sub2').textContent=PASSAGES[selPassage].title;
-  document.getElementById('res-score').textContent=score;
-  document.getElementById('res-wpm').textContent=wpm;
-  document.getElementById('res-acc').textContent=acc+'%';
-  document.getElementById('res-chars').textContent=correctChars;
-  document.getElementById('res-comment').textContent=comment;
-  document.getElementById('res-formula').textContent=`${wpm} WPM × ${acc}% ÷ 100 = ${score}pts`;
+  if(gameEnded) return;
+  gameEnded = true;
+  clearInterval(timerIv);
+  document.getElementById('hidden-input').disabled = true;
+
+  let finalCorrect = correctChars;
+  let finalTyped = totalTyped;
+
+  if(curLine < lines.length && lineTyped){
+    const target = lines[curLine] || '';
+    for(let i = 0; i < Math.min(lineTyped.length, target.length); i++){
+      if(lineTyped[i] === target[i]) finalCorrect++;
+    }
+    finalTyped += lineTyped.length;
+  }
+
+  const elapsed = startTime ? (Date.now() - startTime) / 60000 : TIME_LIMIT / 60;
+  const wpm = elapsed > 0 ? Math.round((finalCorrect / 2) / elapsed) : 0;
+  const acc = finalTyped > 0 ? Math.round((finalCorrect / finalTyped) * 100) : 0;
+  const score = Math.round(wpm * (acc / 100));
+  const comment = score >= 150 ? 'PERFECT! SAFETY LAW MASTER!' :
+                  score >= 100 ? 'EXCELLENT! TOP RANKER!' :
+                  score >= 60 ? 'GOOD JOB! KEEP IT UP!' :
+                  score >= 30 ? 'NICE TRY! STUDY MORE!' :
+                  'GAME OVER. TRY AGAIN!';
+
+  document.getElementById('res-name').textContent = nickname;
+  document.getElementById('res-sub2').textContent = PASSAGES[selPassage].title;
+  document.getElementById('res-score').textContent = score;
+  document.getElementById('res-wpm').textContent = wpm;
+  document.getElementById('res-acc').textContent = acc + '%';
+  document.getElementById('res-chars').textContent = finalCorrect;
+  document.getElementById('res-comment').textContent = comment;
+  document.getElementById('res-formula').textContent = `${wpm} WPM × ${acc}% ÷ 100 = ${score}pts`;
+
   showScreen('result-screen');
   spawnParticles();
-  saveScore({nickname,charEmoji:CHARS[selChar].svg,charName:CHARS[selChar].name,wpm,acc,score,passage:PASSAGES[selPassage].title});
-  // 결과 랭킹 갱신
-  setTimeout(()=>{
-    window['cb_result']=d=>{
-      renderRanking(d,nickname,'rank-list-body-result');
-      let myPos='UNRANKED';
-      d.slice(0,20).forEach((r,i)=>{if(r.nickname===nickname)myPos=(i+1)+'위';});
-      document.getElementById('res-rank-pos').textContent=myPos;
-      // 결과화면 랭킹 표시
-      document.getElementById('res-rank-loading').style.display='none';
-      document.getElementById('res-rank-list').style.display='block';
-    };
-    if(!GAS_URL||GAS_URL.includes('YOUR_GAS')){renderRanking(SAMPLE,nickname,'rank-list-body-result');return;}
-    const s=document.createElement('script');s.src=`${GAS_URL}?action=rank&callback=cb_result`;document.head.appendChild(s);
-  },1200);
+
+  const scoreData = {
+    nickname,
+    charEmoji: CHARS[selChar].svg,
+    charName: CHARS[selChar].name,
+    wpm,
+    acc,
+    score,
+    passage: PASSAGES[selPassage].title
+  };
+
+  saveScore(scoreData);
+
+  setTimeout(() => {
+    requestGas('rank', {}, payload => {
+      const rows = normalizeRankRows(payload);
+      const viewRows = rows.length ? rows : SAMPLE;
+      renderRanking(viewRows, nickname, 'rank-list-body-result');
+      renderRanking(viewRows, nickname, 'rank-list-body-game');
+      renderRanking(viewRows, nickname, 'rank-list-body');
+      renderMainRanking(viewRows);
+      updateTop1(viewRows);
+
+      let myPos = 'UNRANKED';
+      normalizeRankRows(viewRows).slice(0,20).forEach((r,i) => {
+        if(r.nickname === nickname && num(r.score) === score) myPos = (i + 1) + '위';
+      });
+      document.getElementById('res-rank-pos').textContent = myPos;
+    }, err => {
+      console.warn('[결과 랭킹 재조회 실패]', err);
+      const fallbackRows = normalizeRankRows([scoreData, ...SAMPLE]);
+      renderRanking(fallbackRows, nickname, 'rank-list-body-result');
+      document.getElementById('res-rank-pos').textContent = 'LOCAL';
+    });
+  }, 1200);
 }
 
 function saveScore(d){
-  if(!GAS_URL||GAS_URL.includes('YOUR_GAS'))return;
-  // GAS는 CORS 미지원 → JSONP 방식으로 저장
-  const cbName='cb_save_'+Date.now();
-  window[cbName]=function(res){
-    console.log('저장 결과:', res);
-    delete window[cbName];
-    if(s.parentNode)s.parentNode.removeChild(s);
-  };
-  const params=[
-    'action=save',
-    'callback='+cbName,
-    'nickname='+encodeURIComponent(d.nickname),
-    'char='+encodeURIComponent(d.charName||d.charEmoji||''),
-    'wpm='+d.wpm,
-    'acc='+d.acc,
-    'score='+d.score,
-    'passage='+encodeURIComponent(d.passage)
-  ].join('&');
-  const s=document.createElement('script');
-  s.src=GAS_URL+'?'+params;
-  s.onerror=()=>{console.warn('GAS 저장 실패');delete window[cbName];};
-  document.head.appendChild(s);
-  // 5초 후 자동 정리
-  setTimeout(()=>{delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);},5000);
+  if(!GAS_URL || GAS_URL.includes('YOUR_GAS')) return;
+
+  requestGas('save', {
+    nickname: d.nickname,
+    char: d.charName || d.charEmoji || '',
+    wpm: d.wpm,
+    acc: d.acc,
+    score: d.score,
+    passage: d.passage
+  }, res => {
+    console.log('[GAS 저장 결과]', res);
+  }, err => {
+    console.warn('[GAS 저장 실패]', err);
+  });
 }
 
 function loadOvRanking(){
-  document.getElementById('ov-loading').style.display='block';
-  document.getElementById('ov-rank-list').style.display='none';
-  if(!GAS_URL||GAS_URL.includes('YOUR_GAS')){renderOvRanking(SAMPLE);return;}
-  window['cb_ov']=d=>renderOvRanking(d);
-  const s=document.createElement('script');s.src=`${GAS_URL}?action=rank&callback=cb_ov`;s.onerror=()=>renderOvRanking(SAMPLE);document.head.appendChild(s);
+  document.getElementById('ov-loading').style.display = 'block';
+  document.getElementById('ov-rank-list').style.display = 'none';
+
+  requestGas('rank', {}, payload => {
+    const rows = normalizeRankRows(payload);
+    renderOvRanking(rows.length ? rows : SAMPLE);
+  }, err => {
+    console.warn('[오버레이 랭킹 실패]', err);
+    renderOvRanking(SAMPLE);
+  });
 }
 function renderOvRanking(data){
-  document.getElementById('ov-loading').style.display='none';
-  document.getElementById('ov-rank-list').style.display='block';
-  const body=document.getElementById('ov-rank-body');body.innerHTML='';
-  const medals=['🥇','🥈','🥉'];
-  data.slice(0,20).forEach((r,i)=>{
-    const row=document.createElement('div');row.className='ov-rank-row';
-    const nc=i<3?`rr-no n${i+1}`:'rr-no';
-    row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="rr-ch">${r.char||'⛑️'}</span><span class="rr-nick${i===0?' top':''}">${r.nickname}</span><span style="font-size:17px;color:var(--lo);">${shortPassage(r.passage)}</span><span class="rr-sc">${r.score}</span><span class="rr-wpm">${r.wpm}</span>`;
+  document.getElementById('ov-loading').style.display = 'none';
+  document.getElementById('ov-rank-list').style.display = 'block';
+
+  const body = document.getElementById('ov-rank-body');
+  body.innerHTML = '';
+
+  const rows = normalizeRankRows(data);
+  if(!rows.length){
+    body.innerHTML = '<div class="rank-loading">NO RECORD</div>';
+    return;
+  }
+
+  const medals = ['🥇','🥈','🥉'];
+
+  rows.slice(0,20).forEach((r,i) => {
+    const row = document.createElement('div');
+    row.className = 'ov-rank-row';
+    const nc = i < 3 ? `rr-no n${i+1}` : 'rr-no';
+
+    row.innerHTML =
+      `<span class="${nc}">${medals[i] || i + 1}</span>` +
+      `<span class="rr-ch" style="width:20px;height:20px;display:inline-block;">${safeCharSvg(r.char)}</span>` +
+      `<span class="rr-nick${i === 0 ? ' top' : ''}">${esc(r.nickname)}</span>` +
+      `<span style="font-size:17px;color:var(--lo);">${esc(shortPassage(r.passage))}</span>` +
+      `<span class="rr-sc">${esc(r.score)}</span>` +
+      `<span class="rr-wpm">${esc(r.wpm)}</span>`;
     body.appendChild(row);
   });
 }
@@ -1711,7 +1955,14 @@ function showScreen(id){
   const el=document.getElementById(id);el.style.display='flex';el.classList.add('active');
 }
 function focusInput(){const inp=document.getElementById('hidden-input');if(inp&&!inp.disabled)inp.focus();}
-function goIntro(){clearInterval(timerIv);showScreen('intro-screen');loadRankingAll();}
+function goIntro(){
+  clearInterval(timerIv);
+  clearInterval(demoTimerIv);
+  clearInterval(demoTypeIv);
+  showScreen('intro-screen');
+  loadRankingAll();
+  startDemo();
+}
 function restartGame(){openSetupPopup();}
 function spawnParticles(){
   const c=document.getElementById('particles');c.innerHTML='';
