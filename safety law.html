@@ -1,11 +1,9 @@
-
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산업안전보건법 타이핑 훈련 대회</title>
+<title>천하제일 산업안전보건법 타이핑 대회</title>
 <!-- fixed: GAS JSONP callback / record fallback / DOM error patch -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
@@ -137,15 +135,17 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background:var(--bg2);overflow:hidden;position:relative;
 }
 /* ── 타이틀 섹션 (2번 영역) ── */
+/* ★ 수정1: align-items:stretch → align-items:flex-end (글자를 하단/박스 가까이) */
 .im-title-section{
   flex-shrink:0;background:#000;
   border-bottom:3px solid var(--hi);
-  padding:0;display:flex;align-items:stretch;
+  padding:0;display:flex;align-items:flex-end;
   position:relative;overflow:hidden;
 }
 /* 타이틀 좌측 — 전체 너비 */
+/* ★ 수정2: 상단 패딩 축소 (14px→4px) — 텍스트를 아래쪽으로 밀착 */
 .im-title-left{
-  flex:1;padding:14px 28px 18px;
+  flex:1;padding:4px 28px 18px;
   display:flex;flex-direction:column;justify-content:flex-end;gap:6px;
 }
 /* 별 데코 줄 */
@@ -156,11 +156,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .im-deco-stars::before,.im-deco-stars::after{
   content:'';flex:1;height:1px;background:var(--dim);
 }
-/* 메인 타이틀 */
+/* ★ 수정3: 메인 타이틀 폰트 크기 축소 54px→34px */
 .im-title{
   font-family:'DOSGothic','DungGeunMo',sans-serif;
-  font-size:54px;color:var(--hi);
-  letter-spacing:6px;line-height:1.3;
+  font-size:34px;color:var(--hi);
+  letter-spacing:4px;line-height:1.3;
   text-shadow:0 0 24px rgba(255,255,255,0.5),0 0 48px rgba(255,255,255,0.15);
   animation:titleFlicker 5s infinite;
   text-align:center;
@@ -208,12 +208,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   z-index:10;
   display:flex;flex-direction:column;align-items:center;gap:10px;
   pointer-events:auto;
-  /* 배경 없음 — 데모 위에 떠있는 느낌 */
 }
 .im-body{
   flex:1;display:grid;grid-template-columns:1fr 1fr;
   min-height:0;overflow:hidden;
-  position:relative;  /* 오버레이 기준 */
+  position:relative;
 }
 .challenge-msg{
   font-family:'Press Start 2P',monospace;font-size:18px;
@@ -310,14 +309,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .im-rr-wpm{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--lo);text-align:right;}
 .im-rr-acc{font-size:13px;color:var(--lo);text-align:right;font-family:'DOSGothic',monospace;}
 .im-rank-loading{padding:18px;text-align:center;font-family:'Press Start 2P',monospace;font-size:11px;color:var(--lo);letter-spacing:2px;animation:blink 1s step-end infinite;}
-/* 배경 장식 코너 */
-.corner-deco{display:none;}
-.corner-deco.tl{top:16px;left:20px;}
-.corner-deco.tr{top:16px;right:20px;}
-.corner-deco.bl{bottom:16px;left:20px;}
-.corner-deco.br{bottom:16px;right:20px;}
 
-/* 상단 데코라인 */
 .deco-line{
   display:flex;align-items:center;gap:14px;
   font-family:'Press Start 2P',monospace;font-size:14px;color:var(--lo);letter-spacing:2px;
@@ -325,7 +317,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 }
 .deco-line::before,.deco-line::after{content:'';flex:1;height:1px;background:var(--dim);}
 
-/* 메인 타이틀 */
 .main-title{
   font-family:'Press Start 2P',monospace;font-size:26px;
   color:var(--hi);letter-spacing:2px;text-align:center;line-height:1.6;
@@ -339,7 +330,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   margin-bottom:32px;
 }
 
-/* 1위 박스 */
 .top1-box{
   width:100%;max-width:480px;
   background:var(--panel);border:1px solid var(--dim2);
@@ -358,31 +348,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .t1-score{font-family:'Press Start 2P',monospace;font-size:28px;color:var(--hi);text-shadow:0 0 12px rgba(255,255,255,0.25);}
 .t1-점{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--lo);letter-spacing:2px;margin-top:4px;}
 
-/* 도전 텍스트 */
-.challenge-msg{
-  font-family:'Press Start 2P',monospace;font-size:15px;
-  color:var(--mid);letter-spacing:1px;text-align:center;
-  margin-bottom:28px;line-height:2;
-}
-.challenge-msg em{color:var(--hi);font-style:normal;animation:blink 1.5s step-end infinite;font-family:'DOSGothic','DungGeunMo',monospace;}
-
-/* 훈련 시작 버튼 */
-.start-action-btn{
-  padding:18px 56px;
-  font-family:'Press Start 2P',monospace;font-size:18px;letter-spacing:3px;
-  background:#000;color:var(--hi);border:2px solid var(--hi);
-  cursor:pointer;position:relative;overflow:hidden;
-  animation:startGlow 2s ease-in-out infinite;
-  transition:all .12s;
-}
-.start-action-btn::before{
-  content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);
-  animation:shine 2.5s ease-in-out infinite;
-}
-.start-action-btn:hover{background:var(--hi);color:#000;}
-.start-action-btn:active{transform:scale(.98);}
-
 .deco-line-bottom{
   display:flex;align-items:center;gap:14px;
   font-family:'Press Start 2P',monospace;font-size:14px;color:var(--lo);letter-spacing:1px;
@@ -390,7 +355,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 }
 .deco-line-bottom::before,.deco-line-bottom::after{content:'';flex:1;height:1px;background:var(--dim);}
 
-/* 하단 통계 바 */
 .stats-row{
   display:flex;gap:28px;margin-top:12px;
   font-family:'Press Start 2P',monospace;font-size:14px;color:var(--lo);letter-spacing:1px;
@@ -416,7 +380,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   max-height:90vh;
 }
 
-/* 팝업 헤더 */
 .popup-header{
   background:var(--panel);border-bottom:2px solid var(--dim);
   padding:16px 22px;display:flex;align-items:center;justify-content:space-between;
@@ -430,14 +393,12 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 }
 .popup-close:hover{border-color:var(--mid);color:var(--mid);}
 
-/* 팝업 바디 */
 .popup-body{padding:22px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;}
 .popup-body::-webkit-scrollbar{width:3px;}
 .popup-body::-webkit-scrollbar-thumb{background:var(--dim2);}
 
 .pop-label{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--lo);letter-spacing:2px;margin-bottom:8px;}
 
-/* 닉네임 입력 */
 .nick-input{
   width:100%;padding:12px 14px;
   font-family:'DOSGothic','DungGeunMo',monospace;font-size:18px;font-weight:700;
@@ -448,7 +409,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .nick-input::placeholder{color:var(--lo);}
 .nick-input:focus{border-color:var(--mid);}
 
-/* 캐릭터 그리드 */
 .char-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
 .char-btn{
   background:var(--panel);border:1px solid var(--dim);
@@ -462,7 +422,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .char-btn:hover .char-emoji,.char-btn.selected .char-emoji{filter:grayscale(0);}
 .char-name{font-family:'DOSGothic','DungGeunMo',monospace;font-size:12px;color:var(--mid);}
 
-/* 스테이지 선택 */
 .passage-list{display:flex;flex-direction:column;gap:4px;}
 .passage-btn{
   background:var(--panel);border:1px solid var(--dim);
@@ -476,7 +435,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .pb-title.sel{color:var(--hi);}
 .pb-meta{font-size:13px;color:var(--lo);margin-top:2px;}
 
-/* 팝업 하단 */
 .popup-footer{
   border-top:2px solid var(--dim);padding:16px 22px;flex-shrink:0;
   display:flex;gap:10px;
@@ -560,7 +518,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   gap:0;padding:0;
 }
 
-/* 훈련 종료 헤더 — 크게 */
 .result-arcade-hd{
   text-align:center;padding:28px 0 20px;
   border-bottom:1px solid var(--dim);
@@ -578,7 +535,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   letter-spacing:3px;margin-top:10px;
 }
 
-/* 예시어 행 */
 .result-user-row{
   display:flex;align-items:center;gap:24px;
   padding:20px 48px;border-bottom:1px solid var(--dim);
@@ -592,7 +548,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .result-name{font-family:'DOSGothic','DungGeunMo',monospace;font-size:28px;color:var(--hi);line-height:1.4;}
 .result-sub2{font-size:18px;color:var(--mid);margin-top:4px;font-family:'DOSGothic','DungGeunMo',monospace;}
 
-/* 스탯 박스 — 풀너비 크게 */
 .result-stats{
   display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;
   gap:0;border-bottom:1px solid var(--dim);
@@ -610,7 +565,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .rs-val.big{font-size:52px;text-shadow:0 0 24px rgba(255,255,255,0.45);}
 .rs-label{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--lo);margin-top:12px;letter-spacing:1px;}
 
-/* 코멘트 */
 .result-comment{
   padding:20px 48px;border-bottom:1px solid var(--dim);
   background:#000;
@@ -623,7 +577,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   font-family:'DOSGothic','DungGeunMo',monospace;font-size:14px;color:var(--lo);
 }
 
-/* 버튼 행 — 풀너비 절반씩 */
 .result-btns{display:grid;grid-template-columns:1fr 1fr;gap:0;flex-shrink:0;}
 .rb-retry{
   padding:22px;font-family:'Press Start 2P',monospace;
@@ -663,20 +616,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 </style>
 </head>
 <body>
-<!-- 폰트 강제 프리로드 -->
 <span style="position:fixed;top:-999px;left:-999px;font-family:'DOSGothic',monospace;font-size:1px;opacity:0;">산업안전보건법타이핑도장가나다라마바사아자차카타파하</span>
 <span style="position:fixed;top:-999px;left:-999px;font-family:'DungGeunMo',monospace;font-size:1px;opacity:0;">산업안전보건법타이핑도장</span>
 <div id="particles"></div>
 
-<!-- ══════════════════════════════════════════════
-     INTRO 화면
-══════════════════════════════════════════════ -->
+<!-- INTRO 화면 -->
 <div id="intro-screen" class="screen active">
   <div class="layout">
-
-    <!-- 좌측 고정 사이드바 -->
     <div class="sidebar">
-      <!-- 현재 선택 요약 -->
       <div class="sb-current">
         <div class="sb-cur-label">▶ 현재 사용자</div>
         <div class="sb-cur-user">
@@ -691,7 +638,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           <span id="sb-stage-intro">스테이지 미선택</span>
         </div>
       </div>
-      <!-- 랭킹 -->
       <div class="sb-ranking">
         <div class="sb-rank-header">BEST RECORDS</div>
         <div class="rank-scroll">
@@ -705,19 +651,18 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </div>
     </div>
 
-    <!-- 메인 영역 -->
     <div class="main-area">
       <div class="intro-main">
 
-        <!-- ② 타이틀 섹션 -->
+        <!-- ★ 수정: align-items:flex-end + padding-top 축소 적용됨 (CSS에서) -->
         <div class="im-title-section">
           <div class="im-title-left">
             <div class="im-deco-stars">★ ★ ★ BEST RECORD ★ ★ ★</div>
-            <div class="im-title">산업안전보건법 타이핑 </div>
+            <!-- ★ 수정: 텍스트 변경 + font-size:34px (CSS에서) -->
+            <div class="im-title">천하제일 산업안전보건법 타이핑 대회</div>
             <div class="im-sub">SAFETY LAW TYPING TRAINING</div>
           </div>
           <div class="im-title-right">
-            <!-- 1위 하이라이트 -->
             <div class="im-top1-wrap">
               <div class="im-top1-trophy-svg">
                 <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%">
@@ -743,10 +688,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           </div>
         </div>
 
-        <!-- ③ 데모 예시 + ④ 랭킹 — 훈련 시작이 가운데 오버레이로 -->
         <div class="im-body">
-
-          <!-- 훈련 시작 가운데 오버레이 -->
           <div class="im-start-section">
             <div class="challenge-msg" id="challenge-msg"><em>도전하시겠어요?</em></div>
             <button class="start-action-btn" onclick="openSetupPopup()">
@@ -774,7 +716,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
             </div>
           </div>
 
-          <!-- 데모 예시 -->
           <div class="im-demo">
             <div class="im-demo-header">
               <span class="im-demo-title">▶ 예시 화면</span>
@@ -804,7 +745,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
             </div>
           </div>
 
-          <!-- 랭킹 TOP 20 -->
           <div class="im-ranking">
             <div class="im-rank-title">
               <span class="im-rank-title-deco">★</span>
@@ -823,21 +763,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════
-     TRAINING 화면
-══════════════════════════════════════════════ -->
+<!-- TRAINING 화면 -->
 <div id="training-screen" class="screen">
   <div class="layout">
-
-    <!-- 좌측 고정 사이드바 (훈련 중) -->
     <div class="sidebar">
       <div class="sb-current">
         <div class="sb-cur-label">▶ 사용자</div>
@@ -866,7 +800,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </div>
     </div>
 
-    <!-- 훈련 메인 -->
     <div class="main-area">
       <div class="training-main-area">
         <div class="training-topbar">
@@ -918,13 +851,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════
-     결과 화면
-══════════════════════════════════════════════ -->
+<!-- 결과 화면 -->
 <div id="result-screen" class="screen">
   <div class="layout">
-
-    <!-- 좌측 고정 사이드바 (결과) -->
     <div class="sidebar">
       <div class="sb-current">
         <div class="sb-cur-label">▶ 결과</div>
@@ -953,7 +882,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       </div>
     </div>
 
-    <!-- 결과 메인 -->
     <div class="main-area">
       <div class="result-main-area">
         <div class="result-topbar">
@@ -963,7 +891,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <div class="result-content">
           <div class="result-arcade-hd">
             <div class="rah-main">훈련 종료</div>
-            <div class="rah-sub" id="rah-sub">산업안전보건 타이핑 훈련 대회</div>
+            <div class="rah-sub" id="rah-sub">천하제일 산업안전보건법 타이핑 대회</div>
           </div>
           <div class="result-user-row">
             <div class="result-avatar" id="res-avatar">⛑️</div>
@@ -988,18 +916,15 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
           </div>
           <div class="result-btns">
             <button class="rb-retry" onclick="restartTraining()">▶ 다시 훈련</button>
-            <button class="rb-home" onclick="goIntro()"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:28px;height:28px;vertical-align:middle;margin-right:10px;flex-shrink:0;"><rect x="7" y="1" width="2" height="1" fill="currentColor"/><rect x="5" y="2" width="6" height="1" fill="currentColor"/><rect x="3" y="3" width="10" height="1" fill="currentColor"/><rect x="1" y="4" width="14" height="1" fill="currentColor"/><rect x="2" y="5" width="12" height="1" fill="currentColor"/><rect x="3" y="6" width="10" height="8" fill="currentColor"/><rect x="4" y="5" width="8" height="1" fill="currentColor"/><rect x="6" y="9" width="4" height="5" fill="#000"/><rect x="6" y="9" width="4" height="5" fill="none" stroke="currentColor" stroke-width="0"/><rect x="3" y="6" width="4" height="4" fill="#000" opacity="0.4"/><rect x="9" y="6" width="4" height="4" fill="#000" opacity="0.4"/></svg> 처음으로</button>
+            <button class="rb-home" onclick="goIntro()"><svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:28px;height:28px;vertical-align:middle;margin-right:10px;flex-shrink:0;"><rect x="7" y="1" width="2" height="1" fill="currentColor"/><rect x="5" y="2" width="6" height="1" fill="currentColor"/><rect x="3" y="3" width="10" height="1" fill="currentColor"/><rect x="1" y="4" width="14" height="1" fill="currentColor"/><rect x="2" y="5" width="12" height="1" fill="currentColor"/><rect x="3" y="6" width="10" height="8" fill="currentColor"/><rect x="4" y="5" width="8" height="1" fill="currentColor"/><rect x="6" y="9" width="4" height="5" fill="#000"/><rect x="3" y="6" width="4" height="4" fill="#000" opacity="0.4"/><rect x="9" y="6" width="4" height="4" fill="#000" opacity="0.4"/></svg> 처음으로</button>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════
-     설정 팝업
-══════════════════════════════════════════════ -->
+<!-- 설정 팝업 -->
 <div id="setup-popup">
   <div class="popup-card">
     <div class="popup-header">
@@ -1007,17 +932,14 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
       <button class="popup-close" onclick="closeSetupPopup()">✕</button>
     </div>
     <div class="popup-body">
-      <!-- 닉네임 -->
       <div>
         <div class="pop-label">사용자 이름</div>
         <input class="nick-input" id="nick-input" type="text" placeholder="닉네임을 입력하세요..." maxlength="12">
       </div>
-      <!-- 캐릭터 -->
       <div>
         <div class="pop-label">CHARACTER</div>
         <div class="char-grid" id="char-grid"></div>
       </div>
-      <!-- 스테이지 -->
       <div>
         <div class="pop-label">SELECT 단계</div>
         <div class="passage-list" id="passage-list"></div>
@@ -1050,7 +972,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbwry3taI8EQxe6eMl5iCp16CwNJPQkfjHomCif75afQvrswOkzNTn8rEj2QUdY6Yn9B/exec';
 
-/* ── 도트 픽셀 SVG 캐릭터 ── */
 const DOT_CHARS=[
   {name:'안전모', svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%">
     <rect x="5" y="1" width="6" height="1" fill="#FFD700"/>
@@ -1268,32 +1189,14 @@ let startTime=null,timerIv=null;
 const TIME_LIMIT=60;
 let timeLeft=TIME_LIMIT,trainingEnded=false;
 
-/* ═══════════════════════════════════════
-   GAS/시트 연동 안정화 유틸
-   - HTML은 JSONP 방식으로 GAS를 호출합니다.
-   - GAS doGet은 callback 파라미터가 있을 때 반드시 callback({...}) 형태로 응답해야 합니다.
-═══════════════════════════════════════ */
 const GAS_TIMEOUT_MS = 8000;
 
 function esc(v){
-  return String(v ?? '').replace(/[&<>"']/g, m => ({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#39;'
-  }[m]));
+  return String(v ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
-function escChar(ch){
-  return ch === ' ' ? '&nbsp;' : esc(ch);
-}
-function nvl(v, fallback=''){
-  return v === undefined || v === null || v === '' ? fallback : v;
-}
-function num(v, fallback=0){
-  const n = Number(v);
-  return Number.isFinite(n) ? n : fallback;
-}
+function escChar(ch){return ch === ' ' ? '&nbsp;' : esc(ch);}
+function nvl(v, fallback=''){return v === undefined || v === null || v === '' ? fallback : v;}
+function num(v, fallback=0){const n = Number(v);return Number.isFinite(n) ? n : fallback;}
 function safeCharSvg(charName){
   const key = String(charName || '').trim();
   const found = DOT_CHARS.find(d => d && d.name === key);
@@ -1301,12 +1204,10 @@ function safeCharSvg(charName){
 }
 function normalizeRankRows(payload){
   let rows = payload;
-
   if(payload && !Array.isArray(payload)){
     rows = payload.data || payload.rows || payload.list || payload.rank || payload.ranking || payload.result || [];
   }
   if(!Array.isArray(rows)) rows = [];
-
   return rows.map(r => ({
     nickname: String(nvl(r.nickname, nvl(r.name, nvl(r.user, '사용자')))).trim().slice(0, 20),
     char: String(nvl(r.char, nvl(r.charName, nvl(r.character, '안전모')))).trim(),
@@ -1325,49 +1226,26 @@ function buildQuery(params){
     .join('&');
 }
 function requestGas(action, params={}, onSuccess=()=>{}, onFail=()=>{}){
-  if(!GAS_URL || GAS_URL.includes('YOUR_GAS')){
-    onFail(new Error('GAS_URL이 설정되지 않았습니다.'));
-    return;
-  }
-
+  if(!GAS_URL || GAS_URL.includes('YOUR_GAS')){onFail(new Error('GAS_URL 미설정'));return;}
   const cbName = 'gas_cb_' + action + '_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-  let done = false;
-  let scriptEl = null;
-
+  let done = false;let scriptEl = null;
   const cleanup = () => {
     try{ delete window[cbName]; }catch(e){ window[cbName] = undefined; }
     if(scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
   };
   const timer = setTimeout(() => {
-    if(done) return;
-    done = true;
-    cleanup();
-    onFail(new Error('GAS 응답 시간 초과: GAS doGet에서 callback JSONP 응답을 확인하세요.'));
+    if(done) return;done = true;cleanup();
+    onFail(new Error('GAS 응답 시간 초과'));
   }, GAS_TIMEOUT_MS);
-
   window[cbName] = payload => {
-    if(done) return;
-    done = true;
-    clearTimeout(timer);
-    cleanup();
-    onSuccess(payload);
+    if(done) return;done = true;clearTimeout(timer);cleanup();onSuccess(payload);
   };
-
-  const qs = buildQuery({
-    action,
-    callback: cbName,
-    _ts: Date.now(),
-    ...params
-  });
-
+  const qs = buildQuery({action, callback: cbName, _ts: Date.now(), ...params});
   scriptEl = document.createElement('script');
   scriptEl.src = GAS_URL + (GAS_URL.includes('?') ? '&' : '?') + qs;
   scriptEl.onerror = () => {
-    if(done) return;
-    done = true;
-    clearTimeout(timer);
-    cleanup();
-    onFail(new Error('GAS 스크립트 로드 실패: 배포 권한/URL을 확인하세요.'));
+    if(done) return;done = true;clearTimeout(timer);cleanup();
+    onFail(new Error('GAS 스크립트 로드 실패'));
   };
   document.head.appendChild(scriptEl);
 }
@@ -1378,7 +1256,6 @@ function renderFallbackRanking(reason){
   renderRanking(SAMPLE, null, 'rank-list-body-result');
   updateTop1(SAMPLE);
 }
-
 
 window.onload=()=>{
   buildCharGrid();buildPassageList();loadRankingAll();
@@ -1391,13 +1268,9 @@ window.onload=()=>{
     if(document.getElementById('training-screen').classList.contains('active'))
       setTimeout(()=>{if(document.activeElement!==inp)inp.focus();},50);
   });
-  // 데모 자동 예시 시작
   startDemo();
 };
 
-/* ═══════════════════════════════════════
-   데모 자동 예시
-═══════════════════════════════════════ */
 let demoTimerIv=null,demoTypeIv=null;
 let demoCurLine=0,demoCurChar=0,demoTimeLeft=30;
 let demoWpm=0,demoAcc=100,demoCorrect=0,demoTotal=0;
@@ -1408,7 +1281,6 @@ function startDemo(){
   demoWpm=0;demoAcc=100;demoCorrect=0;demoTotal=0;
   renderDemoLines(passage);
   clearInterval(demoTimerIv);clearInterval(demoTypeIv);
-  // 타이머
   demoTimerIv=setInterval(()=>{
     demoTimeLeft--;
     const s=String(demoTimeLeft%60).padStart(2,'0');
@@ -1417,70 +1289,46 @@ function startDemo(){
     if(el)el.textContent=`${m}:${s}`;
     if(demoTimeLeft<=0){clearInterval(demoTimerIv);clearInterval(demoTypeIv);setTimeout(startDemo,2000);}
   },1000);
-  // 타이핑 오토 — 80% 정확도 시뮬레이션
   let demoStart=Date.now();
   demoTypeIv=setInterval(()=>{
     const passage=PASSAGES[0];
     if(demoCurLine>=passage.lines.length){clearInterval(demoTypeIv);setTimeout(startDemo,2000);return;}
     const line=passage.lines[demoCurLine];
     if(demoCurChar<line.length){
-      // 95% 확률 정타, 5% 오타
       const correct=Math.random()>0.05;
       demoCorrect+=(correct?1:0);demoTotal++;
       const el=document.getElementById('demo-disp-'+demoCurLine);
-      if(el){
-        const typed=line.substring(0,demoCurChar+1);
-        renderDemoLine(el,typed,line,true);
-      }
+      if(el){const typed=line.substring(0,demoCurChar+1);renderDemoLine(el,typed,line,true);}
       demoCurChar++;
-      // 통계 업데이트
       const elapsed=(Date.now()-demoStart)/60000;
       demoWpm=elapsed>0?Math.round((demoCorrect/2)/elapsed):0;
       demoAcc=demoTotal>0?Math.round((demoCorrect/demoTotal)*100):100;
       const score=Math.round(demoWpm*(demoAcc/100));
-      const acc=document.getElementById('demo-acc');
-      const wpm=document.getElementById('demo-wpm');
-      const sc=document.getElementById('demo-score');
-      const barA=document.getElementById('demo-bar-acc');
-      const barW=document.getElementById('demo-bar-wpm');
-      const pg=document.getElementById('demo-pg');
-      if(acc)acc.textContent=demoAcc+'%';
-      if(wpm)wpm.textContent=demoWpm;
-      if(sc)sc.textContent=score;
-      if(barA)barA.style.width=Math.min(100,demoAcc)+'%';
-      if(barW)barW.style.width=Math.min(100,demoWpm/2.5)+'%';
+      const acc=document.getElementById('demo-acc');const wpm=document.getElementById('demo-wpm');
+      const sc=document.getElementById('demo-score');const barA=document.getElementById('demo-bar-acc');
+      const barW=document.getElementById('demo-bar-wpm');const pg=document.getElementById('demo-pg');
+      if(acc)acc.textContent=demoAcc+'%';if(wpm)wpm.textContent=demoWpm;if(sc)sc.textContent=score;
+      if(barA)barA.style.width=Math.min(100,demoAcc)+'%';if(barW)barW.style.width=Math.min(100,demoWpm/2.5)+'%';
       if(pg)pg.textContent=`${demoCurLine+1}/${passage.lines.length}`;
-    } else {
-      // 다음 줄
-      demoCurLine++;demoCurChar=0;
-      renderDemoLines(passage);
-    }
-  },55); // 타이핑 속도 약 200WPM 시뮬
+    } else {demoCurLine++;demoCurChar=0;renderDemoLines(passage);}
+  },55);
 }
 
 function renderDemoLines(passage){
-  const container=document.getElementById('demo-lines');
-  if(!container)return;
+  const container=document.getElementById('demo-lines');if(!container)return;
   container.innerHTML='';
-  const start=Math.max(0,demoCurLine-1);
-  const end=Math.min(passage.lines.length-1,demoCurLine+2);
+  const start=Math.max(0,demoCurLine-1);const end=Math.min(passage.lines.length-1,demoCurLine+2);
   for(let i=start;i<=end;i++){
     const unit=document.createElement('div');unit.className='im-demo-unit';
     const src=document.createElement('div');
-    src.className='im-demo-src'+(i===demoCurLine?' cur':' dim');
-    src.textContent=passage.lines[i];
+    src.className='im-demo-src'+(i===demoCurLine?' cur':' dim');src.textContent=passage.lines[i];
     const disp=document.createElement('div');
     if(i<demoCurLine){
       disp.className='im-demo-disp done-d';
       disp.innerHTML=`<span class="demo-ch-ok">${passage.lines[i]}</span>`;
     } else if(i===demoCurLine){
-      disp.className='im-demo-disp active';
-      disp.id='demo-disp-'+i;
-      renderDemoLine(disp,'',passage.lines[i],false);
-    } else {
-      disp.className='im-demo-disp pending';
-      disp.textContent=passage.lines[i];
-    }
+      disp.className='im-demo-disp active';disp.id='demo-disp-'+i;renderDemoLine(disp,'',passage.lines[i],false);
+    } else {disp.className='im-demo-disp pending';disp.textContent=passage.lines[i];}
     unit.appendChild(src);unit.appendChild(disp);container.appendChild(unit);
   }
 }
@@ -1492,102 +1340,65 @@ function renderDemoLine(el,typed,target,hasTyped){
     if(i<typed.length){
       const ok=typed[i]===target[i];
       h+=ok?`<span class="demo-ch-ok">${ch}</span>`:`<span class="demo-ch-err">${ch}</span>`;
-    } else if(i===typed.length){
-      h+=`<span class="demo-ch-cur">${ch}</span>`;
-    } else {
-      h+=`<span class="demo-ch-pend">${ch}</span>`;
-    }
+    } else if(i===typed.length){h+=`<span class="demo-ch-cur">${ch}</span>`;}
+    else{h+=`<span class="demo-ch-pend">${ch}</span>`;}
   }
   el.innerHTML=h;
 }
 
-
-
-/* 팝업 */
-function openSetupPopup(){
-  document.getElementById('setup-popup').classList.add('open');
-  setTimeout(()=>document.getElementById('nick-input').focus(),100);
-}
+function openSetupPopup(){document.getElementById('setup-popup').classList.add('open');setTimeout(()=>document.getElementById('nick-input').focus(),100);}
 function closeSetupPopup(){document.getElementById('setup-popup').classList.remove('open');}
 
-/* 빌드 */
 function buildCharGrid(){
-  const g = document.getElementById('char-grid');
-  g.innerHTML = '';
-
+  const g = document.getElementById('char-grid');g.innerHTML = '';
   CHARS.forEach((c,i) => {
     const b = document.createElement('button');
     b.className = 'char-btn' + (i === selChar ? ' selected' : '');
     b.innerHTML = `<span class="char-emoji">${c.svg}</span><span class="char-name">${esc(c.name)}</span>`;
     b.onclick = () => {
       document.querySelectorAll('.char-btn').forEach(e => e.classList.remove('selected'));
-      b.classList.add('selected');
-      selChar = i;
-      updateSidebarSummary();
+      b.classList.add('selected');selChar = i;updateSidebarSummary();
     };
     g.appendChild(b);
   });
 }
 
 function buildPassageList(){
-  const g = document.getElementById('passage-list');
-  g.innerHTML = '';
-
+  const g = document.getElementById('passage-list');g.innerHTML = '';
   PASSAGES.forEach((p,i) => {
     const b = document.createElement('button');
     b.className = 'passage-btn' + (i === selPassage ? ' selected' : '');
-    b.innerHTML =
-      `<div class="pb-title${i === selPassage ? ' sel' : ''}">${esc(p.title)}</div>` +
-      `<div class="pb-meta">${esc(p.lines.join('').length)}자</div>`;
+    b.innerHTML = `<div class="pb-title${i === selPassage ? ' sel' : ''}">${esc(p.title)}</div><div class="pb-meta">${esc(p.lines.join('').length)}자</div>`;
     b.onclick = () => {
       document.querySelectorAll('.passage-btn').forEach(e => {
-        e.classList.remove('selected');
-        const title = e.querySelector('.pb-title');
-        if(title) title.classList.remove('sel');
+        e.classList.remove('selected');const title = e.querySelector('.pb-title');if(title) title.classList.remove('sel');
       });
-      b.classList.add('selected');
-      const title = b.querySelector('.pb-title');
-      if(title) title.classList.add('sel');
-      selPassage = i;
-      updateSidebarSummary();
+      b.classList.add('selected');const title = b.querySelector('.pb-title');if(title) title.classList.add('sel');
+      selPassage = i;updateSidebarSummary();
     };
     g.appendChild(b);
   });
-
   updateSidebarSummary();
 }
 
-/* 사이드바 요약 업데이트 (모든 화면 공통) */
 function updateSidebarSummary(){
   const nick=document.getElementById('nick-input').value.trim()||'- - -';
-  const char=CHARS[selChar];
-  const stage=PASSAGES[selPassage];
+  const char=CHARS[selChar];const stage=PASSAGES[selPassage];
   ['intro','training','result'].forEach(sc=>{
-    const av=document.getElementById(`sb-avatar-${sc}`);
-    const nm=document.getElementById(`sb-name-${sc}`);
-    const ch=document.getElementById(`sb-char-${sc}`);
-    const st=document.getElementById(`sb-stage-${sc}`);
-    if(av)av.innerHTML=char.svg||char.emoji;
-    if(nm)nm.textContent=nick;
-    if(ch)ch.textContent=char.name;
-    if(st)st.textContent=stage.title;
+    const av=document.getElementById(`sb-avatar-${sc}`);const nm=document.getElementById(`sb-name-${sc}`);
+    const ch=document.getElementById(`sb-char-${sc}`);const st=document.getElementById(`sb-stage-${sc}`);
+    if(av)av.innerHTML=char.svg||char.emoji;if(nm)nm.textContent=nick;
+    if(ch)ch.textContent=char.name;if(st)st.textContent=stage.title;
   });
 }
 
-/* 닉네임 실시간 반영 */
-document.addEventListener('DOMContentLoaded',()=>{});
-function onNickChange(){updateSidebarSummary();}
+document.addEventListener('input',e=>{if(e.target.id==='nick-input')updateSidebarSummary();});
 
-/* 랭킹 로드 */
 function loadRankingAll(){
   const fallback = err => renderFallbackRanking(err && err.message ? err.message : err);
-
   requestGas('rank', {}, payload => {
     const rows = normalizeRankRows(payload);
-    if(!rows.length){
-      fallback('시트에서 랭킹 데이터가 비어 있거나 응답 필드명이 맞지 않습니다.');
-      return;
-    }
+    if(!rows.length){fallback('랭킹 데이터 없음');return;}
     renderRanking(rows, null, 'rank-list-body');
     renderRanking(rows, null, 'rank-list-body-training');
     renderRanking(rows, null, 'rank-list-body-result');
@@ -1604,43 +1415,28 @@ function updateTop1(data){
     document.getElementById('ic-total').textContent='0';
     document.getElementById('ic-top').textContent='0';
     document.getElementById('ic-avg').textContent='0';
-    renderMainRanking([]);
-    return;
+    renderMainRanking([]);return;
   }
-
   const top = rows[0];
   document.getElementById('top1-name').textContent = top.nickname;
   document.getElementById('top1-score').textContent = top.score;
-  document.getElementById('challenge-msg').innerHTML =
-    `<em>${esc(top.nickname)}</em>님의 ${esc(top.score)}점을 넘을 수 있을까요?`;
-
+  document.getElementById('challenge-msg').innerHTML = `<em>${esc(top.nickname)}</em>님의 ${esc(top.score)}점을 넘을 수 있을까요?`;
   document.getElementById('ic-total').textContent = rows.length;
   document.getElementById('ic-top').textContent = Math.max(...rows.map(r => num(r.score, 0)));
-  document.getElementById('ic-avg').textContent =
-    Math.round(rows.reduce((s,r) => s + num(r.wpm, 0), 0) / rows.length);
-
+  document.getElementById('ic-avg').textContent = Math.round(rows.reduce((s,r) => s + num(r.wpm, 0), 0) / rows.length);
   renderMainRanking(rows);
 }
 
 function renderMainRanking(data){
-  const body = document.getElementById('im-rank-body');
-  if(!body) return;
-
+  const body = document.getElementById('im-rank-body');if(!body) return;
   const rows = normalizeRankRows(data);
-  if(!rows.length){
-    body.innerHTML = '<div class="im-rank-loading">기록 없음 YET</div>';
-    return;
-  }
-
-  body.innerHTML = '';
-  const medals = ['🥇','🥈','🥉'];
-
+  if(!rows.length){body.innerHTML = '<div class="im-rank-loading">기록 없음 YET</div>';return;}
+  body.innerHTML = '';const medals = ['🥇','🥈','🥉'];
   rows.slice(0,20).forEach((r,i) => {
     const row = document.createElement('div');
     row.className = 'im-rank-row' + (i < 3 ? ' top3' : '') + (r.nickname === nickname ? ' mine' : '');
     const nc = i < 3 ? `im-rr-no n${i+1}` : 'im-rr-no';
     const charSvg = safeCharSvg(r.char);
-
     row.innerHTML = `
       <span class="${nc}">${medals[i] || i + 1}</span>
       <span class="im-rr-ch" style="width:28px;height:28px;display:inline-block;">${charSvg}</span>
@@ -1654,24 +1450,13 @@ function renderMainRanking(data){
 }
 
 function renderRanking(data, myNick, bodyId){
-  const body = document.getElementById(bodyId);
-  if(!body) return;
-
+  const body = document.getElementById(bodyId);if(!body) return;
   const rows = normalizeRankRows(data);
-  if(!rows.length){
-    body.innerHTML = '<div class="rank-loading">기록 없음</div>';
-    return;
-  }
-
-  body.innerHTML = '';
-  const medals = ['🥇','🥈','🥉'];
-
+  if(!rows.length){body.innerHTML = '<div class="rank-loading">기록 없음</div>';return;}
+  body.innerHTML = '';const medals = ['🥇','🥈','🥉'];
   rows.slice(0,20).forEach((r,i) => {
-    const row = document.createElement('div');
-    row.className = 'rank-row' + (r.nickname === myNick ? ' mine' : '');
-    const nc = i < 3 ? `rr-no n${i+1}` : 'rr-no';
-    const cSvg = safeCharSvg(r.char);
-
+    const row = document.createElement('div');row.className = 'rank-row' + (r.nickname === myNick ? ' mine' : '');
+    const nc = i < 3 ? `rr-no n${i+1}` : 'rr-no';const cSvg = safeCharSvg(r.char);
     row.innerHTML =
       `<span class="${nc}">${medals[i] || i + 1}</span>` +
       `<span class="rr-ch" style="width:20px;height:20px;display:inline-block;">${cSvg}</span>` +
@@ -1682,43 +1467,19 @@ function renderRanking(data, myNick, bodyId){
   });
 }
 
-/* 훈련 시작 */
 function startTraining(){
-  clearInterval(demoTimerIv);
-  clearInterval(demoTypeIv);
-
+  clearInterval(demoTimerIv);clearInterval(demoTypeIv);
   nickname = document.getElementById('nick-input').value.trim() || '사용자';
-  updateSidebarSummary();
-  closeSetupPopup();
-
-  const char = CHARS[selChar];
-  const passage = PASSAGES[selPassage];
-
-  lines = [...passage.lines];
-  curLine = 0;
-  lineTyped = '';
-  correctChars = 0;
-  totalTyped = 0;
-  startTime = null;
-  timeLeft = TIME_LIMIT;
-  trainingEnded = false;
-
+  updateSidebarSummary();closeSetupPopup();
+  const char = CHARS[selChar];const passage = PASSAGES[selPassage];
+  lines = [...passage.lines];curLine = 0;lineTyped = '';correctChars = 0;totalTyped = 0;
+  startTime = null;timeLeft = TIME_LIMIT;trainingEnded = false;
   document.getElementById('gt-sub').textContent = passage.title;
   document.getElementById('res-avatar').innerHTML = char.svg || char.emoji;
-
-  buildLines();
-  showScreen('training-screen');
-  clearInterval(timerIv);
-  updateTimerDisplay();
-
+  buildLines();showScreen('training-screen');clearInterval(timerIv);updateTimerDisplay();
   const inp = document.getElementById('hidden-input');
-  inp.value = '';
-  inp.disabled = false;
-  inp.oninput = onInput;
-  inp.onkeydown = onKeyDown;
-  inp.focus();
-  setTimeout(() => inp.focus(), 100);
-  setTimeout(() => inp.focus(), 300);
+  inp.value = '';inp.disabled = false;inp.oninput = onInput;inp.onkeydown = onKeyDown;inp.focus();
+  setTimeout(() => inp.focus(), 100);setTimeout(() => inp.focus(), 300);
 }
 
 function buildLines(){
@@ -1727,11 +1488,9 @@ function buildLines(){
   for(let i=start;i<=end;i++){
     const unit=document.createElement('div');unit.className='line-unit';
     const src=document.createElement('div');
-    src.className='line-source '+(i<curLine?'done':i>curLine?'upcoming':'');
-    src.textContent=lines[i];
+    src.className='line-source '+(i<curLine?'done':i>curLine?'upcoming':'');src.textContent=lines[i];
     const disp=document.createElement('div');
-    disp.className='line-display '+(i<curLine?'done-line':i===curLine?'active-line':'');
-    disp.id=`ld-${i}`;
+    disp.className='line-display '+(i<curLine?'done-line':i===curLine?'active-line':'');disp.id=`ld-${i}`;
     if(i<curLine)disp.innerHTML=`<span style="color:rgba(255,255,255,0.35);">✓ ${lines[i]}</span>`;
     else if(i===curLine)renderActiveLine(disp,lineTyped,lines[i]);
     else disp.innerHTML=`<span style="color:rgba(255,255,255,0.1);">${lines[i]}</span>`;
@@ -1742,32 +1501,18 @@ function buildLines(){
 
 function renderActiveLine(el, typed, target){
   let h = '';
-
   for(let i = 0; i < target.length; i++){
     const tch = escChar(target[i]);
-
     if(i < typed.length){
-      const correct = typed[i] === target[i];
-      const uch = escChar(typed[i]);
-
-      if(correct){
-        h += `<span class="ch-ok">${tch}</span>`;
-      }else{
-        h += `<span class="ch-err" title="${tch}">${uch}</span>`;
-      }
-    }else if(i === typed.length){
-      h += `<span class="ch-cur">${tch}</span>`;
-    }else{
-      h += `<span class="ch-pend">${tch}</span>`;
-    }
+      const correct = typed[i] === target[i];const uch = escChar(typed[i]);
+      if(correct){h += `<span class="ch-ok">${tch}</span>`;}
+      else{h += `<span class="ch-err" title="${tch}">${uch}</span>`;}
+    }else if(i === typed.length){h += `<span class="ch-cur">${tch}</span>`;}
+    else{h += `<span class="ch-pend">${tch}</span>`;}
   }
-
   if(typed.length > target.length){
-    for(let i = target.length; i < typed.length; i++){
-      h += `<span class="ch-err">${escChar(typed[i])}</span>`;
-    }
+    for(let i = target.length; i < typed.length; i++){h += `<span class="ch-err">${escChar(typed[i])}</span>`;}
   }
-
   el.innerHTML = h;
 }
 
@@ -1775,32 +1520,27 @@ function onInput(){
   if(trainingEnded)return;
   const val=document.getElementById('hidden-input').value;
   if(!startTime&&val.length>0){startTime=Date.now();timerIv=setInterval(tick,1000);}
-  lineTyped=val;
-  const d=document.getElementById(`ld-${curLine}`);
-  if(d)renderActiveLine(d,lineTyped,lines[curLine]);
-  updateStats();
+  lineTyped=val;const d=document.getElementById(`ld-${curLine}`);
+  if(d)renderActiveLine(d,lineTyped,lines[curLine]);updateStats();
 }
 function onKeyDown(e){if(trainingEnded)return;if(e.key==='Tab'||e.key==='Enter'){e.preventDefault();advanceLine();}}
 function advanceLine(){
   const target=lines[curLine];let ok=0;
   for(let i=0;i<Math.min(lineTyped.length,target.length);i++)if(lineTyped[i]===target[i])ok++;
-  correctChars+=ok;totalTyped+=lineTyped.length;
-  curLine++;lineTyped='';document.getElementById('hidden-input').value='';
+  correctChars+=ok;totalTyped+=lineTyped.length;curLine++;lineTyped='';document.getElementById('hidden-input').value='';
   if(curLine>=lines.length){finishTraining();return;}
   buildLines();updateStats();
 }
 function updateStats(){
   if(!startTime)return;
   const el=(Date.now()-startTime)/60000;
-  let tmpOk=correctChars;
-  const target=lines[curLine]||'';
+  let tmpOk=correctChars;const target=lines[curLine]||'';
   for(let i=0;i<Math.min(lineTyped.length,target.length);i++)if(lineTyped[i]===target[i])tmpOk++;
   const tmpTyped=totalTyped+lineTyped.length;
   const wpm=el>0?Math.round((tmpOk/2)/el):0;
   const acc=tmpTyped>0?Math.round((tmpOk/tmpTyped)*100):100;
   const score=Math.round(wpm*(acc/100));
-  document.getElementById('stat-wpm').textContent=wpm;
-  document.getElementById('stat-acc').textContent=acc+'%';
+  document.getElementById('stat-wpm').textContent=wpm;document.getElementById('stat-acc').textContent=acc+'%';
   document.getElementById('stat-score').textContent=score;
   document.getElementById('bar-acc').style.width=Math.min(100,acc)+'%';
   document.getElementById('bar-wpm').style.width=Math.min(100,wpm/2.5)+'%';
@@ -1808,22 +1548,16 @@ function updateStats(){
 function tick(){timeLeft--;updateTimerDisplay();if(timeLeft<=0)finishTraining();}
 function updateTimerDisplay(){
   const s=String(timeLeft%60).padStart(2,'0'),m=String(Math.floor(timeLeft/60)).padStart(2,'0');
-  const el=document.getElementById('timer-val');
-  el.textContent=`${m}:${s}`;
+  const el=document.getElementById('timer-val');el.textContent=`${m}:${s}`;
   if(timeLeft<=10)el.className='timer-val danger';
   else if(timeLeft<=20)el.className='timer-val warn';
   else el.className='timer-val';
 }
 
 function finishTraining(){
-  if(trainingEnded) return;
-  trainingEnded = true;
-  clearInterval(timerIv);
+  if(trainingEnded) return;trainingEnded = true;clearInterval(timerIv);
   document.getElementById('hidden-input').disabled = true;
-
-  let finalCorrect = correctChars;
-  let finalTyped = totalTyped;
-
+  let finalCorrect = correctChars;let finalTyped = totalTyped;
   if(curLine < lines.length && lineTyped){
     const target = lines[curLine] || '';
     for(let i = 0; i < Math.min(lineTyped.length, target.length); i++){
@@ -1831,17 +1565,13 @@ function finishTraining(){
     }
     finalTyped += lineTyped.length;
   }
-
   const elapsed = startTime ? (Date.now() - startTime) / 60000 : TIME_LIMIT / 60;
   const wpm = elapsed > 0 ? Math.round((finalCorrect / 2) / elapsed) : 0;
   const acc = finalTyped > 0 ? Math.round((finalCorrect / finalTyped) * 100) : 0;
   const score = Math.round(wpm * (acc / 100));
-  const comment = score >= 150 ? '최우수 기록입니다.' :
-                  score >= 100 ? '우수 기록입니다.' :
-                  score >= 60 ? '좋습니다. 계속 훈련하세요.' :
-                  score >= 30 ? '좋은 시도입니다. 반복 훈련하세요.' :
+  const comment = score >= 150 ? '최우수 기록입니다.' : score >= 100 ? '우수 기록입니다.' :
+                  score >= 60 ? '좋습니다. 계속 훈련하세요.' : score >= 30 ? '좋은 시도입니다. 반복 훈련하세요.' :
                   '훈련 종료. 다시 도전하세요.';
-
   document.getElementById('res-name').textContent = nickname;
   document.getElementById('res-sub2').textContent = PASSAGES[selPassage].title;
   document.getElementById('res-score').textContent = score;
@@ -1850,32 +1580,16 @@ function finishTraining(){
   document.getElementById('res-chars').textContent = finalCorrect;
   document.getElementById('res-comment').textContent = comment;
   document.getElementById('res-formula').textContent = `${wpm} WPM × ${acc}% ÷ 100 = ${score}점`;
-
-  showScreen('result-screen');
-  spawnParticles();
-
-  const scoreData = {
-    nickname,
-    charEmoji: CHARS[selChar].svg,
-    charName: CHARS[selChar].name,
-    wpm,
-    acc,
-    score,
-    passage: PASSAGES[selPassage].title
-  };
-
+  showScreen('result-screen');spawnParticles();
+  const scoreData = {nickname,charEmoji: CHARS[selChar].svg,charName: CHARS[selChar].name,wpm,acc,score,passage: PASSAGES[selPassage].title};
   saveScore(scoreData);
-
   setTimeout(() => {
     requestGas('rank', {}, payload => {
-      const rows = normalizeRankRows(payload);
-      const viewRows = rows.length ? rows : SAMPLE;
+      const rows = normalizeRankRows(payload);const viewRows = rows.length ? rows : SAMPLE;
       renderRanking(viewRows, nickname, 'rank-list-body-result');
       renderRanking(viewRows, nickname, 'rank-list-body-training');
       renderRanking(viewRows, nickname, 'rank-list-body');
-      renderMainRanking(viewRows);
-      updateTop1(viewRows);
-
+      renderMainRanking(viewRows);updateTop1(viewRows);
       let myPos = '기록 없음';
       normalizeRankRows(viewRows).slice(0,20).forEach((r,i) => {
         if(r.nickname === nickname && num(r.score) === score) myPos = (i + 1) + '위';
@@ -1892,53 +1606,26 @@ function finishTraining(){
 
 function saveScore(d){
   if(!GAS_URL || GAS_URL.includes('YOUR_GAS')) return;
-
-  requestGas('save', {
-    nickname: d.nickname,
-    char: d.charName || d.charEmoji || '',
-    wpm: d.wpm,
-    acc: d.acc,
-    score: d.score,
-    passage: d.passage
-  }, res => {
-    console.log('[GAS 저장 결과]', res);
-  }, err => {
-    console.warn('[GAS 저장 실패]', err);
-  });
+  requestGas('save', {nickname: d.nickname,char: d.charName || d.charEmoji || '',wpm: d.wpm,acc: d.acc,score: d.score,passage: d.passage},
+    res => {console.log('[GAS 저장 결과]', res);},
+    err => {console.warn('[GAS 저장 실패]', err);});
 }
 
 function loadOvRanking(){
-  document.getElementById('ov-loading').style.display = 'block';
-  document.getElementById('ov-rank-list').style.display = 'none';
-
+  document.getElementById('ov-loading').style.display = 'block';document.getElementById('ov-rank-list').style.display = 'none';
   requestGas('rank', {}, payload => {
-    const rows = normalizeRankRows(payload);
-    renderOvRanking(rows.length ? rows : SAMPLE);
-  }, err => {
-    console.warn('[오버레이 랭킹 실패]', err);
-    renderOvRanking(SAMPLE);
-  });
+    const rows = normalizeRankRows(payload);renderOvRanking(rows.length ? rows : SAMPLE);
+  }, err => {console.warn('[오버레이 랭킹 실패]', err);renderOvRanking(SAMPLE);});
 }
 function renderOvRanking(data){
-  document.getElementById('ov-loading').style.display = 'none';
-  document.getElementById('ov-rank-list').style.display = 'block';
-
-  const body = document.getElementById('ov-rank-body');
-  body.innerHTML = '';
-
+  document.getElementById('ov-loading').style.display = 'none';document.getElementById('ov-rank-list').style.display = 'block';
+  const body = document.getElementById('ov-rank-body');body.innerHTML = '';
   const rows = normalizeRankRows(data);
-  if(!rows.length){
-    body.innerHTML = '<div class="rank-loading">기록 없음</div>';
-    return;
-  }
-
+  if(!rows.length){body.innerHTML = '<div class="rank-loading">기록 없음</div>';return;}
   const medals = ['🥇','🥈','🥉'];
-
   rows.slice(0,20).forEach((r,i) => {
-    const row = document.createElement('div');
-    row.className = 'ov-rank-row';
+    const row = document.createElement('div');row.className = 'ov-rank-row';
     const nc = i < 3 ? `rr-no n${i+1}` : 'rr-no';
-
     row.innerHTML =
       `<span class="${nc}">${medals[i] || i + 1}</span>` +
       `<span class="rr-ch" style="width:20px;height:20px;display:inline-block;">${safeCharSvg(r.char)}</span>` +
@@ -1958,12 +1645,8 @@ function showScreen(id){
 }
 function focusInput(){const inp=document.getElementById('hidden-input');if(inp&&!inp.disabled)inp.focus();}
 function goIntro(){
-  clearInterval(timerIv);
-  clearInterval(demoTimerIv);
-  clearInterval(demoTypeIv);
-  showScreen('intro-screen');
-  loadRankingAll();
-  startDemo();
+  clearInterval(timerIv);clearInterval(demoTimerIv);clearInterval(demoTypeIv);
+  showScreen('intro-screen');loadRankingAll();startDemo();
 }
 function restartTraining(){openSetupPopup();}
 function spawnParticles(){
@@ -1978,22 +1661,17 @@ function spawnParticles(){
   setTimeout(()=>c.innerHTML='',5000);
 }
 
-/* 닉네임 입력 시 사이드바 실시간 반영 */
-document.addEventListener('input',e=>{if(e.target.id==='nick-input')updateSidebarSummary();});
-/* 폰트 로드 보장 */
 (async function(){
   try{
     const f1=new FontFace('DOSGothic',"url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_eight@1.0/DOSGothic.woff') format('woff')");
     const f2=new FontFace('DungGeunMo',"url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff')");
     await Promise.all([f1.load(),f2.load()]);
     document.fonts.add(f1);document.fonts.add(f2);
-    // 타이틀 강제 리렌더
     document.querySelectorAll('.im-title,.im-demo-src,.im-demo-disp,.line-source,.line-display').forEach(el=>{
       el.style.fontFamily="'DOSGothic','DungGeunMo',sans-serif";
     });
   }catch(e){console.warn('폰트 로드 실패:',e);}
 })();
-
 </script>
 </body>
 </html>
