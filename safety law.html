@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>산업안전보건법 타이핑 도장</title>
+<title>산업안전보건법 타이핑 대결</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 @font-face{
@@ -613,11 +613,11 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background:#000;
 }
 .result-comment strong{
-  font-family:'Press Start 2P',monospace;font-size:18px;
+  font-family:'DOSGothic','DungGeunMo',monospace;font-size:20px;
   color:var(--hi);display:block;margin-bottom:6px;
 }
 .result-comment span{
-  font-family:'Press Start 2P',monospace;font-size:12px;color:var(--lo);
+  font-family:'DOSGothic','DungGeunMo',monospace;font-size:14px;color:var(--lo);
 }
 
 /* 버튼 행 — 풀너비 절반씩 */
@@ -661,8 +661,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 </head>
 <body>
 <!-- 폰트 강제 프리로드 -->
-<span style="position:fixed;top:-999px;left:-999px;font-family:'DOSGothic',monospace;font-size:1px;opacity:0;">산업안전보건법타이핑도장가나다라마바사아자차카타파하</span>
-<span style="position:fixed;top:-999px;left:-999px;font-family:'DungGeunMo',monospace;font-size:1px;opacity:0;">산업안전보건법타이핑도장</span>
+<span style="position:fixed;top:-999px;left:-999px;font-family:'DOSGothic',monospace;font-size:1px;opacity:0;">산업안전보건법타이핑대결가나다라마바사아자차카타파하</span>
+<span style="position:fixed;top:-999px;left:-999px;font-family:'DungGeunMo',monospace;font-size:1px;opacity:0;">산업안전보건법타이핑대결</span>
 <div id="particles"></div>
 
 <!-- ══════════════════════════════════════════════
@@ -710,7 +710,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <div class="im-title-section">
           <div class="im-title-left">
             <div class="im-deco-stars">★ ★ ★ HIGH SCORE ★ ★ ★</div>
-            <div class="im-title">산업안전보건법 타이핑 도장</div>
+            <div class="im-title">산업안전보건법 타이핑 대결</div>
             <div class="im-sub">SAFETY LAW TYPING ARENA</div>
           </div>
           <div class="im-title-right">
@@ -960,7 +960,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
         <div class="result-content">
           <div class="result-arcade-hd">
             <div class="rah-main">GAME OVER</div>
-            <div class="rah-sub" id="rah-sub">산업안전보건 타이핑 도장</div>
+            <div class="rah-sub" id="rah-sub">산업안전보건법 타이핑 대결</div>
           </div>
           <div class="result-player-row">
             <div class="result-avatar" id="res-avatar">⛑️</div>
@@ -1456,13 +1456,13 @@ function loadRankingAll(){
   s.src=`${GAS_URL}?action=rank&callback=cb_all`;
   s.onerror=()=>{renderRanking(SAMPLE,null,'rank-list-body');updateTop1(SAMPLE);};
   document.head.appendChild(s);
-  setTimeout(()=>{if(document.getElementById('rank-list-body').querySelector('.rank-loading')){renderRanking(SAMPLE,null,'rank-list-body');renderRanking(SAMPLE,null,'rank-list-body-game');renderRanking(SAMPLE,null,'rank-list-body-result');updateTop1(SAMPLE);}},4000);
+  setTimeout(()=>{if(document.getElementById('rank-list-body').querySelector('.rank-loading')){renderRanking(SAMPLE,null,'rank-list-body');renderRanking(SAMPLE,null,'rank-list-body-game');renderRanking(SAMPLE,null,'rank-list-body-result');updateTop1(SAMPLE);}},6000);
 }
 
 function updateTop1(data){
   if(!data||!data.length)return;
   const top=data[0];
-  document.getElementById('top1-name').textContent=`${top.char||''} ${top.nickname}`;
+  document.getElementById('top1-name').textContent=top.nickname;
   document.getElementById('top1-score').textContent=top.score;
   document.getElementById('challenge-msg').innerHTML=`<em>${top.nickname}</em>님의 ${top.score}점을 넘을 수 있을까요?`;
   document.getElementById('ic-total').textContent=data.length;
@@ -1481,7 +1481,7 @@ function renderMainRanking(data){
     const row=document.createElement('div');
     row.className='im-rank-row'+(i<3?' top3':'')+(r.nickname===nickname?' mine':'');
     const nc=i<3?`im-rr-no n${i+1}`:'im-rr-no';
-    const charSvg=DOT_CHARS.find(d=>d.name===(r.charName||''))?.svg||
+    const charSvg=DOT_CHARS.find(d=>d.name===(r.char||r.charName||''))?.svg||
       `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="4" y="1" width="8" height="14" fill="#555"/></svg>`;
     row.innerHTML=`
       <span class="${nc}">${medals[i]||i+1}</span>
@@ -1504,7 +1504,7 @@ function renderRanking(data,myNick,bodyId){
     const row=document.createElement('div');
     row.className='rank-row'+(r.nickname===myNick?' mine':'');
     const nc=i<3?`rr-no n${i+1}`:'rr-no';
-    const cSvg=DOT_CHARS.find(d=>d.name===(r.charName||''))?.svg||DOT_CHARS[0].svg;
+    const cSvg=DOT_CHARS.find(d=>d.name===(r.char||r.charName||''))?.svg||DOT_CHARS[0].svg;
     row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="rr-ch" style="width:20px;height:20px;display:inline-block;">${cSvg}</span><span class="rr-nick${i===0?' top':''}">${r.nickname}</span><span class="rr-sc">${r.score}</span><span class="rr-wpm">${r.wpm}</span>`;
     body.appendChild(row);
   });
@@ -1642,7 +1642,15 @@ function endGame(){
   saveScore({nickname,charEmoji:CHARS[selChar].svg,charName:CHARS[selChar].name,wpm,acc,score,passage:PASSAGES[selPassage].title});
   // 결과 랭킹 갱신
   setTimeout(()=>{
-    window['cb_result']=d=>{renderRanking(d,nickname,'rank-list-body-result');let myPos='UNRANKED';d.slice(0,20).forEach((r,i)=>{if(r.nickname===nickname)myPos=(i+1)+'위';});document.getElementById('res-rank-pos').textContent=myPos;};
+    window['cb_result']=d=>{
+      renderRanking(d,nickname,'rank-list-body-result');
+      let myPos='UNRANKED';
+      d.slice(0,20).forEach((r,i)=>{if(r.nickname===nickname)myPos=(i+1)+'위';});
+      document.getElementById('res-rank-pos').textContent=myPos;
+      // 결과화면 랭킹 표시
+      document.getElementById('res-rank-loading').style.display='none';
+      document.getElementById('res-rank-list').style.display='block';
+    };
     if(!GAS_URL||GAS_URL.includes('YOUR_GAS')){renderRanking(SAMPLE,nickname,'rank-list-body-result');return;}
     const s=document.createElement('script');s.src=`${GAS_URL}?action=rank&callback=cb_result`;document.head.appendChild(s);
   },1200);
@@ -1650,7 +1658,29 @@ function endGame(){
 
 function saveScore(d){
   if(!GAS_URL||GAS_URL.includes('YOUR_GAS'))return;
-  fetch(`${GAS_URL}?action=save&nickname=${encodeURIComponent(d.nickname)}&char=${encodeURIComponent(d.charName)}&wpm=${d.wpm}&acc=${d.acc}&score=${d.score}&passage=${encodeURIComponent(d.passage)}`).catch(()=>{});
+  // GAS는 CORS 미지원 → JSONP 방식으로 저장
+  const cbName='cb_save_'+Date.now();
+  window[cbName]=function(res){
+    console.log('저장 결과:', res);
+    delete window[cbName];
+    if(s.parentNode)s.parentNode.removeChild(s);
+  };
+  const params=[
+    'action=save',
+    'callback='+cbName,
+    'nickname='+encodeURIComponent(d.nickname),
+    'char='+encodeURIComponent(d.charName||d.charEmoji||''),
+    'wpm='+d.wpm,
+    'acc='+d.acc,
+    'score='+d.score,
+    'passage='+encodeURIComponent(d.passage)
+  ].join('&');
+  const s=document.createElement('script');
+  s.src=GAS_URL+'?'+params;
+  s.onerror=()=>{console.warn('GAS 저장 실패');delete window[cbName];};
+  document.head.appendChild(s);
+  // 5초 후 자동 정리
+  setTimeout(()=>{delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);},5000);
 }
 
 function loadOvRanking(){
