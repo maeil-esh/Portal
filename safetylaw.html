@@ -37,12 +37,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 @keyframes wordSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 @keyframes wordWobble{0%,100%{transform:rotate(-5deg) scale(1);}50%{transform:rotate(5deg) scale(1.08);}}
 @keyframes wordPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
-@keyframes rainbowShift{0%{color:#ff0000;}14%{color:#ff8800;}28%{color:#ffff00;}42%{color:#00ff00;}57%{color:#00ffff;}71%{color:#0088ff;}85%{color:#ff00ff;}100%{color:#ff0000;}}
-@keyframes shockwave{0%{box-shadow:0 0 0 0 rgba(255,215,0,0.8);}100%{box-shadow:0 0 0 60px rgba(255,215,0,0);}}
-@keyframes bonusFlash{0%,100%{background:transparent;}50%{background:rgba(255,215,0,0.15);}}
-@keyframes s3GlitchH{0%,100%{transform:translateX(0);}20%{transform:translateX(-4px);}40%{transform:translateX(4px);}60%{transform:translateX(-2px);}80%{transform:translateX(2px);}}
-@keyframes comboFire{0%{text-shadow:0 0 10px var(--yellow);}50%{text-shadow:0 0 30px var(--orange),0 0 60px var(--red);}100%{text-shadow:0 0 10px var(--yellow);}}
-@keyframes dangerPulse{0%,100%{border-color:var(--dim);}50%{border-color:var(--red);box-shadow:0 0 20px rgba(255,68,68,0.3);}}
+@keyframes dangerBlink{50%{opacity:0.3;}}
+@keyframes scoreFlicker{0%,100%{opacity:1;}50%{opacity:0.6;}}
 
 .screen{display:none;position:relative;z-index:1;}
 .screen.active{display:flex;}
@@ -63,7 +59,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .sb-score-lbl{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);letter-spacing:1px;}
 .sb-score-val{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--hi);}
 .sb-score-val.green{color:var(--green);}
-.sb-score-val.cyan{color:var(--cyan);}
 .sb-total-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--dim2);padding:5px 7px;margin-top:5px;}
 .sb-total-lbl{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--mid);}
 .sb-total-val{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--hi);text-shadow:0 0 8px rgba(255,255,255,0.3);}
@@ -270,7 +265,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .word-block.spin{animation:wordSpin 2s linear infinite;}
 .word-block.wobble{animation:wordWobble 0.6s ease-in-out infinite;}
 .word-block.pulse-anim{animation:wordPulse 0.4s ease-in-out infinite;}
-.word-block.rainbow .wb-text{animation:rainbowShift 1s linear infinite;}
 /* 방향별 스타일 */
 .word-block.from-left .wb-text{border-color:#4466ff;color:#aabbff;}
 .word-block.from-right .wb-text{border-color:#ff4466;color:#ffaabb;}
@@ -294,58 +288,43 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 
 /* ══ STAGE 3 CHAOS ══ */
 .chaos-main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.chaos-hud{display:flex;justify-content:space-between;align-items:center;padding:7px 14px;background:#000;border-bottom:2px solid var(--purple);flex-shrink:0;height:52px;}
+.chaos-hud{display:flex;justify-content:space-between;align-items:center;padding:7px 14px;background:#000;border-bottom:2px solid var(--dim2);flex-shrink:0;height:52px;}
 .chud-item{}
 .chud-label{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--lo);}
 .chud-val{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--hi);margin-top:2px;}
-.chud-val.cyan{color:var(--cyan);}
-.chud-val.yellow{color:var(--yellow);animation:comboFire 1s ease-in-out infinite;}
-.chud-val.danger{color:var(--red);animation:blink .3s step-end infinite;}
-.chud-badge{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--purple);border:1px solid var(--purple);padding:3px 7px;}
+.chud-val.warn{color:var(--mid);}
+.chud-val.danger{color:var(--hi);animation:blink .3s step-end infinite;}
+.chud-badge{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mid);border:1px solid var(--dim2);padding:3px 7px;}
 .chud-lives{font-size:13px;letter-spacing:2px;margin-top:2px;}
-#chaos-area{flex:1;position:relative;overflow:hidden;cursor:crosshair;background:radial-gradient(ellipse at center,#0a0a1a 0%,#000 100%);}
-/* S3 파티클 배경 */
+#chaos-area{flex:1;position:relative;overflow:hidden;cursor:crosshair;background:#000;}
 #chaos-bg-canvas{position:absolute;inset:0;z-index:0;pointer-events:none;}
-/* S3 단어 블록 강화 */
 .chaos-block{position:absolute;display:flex;flex-direction:column;align-items:center;gap:2px;z-index:10;pointer-events:none;}
 .cb-inner{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.cb-emoji{font-size:20px;line-height:1;}
-.cb-text{font-family:'DOSGothic',monospace;font-weight:700;padding:3px 8px;white-space:nowrap;border:2px solid;transition:all .1s;}
-.cb-text .match{animation:rainbowShift .5s linear infinite;}
-/* 방향별 색 */
-.chaos-block.dir-top .cb-text{border-color:#666;color:#ccc;font-size:13px;background:#0a0a0a;}
-.chaos-block.dir-bottom .cb-text{border-color:#ff8800;color:#ffcc66;font-size:13px;background:#1a0a00;}
-.chaos-block.dir-left .cb-text{border-color:#4466ff;color:#aabbff;font-size:13px;background:#000a1a;}
-.chaos-block.dir-right .cb-text{border-color:#ff4466;color:#ffaabb;font-size:13px;background:#1a000a;}
-/* 특수 타입 */
-.chaos-block.type-boss .cb-text{font-size:16px;border-color:var(--yellow);color:var(--yellow);background:#1a1000;box-shadow:0 0 10px rgba(255,215,0,0.4);}
-.chaos-block.type-bonus .cb-text{font-size:12px;border-color:var(--cyan);color:var(--cyan);background:#001a1a;animation:shockwave 1s ease-out infinite;}
-.chaos-block.type-bomb .cb-text{font-size:13px;border-color:var(--red);color:var(--red);background:#1a0000;}
-.chaos-block.type-shield .cb-text{font-size:13px;border-color:#8888ff;color:#ccccff;background:#08081a;}
-.chaos-block.targeted .cb-text{border-color:var(--green)!important;box-shadow:0 0 12px rgba(0,255,136,0.5);}
-/* 회전/효과 */
+.cb-emoji{font-size:18px;line-height:1;opacity:0.7;}
+.cb-text{font-family:'DOSGothic',monospace;font-weight:700;font-size:13px;padding:3px 8px;white-space:nowrap;border:1px solid #444;color:#ccc;background:#0a0a0a;transition:border-color .1s;}
+.cb-text .match{color:#fff;text-decoration:underline;}
+.chaos-block.type-boss .cb-text{font-size:15px;border-color:#888;color:#fff;background:#111;border-width:2px;}
+.chaos-block.type-bonus .cb-text{font-size:12px;border-color:#666;color:#aaa;background:#050505;border-style:dashed;}
+.chaos-block.type-bomb .cb-text{font-size:13px;border-color:#666;color:#999;background:#0a0a0a;border-style:dotted;}
+.chaos-block.type-shield .cb-text{font-size:13px;border-color:#555;color:#888;background:#050505;}
+.chaos-block.targeted .cb-text{border-color:#fff!important;border-style:solid!important;color:#fff!important;box-shadow:0 0 6px rgba(255,255,255,0.3);}
 .chaos-block.eff-spin{animation:wordSpin 3s linear infinite;}
-.chaos-block.eff-wobble{animation:wordWobble 0.5s ease-in-out infinite;}
-.chaos-block.eff-pulse{animation:wordPulse 0.35s ease-in-out infinite;}
-/* 보너스 배너 */
-.bonus-banner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;font-family:'Press Start 2P',monospace;font-size:18px;color:var(--yellow);text-shadow:0 0 20px var(--yellow),0 0 40px var(--orange);animation:waPop 1.8s ease-out forwards;pointer-events:none;text-align:center;line-height:1.8;}
-/* 역전 판정 배너 */
-.reversal-banner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:500;font-family:'Press Start 2P',monospace;font-size:22px;color:var(--red);text-shadow:0 0 30px var(--red);animation:waPop 2.5s ease-out forwards;pointer-events:none;text-align:center;line-height:1.8;background:rgba(0,0,0,0.85);border:3px solid var(--red);padding:20px 40px;display:none;}
+.chaos-block.eff-wobble{animation:wordWobble 0.6s ease-in-out infinite;}
+.chaos-block.eff-pulse{animation:wordPulse 0.4s ease-in-out infinite;}
+.bonus-banner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;font-family:'Press Start 2P',monospace;font-size:16px;color:#fff;text-shadow:0 0 10px rgba(255,255,255,0.4);animation:waPop 1.8s ease-out forwards;pointer-events:none;text-align:center;line-height:1.8;}
+.reversal-banner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:500;font-family:'Press Start 2P',monospace;font-size:20px;color:#fff;text-shadow:0 0 20px rgba(255,255,255,0.5);animation:waPop 2.5s ease-out forwards;pointer-events:none;text-align:center;line-height:1.8;background:rgba(0,0,0,0.9);border:2px solid #888;padding:20px 40px;display:none;}
 .reversal-banner.open{display:block;}
-/* S3 입력바 */
-#chaos-input-bar{display:flex;align-items:center;gap:0;background:#000;border-top:2px solid var(--purple);flex-shrink:0;height:52px;padding:0 14px;}
-#chaos-type-label{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--purple);margin-right:10px;letter-spacing:1px;white-space:nowrap;}
-#chaos-input{flex:1;background:#000;border:none;border-bottom:2px solid var(--cyan);color:var(--cyan);font-family:'DOSGothic',monospace;font-size:20px;font-weight:700;padding:3px 7px;outline:none;caret-color:var(--cyan);}
-#chaos-input::placeholder{color:#111;}
+#chaos-input-bar{display:flex;align-items:center;gap:0;background:#000;border-top:2px solid var(--dim2);flex-shrink:0;height:52px;padding:0 14px;}
+#chaos-type-label{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mid);margin-right:10px;letter-spacing:1px;white-space:nowrap;}
+#chaos-input{flex:1;background:#000;border:none;border-bottom:2px solid var(--mid);color:var(--hi);font-family:'DOSGothic',monospace;font-size:20px;font-weight:700;padding:3px 7px;outline:none;caret-color:var(--hi);}
+#chaos-input::placeholder{color:#222;}
 #chaos-bonus-bar{display:flex;align-items:center;gap:7px;margin-left:14px;}
 .bonus-pip{font-family:'Press Start 2P',monospace;font-size:7px;padding:2px 5px;border:1px solid var(--dim2);color:var(--lo);}
-.bonus-pip.active{border-color:var(--cyan);color:var(--cyan);}
-/* S3 스코어 팝 */
+.bonus-pip.active{border-color:var(--mid);color:var(--mid);}
 #s3-score-pop{position:absolute;pointer-events:none;z-index:60;font-family:'Press Start 2P',monospace;font-size:13px;display:none;}
 #s3-score-pop.anim{animation:scorePop 0.9s ease-out forwards;}
-/* 실드 오버레이 */
-.shield-overlay{position:absolute;inset:0;z-index:5;pointer-events:none;border:6px solid #8888ff;box-shadow:inset 0 0 30px rgba(136,136,255,0.2);display:none;}
-.shield-overlay.active{display:block;animation:blink .5s step-end infinite;}
+.shield-overlay{position:absolute;inset:0;z-index:5;pointer-events:none;border:4px solid #555;display:none;}
+.shield-overlay.active{display:block;animation:blink .6s step-end infinite;}
 
 /* ══ STAGE CLEAR OVERLAY ══ */
 #stage-clear-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:18px;}
@@ -364,7 +343,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .sc-total-val{font-family:'Press Start 2P',monospace;font-size:32px;color:var(--hi);text-shadow:0 0 16px rgba(255,255,255,0.4);}
 .sc-btn{font-family:'Press Start 2P',monospace;font-size:14px;background:#000;color:var(--hi);border:3px solid var(--hi);padding:14px 42px;cursor:pointer;letter-spacing:2px;animation:startGlow 1.5s ease-in-out infinite;transition:all .12s;}
 .sc-btn:hover{background:var(--hi);color:#000;}
-.sc-s3-note{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--purple);letter-spacing:2px;text-align:center;line-height:1.8;border:1px solid var(--purple);padding:10px 20px;max-width:500px;}
+.sc-s3-note{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mid);letter-spacing:2px;text-align:center;line-height:1.8;border:1px solid var(--dim2);padding:10px 20px;max-width:500px;}
 
 /* ══ FINAL RESULT ══ */
 .result-main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#000;}
@@ -379,17 +358,28 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .result-name{font-family:'DOSGothic',monospace;font-size:22px;color:var(--hi);line-height:1.4;}
 .result-sub2{font-size:14px;color:var(--mid);margin-top:3px;}
 /* 4분할 점수 */
+/* ── 슬롯머신 점수 연출 ── */
+@keyframes slotRoll{0%{transform:translateY(0);}100%{transform:translateY(-100%);}}
+@keyframes slotLand{0%{transform:scale(1.3);opacity:0.5;}60%{transform:scale(0.95);}100%{transform:scale(1);opacity:1;}}
+@keyframes digitBounce{0%{transform:translateY(-8px);opacity:0;}50%{transform:translateY(2px);}100%{transform:translateY(0);opacity:1;}}
+.slot-digit-wrap{display:inline-block;overflow:hidden;height:1.2em;vertical-align:middle;position:relative;}
+.slot-digit{display:block;animation:none;font-variant-numeric:tabular-nums;}
+.slot-digit.rolling{animation:slotRoll 0.06s linear infinite;}
+.slot-digit.landing{animation:digitBounce 0.35s cubic-bezier(0.22,1,0.36,1) forwards;}
+.slot-score-display{font-family:'Press Start 2P',monospace;font-size:30px;color:var(--hi);letter-spacing:2px;display:flex;align-items:center;justify-content:center;gap:0;}
+.slot-score-display.locked .slot-digit{color:var(--hi);}
+/* ── */
 .result-scores-4{display:grid;grid-template-columns:1fr 30px 1fr 30px 1fr 30px 1fr;border-bottom:1px solid var(--dim);}
 .rs-box{background:var(--panel);border-right:1px solid var(--dim);padding:14px 12px;text-align:center;}
 .rs-box.total-box{background:#0a1a0a;border:1px solid var(--green);}
 .rs-plus-box{display:flex;align-items:center;justify-content:center;background:#000;border-right:1px solid var(--dim);}
 .rs-plus-sym{font-family:'Press Start 2P',monospace;font-size:16px;color:var(--dim2);}
 .rs-val{font-family:'Press Start 2P',monospace;font-size:18px;color:var(--hi);display:block;}
-.rs-val.big{font-size:30px;text-shadow:0 0 20px rgba(255,255,255,0.45);animation:totalScorePulse 2s ease-in-out infinite;}
+.rs-val.big{font-size:30px;color:var(--hi);}
 .rs-val.s1{color:var(--mid);}
-.rs-val.s2{color:var(--green);}
-.rs-val.s3{color:var(--cyan);}
-.rs-val.reversal{color:var(--yellow);text-shadow:0 0 15px var(--yellow);}
+.rs-val.s2{color:var(--mid);}
+.rs-val.s3{color:var(--mid);}
+.rs-val.reversal{color:var(--hi);}
 .rs-label{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);margin-top:6px;letter-spacing:1px;}
 .rs-sublabel{font-family:'DOSGothic',monospace;font-size:11px;color:var(--lo);margin-top:3px;}
 .rs-reversal-tag{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--red);margin-top:3px;animation:blink .7s step-end infinite;}
@@ -439,7 +429,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div class="sb-score-area">
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1</span><span class="sb-score-val" id="sb-s1-intro">—</span></div>
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2</span><span class="sb-score-val green" id="sb-s2-intro">—</span></div>
-        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3</span><span class="sb-score-val cyan" id="sb-s3-intro">—</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3</span><span class="sb-score-val" id="sb-s3-intro">—</span></div>
         <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-intro">—</span></div>
       </div>
       <div class="sb-ranking">
@@ -529,7 +519,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div class="sb-score-area">
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1 (진행중)</span><span class="sb-score-val" id="sb-s1-training">0</span></div>
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2</span><span class="sb-score-val green" id="sb-s2-training">—</span></div>
-        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3</span><span class="sb-score-val cyan" id="sb-s3-training">—</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3</span><span class="sb-score-val" id="sb-s3-training">—</span></div>
         <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-training">0</span></div>
       </div>
       <div class="sb-ranking">
@@ -577,7 +567,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div class="sb-score-area">
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1 ✓</span><span class="sb-score-val" id="sb-s1-galaga">0</span></div>
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2 (진행중)</span><span class="sb-score-val green" id="sb-s2-galaga">0</span></div>
-        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3</span><span class="sb-score-val cyan" id="sb-s3-galaga">—</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3</span><span class="sb-score-val" id="sb-s3-galaga">—</span></div>
         <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-galaga">0</span></div>
       </div>
       <div class="sb-ranking">
@@ -622,7 +612,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div class="sb-score-area">
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1 ✓</span><span class="sb-score-val" id="sb-s1-chaos">0</span></div>
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2 ✓</span><span class="sb-score-val green" id="sb-s2-chaos">0</span></div>
-        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3 (진행중)</span><span class="sb-score-val cyan" id="sb-s3-chaos">0</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3 (진행중)</span><span class="sb-score-val" id="sb-s3-chaos">0</span></div>
         <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-chaos">0</span></div>
       </div>
       <div class="sb-ranking">
@@ -633,7 +623,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
     <div class="main-area">
       <div class="chaos-main-area">
         <div class="chaos-hud">
-          <div class="chud-item"><div class="chud-label">S3 SCORE</div><div class="chud-val cyan" id="chud-score">0</div></div>
+          <div class="chud-item"><div class="chud-label">S3 SCORE</div><div class="chud-val" id="chud-score">0</div></div>
           <div class="chud-item"><div class="chud-label">LIVES</div><div class="chud-lives" id="chud-lives">❤️❤️❤️</div></div>
           <div class="chud-item"><div class="chud-label">COMBO</div><div class="chud-val" id="chud-combo">x1</div></div>
           <div class="chud-badge">STAGE 3 — CHAOS</div>
@@ -647,7 +637,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
             <svg viewBox="0 0 24 24" style="width:100%;height:100%;"><circle cx="12" cy="12" r="9" fill="none" stroke="rgba(0,238,255,0.5)" stroke-width="1.5"/><line x1="12" y1="2" x2="12" y2="8" stroke="rgba(0,238,255,0.7)" stroke-width="1.5"/><line x1="12" y1="16" x2="12" y2="22" stroke="rgba(0,238,255,0.7)" stroke-width="1.5"/><line x1="2" y1="12" x2="8" y2="12" stroke="rgba(0,238,255,0.7)" stroke-width="1.5"/><line x1="16" y1="12" x2="22" y2="12" stroke="rgba(0,238,255,0.7)" stroke-width="1.5"/></svg>
           </div>
           <div class="shield-overlay" id="shield-overlay"></div>
-          <div id="wave-announce-chaos"><div class="wa-text" id="wa-text-chaos" style="font-family:'Press Start 2P',monospace;font-size:18px;color:var(--cyan);letter-spacing:4px;"></div></div>
+          <div id="wave-announce-chaos" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:80;pointer-events:none;text-align:center;display:none;"><div class="wa-text" id="wa-text-chaos" style="font-family:'Press Start 2P',monospace;font-size:18px;color:#fff;letter-spacing:4px;"></div></div>
           <div id="s3-score-pop"></div>
         </div>
         <div id="chaos-input-bar">
@@ -675,7 +665,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div class="sb-score-area">
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1</span><span class="sb-score-val" id="sb-s1-result">0</span></div>
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2</span><span class="sb-score-val green" id="sb-s2-result">0</span></div>
-        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3</span><span class="sb-score-val cyan" id="sb-s3-result">0</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3</span><span class="sb-score-val" id="sb-s3-result">0</span></div>
         <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-result">0</span></div>
       </div>
       <div class="sb-ranking">
@@ -695,7 +685,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
             <div class="result-avatar" id="res-avatar">⛑️</div>
             <div><div class="result-name" id="res-name">사용자</div><div class="result-sub2" id="res-sub2">—</div></div>
             <div style="margin-left:auto;text-align:right;">
-              <div id="res-reversal-notice" style="display:none;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--yellow);animation:blink .8s step-end infinite;">⚡ REVERSAL ACHIEVED ⚡</div>
+              <div id="res-reversal-notice" style="display:none;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--hi);animation:blink .8s step-end infinite;">★ REVERSAL ACHIEVED ★</div>
             </div>
           </div>
           <div class="result-scores-4">
@@ -896,19 +886,19 @@ const WAVE_CONFIG_S2=[
 
 // S3 웨이브 설정
 const WAVE_CONFIG_S3=[
-  {count:6,  speed:0.7,  spawnInterval:2000,maxOnScreen:4,  bossChance:0,   bonusChance:0.1, bombChance:0.05, shieldChance:0.05},
-  {count:8,  speed:1.0,  spawnInterval:1700,maxOnScreen:5,  bossChance:0.05,bonusChance:0.12,bombChance:0.08, shieldChance:0.07},
-  {count:10, speed:1.35, spawnInterval:1400,maxOnScreen:6,  bossChance:0.1, bonusChance:0.12,bombChance:0.1,  shieldChance:0.08},
-  {count:12, speed:1.7,  spawnInterval:1100,maxOnScreen:7,  bossChance:0.15,bonusChance:0.15,bombChance:0.12, shieldChance:0.1},
-  {count:15, speed:2.1,  spawnInterval:900, maxOnScreen:9,  bossChance:0.2, bonusChance:0.15,bombChance:0.15, shieldChance:0.1}
+  {count:8,  speed:0.7,  spawnInterval:1550,maxOnScreen:5,  bossChance:0,   bonusChance:0.1, bombChance:0.05, shieldChance:0.05},
+  {count:10, speed:1.0,  spawnInterval:1300,maxOnScreen:6,  bossChance:0.05,bonusChance:0.12,bombChance:0.08, shieldChance:0.07},
+  {count:13, speed:1.35, spawnInterval:1080,maxOnScreen:8,  bossChance:0.1, bonusChance:0.12,bombChance:0.1,  shieldChance:0.08},
+  {count:16, speed:1.7,  spawnInterval:850, maxOnScreen:9,  bossChance:0.15,bonusChance:0.15,bombChance:0.12, shieldChance:0.1},
+  {count:20, speed:2.1,  spawnInterval:700, maxOnScreen:11, bossChance:0.2, bonusChance:0.15,bombChance:0.15, shieldChance:0.1}
 ];
 
 const SAMPLE=[
-  {nickname:'안전왕',char:'안전모',wpm:180,acc:96,score:3456,stage2:3200,stage3:3500,total:10156,passage:'제1조, 제2조'},
-  {nickname:'현장달인',char:'현장반장',wpm:155,acc:94,score:2914,stage2:2600,stage3:2900,total:8414,passage:'제36조, 제38조'},
-  {nickname:'보건마스터',char:'보건관리자',wpm:142,acc:91,score:2584,stage2:2100,stage3:2200,total:6884,passage:'제51조~제54조'},
-  {nickname:'소방영웅',char:'소방관',wpm:130,acc:88,score:2288,stage2:1700,stage3:1500,total:5488,passage:'제63조, 제167조'},
-  {nickname:'안전조끼맨',char:'안전조끼',wpm:118,acc:85,score:2006,stage2:1200,stage3:1000,total:4206,passage:'제5조, 제6조'}
+  {nickname:'안전왕',char:'안전모',wpm:180,acc:96,score:5184,stage2:3200,stage3:3500,total:11884,passage:'제1조, 제2조'},
+  {nickname:'현장달인',char:'현장반장',wpm:155,acc:94,score:4371,stage2:2600,stage3:2900,total:9871,passage:'제36조, 제38조'},
+  {nickname:'보건마스터',char:'보건관리자',wpm:142,acc:91,score:3876,stage2:2100,stage3:2200,total:8176,passage:'제51조~제54조'},
+  {nickname:'소방영웅',char:'소방관',wpm:130,acc:88,score:3432,stage2:1700,stage3:1500,total:6632,passage:'제63조, 제167조'},
+  {nickname:'안전조끼맨',char:'안전조끼',wpm:118,acc:85,score:3009,stage2:1200,stage3:1000,total:5209,passage:'제5조, 제6조'}
 ];
 
 /* ───────────────────────────────────
@@ -1244,7 +1234,7 @@ function s1UpdateStats(){
   let tmpOk=s1CorrectChars;const target=s1Lines[s1CurLine]||'';
   for(let i=0;i<Math.min(s1LineTyped.length,target.length);i++)if(s1LineTyped[i]===target[i])tmpOk++;
   const tmpTyped=s1TotalTyped+s1LineTyped.length;
-  const wpm=el>0?Math.round((tmpOk/2)/el):0;const acc=tmpTyped>0?Math.round((tmpOk/tmpTyped)*100):100;const score=Math.round(wpm*(acc/100)*20);
+  const wpm=el>0?Math.round((tmpOk/2)/el):0;const acc=tmpTyped>0?Math.round((tmpOk/tmpTyped)*100):100;const score=Math.round(wpm*(acc/100)*30);
   document.getElementById('stat-wpm').textContent=wpm;document.getElementById('stat-acc').textContent=acc+'%';document.getElementById('stat-score').textContent=score;
   document.getElementById('bar-acc').style.width=Math.min(100,acc)+'%';document.getElementById('bar-wpm').style.width=Math.min(100,wpm/2.5)+'%';
   document.getElementById('sb-s1-training').textContent=score;document.getElementById('sb-total-training').textContent=score;
@@ -1263,7 +1253,7 @@ function s1FinishTraining(){
   const elapsed=s1StartTime?(Date.now()-s1StartTime)/60000:TIME_LIMIT/60;
   stage1Wpm=elapsed>0?Math.round((finalCorrect/2)/elapsed):0;
   stage1Acc=finalTyped>0?Math.round((finalCorrect/finalTyped)*100):0;
-  stage1Score=Math.round(stage1Wpm*(stage1Acc/100)*20);
+  stage1Score=Math.round(stage1Wpm*(stage1Acc/100)*30);
   stage1Chars=finalCorrect;
   updateScoreSidebar();
   showStageClearToGalaga();
@@ -1295,7 +1285,7 @@ function showStageClearToGalaga(){
 function showStageClearToChaos(){
   showStageClearGeneric({
     title:'STAGE 2 CLEAR!',sub:'이제 STAGE 3 CHAOS MODE로 진행합니다',
-    scoreRow:`<div class="sc-score-box"><span class="sc-score-lbl">STAGE 1</span><span class="sc-score-val stage1">${stage1Score}</span></div><span class="sc-plus">+</span><div class="sc-score-box"><span class="sc-score-lbl">STAGE 2</span><span class="sc-score-val stage2">${stage2Score}</span></div><span class="sc-plus">+</span><div class="sc-score-box"><span class="sc-score-lbl">STAGE 3</span><span class="sc-score-val" style="color:var(--purple);">???</span></div><span class="sc-plus">=</span><div class="sc-total-box"><span class="sc-total-lbl">TOTAL</span><span class="sc-total-val">${stage1Score+stage2Score} + ???</span></div>`,
+    scoreRow:`<div class="sc-score-box"><span class="sc-score-lbl">STAGE 1</span><span class="sc-score-val stage1">${stage1Score}</span></div><span class="sc-plus">+</span><div class="sc-score-box"><span class="sc-score-lbl">STAGE 2</span><span class="sc-score-val stage2">${stage2Score}</span></div><span class="sc-plus">+</span><div class="sc-score-box"><span class="sc-score-lbl">STAGE 3</span><span class="sc-score-val" style="color:var(--mid);">???</span></div><span class="sc-plus">=</span><div class="sc-total-box"><span class="sc-total-lbl">TOTAL</span><span class="sc-total-val">${stage1Score+stage2Score} + ???</span></div>`,
     note:`⚡ STAGE 3 — CHAOS MODE ⚡<br>4방향(상/하/좌/우)에서 단어 출현<br>회전/파동/무지개 특수효과<br>👑 BOSS · ⭐ BONUS · 💣 BOMB · 🛡️ SHIELD<br>💥 역전 가능! S3에서 S1+S2 합산 초과 시<br>역전 보너스 +500점 획득!`,
     btnLabel:'▶ STAGE 3 시작',nextFn:startChaos
   });
@@ -1468,7 +1458,7 @@ function animateChaosBackground(){
   c_bgStars.forEach(s=>{
     s.opacity+=0.02*(Math.random()>0.5?1:-1);s.opacity=Math.max(0.1,Math.min(1,s.opacity));
     c_bgCtx.beginPath();c_bgCtx.arc(s.x,s.y,s.r,0,Math.PI*2);
-    c_bgCtx.fillStyle=`rgba(0,238,255,${s.opacity*0.4})`;c_bgCtx.fill();
+    c_bgCtx.fillStyle=`rgba(200,200,200,${s.opacity*0.25})`;c_bgCtx.fill();
   });
   c_bgAnimId=requestAnimationFrame(animateChaosBackground);
 }
@@ -1492,7 +1482,7 @@ function startChaos(){
   c_timerIv=setInterval(()=>{
     c_timeLeft--;
     const el=document.getElementById('chud-time');
-    if(el){el.textContent=c_timeLeft;el.className='chud-val'+(c_timeLeft<=15?' danger':c_timeLeft<=30?' yellow':'');}
+    if(el){el.textContent=c_timeLeft;el.className='chud-val'+(c_timeLeft<=15?' danger':c_timeLeft<=30?' warn':'');}
     if(c_timeLeft<=0){clearInterval(c_timerIv);c_gameActive=false;clearTimeout(c_spawnTimer);cancelAnimationFrame(c_rafId);c_blocks.forEach(b=>{try{b.el.remove();}catch(e){}});c_blocks=[];stage3Score=c_score;finishGame();}
   },1000);
   const cfg=getWaveCfgS3();c_waveTarget=cfg.count;
@@ -1637,7 +1627,7 @@ function drawChaosLaser(area,tx,ty,dir){
     laser.style.top=dir==='top'?'0':ty+'px';
     laser.style.height=h+'px';
     laser.style.width='2px';
-    laser.style.background=dir==='top'?'linear-gradient(to bottom,transparent,var(--cyan))':'linear-gradient(to top,transparent,var(--cyan))';
+    laser.style.background=dir==='top'?'linear-gradient(to bottom,transparent,rgba(255,255,255,0.7))':'linear-gradient(to top,transparent,rgba(255,255,255,0.7))';
   } else {
     laser.classList.add('laser-h');
     const w=dir==='left'?tx:aW-tx;
@@ -1645,7 +1635,7 @@ function drawChaosLaser(area,tx,ty,dir){
     laser.style.left=dir==='left'?'0':tx+'px';
     laser.style.width=w+'px';
     laser.style.height='2px';
-    laser.style.background=dir==='left'?'linear-gradient(to right,transparent,var(--cyan))':'linear-gradient(to left,transparent,var(--cyan))';
+    laser.style.background=dir==='left'?'linear-gradient(to right,transparent,rgba(255,255,255,0.7))':'linear-gradient(to left,transparent,rgba(255,255,255,0.7))';
   }
   area.appendChild(laser);setTimeout(()=>laser.remove(),280);
 }
@@ -1698,16 +1688,16 @@ function cExplode(tx,ty,emoji,scale=1){
   area.appendChild(exp);setTimeout(()=>exp.remove(),500);
 }
 
-function showChaosBonus(x,y,text,color='var(--cyan)'){
+function showChaosBonus(x,y,text,color='#fff'){
   const area=document.getElementById('chaos-area');if(!area)return;
   const el=document.createElement('div');
-  el.style.cssText=`position:absolute;left:${x}px;top:${y-30}px;font-family:'Press Start 2P',monospace;font-size:12px;color:${color};pointer-events:none;z-index:100;white-space:nowrap;animation:scorePop .9s ease-out forwards;`;
+  el.style.cssText=`position:absolute;left:${x}px;top:${y-30}px;font-family:'Press Start 2P',monospace;font-size:11px;color:#fff;pointer-events:none;z-index:100;white-space:nowrap;animation:scorePop .9s ease-out forwards;`;
   el.textContent=text;area.appendChild(el);setTimeout(()=>el.remove(),900);
 }
 
 function showS3ScorePop(x,y,txt){
   const el=document.getElementById('s3-score-pop');if(!el)return;
-  el.textContent=txt;el.style.left=x+'px';el.style.top=(y-20)+'px';el.style.display='block';el.style.color='var(--cyan)';
+  el.textContent=txt;el.style.left=x+'px';el.style.top=(y-20)+'px';el.style.display='block';el.style.color='#fff';
   el.className='';void el.offsetWidth;el.className='anim';
 }
 
@@ -1757,7 +1747,7 @@ function updateChaosHUD(){
   setEl('chud-score','textContent',c_score);
   setEl('chud-combo','textContent','x'+c_combo);setEl('chud-wave','textContent',c_wave);
   const comboEl=document.getElementById('chud-combo');
-  if(comboEl){comboEl.className=c_combo>=5?'chud-val yellow':c_combo>=3?'chud-val cyan':'chud-val';}
+  if(comboEl){comboEl.className=c_combo>=5?'chud-val warn':c_combo>=3?'chud-val':'chud-val';}
   const heartsMap=['','❤️','❤️❤️','❤️❤️❤️'];
   setEl('chud-lives','textContent',heartsMap[Math.max(0,Math.min(3,c_lives))]);
   if(!c_shieldActive){setEl('chud-shield','textContent','—');}
@@ -1787,21 +1777,19 @@ function checkReversal(){
 function finishGame(){
   clearInterval(c_timerIv);clearTimeout(c_stageTimer);clearTimeout(c_spawnTimer);cancelAnimationFrame(c_rafId);
   if(c_bgAnimId)cancelAnimationFrame(c_bgAnimId);
-  // 역전 판정
   const isReversal=checkReversal();
   const total=stage1Score+stage2Score+stage3Score;
+
+  // 기본 정보 세팅
   document.getElementById('res-name').textContent=nickname;
   document.getElementById('res-sub2').textContent=`${PASSAGES[selPassage].title} | S2 WAVE ${g_wave} | S3 WAVE ${c_wave}`;
   document.getElementById('res-avatar').innerHTML=CHARS[selChar].svg;
-  document.getElementById('res-s1-score').textContent=stage1Score;
-  document.getElementById('res-s2-score').textContent=stage2Score;
-  document.getElementById('res-s3-score').textContent=stage3Score;
-  document.getElementById('res-total-score').textContent=total;
-  if(isReversal){
-    document.getElementById('res-reversal-notice').style.display='';
-    document.getElementById('res-reversal-tag').style.display='';
-    document.getElementById('res-s3-score').className='rs-val reversal';
-  }
+  // 점수칸 초기화 (슬롯 연출 전 0으로)
+  document.getElementById('res-s1-score').textContent='0';
+  document.getElementById('res-s2-score').textContent='0';
+  document.getElementById('res-s3-score').textContent='0';
+  document.getElementById('res-total-score').textContent='0';
+
   document.getElementById('res-wpm').textContent=stage1Wpm;
   document.getElementById('res-acc').textContent=stage1Acc+'%';
   document.getElementById('res-chars').textContent=stage1Chars;
@@ -1810,10 +1798,36 @@ function finishGame(){
   ['sb-s1-result','sb-s2-result','sb-s3-result','sb-total-result'].forEach((id,idx)=>{
     const el=document.getElementById(id);if(el)el.textContent=[stage1Score,stage2Score,stage3Score,total][idx];
   });
-  const grade=total>=9000?'★★★ 전설급! 만점에 근접한 기록!':total>=7000?'★★ 우수한 종합 성적 (상위권)':total>=4000?'★ 좋은 결과입니다':total>=2000?'계속 훈련하세요':'다시 도전하세요';
-  document.getElementById('res-comment').textContent=grade+(isReversal?' ⚡역전 달성!':'');
+  const grade=total>=10000?'★★★ 전설급! 10,000점 달성!':total>=8000?'★★ 우수한 종합 성적 (상위권)':total>=5000?'★ 좋은 결과입니다':total>=2500?'계속 훈련하세요':'다시 도전하세요';
+  document.getElementById('res-comment').textContent=grade+(isReversal?' ★역전 달성!':'');
   document.getElementById('res-formula').textContent=`S1:${stage1Score} + S2:${stage2Score} + S3:${stage3Score}${stage3ReversalBonus?`(역전+${stage3ReversalBonus})`:''} = ${total}`;
-  showScreen('result-screen');spawnParticles();
+  if(isReversal){
+    document.getElementById('res-reversal-notice').style.display='';
+    document.getElementById('res-reversal-tag').style.display='';
+  }
+
+  showScreen('result-screen');
+
+  // ── 슬롯머신 연출 ──────────────────────────────────
+  // 순서: 오른쪽(S3) → 가운데(S2) → 왼쪽(S1) → TOTAL
+  const slotQueue=[
+    {id:'res-s3-score', finalVal:stage3Score, delay:400},
+    {id:'res-s2-score', finalVal:stage2Score, delay:1600},
+    {id:'res-s1-score', finalVal:stage1Score, delay:2800},
+    {id:'res-total-score', finalVal:total,    delay:4200, isTotal:true}
+  ];
+
+  slotQueue.forEach(({id,finalVal,delay,isTotal})=>{
+    const el=document.getElementById(id);if(!el)return;
+    setTimeout(()=>{
+      runSlotMachine(el, finalVal, isTotal);
+    }, delay);
+  });
+
+  // 파티클은 TOTAL 확정 후
+  setTimeout(()=>spawnParticles(), 5400);
+
+  // GAS 저장 & 랭킹
   const scoreData={nickname,charEmoji:CHARS[selChar].svg,charName:CHARS[selChar].name,wpm:stage1Wpm,acc:stage1Acc,score:stage1Score,stage2:stage2Score,stage3:stage3Score,total,passage:PASSAGES[selPassage].title,kills:stage2Kills,s3kills:stage3Kills,wave:g_wave,s3wave:c_wave,reversal:isReversal?1:0};
   saveScore(scoreData);
   setTimeout(()=>{
@@ -1829,7 +1843,71 @@ function finishGame(){
       renderSidebarRanking(fallback,nickname,'rank-list-body-result');
       document.getElementById('res-rank-pos').textContent='LOCAL';
     });
-  },1200);
+  },5800);
+}
+
+/* ── 슬롯머신 한 칸 연출 ──────────────────────────────
+   finalVal: 최종 점수
+   오른쪽 자릿수부터 왼쪽으로 순차 확정 (땡~땡~땡)
+─────────────────────────────────────────────────── */
+function runSlotMachine(el, finalVal, isTotal){
+  const digits=String(finalVal).split('');  // e.g. ['3','4','5','6']
+  const totalDigits=digits.length;
+
+  // 슬롯 DOM 생성
+  el.textContent='';
+  el.style.fontFamily="'Press Start 2P',monospace";
+  el.style.fontSize=isTotal?'28px':'18px';
+  el.style.letterSpacing='2px';
+  el.style.display='flex';
+  el.style.alignItems='center';
+  el.style.justifyContent='center';
+  el.style.gap='1px';
+
+  const digitEls=[];
+  for(let i=0;i<totalDigits;i++){
+    const wrap=document.createElement('span');
+    wrap.style.cssText='display:inline-block;overflow:hidden;height:1.25em;vertical-align:middle;';
+    const span=document.createElement('span');
+    span.style.display='block';
+    span.textContent='0';
+    wrap.appendChild(span);
+    el.appendChild(wrap);
+    digitEls.push(span);
+  }
+
+  // 각 자릿수: 롤링 시작
+  const rollIntervals=[];
+  digitEls.forEach((span,i)=>{
+    let n=0;
+    rollIntervals[i]=setInterval(()=>{
+      n=(n+Math.floor(Math.random()*3)+1)%10;
+      span.textContent=n;
+    },60);
+  });
+
+  // 오른쪽부터 왼쪽으로 순차 확정 (간격 220ms)
+  const lockInterval=220;
+  for(let i=totalDigits-1;i>=0;i--){
+    const lockDelay=(totalDigits-1-i)*lockInterval;
+    ((idx,lockAt)=>{
+      setTimeout(()=>{
+        clearInterval(rollIntervals[idx]);
+        const span=digitEls[idx];
+        span.textContent=digits[idx];
+        // bounce 효과
+        span.style.animation='none';
+        void span.offsetWidth;
+        span.style.animation='digitBounce 0.35s cubic-bezier(0.22,1,0.36,1) forwards';
+        // TOTAL이면 마지막 자릿수 확정 시 강조
+        if(isTotal && idx===0){
+          setTimeout(()=>{
+            el.style.textShadow='0 0 14px rgba(255,255,255,0.5)';
+          },350);
+        }
+      }, lockAt);
+    })(i, lockDelay);
+  }
 }
 
 function saveScore(d){
