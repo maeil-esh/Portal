@@ -5,8 +5,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="cache-version" content="20260518_01">
 <title>천하제일 산업안전보건법 타이핑 대회</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script>
+/* 브라우저 뒤로가기 캐시(bfcache) 방지: 이전 화면 복원 시 최신 상태로 재로딩 */
+window.addEventListener('pageshow', function(event) {
+  if (event.persisted) {
+    window.location.reload();
+  }
+});
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap&v=20260518_01" rel="stylesheet">
 <style>
 @font-face{font-family:'DOSGothic';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_eight@1.0/DOSGothic.woff') format('woff');font-weight:normal;font-style:normal;font-display:block;}
 @font-face{font-family:'DungGeunMo';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');font-weight:normal;font-style:normal;font-display:block;}
@@ -699,6 +711,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbwry3taI8EQxe6eMl5iCp16CwNJPQkfjHomCif75afQvrswOkzNTn8rEj2QUdY6Yn9B/exec';
+const APP_CACHE_VERSION='20260518_01';
 const GAS_TIMEOUT_MS=8000;
 
 /* ─── 캐릭터 ─── */
@@ -909,7 +922,8 @@ function requestGas(action,params={},onSuccess=()=>{},onFail=()=>{}){
   const cleanup=()=>{try{delete window[cbName];}catch(e){window[cbName]=undefined;}if(scriptEl&&scriptEl.parentNode)scriptEl.parentNode.removeChild(scriptEl);};
   const timer=setTimeout(()=>{if(done)return;done=true;cleanup();onFail(new Error('GAS 시간 초과'));},GAS_TIMEOUT_MS);
   window[cbName]=payload=>{if(done)return;done=true;clearTimeout(timer);cleanup();onSuccess(payload);};
-  const qs=buildQuery({action,callback:cbName,_ts:Date.now(),...params});
+  const now=Date.now();
+  const qs=buildQuery({action,callback:cbName,...params,_t:now,_ts:now,_nocache:now+'_'+Math.random().toString(36).slice(2)});
   scriptEl=document.createElement('script');
   scriptEl.src=GAS_URL+(GAS_URL.includes('?')?'&':'?')+qs;
   scriptEl.onerror=()=>{if(done)return;done=true;clearTimeout(timer);cleanup();onFail(new Error('GAS 로드 실패'));};
