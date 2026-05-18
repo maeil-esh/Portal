@@ -1,24 +1,14 @@
-
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<meta name="cache-version" content="20260518_01">
 <title>천하제일 산업안전보건법 타이핑 대회</title>
 <script>
-/* 브라우저 뒤로가기 캐시(bfcache) 방지: 이전 화면 복원 시 최신 상태로 재로딩 */
-window.addEventListener('pageshow', function(event) {
-  if (event.persisted) {
-    window.location.reload();
-  }
-});
+window.addEventListener('pageshow', function(event) { if (event.persisted) window.location.reload(); });
 </script>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap&v=20260518_01" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
 @font-face{font-family:'DOSGothic';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_eight@1.0/DOSGothic.woff') format('woff');font-weight:normal;font-style:normal;font-display:block;}
 @font-face{font-family:'DungGeunMo';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');font-weight:normal;font-style:normal;font-display:block;}
@@ -26,7 +16,7 @@ window.addEventListener('pageshow', function(event) {
 :root{
   --bg:#0e0e0e;--bg2:#111;--panel:#1a1a1a;--panel2:#222;
   --hi:#ffffff;--mid:#aaaaaa;--lo:#555555;--dim:#2a2a2a;--dim2:#333;
-  --active:#1e2a1e;--green:#00ff88;--red:#ff4444;
+  --active:#1e2a1e;--green:#00ff88;--red:#ff4444;--yellow:#ffd700;--cyan:#00eeff;--purple:#cc44ff;--orange:#ff8800;
 }
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'DOSGothic','DungGeunMo',monospace;color:var(--hi);}
 body::after{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.09) 0,rgba(0,0,0,0.09) 1px,transparent 1px,transparent 4px);}
@@ -42,109 +32,107 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 @keyframes explode{0%{opacity:1;transform:scale(0.5);}100%{opacity:0;transform:scale(2.5);}}
 @keyframes laserFade{from{opacity:1;}to{opacity:0;}}
 @keyframes waPop{0%{opacity:0;transform:scale(0.7);}20%{opacity:1;transform:scale(1.05);}80%{opacity:1;}100%{opacity:0;transform:scale(0.95);}}
-@keyframes scorePop{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(-40px);}}
+@keyframes scorePop{from{opacity:1;transform:translateY(0) scale(1);}to{opacity:0;transform:translateY(-60px) scale(1.4);}}
 @keyframes totalScorePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+@keyframes wordSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@keyframes wordWobble{0%,100%{transform:rotate(-5deg) scale(1);}50%{transform:rotate(5deg) scale(1.08);}}
+@keyframes wordPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+@keyframes rainbowShift{0%{color:#ff0000;}14%{color:#ff8800;}28%{color:#ffff00;}42%{color:#00ff00;}57%{color:#00ffff;}71%{color:#0088ff;}85%{color:#ff00ff;}100%{color:#ff0000;}}
+@keyframes shockwave{0%{box-shadow:0 0 0 0 rgba(255,215,0,0.8);}100%{box-shadow:0 0 0 60px rgba(255,215,0,0);}}
+@keyframes bonusFlash{0%,100%{background:transparent;}50%{background:rgba(255,215,0,0.15);}}
+@keyframes s3GlitchH{0%,100%{transform:translateX(0);}20%{transform:translateX(-4px);}40%{transform:translateX(4px);}60%{transform:translateX(-2px);}80%{transform:translateX(2px);}}
+@keyframes comboFire{0%{text-shadow:0 0 10px var(--yellow);}50%{text-shadow:0 0 30px var(--orange),0 0 60px var(--red);}100%{text-shadow:0 0 10px var(--yellow);}}
+@keyframes dangerPulse{0%,100%{border-color:var(--dim);}50%{border-color:var(--red);box-shadow:0 0 20px rgba(255,68,68,0.3);}}
 
 .screen{display:none;position:relative;z-index:1;}
 .screen.active{display:flex;}
 .layout{width:100vw;height:100vh;display:flex;overflow:hidden;}
 
 /* ── 사이드바 ── */
-.sidebar{width:240px;height:100vh;background:#000;flex-shrink:0;border-right:2px solid var(--dim);display:flex;flex-direction:column;overflow:hidden;}
-.sb-current{padding:14px 16px;border-bottom:2px solid var(--dim);flex-shrink:0;}
-.sb-cur-label{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:2px;margin-bottom:12px;text-align:center;}
-.sb-cur-user{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:8px;text-align:center;}
-.sb-cur-avatar{width:64px;height:64px;background:var(--panel);border:2px solid var(--dim2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:4px;}
-.sb-cur-name{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--hi);line-height:1.6;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
-.sb-cur-char{font-size:13px;color:var(--lo);margin-top:2px;text-align:center;}
-.sb-cur-stage{font-size:13px;color:var(--mid);background:var(--panel);border:1px solid var(--dim);padding:6px 10px;line-height:1.5;word-break:keep-all;text-align:center;}
-.sb-cur-stage-lbl{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:1px;display:block;margin-bottom:3px;}
-
-/* 사이드바 점수 박스 */
-.sb-score-area{padding:10px 16px;border-bottom:2px solid var(--dim);flex-shrink:0;}
-.sb-score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
-.sb-score-lbl{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);letter-spacing:1px;}
-.sb-score-val{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--hi);}
+.sidebar{width:220px;height:100vh;background:#000;flex-shrink:0;border-right:2px solid var(--dim);display:flex;flex-direction:column;overflow:hidden;}
+.sb-current{padding:12px 14px;border-bottom:2px solid var(--dim);flex-shrink:0;}
+.sb-cur-label{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);letter-spacing:2px;margin-bottom:10px;text-align:center;}
+.sb-cur-user{display:flex;flex-direction:column;align-items:center;gap:5px;margin-bottom:7px;text-align:center;}
+.sb-cur-avatar{width:56px;height:56px;background:var(--panel);border:2px solid var(--dim2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:3px;}
+.sb-cur-name{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--hi);line-height:1.6;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px;}
+.sb-cur-char{font-size:12px;color:var(--lo);margin-top:2px;}
+.sb-cur-stage{font-size:12px;color:var(--mid);background:var(--panel);border:1px solid var(--dim);padding:5px 8px;line-height:1.4;text-align:center;}
+.sb-cur-stage-lbl{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);display:block;margin-bottom:2px;}
+.sb-score-area{padding:8px 14px;border-bottom:2px solid var(--dim);flex-shrink:0;}
+.sb-score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.sb-score-lbl{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);letter-spacing:1px;}
+.sb-score-val{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--hi);}
 .sb-score-val.green{color:var(--green);}
-.sb-total-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--dim2);padding:6px 8px;margin-top:6px;}
-.sb-total-lbl{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mid);letter-spacing:1px;}
-.sb-total-val{font-family:'Press Start 2P',monospace;font-size:16px;color:var(--hi);text-shadow:0 0 8px rgba(255,255,255,0.3);}
-
-/* 랭킹 */
+.sb-score-val.cyan{color:var(--cyan);}
+.sb-total-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--dim2);padding:5px 7px;margin-top:5px;}
+.sb-total-lbl{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--mid);}
+.sb-total-val{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--hi);text-shadow:0 0 8px rgba(255,255,255,0.3);}
 .sb-ranking{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
-.sb-rank-header{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);padding:8px 16px;border-bottom:1px solid var(--dim);flex-shrink:0;letter-spacing:2px;display:flex;align-items:center;gap:6px;}
+.sb-rank-header{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mid);padding:7px 14px;border-bottom:1px solid var(--dim);flex-shrink:0;letter-spacing:2px;}
 .rank-scroll{flex:1;overflow-y:auto;min-height:0;}
 .rank-scroll::-webkit-scrollbar{width:3px;}
 .rank-scroll::-webkit-scrollbar-thumb{background:var(--dim2);}
-.rank-row{display:grid;grid-template-columns:24px 20px 1fr 48px 32px;align-items:center;gap:3px;padding:7px 14px;border-bottom:1px solid var(--dim);font-size:13px;transition:background .1s;}
+.rank-row{display:grid;grid-template-columns:22px 18px 1fr 44px 30px;align-items:center;gap:3px;padding:6px 12px;border-bottom:1px solid var(--dim);font-size:12px;transition:background .1s;}
 .rank-row:hover{background:var(--panel);}
 .rank-row.mine{background:rgba(255,255,255,0.04)!important;}
-.rank-row.rh{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);letter-spacing:1px;padding:4px 14px;border-bottom:2px solid var(--dim2);background:#000;position:sticky;top:0;z-index:2;}
-.rr-no{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--lo);}
+.rank-row.rh{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);padding:4px 12px;border-bottom:2px solid var(--dim2);background:#000;position:sticky;top:0;z-index:2;}
+.rr-no{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);}
 .rr-no.n1{color:var(--hi);}
 .rr-no.n2{color:var(--mid);}
 .rr-no.n3{color:var(--lo);}
-.rr-ch{font-size:16px;text-align:center;}
-.rr-nick{font-weight:700;color:var(--mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;}
+.rr-ch{font-size:14px;text-align:center;}
+.rr-nick{font-weight:700;color:var(--mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;}
 .rr-nick.top{color:var(--hi);}
-.rr-sc{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--hi);text-align:right;}
-.rr-wpm{font-size:12px;color:var(--lo);text-align:right;}
-.rank-loading{padding:14px;text-align:center;font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:2px;animation:blink 1s step-end infinite;}
-
+.rr-sc{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--hi);text-align:right;}
+.rr-wpm{font-size:11px;color:var(--lo);text-align:right;}
+.rank-loading{padding:12px;text-align:center;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);animation:blink 1s step-end infinite;}
 .main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 
-/* ══════════════════════ INTRO ══════════════════════ */
-.intro-main{flex:1;display:flex;flex-direction:column;background:var(--bg2);overflow:hidden;position:relative;}
-.im-title-section{flex-shrink:0;background:#000;border-bottom:3px solid var(--hi);padding:0;display:flex;align-items:flex-end;position:relative;overflow:hidden;}
-.im-title-left{flex:1;padding:4px 24px 16px;display:flex;flex-direction:column;justify-content:flex-end;gap:5px;}
-.im-deco-stars{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:4px;display:flex;align-items:center;gap:8px;}
+/* ══ INTRO ══ */
+.intro-main{flex:1;display:flex;flex-direction:column;background:var(--bg2);overflow:hidden;}
+.im-title-section{flex-shrink:0;background:#000;border-bottom:3px solid var(--hi);padding:0;display:flex;align-items:flex-end;overflow:hidden;}
+.im-title-left{flex:1;padding:4px 20px 14px;display:flex;flex-direction:column;justify-content:flex-end;gap:4px;}
+.im-deco-stars{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);letter-spacing:4px;display:flex;align-items:center;gap:8px;}
 .im-deco-stars::before,.im-deco-stars::after{content:'';flex:1;height:1px;background:var(--dim);}
-.im-title{font-family:'DOSGothic','DungGeunMo',sans-serif;font-size:30px;color:var(--hi);letter-spacing:4px;line-height:1.3;text-shadow:0 0 24px rgba(255,255,255,0.5);animation:titleFlicker 5s infinite;text-align:center;white-space:nowrap;font-weight:700;}
-.im-sub{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:4px;text-align:center;margin-top:3px;}
-.im-sub::before{content:'[ ';}
-.im-sub::after{content:' ]';}
-.im-title-right{display:flex;flex-direction:column;min-width:340px;flex-shrink:0;border-left:2px solid var(--dim2);margin-right:16px;}
-.im-top1-wrap{padding:14px 22px;border:2px solid var(--mid);display:flex;align-items:center;gap:14px;flex:1;position:relative;overflow:hidden;margin:10px;box-shadow:0 0 12px rgba(255,255,255,0.08);}
-.im-top1-wrap::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent 0,transparent 6px,rgba(255,255,255,0.012) 6px,rgba(255,255,255,0.012) 7px);}
-.im-top1-trophy-svg{width:40px;height:40px;flex-shrink:0;position:relative;}
-.im-top1-body{flex:1;min-width:0;position:relative;}
-.im-top1-label{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);letter-spacing:1px;margin-bottom:5px;}
-.im-top1-name{font-family:'DOSGothic','DungGeunMo',monospace;font-size:20px;color:var(--hi);text-shadow:0 0 10px rgba(255,255,255,0.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.im-title{font-family:'DOSGothic',sans-serif;font-size:26px;color:var(--hi);letter-spacing:4px;line-height:1.3;text-shadow:0 0 24px rgba(255,255,255,0.5);animation:titleFlicker 5s infinite;text-align:center;white-space:nowrap;font-weight:700;}
+.im-sub{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);letter-spacing:3px;text-align:center;margin-top:2px;}
+.im-title-right{display:flex;flex-direction:column;min-width:300px;flex-shrink:0;border-left:2px solid var(--dim2);margin-right:12px;}
+.im-top1-wrap{padding:12px 18px;border:2px solid var(--mid);display:flex;align-items:center;gap:12px;flex:1;margin:8px;box-shadow:0 0 12px rgba(255,255,255,0.08);}
+.im-top1-trophy-svg{width:36px;height:36px;flex-shrink:0;}
+.im-top1-body{flex:1;min-width:0;}
+.im-top1-label{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mid);margin-bottom:4px;}
+.im-top1-name{font-family:'DOSGothic',monospace;font-size:18px;color:var(--hi);text-shadow:0 0 10px rgba(255,255,255,0.4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .im-top1-score-wrap{text-align:right;flex-shrink:0;}
-.im-top1-score{font-family:'Press Start 2P',monospace;font-size:24px;color:var(--hi);text-shadow:0 0 14px rgba(255,255,255,0.45);}
-.im-점{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);display:block;margin-top:3px;}
-
+.im-top1-score{font-family:'Press Start 2P',monospace;font-size:20px;color:var(--hi);text-shadow:0 0 14px rgba(255,255,255,0.45);}
+.im-점{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mid);display:block;margin-top:2px;}
 .im-body{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:0;overflow:hidden;position:relative;}
-.im-start-section{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:auto;}
-.challenge-msg{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--mid);letter-spacing:1px;text-align:center;line-height:1.2;margin-bottom:3px;}
+.im-start-section{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.challenge-msg{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--mid);letter-spacing:1px;text-align:center;line-height:1.2;margin-bottom:3px;}
 .challenge-msg em{color:var(--hi);font-style:normal;animation:blink 1.2s step-end infinite;}
-.challenge-sub{display:none;}
-.start-action-btn{display:flex;align-items:center;gap:16px;padding:18px 56px;width:auto;min-width:400px;justify-content:center;font-family:'Press Start 2P',monospace;font-size:20px;letter-spacing:3px;background:#000;color:var(--hi);border:3px solid var(--hi);cursor:pointer;position:relative;overflow:hidden;animation:startGlow 1.8s ease-in-out infinite;transition:all .12s;}
+.start-action-btn{display:flex;align-items:center;gap:14px;padding:16px 48px;font-family:'Press Start 2P',monospace;font-size:18px;letter-spacing:3px;background:#000;color:var(--hi);border:3px solid var(--hi);cursor:pointer;position:relative;overflow:hidden;animation:startGlow 1.8s ease-in-out infinite;transition:all .12s;}
 .start-action-btn::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);animation:shine 2.5s ease-in-out infinite;}
 .start-action-btn:hover{background:var(--hi);color:#000;}
-.start-icon{width:36px;height:36px;flex-shrink:0;}
-.im-stats{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--lo);display:flex;gap:16px;}
+.start-icon{width:30px;height:30px;flex-shrink:0;}
+.im-stats{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--lo);display:flex;gap:14px;}
 .im-stats strong{color:var(--mid);}
-
-/* 데모 */
 .im-demo{display:flex;flex-direction:column;overflow:hidden;border-right:2px solid var(--dim);}
-.im-demo-header{background:var(--panel);border-bottom:1px solid var(--dim);padding:7px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.im-demo-title{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);letter-spacing:2px;}
-.im-demo-timer{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--hi);letter-spacing:2px;}
-.im-demo-statusbar{background:var(--panel2);border-bottom:1px solid var(--dim);padding:4px 14px;display:flex;align-items:center;gap:14px;flex-shrink:0;}
-.im-demo-stat{display:flex;align-items:center;gap:5px;font-size:11px;}
-.im-demo-stat-lbl{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);}
-.im-demo-bar{width:50px;height:3px;background:var(--dim);}
+.im-demo-header{background:var(--panel);border-bottom:1px solid var(--dim);padding:6px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.im-demo-title{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mid);letter-spacing:2px;}
+.im-demo-timer{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--hi);}
+.im-demo-statusbar{background:var(--panel2);border-bottom:1px solid var(--dim);padding:4px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.im-demo-stat{display:flex;align-items:center;gap:4px;font-size:10px;}
+.im-demo-stat-lbl{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--lo);}
+.im-demo-bar{width:44px;height:3px;background:var(--dim);}
 .im-demo-bar-fill{height:100%;background:var(--mid);transition:width .3s;}
-.im-demo-val{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--hi);min-width:26px;}
-.im-demo-pg{margin-left:auto;font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);}
-.im-demo-score{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--hi);}
-.im-demo-lines{flex:1;padding:8px 14px;display:flex;flex-direction:column;gap:2px;overflow:hidden;background:#000;}
+.im-demo-val{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--hi);min-width:24px;}
+.im-demo-pg{margin-left:auto;font-family:'Press Start 2P',monospace;font-size:7px;color:var(--lo);}
+.im-demo-score{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--hi);}
+.im-demo-lines{flex:1;padding:7px 12px;display:flex;flex-direction:column;gap:2px;overflow:hidden;background:#000;}
 .im-demo-unit{flex-shrink:0;}
-.im-demo-src{font-family:'DOSGothic',monospace;font-size:18px;font-weight:700;color:rgba(255,255,255,0.42);padding:2px 8px 1px;line-height:1.4;word-break:keep-all;}
+.im-demo-src{font-family:'DOSGothic',monospace;font-size:16px;font-weight:700;color:rgba(255,255,255,0.42);padding:2px 7px 1px;line-height:1.4;}
 .im-demo-src.cur{color:rgba(255,255,255,0.55);}
 .im-demo-src.dim{color:rgba(255,255,255,0.18);}
-.im-demo-disp{font-family:'DOSGothic',monospace;font-size:18px;padding:4px 8px;line-height:1.4;word-break:keep-all;}
+.im-demo-disp{font-family:'DOSGothic',monospace;font-size:16px;padding:3px 7px;line-height:1.4;}
 .im-demo-disp.active{background:var(--active);border-left:2px solid var(--hi);}
 .im-demo-disp.pending{color:rgba(255,255,255,0.12);}
 .im-demo-disp.done-d{color:rgba(255,255,255,0.35);border-left:2px solid var(--dim);}
@@ -152,230 +140,286 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .demo-ch-err{color:rgba(255,255,255,0.2);text-decoration:line-through;}
 .demo-ch-cur{background:rgba(255,255,255,0.9);color:#000;animation:curBlink .5s step-end infinite;}
 .demo-ch-pend{color:rgba(255,255,255,0.15);}
-.im-demo-guide{border-top:1px solid var(--dim);background:var(--panel);padding:4px 14px;display:flex;justify-content:space-between;font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);flex-shrink:0;}
-
-/* 랭킹 테이블 */
+.im-demo-guide{border-top:1px solid var(--dim);background:var(--panel);padding:4px 12px;display:flex;justify-content:space-between;font-family:'Press Start 2P',monospace;font-size:7px;color:var(--lo);flex-shrink:0;}
 .im-ranking{display:flex;flex-direction:column;overflow:hidden;min-height:0;}
-.im-rank-title{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--mid);letter-spacing:2px;text-align:center;padding:8px;border-bottom:1px solid var(--dim);flex-shrink:0;}
-.im-rank-title-deco{color:var(--lo);margin:0 5px;}
+.im-rank-title{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);letter-spacing:2px;text-align:center;padding:7px;border-bottom:1px solid var(--dim);flex-shrink:0;}
 .im-rank-table{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
-.im-rank-head{display:grid;grid-template-columns:32px 24px 1fr 1fr 64px 46px 44px;gap:3px;padding:6px 14px;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);border-bottom:2px solid var(--dim2);background:var(--panel);flex-shrink:0;}
+.im-rank-head{display:grid;grid-template-columns:28px 22px 1fr 1fr 58px 42px 40px;gap:3px;padding:5px 12px;font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);border-bottom:2px solid var(--dim2);background:var(--panel);flex-shrink:0;}
 .im-rank-body{flex:1;overflow-y:auto;min-height:0;}
 .im-rank-body::-webkit-scrollbar{width:3px;}
 .im-rank-body::-webkit-scrollbar-thumb{background:var(--dim2);}
-.im-rank-row{display:grid;grid-template-columns:32px 24px 1fr 1fr 64px 46px 44px;gap:3px;padding:7px 14px;border-bottom:1px solid var(--dim);font-size:13px;align-items:center;transition:background .1s;}
+.im-rank-row{display:grid;grid-template-columns:28px 22px 1fr 1fr 58px 42px 40px;gap:3px;padding:6px 12px;border-bottom:1px solid var(--dim);font-size:12px;align-items:center;transition:background .1s;}
 .im-rank-row:hover{background:var(--panel);}
 .im-rank-row.mine{background:rgba(255,255,255,0.04)!important;}
-.im-rr-no{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--lo);}
+.im-rr-no{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--lo);}
 .im-rr-no.n1{color:var(--hi);}
 .im-rr-no.n2{color:var(--mid);}
 .im-rr-no.n3{color:var(--lo);}
-.im-rr-ch{width:24px;height:24px;flex-shrink:0;}
-.im-rr-nick{font-weight:700;color:var(--mid);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.im-rr-nick{font-weight:700;color:var(--mid);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .im-rr-nick.top{color:var(--hi);}
-.im-rr-stage{font-size:12px;color:var(--lo);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.im-rr-sc{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--hi);text-align:right;}
-.im-rr-wpm{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--lo);text-align:right;}
-.im-rr-acc{font-size:12px;color:var(--lo);text-align:right;}
-.im-rank-loading{padding:14px;text-align:center;font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:2px;animation:blink 1s step-end infinite;}
+.im-rr-stage{font-size:11px;color:var(--lo);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.im-rr-sc{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--hi);text-align:right;}
+.im-rr-wpm{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);text-align:right;}
+.im-rr-acc{font-size:11px;color:var(--lo);text-align:right;}
+.im-rank-loading{padding:12px;text-align:center;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);animation:blink 1s step-end infinite;}
 
-/* ══════════════════════ POPUP ══════════════════════ */
+/* ══ POPUP ══ */
 #setup-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:200;align-items:center;justify-content:center;padding:20px;}
 #setup-popup.open{display:flex;}
-.popup-card{background:#000;border:2px solid var(--dim2);width:100%;max-width:500px;animation:popIn .22s ease-out;box-shadow:0 0 40px rgba(255,255,255,0.06);display:flex;flex-direction:column;overflow:hidden;max-height:90vh;}
-.popup-header{background:var(--panel);border-bottom:2px solid var(--dim);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.popup-title{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--hi);letter-spacing:1px;}
-.popup-close{background:none;border:1px solid var(--dim2);font-size:16px;cursor:pointer;color:var(--lo);width:26px;height:26px;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.popup-card{background:#000;border:2px solid var(--dim2);width:100%;max-width:480px;animation:popIn .22s ease-out;box-shadow:0 0 40px rgba(255,255,255,0.06);display:flex;flex-direction:column;overflow:hidden;max-height:90vh;}
+.popup-header{background:var(--panel);border-bottom:2px solid var(--dim);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.popup-title{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--hi);letter-spacing:1px;}
+.popup-close{background:none;border:1px solid var(--dim2);font-size:15px;cursor:pointer;color:var(--lo);width:24px;height:24px;display:flex;align-items:center;justify-content:center;transition:all .12s;}
 .popup-close:hover{border-color:var(--mid);color:var(--mid);}
-.popup-body{padding:20px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;}
+.popup-body{padding:18px;display:flex;flex-direction:column;gap:16px;overflow-y:auto;}
 .popup-body::-webkit-scrollbar{width:3px;}
 .popup-body::-webkit-scrollbar-thumb{background:var(--dim2);}
-.pop-label{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--lo);letter-spacing:2px;margin-bottom:7px;}
-.nick-input{width:100%;padding:10px 12px;font-family:'DOSGothic','DungGeunMo',monospace;font-size:17px;font-weight:700;background:var(--panel);border:1px solid var(--dim2);color:var(--hi);outline:none;transition:border-color .2s;caret-color:var(--hi);}
+.pop-label{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:2px;margin-bottom:6px;}
+.nick-input{width:100%;padding:9px 11px;font-family:'DOSGothic','DungGeunMo',monospace;font-size:16px;font-weight:700;background:var(--panel);border:1px solid var(--dim2);color:var(--hi);outline:none;transition:border-color .2s;caret-color:var(--hi);}
 .nick-input::placeholder{color:var(--lo);}
 .nick-input:focus{border-color:var(--mid);}
 .char-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
 .char-btn{background:var(--panel);border:1px solid var(--dim);padding:5px 3px;cursor:pointer;text-align:center;transition:all .12s;position:relative;}
 .char-btn:hover{border-color:var(--mid);background:var(--panel2);}
 .char-btn.selected{border-color:var(--hi);background:var(--panel2);}
-.char-btn.selected::after{content:'▶';position:absolute;top:2px;right:3px;font-size:7px;color:var(--hi);animation:blink .5s step-end infinite;}
-.char-emoji{display:block;width:32px;height:32px;margin:0 auto 2px;}
-.char-name{font-size:11px;color:var(--mid);}
+.char-btn.selected::after{content:'▶';position:absolute;top:2px;right:3px;font-size:6px;color:var(--hi);animation:blink .5s step-end infinite;}
+.char-emoji{display:block;width:28px;height:28px;margin:0 auto 2px;}
+.char-name{font-size:10px;color:var(--mid);}
 .passage-list{display:flex;flex-direction:column;gap:3px;}
-.passage-btn{background:var(--panel);border:1px solid var(--dim);padding:8px 10px;cursor:pointer;text-align:left;transition:all .12s;position:relative;}
+.passage-btn{background:var(--panel);border:1px solid var(--dim);padding:7px 9px;cursor:pointer;text-align:left;transition:all .12s;position:relative;}
 .passage-btn:hover{border-color:var(--mid);background:var(--panel2);}
-.passage-btn.selected{border-color:var(--hi);background:var(--panel2);padding-left:18px;}
-.passage-btn.selected::before{content:'▶';position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:7px;color:var(--hi);animation:blink .5s step-end infinite;}
-.pb-title{font-size:14px;font-weight:700;color:var(--mid);}
+.passage-btn.selected{border-color:var(--hi);background:var(--panel2);padding-left:16px;}
+.passage-btn.selected::before{content:'▶';position:absolute;left:5px;top:50%;transform:translateY(-50%);font-size:6px;color:var(--hi);animation:blink .5s step-end infinite;}
+.pb-title{font-size:13px;font-weight:700;color:var(--mid);}
 .pb-title.sel{color:var(--hi);}
-.pb-meta{font-size:12px;color:var(--lo);margin-top:2px;}
-.popup-footer{border-top:2px solid var(--dim);padding:14px 20px;flex-shrink:0;display:flex;gap:8px;}
-.pop-start-btn{flex:1;padding:12px;font-family:'Press Start 2P',monospace;font-size:14px;letter-spacing:2px;background:var(--hi);color:#000;border:none;cursor:pointer;transition:all .12s;}
+.pb-meta{font-size:11px;color:var(--lo);margin-top:2px;}
+.popup-footer{border-top:2px solid var(--dim);padding:12px 18px;flex-shrink:0;display:flex;gap:7px;}
+.pop-start-btn{flex:1;padding:11px;font-family:'Press Start 2P',monospace;font-size:13px;letter-spacing:2px;background:var(--hi);color:#000;border:none;cursor:pointer;transition:all .12s;}
 .pop-start-btn:hover{background:#ddd;}
-.pop-cancel-btn{padding:12px 16px;font-family:'Press Start 2P',monospace;font-size:14px;letter-spacing:1px;background:#000;color:var(--lo);border:1px solid var(--dim);cursor:pointer;transition:all .12s;}
+.pop-cancel-btn{padding:11px 14px;font-family:'Press Start 2P',monospace;font-size:13px;background:#000;color:var(--lo);border:1px solid var(--dim);cursor:pointer;transition:all .12s;}
 .pop-cancel-btn:hover{border-color:var(--mid);color:var(--mid);}
 
-/* ══════════════════════ STAGE 1 TRAINING ══════════════════════ */
-.training-main-area{flex:1;display:flex;flex-direction:column;padding:10px 16px 10px;overflow:hidden;}
-.training-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-shrink:0;}
-.gt-left{display:flex;align-items:center;gap:10px;}
-.gt-title{font-family:'Press Start 2P',monospace;font-size:16px;color:var(--hi);letter-spacing:1px;}
+/* ══ STAGE 1 TRAINING ══ */
+.training-main-area{flex:1;display:flex;flex-direction:column;padding:9px 14px 9px;overflow:hidden;}
+.training-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;flex-shrink:0;}
+.gt-left{display:flex;align-items:center;gap:9px;}
+.gt-title{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--hi);}
 .gt-sep{color:var(--dim);}
-.gt-sub{font-size:16px;color:var(--mid);}
-.gt-right{display:flex;gap:6px;}
-.gt-btn{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--mid);background:#000;border:1px solid var(--dim2);padding:7px 14px;cursor:pointer;letter-spacing:1px;transition:all .12s;}
-.gt-btn:hover{border-color:var(--mid);color:var(--mid);}
-
-/* 스테이지 배지 */
-.stage-indicator{display:flex;gap:8px;align-items:center;}
-.stage-pip{font-family:'Press Start 2P',monospace;font-size:10px;padding:5px 10px;border:1px solid var(--dim);color:var(--lo);letter-spacing:1px;}
+.gt-sub{font-size:14px;color:var(--mid);}
+.gt-right{display:flex;gap:5px;}
+.gt-btn{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--mid);background:#000;border:1px solid var(--dim2);padding:6px 12px;cursor:pointer;transition:all .12s;}
+.gt-btn:hover{border-color:var(--mid);}
+.stage-indicator{display:flex;gap:7px;align-items:center;}
+.stage-pip{font-family:'Press Start 2P',monospace;font-size:9px;padding:4px 9px;border:1px solid var(--dim);color:var(--lo);}
 .stage-pip.active{border-color:var(--hi);color:var(--hi);background:rgba(255,255,255,0.05);}
 .stage-pip.done{border-color:var(--green);color:var(--green);}
-
-.timer-row{display:flex;justify-content:center;margin-bottom:8px;flex-shrink:0;}
-.timer-wrap{background:#000;border:2px solid var(--mid);padding:6px 24px;display:flex;align-items:center;gap:10px;}
-.timer-icon{font-size:24px;filter:grayscale(1);}
-.timer-val{font-family:'Press Start 2P',monospace;font-size:34px;color:var(--hi);letter-spacing:3px;}
+.timer-row{display:flex;justify-content:center;margin-bottom:7px;flex-shrink:0;}
+.timer-wrap{background:#000;border:2px solid var(--mid);padding:5px 20px;display:flex;align-items:center;gap:9px;}
+.timer-icon{font-size:22px;filter:grayscale(1);}
+.timer-val{font-family:'Press Start 2P',monospace;font-size:30px;color:var(--hi);letter-spacing:3px;}
 .timer-val.warn{color:var(--mid);}
 .timer-val.danger{color:var(--hi);animation:blink .4s step-end infinite;}
-
 .typing-box{flex:1;background:#000;border:2px solid var(--dim);display:flex;flex-direction:column;min-height:0;position:relative;cursor:text;}
-.status-bar{background:var(--panel);border-bottom:1px solid var(--dim);padding:5px 12px;display:flex;align-items:center;gap:14px;flex-shrink:0;}
-.stat-item{display:flex;align-items:center;gap:8px;font-size:15px;}
-.stat-lbl{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--mid);letter-spacing:1px;}
-.stat-bar-wrap{width:64px;height:4px;background:var(--dim);}
+.status-bar{background:var(--panel);border-bottom:1px solid var(--dim);padding:5px 11px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.stat-item{display:flex;align-items:center;gap:7px;font-size:13px;}
+.stat-lbl{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--mid);}
+.stat-bar-wrap{width:56px;height:4px;background:var(--dim);}
 .stat-bar{height:100%;transition:width .3s;background:var(--mid);}
-.stat-val{font-family:'Press Start 2P',monospace;font-size:16px;color:var(--hi);min-width:40px;}
-.stat-page{margin-left:auto;font-family:'Press Start 2P',monospace;font-size:13px;color:var(--mid);}
-.stat-score{font-family:'Press Start 2P',monospace;font-size:18px;color:var(--hi);}
-
-.lines-container{flex:1;overflow:hidden;padding:12px 18px;display:flex;flex-direction:column;gap:0;min-height:0;}
+.stat-val{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--hi);min-width:36px;}
+.stat-page{margin-left:auto;font-family:'Press Start 2P',monospace;font-size:11px;color:var(--mid);}
+.stat-score{font-family:'Press Start 2P',monospace;font-size:16px;color:var(--hi);}
+.lines-container{flex:1;overflow:hidden;padding:10px 16px;display:flex;flex-direction:column;gap:0;min-height:0;}
 .line-unit{flex-shrink:0;margin-bottom:2px;}
-.line-source{font-size:36px;font-weight:700;color:rgba(255,255,255,0.55);padding:3px 12px 2px;line-height:1.4;word-break:keep-all;}
-.line-source.done{color:rgba(255,255,255,0.18);font-size:30px;}
-.line-source.upcoming{color:rgba(255,255,255,0.12);font-size:30px;}
-.line-display{font-size:36px;padding:7px 12px;line-height:1.4;min-height:50px;word-break:keep-all;color:rgba(255,255,255,0.18);}
+.line-source{font-size:32px;font-weight:700;color:rgba(255,255,255,0.55);padding:3px 10px 2px;line-height:1.4;}
+.line-source.done{color:rgba(255,255,255,0.18);font-size:27px;}
+.line-source.upcoming{color:rgba(255,255,255,0.12);font-size:27px;}
+.line-display{font-size:32px;padding:6px 10px;line-height:1.4;min-height:46px;word-break:keep-all;color:rgba(255,255,255,0.18);}
 .line-display.active-line{background:#0e1e0e;border-left:5px solid var(--green);box-shadow:inset 0 0 24px rgba(0,255,80,0.06);}
-.line-display.done-line{border-left:3px solid var(--dim);color:rgba(255,255,255,0.3);font-size:30px;}
+.line-display.done-line{border-left:3px solid var(--dim);color:rgba(255,255,255,0.3);font-size:27px;}
 .active-line .ch-ok{color:var(--green);text-shadow:0 0 6px rgba(0,255,136,0.5);}
-.active-line .ch-err{color:var(--red);background:rgba(255,0,0,0.22);border-radius:2px;text-decoration:underline;text-decoration-color:var(--red);}
+.active-line .ch-err{color:var(--red);background:rgba(255,0,0,0.22);border-radius:2px;text-decoration:underline;}
 .active-line .ch-cur{background:var(--green);color:#000;padding:0 3px;margin:0 1px;animation:curBlink .45s step-end infinite;font-weight:700;}
 .active-line .ch-pend{color:rgba(255,255,255,0.42);}
 .done-line .ch-ok{color:rgba(0,220,100,0.45);}
 .done-line .ch-err{color:rgba(255,60,60,0.4);text-decoration:line-through;}
-.done-line .ch-cur,.done-line .ch-pend{color:rgba(255,255,255,0.15);}
-.input-guide{display:flex;justify-content:space-between;align-items:center;padding:8px 18px;border-top:2px solid var(--dim2);background:var(--panel);font-family:'Press Start 2P',monospace;font-size:12px;color:var(--mid);letter-spacing:1px;flex-shrink:0;}
-.guide-key{background:#000;border:1px solid var(--mid);padding:2px 6px;font-family:'Press Start 2P',monospace;font-size:12px;color:var(--hi);margin:0 2px;}
+.input-guide{display:flex;justify-content:space-between;align-items:center;padding:7px 16px;border-top:2px solid var(--dim2);background:var(--panel);font-family:'Press Start 2P',monospace;font-size:11px;color:var(--mid);flex-shrink:0;}
+.guide-key{background:#000;border:1px solid var(--mid);padding:2px 5px;font-family:'Press Start 2P',monospace;font-size:11px;color:var(--hi);margin:0 2px;}
 .hidden-input{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;z-index:10;cursor:text;resize:none;font-size:18px;background:transparent;border:none;outline:none;color:transparent;caret-color:transparent;}
 
-/* ══════════════════════ STAGE 2 GALAGA ══════════════════════ */
+/* ══ STAGE 2 GALAGA ══ */
 .galaga-main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.galaga-hud{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:#000;border-bottom:2px solid var(--dim2);flex-shrink:0;height:48px;}
+.galaga-hud{display:flex;justify-content:space-between;align-items:center;padding:7px 14px;background:#000;border-bottom:2px solid var(--dim2);flex-shrink:0;height:46px;}
 .ghud-item{}
-.ghud-label{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);letter-spacing:1px;}
-.ghud-val{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--hi);margin-top:2px;}
-.ghud-lives{font-size:16px;letter-spacing:3px;margin-top:2px;}
-.ghud-badge{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);border:1px solid var(--dim);padding:4px 8px;}
-
+.ghud-label{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);}
+.ghud-val{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--hi);margin-top:2px;}
+.ghud-lives{font-size:14px;letter-spacing:2px;margin-top:2px;}
+.ghud-badge{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mid);border:1px solid var(--dim);padding:3px 7px;}
 #game-area{flex:1;position:relative;overflow:hidden;cursor:none;}
-#galaga-input-bar{display:flex;align-items:center;gap:0;background:#000;border-top:2px solid var(--dim2);flex-shrink:0;height:52px;padding:0 16px;}
-#galaga-type-label{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);margin-right:12px;letter-spacing:1px;white-space:nowrap;}
-#galaga-input{flex:1;background:#000;border:none;border-bottom:2px solid var(--green);color:var(--green);font-family:'DOSGothic',monospace;font-size:22px;font-weight:700;padding:4px 8px;outline:none;caret-color:var(--green);}
+#galaga-input-bar{display:flex;align-items:center;gap:0;background:#000;border-top:2px solid var(--dim2);flex-shrink:0;height:50px;padding:0 14px;}
+#galaga-type-label{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);margin-right:10px;letter-spacing:1px;white-space:nowrap;}
+#galaga-input{flex:1;background:#000;border:none;border-bottom:2px solid var(--green);color:var(--green);font-family:'DOSGothic',monospace;font-size:20px;font-weight:700;padding:3px 7px;outline:none;caret-color:var(--green);}
 #galaga-input::placeholder{color:#222;}
-#galaga-enter-hint{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--dim2);margin-left:16px;white-space:nowrap;}
-
-.word-block{position:absolute;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:default;}
-.wb-emoji{font-size:24px;filter:grayscale(0.2);line-height:1;}
-.wb-text{font-family:'DOSGothic',monospace;font-size:14px;font-weight:700;color:rgba(255,255,255,0.9);background:#0a0a0a;border:1px solid #333;padding:2px 7px;white-space:nowrap;letter-spacing:1px;}
+#galaga-enter-hint{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--dim2);margin-left:14px;white-space:nowrap;}
+.word-block{position:absolute;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:default;transition:none;}
+.wb-emoji{font-size:22px;filter:grayscale(0.2);line-height:1;}
+.wb-text{font-family:'DOSGothic',monospace;font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);background:#0a0a0a;border:1px solid #333;padding:2px 6px;white-space:nowrap;letter-spacing:1px;}
 .wb-text .match{color:var(--green);}
 .wb-text.targeted{border-color:var(--green);color:#fff;}
 .word-block.targeted .wb-emoji{filter:drop-shadow(0 0 4px rgba(0,255,136,0.6));}
+/* 회전 효과 */
+.word-block.spin{animation:wordSpin 2s linear infinite;}
+.word-block.wobble{animation:wordWobble 0.6s ease-in-out infinite;}
+.word-block.pulse-anim{animation:wordPulse 0.4s ease-in-out infinite;}
+.word-block.rainbow .wb-text{animation:rainbowShift 1s linear infinite;}
+/* 방향별 스타일 */
+.word-block.from-left .wb-text{border-color:#4466ff;color:#aabbff;}
+.word-block.from-right .wb-text{border-color:#ff4466;color:#ffaabb;}
+.word-block.from-bottom .wb-text{border-color:#ffaa00;color:#ffdd88;}
+.word-block.from-top .wb-text{border-color:#888;color:#ccc;}
 
 .explosion{position:absolute;pointer-events:none;z-index:50;animation:explode 0.5s steps(5) forwards;}
-.exp-inner{font-size:26px;text-align:center;}
-.laser{position:absolute;width:2px;background:linear-gradient(to top,var(--green),transparent);pointer-events:none;z-index:40;animation:laserFade 0.25s linear forwards;}
-
+.exp-inner{font-size:24px;text-align:center;}
+.laser{position:absolute;pointer-events:none;z-index:40;animation:laserFade 0.25s linear forwards;}
+.laser-v{width:2px;background:linear-gradient(to top,var(--green),transparent);}
+.laser-h{height:2px;background:linear-gradient(to left,var(--green),transparent);}
+.laser-diag{height:2px;background:linear-gradient(to left,var(--green),transparent);transform-origin:left center;}
 #crosshair{position:absolute;width:20px;height:20px;pointer-events:none;z-index:30;}
 #crosshair::before,#crosshair::after{content:'';position:absolute;background:rgba(0,255,136,0.3);}
 #crosshair::before{width:2px;height:100%;left:50%;transform:translateX(-50%);}
 #crosshair::after{height:2px;width:100%;top:50%;transform:translateY(-50%);}
-
 #wave-announce{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:80;pointer-events:none;text-align:center;display:none;}
-.wa-text{font-family:'Press Start 2P',monospace;font-size:20px;color:#fff;letter-spacing:4px;animation:waPop 1.8s ease-out forwards;}
-#g-score-pop{position:absolute;pointer-events:none;z-index:60;font-family:'Press Start 2P',monospace;font-size:12px;color:var(--green);display:none;}
+.wa-text{font-family:'Press Start 2P',monospace;font-size:18px;color:#fff;letter-spacing:4px;animation:waPop 1.8s ease-out forwards;}
+#g-score-pop{position:absolute;pointer-events:none;z-index:60;font-family:'Press Start 2P',monospace;font-size:11px;color:var(--green);display:none;}
 #g-score-pop.anim{animation:scorePop 0.8s ease-out forwards;}
 
-/* ══════════════════════ STAGE CLEAR (stage1→stage2 전환) ══════════════════════ */
-#stage-clear-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:20px;}
+/* ══ STAGE 3 CHAOS ══ */
+.chaos-main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.chaos-hud{display:flex;justify-content:space-between;align-items:center;padding:7px 14px;background:#000;border-bottom:2px solid var(--purple);flex-shrink:0;height:52px;}
+.chud-item{}
+.chud-label{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--lo);}
+.chud-val{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--hi);margin-top:2px;}
+.chud-val.cyan{color:var(--cyan);}
+.chud-val.yellow{color:var(--yellow);animation:comboFire 1s ease-in-out infinite;}
+.chud-val.danger{color:var(--red);animation:blink .3s step-end infinite;}
+.chud-badge{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--purple);border:1px solid var(--purple);padding:3px 7px;}
+.chud-lives{font-size:13px;letter-spacing:2px;margin-top:2px;}
+#chaos-area{flex:1;position:relative;overflow:hidden;cursor:crosshair;background:radial-gradient(ellipse at center,#0a0a1a 0%,#000 100%);}
+/* S3 파티클 배경 */
+#chaos-bg-canvas{position:absolute;inset:0;z-index:0;pointer-events:none;}
+/* S3 단어 블록 강화 */
+.chaos-block{position:absolute;display:flex;flex-direction:column;align-items:center;gap:2px;z-index:10;pointer-events:none;}
+.cb-inner{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.cb-emoji{font-size:20px;line-height:1;}
+.cb-text{font-family:'DOSGothic',monospace;font-weight:700;padding:3px 8px;white-space:nowrap;border:2px solid;transition:all .1s;}
+.cb-text .match{animation:rainbowShift .5s linear infinite;}
+/* 방향별 색 */
+.chaos-block.dir-top .cb-text{border-color:#666;color:#ccc;font-size:13px;background:#0a0a0a;}
+.chaos-block.dir-bottom .cb-text{border-color:#ff8800;color:#ffcc66;font-size:13px;background:#1a0a00;}
+.chaos-block.dir-left .cb-text{border-color:#4466ff;color:#aabbff;font-size:13px;background:#000a1a;}
+.chaos-block.dir-right .cb-text{border-color:#ff4466;color:#ffaabb;font-size:13px;background:#1a000a;}
+/* 특수 타입 */
+.chaos-block.type-boss .cb-text{font-size:16px;border-color:var(--yellow);color:var(--yellow);background:#1a1000;box-shadow:0 0 10px rgba(255,215,0,0.4);}
+.chaos-block.type-bonus .cb-text{font-size:12px;border-color:var(--cyan);color:var(--cyan);background:#001a1a;animation:shockwave 1s ease-out infinite;}
+.chaos-block.type-bomb .cb-text{font-size:13px;border-color:var(--red);color:var(--red);background:#1a0000;}
+.chaos-block.type-shield .cb-text{font-size:13px;border-color:#8888ff;color:#ccccff;background:#08081a;}
+.chaos-block.targeted .cb-text{border-color:var(--green)!important;box-shadow:0 0 12px rgba(0,255,136,0.5);}
+/* 회전/효과 */
+.chaos-block.eff-spin{animation:wordSpin 3s linear infinite;}
+.chaos-block.eff-wobble{animation:wordWobble 0.5s ease-in-out infinite;}
+.chaos-block.eff-pulse{animation:wordPulse 0.35s ease-in-out infinite;}
+/* 보너스 배너 */
+.bonus-banner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;font-family:'Press Start 2P',monospace;font-size:18px;color:var(--yellow);text-shadow:0 0 20px var(--yellow),0 0 40px var(--orange);animation:waPop 1.8s ease-out forwards;pointer-events:none;text-align:center;line-height:1.8;}
+/* 역전 판정 배너 */
+.reversal-banner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:500;font-family:'Press Start 2P',monospace;font-size:22px;color:var(--red);text-shadow:0 0 30px var(--red);animation:waPop 2.5s ease-out forwards;pointer-events:none;text-align:center;line-height:1.8;background:rgba(0,0,0,0.85);border:3px solid var(--red);padding:20px 40px;display:none;}
+.reversal-banner.open{display:block;}
+/* S3 입력바 */
+#chaos-input-bar{display:flex;align-items:center;gap:0;background:#000;border-top:2px solid var(--purple);flex-shrink:0;height:52px;padding:0 14px;}
+#chaos-type-label{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--purple);margin-right:10px;letter-spacing:1px;white-space:nowrap;}
+#chaos-input{flex:1;background:#000;border:none;border-bottom:2px solid var(--cyan);color:var(--cyan);font-family:'DOSGothic',monospace;font-size:20px;font-weight:700;padding:3px 7px;outline:none;caret-color:var(--cyan);}
+#chaos-input::placeholder{color:#111;}
+#chaos-bonus-bar{display:flex;align-items:center;gap:7px;margin-left:14px;}
+.bonus-pip{font-family:'Press Start 2P',monospace;font-size:7px;padding:2px 5px;border:1px solid var(--dim2);color:var(--lo);}
+.bonus-pip.active{border-color:var(--cyan);color:var(--cyan);}
+/* S3 스코어 팝 */
+#s3-score-pop{position:absolute;pointer-events:none;z-index:60;font-family:'Press Start 2P',monospace;font-size:13px;display:none;}
+#s3-score-pop.anim{animation:scorePop 0.9s ease-out forwards;}
+/* 실드 오버레이 */
+.shield-overlay{position:absolute;inset:0;z-index:5;pointer-events:none;border:6px solid #8888ff;box-shadow:inset 0 0 30px rgba(136,136,255,0.2);display:none;}
+.shield-overlay.active{display:block;animation:blink .5s step-end infinite;}
+
+/* ══ STAGE CLEAR OVERLAY ══ */
+#stage-clear-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:18px;}
 #stage-clear-overlay.open{display:flex;}
-.sc-title{font-family:'Press Start 2P',monospace;font-size:32px;color:var(--hi);letter-spacing:4px;text-align:center;line-height:1.6;animation:titleFlicker 3s infinite;}
-.sc-sub{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--mid);letter-spacing:3px;text-align:center;}
-.sc-score-row{display:flex;gap:40px;align-items:flex-end;justify-content:center;}
+.sc-title{font-family:'Press Start 2P',monospace;font-size:28px;color:var(--hi);letter-spacing:4px;text-align:center;line-height:1.6;animation:titleFlicker 3s infinite;}
+.sc-sub{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--mid);letter-spacing:3px;text-align:center;}
+.sc-score-row{display:flex;gap:36px;align-items:flex-end;justify-content:center;}
 .sc-score-box{text-align:center;}
-.sc-score-lbl{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:2px;display:block;margin-bottom:8px;}
-.sc-score-val{font-family:'Press Start 2P',monospace;font-size:28px;color:var(--hi);}
+.sc-score-lbl{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);letter-spacing:2px;display:block;margin-bottom:7px;}
+.sc-score-val{font-family:'Press Start 2P',monospace;font-size:24px;color:var(--hi);}
 .sc-score-val.stage1{color:var(--mid);}
-.sc-plus{font-family:'Press Start 2P',monospace;font-size:28px;color:var(--lo);align-self:center;}
-.sc-total-box{text-align:center;border:2px solid var(--hi);padding:16px 28px;}
-.sc-total-lbl{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);letter-spacing:2px;display:block;margin-bottom:8px;}
-.sc-total-val{font-family:'Press Start 2P',monospace;font-size:36px;color:var(--hi);text-shadow:0 0 16px rgba(255,255,255,0.4);}
-.sc-btn{font-family:'Press Start 2P',monospace;font-size:16px;background:#000;color:var(--hi);border:3px solid var(--hi);padding:16px 48px;cursor:pointer;letter-spacing:2px;animation:startGlow 1.5s ease-in-out infinite;transition:all .12s;}
+.sc-score-val.stage2{color:var(--green);}
+.sc-plus{font-family:'Press Start 2P',monospace;font-size:24px;color:var(--lo);align-self:center;}
+.sc-total-box{text-align:center;border:2px solid var(--hi);padding:14px 24px;}
+.sc-total-lbl{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mid);letter-spacing:2px;display:block;margin-bottom:7px;}
+.sc-total-val{font-family:'Press Start 2P',monospace;font-size:32px;color:var(--hi);text-shadow:0 0 16px rgba(255,255,255,0.4);}
+.sc-btn{font-family:'Press Start 2P',monospace;font-size:14px;background:#000;color:var(--hi);border:3px solid var(--hi);padding:14px 42px;cursor:pointer;letter-spacing:2px;animation:startGlow 1.5s ease-in-out infinite;transition:all .12s;}
 .sc-btn:hover{background:var(--hi);color:#000;}
+.sc-s3-note{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--purple);letter-spacing:2px;text-align:center;line-height:1.8;border:1px solid var(--purple);padding:10px 20px;max-width:500px;}
 
-/* ══════════════════════ FINAL RESULT ══════════════════════ */
+/* ══ FINAL RESULT ══ */
 .result-main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#000;}
-.result-topbar{background:#000;height:48px;padding:0 24px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:2px solid var(--dim);}
-.result-topbar-title{font-family:'Press Start 2P',monospace;font-size:16px;color:var(--hi);letter-spacing:1px;}
-.result-content{flex:1;overflow:hidden;display:grid;grid-template-rows:auto auto 1fr auto auto;gap:0;padding:0;}
-.result-arcade-hd{text-align:center;padding:20px 0 16px;border-bottom:1px solid var(--dim);background:#000;}
-.rah-main{font-family:'Press Start 2P',monospace;font-size:36px;color:var(--hi);letter-spacing:6px;text-shadow:0 0 20px rgba(255,255,255,0.4);animation:titleFlicker 4s infinite;}
-.rah-sub{font-family:'DOSGothic','DungGeunMo',monospace;font-size:18px;color:var(--mid);letter-spacing:3px;margin-top:8px;}
-.result-user-row{display:flex;align-items:center;gap:20px;padding:16px 40px;border-bottom:1px solid var(--dim);background:var(--panel);flex-shrink:0;}
-.result-avatar{width:64px;height:64px;border:2px solid var(--dim2);background:#000;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:3px;overflow:hidden;}
-.result-name{font-family:'DOSGothic','DungGeunMo',monospace;font-size:24px;color:var(--hi);line-height:1.4;}
-.result-sub2{font-size:15px;color:var(--mid);margin-top:3px;}
-
-/* 점수 분리 표시 */
-.result-scores-combined{display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr;border-bottom:1px solid var(--dim);}
-.rs-box{background:var(--panel);border-right:1px solid var(--dim);padding:20px 16px;text-align:center;}
-.rs-box:last-child{border-right:none;}
+.result-topbar{background:#000;height:46px;padding:0 22px;display:flex;align-items:center;gap:9px;flex-shrink:0;border-bottom:2px solid var(--dim);}
+.result-topbar-title{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--hi);}
+.result-content{flex:1;overflow:hidden;display:grid;grid-template-rows:auto auto 1fr auto auto auto;gap:0;padding:0;}
+.result-arcade-hd{text-align:center;padding:16px 0 14px;border-bottom:1px solid var(--dim);background:#000;}
+.rah-main{font-family:'Press Start 2P',monospace;font-size:32px;color:var(--hi);letter-spacing:6px;text-shadow:0 0 20px rgba(255,255,255,0.4);animation:titleFlicker 4s infinite;}
+.rah-sub{font-family:'DOSGothic',monospace;font-size:16px;color:var(--mid);letter-spacing:3px;margin-top:7px;}
+.result-user-row{display:flex;align-items:center;gap:18px;padding:14px 36px;border-bottom:1px solid var(--dim);background:var(--panel);flex-shrink:0;}
+.result-avatar{width:56px;height:56px;border:2px solid var(--dim2);background:#000;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:3px;overflow:hidden;}
+.result-name{font-family:'DOSGothic',monospace;font-size:22px;color:var(--hi);line-height:1.4;}
+.result-sub2{font-size:14px;color:var(--mid);margin-top:3px;}
+/* 4분할 점수 */
+.result-scores-4{display:grid;grid-template-columns:1fr 30px 1fr 30px 1fr 30px 1fr;border-bottom:1px solid var(--dim);}
+.rs-box{background:var(--panel);border-right:1px solid var(--dim);padding:14px 12px;text-align:center;}
+.rs-box.total-box{background:#0a1a0a;border:1px solid var(--green);}
 .rs-plus-box{display:flex;align-items:center;justify-content:center;background:#000;border-right:1px solid var(--dim);}
-.rs-plus-sym{font-family:'Press Start 2P',monospace;font-size:20px;color:var(--dim2);}
-.rs-val{font-family:'Press Start 2P',monospace;font-size:22px;color:var(--hi);display:block;}
-.rs-val.big{font-size:36px;text-shadow:0 0 20px rgba(255,255,255,0.45);animation:totalScorePulse 2s ease-in-out infinite;}
-.rs-val.stage-score{font-size:20px;color:var(--mid);}
-.rs-label{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);margin-top:8px;letter-spacing:1px;}
-.rs-sublabel{font-family:'DOSGothic',monospace;font-size:12px;color:var(--lo);margin-top:4px;}
-
-.result-stats-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-bottom:1px solid var(--dim);}
-.result-comment{padding:16px 40px;border-bottom:1px solid var(--dim);background:#000;}
-.result-comment strong{font-family:'DOSGothic','DungGeunMo',monospace;font-size:18px;color:var(--hi);display:block;margin-bottom:4px;}
-.result-comment span{font-family:'DOSGothic','DungGeunMo',monospace;font-size:13px;color:var(--lo);}
+.rs-plus-sym{font-family:'Press Start 2P',monospace;font-size:16px;color:var(--dim2);}
+.rs-val{font-family:'Press Start 2P',monospace;font-size:18px;color:var(--hi);display:block;}
+.rs-val.big{font-size:30px;text-shadow:0 0 20px rgba(255,255,255,0.45);animation:totalScorePulse 2s ease-in-out infinite;}
+.rs-val.s1{color:var(--mid);}
+.rs-val.s2{color:var(--green);}
+.rs-val.s3{color:var(--cyan);}
+.rs-val.reversal{color:var(--yellow);text-shadow:0 0 15px var(--yellow);}
+.rs-label{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);margin-top:6px;letter-spacing:1px;}
+.rs-sublabel{font-family:'DOSGothic',monospace;font-size:11px;color:var(--lo);margin-top:3px;}
+.rs-reversal-tag{font-family:'Press Start 2P',monospace;font-size:7px;color:var(--red);margin-top:3px;animation:blink .7s step-end infinite;}
+.result-stats-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;border-bottom:1px solid var(--dim);}
+.result-comment{padding:12px 36px;border-bottom:1px solid var(--dim);background:#000;}
+.result-comment strong{font-family:'DOSGothic',monospace;font-size:16px;color:var(--hi);display:block;margin-bottom:3px;}
+.result-comment span{font-family:'DOSGothic',monospace;font-size:12px;color:var(--lo);}
 .result-btns{display:grid;grid-template-columns:1fr 1fr;gap:0;flex-shrink:0;}
-.rb-retry{padding:20px;font-family:'Press Start 2P',monospace;font-size:16px;letter-spacing:3px;background:var(--hi);color:#000;border:none;cursor:pointer;transition:all .12s;border-right:2px solid #000;}
+.rb-retry{padding:18px;font-family:'Press Start 2P',monospace;font-size:14px;letter-spacing:3px;background:var(--hi);color:#000;border:none;cursor:pointer;transition:all .12s;border-right:2px solid #000;}
 .rb-retry:hover{background:#ddd;}
-.rb-home{padding:20px;font-family:'Press Start 2P',monospace;font-size:16px;letter-spacing:3px;background:#000;color:var(--hi);border:2px solid var(--hi);cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;}
+.rb-home{padding:18px;font-family:'Press Start 2P',monospace;font-size:14px;letter-spacing:3px;background:#000;color:var(--hi);border:2px solid var(--hi);cursor:pointer;transition:all .12s;}
 .rb-home:hover{background:var(--hi);color:#000;}
-
 #rank-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:300;align-items:center;justify-content:center;padding:20px;}
 #rank-overlay.open{display:flex;}
-.ov-card{background:#000;border:2px solid var(--dim2);padding:20px 24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;animation:popIn .2s ease-out;}
+.ov-card{background:#000;border:2px solid var(--dim2);padding:18px 22px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;animation:popIn .2s ease-out;}
 .ov-card::-webkit-scrollbar{width:3px;}
 .ov-card::-webkit-scrollbar-thumb{background:var(--dim2);}
-.ov-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid var(--dim);padding-bottom:8px;}
-.ov-head-title{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--hi);letter-spacing:2px;}
-.ov-close{background:none;border:1px solid var(--dim);font-size:16px;cursor:pointer;color:var(--lo);width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.ov-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;border-bottom:1px solid var(--dim);padding-bottom:7px;}
+.ov-head-title{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--hi);letter-spacing:2px;}
+.ov-close{background:none;border:1px solid var(--dim);font-size:15px;cursor:pointer;color:var(--lo);width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
 .ov-close:hover{border-color:var(--mid);color:var(--mid);}
-.ov-rank-row{display:grid;grid-template-columns:22px 18px 1fr 56px 44px 34px;align-items:center;gap:3px;padding:7px 3px;border-bottom:1px solid var(--dim);font-size:13px;}
-.ov-rank-row.rh{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:1px;border-bottom:2px solid var(--dim2);}
-
+.ov-rank-row{display:grid;grid-template-columns:20px 18px 1fr 52px 40px;align-items:center;gap:3px;padding:6px 3px;border-bottom:1px solid var(--dim);font-size:12px;}
+.ov-rank-row.rh{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);border-bottom:2px solid var(--dim2);}
 #particles{position:fixed;inset:0;pointer-events:none;z-index:500;overflow:hidden;}
 .pt{position:absolute;animation:ptFall linear forwards;}
 </style>
 </head>
 <body>
-<span style="position:fixed;top:-999px;left:-999px;font-family:'DOSGothic',monospace;font-size:1px;opacity:0;">산업안전보건법타이핑도장</span>
 <div id="particles"></div>
+<div id="reversal-banner" class="reversal-banner">⚡ REVERSAL! ⚡<br><span id="reversal-detail"></span></div>
 
 <!-- ══════════════ INTRO ══════════════ -->
 <div id="intro-screen" class="screen active">
@@ -395,6 +439,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div class="sb-score-area">
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1</span><span class="sb-score-val" id="sb-s1-intro">—</span></div>
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2</span><span class="sb-score-val green" id="sb-s2-intro">—</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3</span><span class="sb-score-val cyan" id="sb-s3-intro">—</span></div>
         <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-intro">—</span></div>
       </div>
       <div class="sb-ranking">
@@ -409,9 +454,9 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div class="intro-main">
         <div class="im-title-section">
           <div class="im-title-left">
-            <div class="im-deco-stars">★ ★ ★ STAGE 1+2 COMBINED ★ ★ ★</div>
+            <div class="im-deco-stars">★ STAGE 1+2+3 COMBINED ★</div>
             <div class="im-title">천하제일 산업안전보건법 타이핑 대회</div>
-            <div class="im-sub">SAFETY LAW TYPING + GALAGA TRAINING</div>
+            <div class="im-sub">SAFETY LAW TYPING + GALAGA + CHAOS MODE</div>
           </div>
           <div class="im-title-right">
             <div class="im-top1-wrap">
@@ -437,7 +482,6 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
         <div class="im-body">
           <div class="im-start-section">
             <div class="challenge-msg" id="challenge-msg"><em>도전하시겠어요?</em></div>
-            <div class="challenge-sub">STAGE 1 + STAGE 2 합산 랭킹</div>
             <button class="start-action-btn" onclick="openSetupPopup()">
               <svg class="start-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;">
                 <rect x="4" y="1" width="8" height="1" fill="#FFD700"/><rect x="2" y="2" width="12" height="1" fill="#FFD700"/>
@@ -458,10 +502,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
               <span class="im-demo-pg" id="demo-pg">— / —</span>
             </div>
             <div class="im-demo-lines" id="demo-lines"></div>
-            <div class="im-demo-guide"><span>Stage 1 → Stage 2 자동 진행</span><span>TAB / ENTER → 다음 줄</span></div>
+            <div class="im-demo-guide"><span>S1→S2→S3 자동 진행</span><span>TAB/ENTER → 다음 줄</span></div>
           </div>
           <div class="im-ranking">
-            <div class="im-rank-title"><span class="im-rank-title-deco">★</span> BEST RECORDS — TOP 20 <span class="im-rank-title-deco">★</span></div>
+            <div class="im-rank-title">★ BEST RECORDS — TOP 20 ★</div>
             <div class="im-rank-table">
               <div class="im-rank-head"><span>NO</span><span></span><span>사용자</span><span>단계</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span><span style="text-align:right;">ACC</span></div>
               <div class="im-rank-body" id="im-rank-body"><div class="im-rank-loading">불러오는 중...</div></div>
@@ -473,51 +517,38 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
   </div>
 </div>
 
-<!-- ══════════════ STAGE 1 TRAINING ══════════════ -->
+<!-- ══════════════ STAGE 1 ══════════════ -->
 <div id="training-screen" class="screen">
   <div class="layout">
     <div class="sidebar">
       <div class="sb-current">
         <div class="sb-cur-label">▶ 사용자</div>
-        <div class="sb-cur-user">
-          <div class="sb-cur-avatar" id="sb-avatar-training">⛑️</div>
-          <div><div class="sb-cur-name" id="sb-name-training">사용자</div><div class="sb-cur-char" id="sb-char-training"></div></div>
-        </div>
+        <div class="sb-cur-user"><div class="sb-cur-avatar" id="sb-avatar-training">⛑️</div><div><div class="sb-cur-name" id="sb-name-training">사용자</div><div class="sb-cur-char" id="sb-char-training"></div></div></div>
         <div class="sb-cur-stage"><span class="sb-cur-stage-lbl">단계</span><span id="sb-stage-training">—</span></div>
       </div>
       <div class="sb-score-area">
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1 (진행중)</span><span class="sb-score-val" id="sb-s1-training">0</span></div>
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2</span><span class="sb-score-val green" id="sb-s2-training">—</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3</span><span class="sb-score-val cyan" id="sb-s3-training">—</span></div>
         <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-training">0</span></div>
       </div>
       <div class="sb-ranking">
         <div class="sb-rank-header">🏆 BEST RECORDS</div>
-        <div class="rank-scroll">
-          <div class="rank-row rh"><span>NO</span><span></span><span>이름</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span></div>
-          <div id="rank-list-body-training"><div class="rank-loading">불러오는 중...</div></div>
-        </div>
+        <div class="rank-scroll"><div class="rank-row rh"><span>NO</span><span></span><span>이름</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span></div><div id="rank-list-body-training"><div class="rank-loading">불러오는 중...</div></div></div>
       </div>
     </div>
     <div class="main-area">
       <div class="training-main-area">
         <div class="training-topbar">
-          <div class="gt-left">
-            <span class="gt-title">STAGE 1</span>
-            <span class="gt-sep">|</span>
-            <span class="gt-sub" id="gt-sub">산업안전보건법</span>
-          </div>
+          <div class="gt-left"><span class="gt-title">STAGE 1</span><span class="gt-sep">|</span><span class="gt-sub" id="gt-sub">산업안전보건법</span></div>
           <div class="stage-indicator">
             <div class="stage-pip active" id="pip-s1">S1 타이핑</div>
             <div class="stage-pip" id="pip-s2">S2 갤러그</div>
+            <div class="stage-pip" id="pip-s3">S3 카오스</div>
           </div>
-          <div class="gt-right">
-            <button class="gt-btn" onclick="goIntro()">◀ 이전</button>
-            <button class="gt-btn" onclick="showRankOverlay()">🏆 기록</button>
-          </div>
+          <div class="gt-right"><button class="gt-btn" onclick="goIntro()">◀ 이전</button><button class="gt-btn" onclick="showRankOverlay()">🏆 기록</button></div>
         </div>
-        <div class="timer-row">
-          <div class="timer-wrap"><span class="timer-icon">⏱️</span><span class="timer-val" id="timer-val">01:00</span></div>
-        </div>
+        <div class="timer-row"><div class="timer-wrap"><span class="timer-icon">⏱️</span><span class="timer-val" id="timer-val">01:00</span></div></div>
         <div class="typing-box" onclick="focusInput()">
           <textarea class="hidden-input" id="hidden-input" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
           <div class="status-bar">
@@ -540,23 +571,18 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
     <div class="sidebar">
       <div class="sb-current">
         <div class="sb-cur-label">▶ 사용자</div>
-        <div class="sb-cur-user">
-          <div class="sb-cur-avatar" id="sb-avatar-galaga">⛑️</div>
-          <div><div class="sb-cur-name" id="sb-name-galaga">사용자</div><div class="sb-cur-char" id="sb-char-galaga"></div></div>
-        </div>
+        <div class="sb-cur-user"><div class="sb-cur-avatar" id="sb-avatar-galaga">⛑️</div><div><div class="sb-cur-name" id="sb-name-galaga">사용자</div><div class="sb-cur-char" id="sb-char-galaga"></div></div></div>
         <div class="sb-cur-stage"><span class="sb-cur-stage-lbl">단계</span><span id="sb-stage-galaga">GALAGA</span></div>
       </div>
       <div class="sb-score-area">
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1 ✓</span><span class="sb-score-val" id="sb-s1-galaga">0</span></div>
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2 (진행중)</span><span class="sb-score-val green" id="sb-s2-galaga">0</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3</span><span class="sb-score-val cyan" id="sb-s3-galaga">—</span></div>
         <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-galaga">0</span></div>
       </div>
       <div class="sb-ranking">
         <div class="sb-rank-header">🏆 BEST RECORDS</div>
-        <div class="rank-scroll">
-          <div class="rank-row rh"><span>NO</span><span></span><span>이름</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span></div>
-          <div id="rank-list-body-galaga"><div class="rank-loading">불러오는 중...</div></div>
-        </div>
+        <div class="rank-scroll"><div class="rank-row rh"><span>NO</span><span></span><span>이름</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span></div><div id="rank-list-body-galaga"><div class="rank-loading">불러오는 중...</div></div></div>
       </div>
     </div>
     <div class="main-area">
@@ -584,58 +610,115 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
   </div>
 </div>
 
+<!-- ══════════════ STAGE 3 CHAOS ══════════════ -->
+<div id="chaos-screen" class="screen">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sb-current">
+        <div class="sb-cur-label">▶ 사용자</div>
+        <div class="sb-cur-user"><div class="sb-cur-avatar" id="sb-avatar-chaos">⛑️</div><div><div class="sb-cur-name" id="sb-name-chaos">사용자</div><div class="sb-cur-char" id="sb-char-chaos"></div></div></div>
+        <div class="sb-cur-stage"><span class="sb-cur-stage-lbl">단계</span><span id="sb-stage-chaos">CHAOS</span></div>
+      </div>
+      <div class="sb-score-area">
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1 ✓</span><span class="sb-score-val" id="sb-s1-chaos">0</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2 ✓</span><span class="sb-score-val green" id="sb-s2-chaos">0</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3 (진행중)</span><span class="sb-score-val cyan" id="sb-s3-chaos">0</span></div>
+        <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-chaos">0</span></div>
+      </div>
+      <div class="sb-ranking">
+        <div class="sb-rank-header">🏆 BEST RECORDS</div>
+        <div class="rank-scroll"><div class="rank-row rh"><span>NO</span><span></span><span>이름</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span></div><div id="rank-list-body-chaos"><div class="rank-loading">불러오는 중...</div></div></div>
+      </div>
+    </div>
+    <div class="main-area">
+      <div class="chaos-main-area">
+        <div class="chaos-hud">
+          <div class="chud-item"><div class="chud-label">S3 SCORE</div><div class="chud-val cyan" id="chud-score">0</div></div>
+          <div class="chud-item"><div class="chud-label">LIVES</div><div class="chud-lives" id="chud-lives">❤️❤️❤️</div></div>
+          <div class="chud-item"><div class="chud-label">COMBO</div><div class="chud-val" id="chud-combo">x1</div></div>
+          <div class="chud-badge">STAGE 3 — CHAOS</div>
+          <div class="chud-item" style="text-align:center;"><div class="chud-label">WAVE</div><div class="chud-val" id="chud-wave">1</div></div>
+          <div class="chud-item"><div class="chud-label">SHIELD</div><div class="chud-val" id="chud-shield">—</div></div>
+          <div class="chud-item" style="text-align:right;"><div class="chud-label">TIME</div><div class="chud-val" id="chud-time">90</div></div>
+        </div>
+        <div id="chaos-area">
+          <canvas id="chaos-bg-canvas"></canvas>
+          <div id="chaos-crosshair" style="position:absolute;width:24px;height:24px;pointer-events:none;z-index:30;">
+            <svg viewBox="0 0 24 24" style="width:100%;height:100%;"><circle cx="12" cy="12" r="9" fill="none" stroke="rgba(0,238,255,0.5)" stroke-width="1.5"/><line x1="12" y1="2" x2="12" y2="8" stroke="rgba(0,238,255,0.7)" stroke-width="1.5"/><line x1="12" y1="16" x2="12" y2="22" stroke="rgba(0,238,255,0.7)" stroke-width="1.5"/><line x1="2" y1="12" x2="8" y2="12" stroke="rgba(0,238,255,0.7)" stroke-width="1.5"/><line x1="16" y1="12" x2="22" y2="12" stroke="rgba(0,238,255,0.7)" stroke-width="1.5"/></svg>
+          </div>
+          <div class="shield-overlay" id="shield-overlay"></div>
+          <div id="wave-announce-chaos"><div class="wa-text" id="wa-text-chaos" style="font-family:'Press Start 2P',monospace;font-size:18px;color:var(--cyan);letter-spacing:4px;"></div></div>
+          <div id="s3-score-pop"></div>
+        </div>
+        <div id="chaos-input-bar">
+          <span id="chaos-type-label">▶ CHAOS TYPING</span>
+          <input id="chaos-input" type="text" placeholder="타이핑으로 격파하세요..." autocomplete="off" autocorrect="off" spellcheck="false">
+          <div id="chaos-bonus-bar">
+            <span style="font-family:'Press Start 2P',monospace;font-size:7px;color:var(--lo);margin-right:4px;">BONUS</span>
+            <div id="bonus-pips"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════════ FINAL RESULT ══════════════ -->
 <div id="result-screen" class="screen">
   <div class="layout">
     <div class="sidebar">
       <div class="sb-current">
         <div class="sb-cur-label">▶ 최종 결과</div>
-        <div class="sb-cur-user">
-          <div class="sb-cur-avatar" id="sb-avatar-result">⛑️</div>
-          <div><div class="sb-cur-name" id="sb-name-result">사용자</div><div class="sb-cur-char" id="sb-char-result"></div></div>
-        </div>
+        <div class="sb-cur-user"><div class="sb-cur-avatar" id="sb-avatar-result">⛑️</div><div><div class="sb-cur-name" id="sb-name-result">사용자</div><div class="sb-cur-char" id="sb-char-result"></div></div></div>
         <div class="sb-cur-stage"><span class="sb-cur-stage-lbl">단계</span><span id="sb-stage-result">완료</span></div>
       </div>
       <div class="sb-score-area">
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1</span><span class="sb-score-val" id="sb-s1-result">0</span></div>
         <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2</span><span class="sb-score-val green" id="sb-s2-result">0</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 3</span><span class="sb-score-val cyan" id="sb-s3-result">0</span></div>
         <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-result">0</span></div>
       </div>
       <div class="sb-ranking">
         <div class="sb-rank-header">🏆 BEST RECORDS</div>
-        <div class="rank-scroll">
-          <div class="rank-row rh"><span>NO</span><span></span><span>이름</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span></div>
-          <div id="rank-list-body-result"><div class="rank-loading">불러오는 중...</div></div>
-        </div>
+        <div class="rank-scroll"><div class="rank-row rh"><span>NO</span><span></span><span>이름</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span></div><div id="rank-list-body-result"><div class="rank-loading">불러오는 중...</div></div></div>
       </div>
     </div>
     <div class="main-area">
       <div class="result-main-area">
-        <div class="result-topbar"><span style="font-size:18px;">🏆</span><span class="result-topbar-title">훈련 완료 — 최종 결과</span></div>
+        <div class="result-topbar"><span style="font-size:16px;">🏆</span><span class="result-topbar-title">훈련 완료 — 최종 결과 (S1+S2+S3)</span></div>
         <div class="result-content">
           <div class="result-arcade-hd">
             <div class="rah-main">훈련 완료</div>
-            <div class="rah-sub">천하제일 산업안전보건법 타이핑 대회 — STAGE 1+2 합산</div>
+            <div class="rah-sub">천하제일 산업안전보건법 타이핑 대회 — S1+S2+S3 합산</div>
           </div>
           <div class="result-user-row">
             <div class="result-avatar" id="res-avatar">⛑️</div>
             <div><div class="result-name" id="res-name">사용자</div><div class="result-sub2" id="res-sub2">—</div></div>
+            <div style="margin-left:auto;text-align:right;">
+              <div id="res-reversal-notice" style="display:none;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--yellow);animation:blink .8s step-end infinite;">⚡ REVERSAL ACHIEVED ⚡</div>
+            </div>
           </div>
-          <!-- 점수 합산 표시 -->
-          <div class="result-scores-combined">
+          <div class="result-scores-4">
             <div class="rs-box">
-              <span class="rs-val stage-score" id="res-s1-score">0</span>
+              <span class="rs-val s1" id="res-s1-score">0</span>
               <div class="rs-label">STAGE 1</div>
-              <div class="rs-sublabel">타이핑 점수</div>
+              <div class="rs-sublabel">타이핑</div>
             </div>
             <div class="rs-plus-box"><span class="rs-plus-sym">+</span></div>
             <div class="rs-box">
-              <span class="rs-val stage-score" id="res-s2-score">0</span>
+              <span class="rs-val s2" id="res-s2-score">0</span>
               <div class="rs-label">STAGE 2</div>
-              <div class="rs-sublabel">갤러그 점수</div>
+              <div class="rs-sublabel">갤러그</div>
+            </div>
+            <div class="rs-plus-box"><span class="rs-plus-sym">+</span></div>
+            <div class="rs-box">
+              <span class="rs-val s3" id="res-s3-score">0</span>
+              <div class="rs-label">STAGE 3</div>
+              <div class="rs-sublabel">카오스</div>
+              <div class="rs-reversal-tag" id="res-reversal-tag" style="display:none;">역전 보너스 포함!</div>
             </div>
             <div class="rs-plus-box"><span class="rs-plus-sym">=</span></div>
-            <div class="rs-box" style="background:#0a1a0a;border:1px solid var(--green);">
+            <div class="rs-box total-box">
               <span class="rs-val big" id="res-total-score">0</span>
               <div class="rs-label" style="color:var(--green);">TOTAL 합산</div>
               <div class="rs-sublabel" id="res-rank-pos">—</div>
@@ -645,7 +728,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
             <div class="rs-box"><span class="rs-val" id="res-wpm">0</span><div class="rs-label">WPM</div></div>
             <div class="rs-box"><span class="rs-val" id="res-acc">0%</span><div class="rs-label">ACCURACY</div></div>
             <div class="rs-box"><span class="rs-val" id="res-chars">0</span><div class="rs-label">CHARS</div></div>
-            <div class="rs-box"><span class="rs-val" id="res-kills">0</span><div class="rs-label">KILLS (S2)</div></div>
+            <div class="rs-box"><span class="rs-val" id="res-kills">0</span><div class="rs-label">S2 KILLS</div></div>
+            <div class="rs-box"><span class="rs-val" id="res-s3kills">0</span><div class="rs-label">S3 KILLS</div></div>
           </div>
           <div class="result-comment"><strong id="res-comment"></strong><span id="res-formula"></span></div>
           <div class="result-btns">
@@ -658,27 +742,18 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
   </div>
 </div>
 
-<!-- Stage Clear 오버레이 -->
+<!-- Stage Clear Overlay -->
 <div id="stage-clear-overlay">
-  <div class="sc-title">STAGE 1 CLEAR!</div>
-  <div class="sc-sub">이제 STAGE 2 갤러그로 진행합니다</div>
-  <div class="sc-score-row">
-    <div class="sc-score-box">
-      <span class="sc-score-lbl">STAGE 1 점수</span>
-      <span class="sc-score-val stage1" id="sc-s1-val">0</span>
-    </div>
-    <span class="sc-plus">+</span>
-    <div class="sc-score-box">
-      <span class="sc-score-lbl">STAGE 2 점수</span>
-      <span class="sc-score-val" style="color:var(--lo);">???</span>
-    </div>
-    <span class="sc-plus">=</span>
-    <div class="sc-total-box">
-      <span class="sc-total-lbl">TOTAL SCORE</span>
-      <span class="sc-total-val" id="sc-total-val">?</span>
-    </div>
+  <div class="sc-title" id="sc-title-text">STAGE CLEAR!</div>
+  <div class="sc-sub" id="sc-sub-text">다음 스테이지로 진행합니다</div>
+  <div class="sc-score-row" id="sc-score-row"></div>
+  <div class="sc-s3-note" id="sc-s3-note" style="display:none;">
+    ⚡ STAGE 3 — CHAOS MODE ⚡<br>
+    4방향에서 단어가 출현 · 회전/특수효과<br>
+    BOSS / BONUS / BOMB / SHIELD 특수 블록<br>
+    💀 역전 가능! S3에서 S1+S2 합산 초과 시 역전 보너스
   </div>
-  <button class="sc-btn" onclick="startGalaga()">▶ STAGE 2 시작</button>
+  <button class="sc-btn" id="sc-next-btn" onclick="handleStageClearNext()">▶ 다음 스테이지</button>
 </div>
 
 <!-- 설정 팝업 -->
@@ -701,20 +776,24 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 <div id="rank-overlay">
   <div class="ov-card">
     <div class="ov-head"><div class="ov-head-title">BEST RECORDS (합산)</div><button class="ov-close" onclick="hideRankOverlay()">✕</button></div>
-    <div id="ov-loading" style="padding:18px;text-align:center;font-family:'Press Start 2P',monospace;font-size:12px;color:var(--lo);animation:blink 1s step-end infinite;">불러오는 중...</div>
+    <div id="ov-loading" style="padding:16px;text-align:center;font-family:'Press Start 2P',monospace;font-size:11px;color:var(--lo);animation:blink 1s step-end infinite;">불러오는 중...</div>
     <div id="ov-rank-list" style="display:none;">
-      <div class="ov-rank-row rh"><span>NO</span><span></span><span>이름</span><span>단계</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span></div>
+      <div class="ov-rank-row rh"><span>NO</span><span></span><span>이름</span><span>단계</span><span style="text-align:right;">합산</span></div>
       <div id="ov-rank-body"></div>
     </div>
   </div>
 </div>
 
 <script>
+/* ───────────────────────────────────
+   CONFIG
+─────────────────────────────────── */
 const GAS_URL='https://script.google.com/macros/s/AKfycbypZcd2XsCMPxyoaKhStC9ziOmRQ8vzTQHNHaxEnIeLpVD7u0eZfW90vDHv7p8ob1NW/exec';
-const APP_CACHE_VERSION='20260518_01';
 const GAS_TIMEOUT_MS=8000;
 
-/* ─── 캐릭터 ─── */
+/* ───────────────────────────────────
+   캐릭터
+─────────────────────────────────── */
 const DOT_CHARS=[
   {name:'안전모',svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="5" y="1" width="6" height="1" fill="#FFD700"/><rect x="3" y="2" width="10" height="1" fill="#FFD700"/><rect x="2" y="3" width="12" height="2" fill="#FFD700"/><rect x="3" y="4" width="10" height="1" fill="#FFA500"/><rect x="4" y="5" width="8" height="4" fill="#FDDBB4"/><rect x="4" y="6" width="1" height="1" fill="#333"/><rect x="11" y="6" width="1" height="1" fill="#333"/><rect x="5" y="8" width="6" height="1" fill="#C47A50"/><rect x="4" y="9" width="8" height="3" fill="#4A90D9"/><rect x="3" y="11" width="10" height="2" fill="#4A90D9"/></svg>`},
   {name:'안전조끼',svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="5" y="1" width="6" height="4" fill="#FDDBB4"/><rect x="4" y="2" width="1" height="2" fill="#FDDBB4"/><rect x="11" y="2" width="1" height="2" fill="#FDDBB4"/><rect x="4" y="5" width="1" height="7" fill="#FF6B00"/><rect x="5" y="5" width="2" height="7" fill="#FF6B00"/><rect x="9" y="5" width="2" height="7" fill="#FF6B00"/><rect x="11" y="5" width="1" height="7" fill="#FF6B00"/><rect x="7" y="5" width="2" height="9" fill="#FF6B00"/><rect x="5" y="6" width="6" height="1" fill="#FFD700"/><rect x="5" y="9" width="6" height="1" fill="#FFD700"/></svg>`},
@@ -729,167 +808,155 @@ const DOT_CHARS=[
 ];
 const CHARS=DOT_CHARS.map(d=>({emoji:d.svg,name:d.name,svg:d.svg}));
 
-/* ─── STAGE 1 지문 ─── */
+/* ───────────────────────────────────
+   STAGE 1 지문
+─────────────────────────────────── */
 const PASSAGES=[
   {id:'p1',title:'제1조, 제2조 목적 및 정의',ref:'제1조, 제2조',lines:['제1조(목적) 이 법은 산업 안전 및 보건에 관한 기준을','확립하고 그 책임의 소재를 명확하게 하여 산업재해를','예방하고 쾌적한 작업환경을 조성함으로써 노무를 제공하는','사람의 안전 및 보건을 유지, 증진함을 목적으로 한다.','제2조(정의) "산업재해"란 노무를 제공하는 사람이 업무에','관계되는 건설물, 설비, 원재료, 가스, 증기, 분진 등에','의하거나 작업 또는 그 밖의 업무로 인하여 사망 또는','부상하거나 질병에 걸리는 것을 말한다.','"중대재해"란 산업재해 중 사망 등 재해 정도가 심하거나','다수의 재해자가 발생한 경우로서 고용노동부령으로 정하는 재해를 말한다.']},
   {id:'p2',title:'제5조, 제6조 사업주, 근로자 의무',ref:'제5조, 제6조',lines:['제5조(사업주 등의 의무) 사업주는 다음 각 호의 사항을','이행함으로써 근로자의 안전 및 보건을 유지, 증진시켜야 한다.','1. 이 법과 이 법에 따른 명령으로 정하는','산업재해 예방을 위한 기준을 지킬 것','2. 근로자의 신체적 피로와 정신적 스트레스 등을 줄일 수 있는','쾌적한 작업환경을 조성하고 근로조건을 개선할 것','3. 해당 사업장의 안전 및 보건에 관한 정보를 근로자에게 제공할 것','제6조(근로자의 의무) 근로자는 이 법과 이 법에 따른','명령으로 정하는 산업재해 예방을 위한 기준을 지켜야 하며,','관계인이 실시하는 산업재해 예방에 관한 조치에 따라야 한다.']},
-  {id:'p3',title:'제16조, 제17조 관리감독자, 안전관리자',ref:'제16조, 제17조',lines:['제16조(관리감독자) 사업주는 사업장의 생산과 관련되는','업무와 그 소속 직원을 직접 지휘, 감독하는 직위에 있는','사람(이하 "관리감독자"라 한다)에게 산업 안전 및 보건에','관한 업무로서 대통령령으로 정하는 업무를 수행하도록','하여야 한다.','제17조(안전관리자) 사업주는 사업장에 안전에 관한','기술적인 사항에 관하여 사업주 또는 안전보건관리책임자를','보좌하고 관리감독자에게 지도, 조언하는 업무를 수행하는','사람(이하 "안전관리자"라 한다)을 두어야 한다.']},
-  {id:'p4',title:'제36조, 제38조 위험성평가, 안전조치',ref:'제36조, 제38조',lines:['제36조(위험성평가의 실시) 사업주는 건설물, 기계, 기구, 설비,','원재료, 가스, 증기, 분진, 근로자의 작업행동 또는 그 밖의','업무로 인한 유해, 위험 요인을 찾아내어 부상 및 질병으로','이어질 수 있는 위험성의 크기가 허용 가능한 수준인지를','결정하고 그 위험성을 줄이기 위한 조치를 하여야 한다.','제38조(안전조치) 사업주는 기계, 기구, 그 밖의 설비에 의한','위험, 폭발성, 발화성 및 인화성 물질 등에 의한 위험,','전기, 열, 그 밖의 에너지에 의한 위험으로 인한 산업재해를','예방하기 위하여 필요한 조치를 하여야 한다.']},
-  {id:'p5',title:'제51조~제54조 작업중지, 중대재해',ref:'제51조~제54조',lines:['제51조(사업주의 작업중지) 사업주는 산업재해가 발생할','급박한 위험이 있을 때에는 즉시 작업을 중지시키고','근로자를 작업장소에서 대피시키는 등 안전 및 보건에','관하여 필요한 조치를 하여야 한다.','제52조(근로자의 작업중지) 근로자는 산업재해가 발생할','급박한 위험이 있는 경우에는 작업을 중지하고 대피할 수 있다.','제54조(중대재해 발생 시 사업주의 조치) 사업주는 중대재해가','발생하였을 때에는 즉시 해당 작업을 중지시키고 근로자를','작업장소에서 대피시키는 등 필요한 조치를 하여야 하며,','지체 없이 고용노동부장관에게 보고하여야 한다.']},
-  {id:'p6',title:'제63조, 제167조 도급인 의무, 벌칙',ref:'제63조, 제167조',lines:['제63조(도급인의 안전조치 및 보건조치) 도급인은 관계수급인','근로자가 도급인의 사업장에서 작업을 하는 경우에 자신의','근로자와 관계수급인 근로자의 산업재해를 예방하기 위하여','안전 및 보건 시설의 설치 등 필요한 안전조치 및','보건조치를 하여야 한다. 다만, 보호구 착용의 지시 등','관계수급인 근로자의 작업행동에 관한 직접적인 조치는 제외한다.','제167조(벌칙) 제38조, 제39조, 제63조를 위반하여 근로자를','사망에 이르게 한 자는 7년 이하의 징역 또는','1억원 이하의 벌금에 처한다.']}
+  {id:'p3',title:'제16조, 제17조 관리감독자, 안전관리자',ref:'제16조, 제17조',lines:['제16조(관리감독자) 사업주는 사업장의 생산과 관련되는','업무와 그 소속 직원을 직접 지휘, 감독하는 직위에 있는','사람에게 산업 안전 및 보건에 관한 업무로서','대통령령으로 정하는 업무를 수행하도록 하여야 한다.','제17조(안전관리자) 사업주는 사업장에 안전에 관한','기술적인 사항에 관하여 사업주 또는 안전보건관리책임자를','보좌하고 관리감독자에게 지도, 조언하는 업무를 수행하는','사람을 두어야 한다.']},
+  {id:'p4',title:'제36조, 제38조 위험성평가, 안전조치',ref:'제36조, 제38조',lines:['제36조(위험성평가의 실시) 사업주는 건설물, 기계, 기구,','설비, 원재료, 가스, 증기, 분진, 근로자의 작업행동 또는','그 밖의 업무로 인한 유해, 위험 요인을 찾아내어','부상 및 질병으로 이어질 수 있는 위험성의 크기가','허용 가능한 수준인지를 결정하고 그 위험성을','줄이기 위한 조치를 하여야 한다.','제38조(안전조치) 사업주는 기계, 기구, 그 밖의 설비에 의한','위험, 폭발성, 발화성 및 인화성 물질 등에 의한 위험으로','인한 산업재해를 예방하기 위하여 필요한 조치를 하여야 한다.']},
+  {id:'p5',title:'제51조~제54조 작업중지, 중대재해',ref:'제51조~제54조',lines:['제51조(사업주의 작업중지) 사업주는 산업재해가 발생할','급박한 위험이 있을 때에는 즉시 작업을 중지시키고','근로자를 작업장소에서 대피시키는 등 안전 및 보건에','관하여 필요한 조치를 하여야 한다.','제52조(근로자의 작업중지) 근로자는 산업재해가 발생할','급박한 위험이 있는 경우에는 작업을 중지하고 대피할 수 있다.','제54조(중대재해 발생 시) 사업주는 중대재해가 발생하였을 때에는','즉시 해당 작업을 중지시키고 근로자를 작업장소에서 대피시키는 등','필요한 조치를 하여야 하며, 지체 없이 고용노동부장관에게 보고하여야 한다.']},
+  {id:'p6',title:'제63조, 제167조 도급인 의무, 벌칙',ref:'제63조, 제167조',lines:['제63조(도급인의 안전조치 및 보건조치) 도급인은 관계수급인','근로자가 도급인의 사업장에서 작업을 하는 경우에','자신의 근로자와 관계수급인 근로자의 산업재해를 예방하기 위하여','안전 및 보건 시설의 설치 등 필요한 조치를 하여야 한다.','제167조(벌칙) 제38조, 제39조, 제63조를 위반하여 근로자를','사망에 이르게 한 자는 7년 이하의 징역 또는','1억원 이하의 벌금에 처한다.']}
 ];
 
-/* ─── STAGE 2 단어풀 ─── */
+/* ───────────────────────────────────
+   STAGE 2 단어풀
+─────────────────────────────────── */
 const GALAGA_WORDS=[
-  {t:'굴삭기',cat:'중장비'},
-  {t:'호흡용보호구',cat:'보호구'},
-  {t:'안전모',cat:'보호구'},
-  {t:'추락방지',cat:'안전조치'},
-  {t:'위험성평가',cat:'법령'},
-  {t:'중대재해',cat:'법령'},
-  {t:'안전관리자',cat:'직책'},
-  {t:'보건조치',cat:'법령'},
-  {t:'작업중지',cat:'법령'},
-  {t:'관리감독자',cat:'직책'},
-  {t:'방호장치',cat:'설비'},
-  {t:'산업재해',cat:'법령'},
-  {t:'안전난간',cat:'설비'},
-  {t:'차량계기계',cat:'중장비'},
-  {t:'지게차',cat:'중장비'},
-  {t:'이동식비계',cat:'설비'},
-  {t:'안전조끼',cat:'보호구'},
-  {t:'전기안전',cat:'안전조치'},
-  {t:'도급인',cat:'법령'},
-  {t:'폭발위험',cat:'위험'},
-  {t:'보호구착용',cat:'보호구'},
-  {t:'밀폐공간',cat:'위험'},
-  {t:'질식위험',cat:'위험'},
-  {t:'화학물질',cat:'위험'},
-  {t:'작업발판',cat:'설비'},
-  {t:'안전벨트',cat:'보호구'},
-  {t:'TBM',cat:'안전조치'},
-  {t:'JSA',cat:'안전조치'},
-  {t:'PSM',cat:'법령'},
-  {t:'안전점검',cat:'안전조치'},
-  {t:'소화기',cat:'설비'},
-  {t:'화재예방',cat:'안전조치'},
-  {t:'크레인',cat:'중장비'},
-  {t:'와이어로프',cat:'설비'},
-  {t:'추락사고',cat:'위험'},
-  {t:'끼임사고',cat:'위험'},
-  {t:'낙하물',cat:'위험'},
-  {t:'절연장갑',cat:'보호구'},
-  {t:'안전작업',cat:'안전조치'},
-  {t:'보건관리자',cat:'직책'},
-  {t:'아차사고',cat:'안전조치'},
-  {t:'비상대피',cat:'안전조치'},
-  {t:'작업허가',cat:'안전조치'},
-  {t:'산소농도',cat:'위험'},
-  {t:'유해가스',cat:'위험'},
-  {t:'가스측정',cat:'설비'},
-  {t:'국소배기',cat:'설비'},
-  {t:'보호안경',cat:'보호구'},
-  {t:'귀마개',cat:'보호구'},
-  {t:'방진마스크',cat:'보호구'},
-  {t:'방독마스크',cat:'보호구'},
-  {t:'안전화',cat:'보호구'},
-  {t:'안전대',cat:'보호구'},
-  {t:'얼굴보호구',cat:'보호구'},
-  {t:'송기마스크',cat:'보호구'},
-  {t:'안전보건표지',cat:'안전조치'},
-  {t:'비상샤워',cat:'설비'},
-  {t:'세안설비',cat:'설비'},
-  {t:'잠금장치',cat:'설비'},
-  {t:'꼬리표부착',cat:'안전조치'},
-  {t:'LOTO',cat:'안전조치'},
-  {t:'정전작업',cat:'안전조치'},
-  {t:'활선작업',cat:'위험'},
-  {t:'감전위험',cat:'위험'},
-  {t:'접지설비',cat:'설비'},
-  {t:'누전차단기',cat:'설비'},
-  {t:'과부하',cat:'위험'},
-  {t:'화기작업',cat:'위험'},
-  {t:'용접작업',cat:'위험'},
-  {t:'불티비산',cat:'위험'},
-  {t:'가연성물질',cat:'위험'},
-  {t:'인화성액체',cat:'위험'},
-  {t:'고압가스',cat:'위험'},
-  {t:'산소결핍',cat:'위험'},
-  {t:'특별교육',cat:'법령'},
-  {t:'정기교육',cat:'법령'},
-  {t:'신규교육',cat:'법령'},
-  {t:'채용시교육',cat:'법령'},
-  {t:'안전보건관리책임자',cat:'직책'},
-  {t:'산업보건의',cat:'직책'},
-  {t:'명예산업안전감독관',cat:'직책'},
-  {t:'안전보건총괄책임자',cat:'직책'},
-  {t:'유해위험방지계획서',cat:'법령'},
-  {t:'공정안전보고서',cat:'법령'},
-  {t:'MSDS',cat:'법령'},
-  {t:'물질안전보건자료',cat:'법령'},
-  {t:'경고표지',cat:'안전조치'},
-  {t:'작업환경측정',cat:'법령'},
-  {t:'특수건강진단',cat:'법령'},
-  {t:'근골격계부담작업',cat:'위험'},
-  {t:'소음노출',cat:'위험'},
-  {t:'분진노출',cat:'위험'},
-  {t:'열사병',cat:'위험'},
-  {t:'한랭질환',cat:'위험'},
-  {t:'중량물취급',cat:'위험'},
-  {t:'사다리작업',cat:'위험'},
-  {t:'고소작업',cat:'위험'},
-  {t:'개구부방호',cat:'설비'},
-  {t:'안전블록',cat:'설비'},
-  {t:'비계해체',cat:'위험'}
+  {t:'굴삭기',cat:'중장비'},{t:'호흡용보호구',cat:'보호구'},{t:'안전모',cat:'보호구'},{t:'추락방지',cat:'안전조치'},
+  {t:'위험성평가',cat:'법령'},{t:'중대재해',cat:'법령'},{t:'안전관리자',cat:'직책'},{t:'보건조치',cat:'법령'},
+  {t:'작업중지',cat:'법령'},{t:'관리감독자',cat:'직책'},{t:'방호장치',cat:'설비'},{t:'산업재해',cat:'법령'},
+  {t:'안전난간',cat:'설비'},{t:'차량계기계',cat:'중장비'},{t:'지게차',cat:'중장비'},{t:'이동식비계',cat:'설비'},
+  {t:'안전조끼',cat:'보호구'},{t:'전기안전',cat:'안전조치'},{t:'도급인',cat:'법령'},{t:'폭발위험',cat:'위험'},
+  {t:'보호구착용',cat:'보호구'},{t:'밀폐공간',cat:'위험'},{t:'질식위험',cat:'위험'},{t:'화학물질',cat:'위험'},
+  {t:'작업발판',cat:'설비'},{t:'안전벨트',cat:'보호구'},{t:'TBM',cat:'안전조치'},{t:'JSA',cat:'안전조치'},
+  {t:'PSM',cat:'법령'},{t:'안전점검',cat:'안전조치'},{t:'소화기',cat:'설비'},{t:'화재예방',cat:'안전조치'},
+  {t:'크레인',cat:'중장비'},{t:'와이어로프',cat:'설비'},{t:'추락사고',cat:'위험'},{t:'끼임사고',cat:'위험'},
+  {t:'낙하물',cat:'위험'},{t:'절연장갑',cat:'보호구'},{t:'안전작업',cat:'안전조치'},{t:'보건관리자',cat:'직책'},
+  {t:'아차사고',cat:'안전조치'},{t:'비상대피',cat:'안전조치'},{t:'작업허가',cat:'안전조치'},{t:'산소농도',cat:'위험'},
+  {t:'유해가스',cat:'위험'},{t:'가스측정',cat:'설비'},{t:'국소배기',cat:'설비'},{t:'보호안경',cat:'보호구'},
+  {t:'귀마개',cat:'보호구'},{t:'방진마스크',cat:'보호구'},{t:'방독마스크',cat:'보호구'},{t:'안전화',cat:'보호구'},
+  {t:'안전대',cat:'보호구'},{t:'LOTO',cat:'안전조치'},{t:'정전작업',cat:'안전조치'},{t:'감전위험',cat:'위험'},
+  {t:'접지설비',cat:'설비'},{t:'누전차단기',cat:'설비'},{t:'화기작업',cat:'위험'},{t:'용접작업',cat:'위험'},
+  {t:'고압가스',cat:'위험'},{t:'산소결핍',cat:'위험'},{t:'특별교육',cat:'법령'},{t:'정기교육',cat:'법령'},
+  {t:'MSDS',cat:'법령'},{t:'물질안전보건자료',cat:'법령'},{t:'경고표지',cat:'안전조치'},{t:'작업환경측정',cat:'법령'},
+  {t:'특수건강진단',cat:'법령'},{t:'소음노출',cat:'위험'},{t:'분진노출',cat:'위험'},{t:'열사병',cat:'위험'},
+  {t:'고소작업',cat:'위험'},{t:'개구부방호',cat:'설비'},{t:'안전블록',cat:'설비'},{t:'비계해체',cat:'위험'}
 ];
-const CAT_EMOJIS={'중장비':'🚜','보호구':'⛑️','법령':'📋','직책':'👷','설비':'🔧','안전조치':'✅','위험':'⚠️'};
-const WAVE_CONFIG=[
-  {count:4, speed:0.55,spawnInterval:2200,maxOnScreen:3},
-  {count:6, speed:0.82,spawnInterval:1800,maxOnScreen:4},
-  {count:8, speed:1.13,spawnInterval:1500,maxOnScreen:5},
+
+/* ───────────────────────────────────
+   STAGE 3 단어풀 (더 어렵고 긴 단어)
+─────────────────────────────────── */
+const CHAOS_WORDS_NORMAL=[
+  {t:'위험성평가',cat:'법령',pts:250},{t:'안전보건관리책임자',cat:'직책',pts:500},
+  {t:'공정안전보고서',cat:'법령',pts:450},{t:'유해위험방지계획서',cat:'법령',pts:500},
+  {t:'물질안전보건자료',cat:'법령',pts:450},{t:'작업환경측정',cat:'법령',pts:330},
+  {t:'특수건강진단',cat:'법령',pts:350},{t:'명예산업안전감독관',cat:'직책',pts:550},
+  {t:'안전보건총괄책임자',cat:'직책',pts:530},{t:'근골격계부담작업',cat:'위험',pts:480},
+  {t:'보건관리자',cat:'직책',pts:250},{t:'방호장치',cat:'설비',pts:200},
+  {t:'개인보호구',cat:'보호구',pts:230},{t:'산업보건의',cat:'직책',pts:300},
+  {t:'안전검사',cat:'안전조치',pts:230},{t:'타워크레인',cat:'중장비',pts:330},
+  {t:'이동식크레인',cat:'중장비',pts:380},{t:'굴착공사',cat:'위험',pts:280},
+  {t:'밀폐공간',cat:'위험',pts:250},{t:'산소결핍',cat:'위험',pts:230},
+  {t:'LOTO절차',cat:'안전조치',pts:300},{t:'작업허가서',cat:'안전조치',pts:280},
+  {t:'화기작업허가',cat:'안전조치',pts:350},{t:'고소작업대',cat:'설비',pts:330},
+  {t:'안전작업발판',cat:'설비',pts:330},{t:'추락방지망',cat:'설비',pts:300},
+  {t:'낙하물방지망',cat:'설비',pts:300},{t:'비상대피로',cat:'안전조치',pts:280}
+];
+const CHAOS_WORDS_BOSS=[
+  {t:'산업안전보건법',cat:'BOSS',pts:1000},{t:'중대재해처벌법',cat:'BOSS',pts:1100},
+  {t:'안전보건관리체계',cat:'BOSS',pts:950},{t:'도급사업안전조치',cat:'BOSS',pts:880},
+  {t:'위험기계기구검사',cat:'BOSS',pts:900},{t:'화학물질관리법',cat:'BOSS',pts:920}
+];
+const CHAOS_WORDS_BONUS=[
+  {t:'안전',cat:'BONUS',pts:500},{t:'예방',cat:'BONUS',pts:450},
+  {t:'보호',cat:'BONUS',pts:400},{t:'점검',cat:'BONUS',pts:380},
+  {t:'TBM',cat:'BONUS',pts:550},{t:'JSA',cat:'BONUS',pts:550}
+];
+const CHAOS_WORDS_BOMB=[
+  {t:'위험',cat:'BOMB',pts:-300},{t:'폭발',cat:'BOMB',pts:-300},
+  {t:'재해',cat:'BOMB',pts:-400},{t:'감전',cat:'BOMB',pts:-300},
+  {t:'질식',cat:'BOMB',pts:-350}
+];
+const CHAOS_WORDS_SHIELD=[
+  {t:'안전모',cat:'SHIELD',pts:0},{t:'방호',cat:'SHIELD',pts:0},
+  {t:'차단기',cat:'SHIELD',pts:0},{t:'보호구',cat:'SHIELD',pts:0}
+];
+
+const CAT_EMOJIS={'중장비':'🚜','보호구':'⛑️','법령':'📋','직책':'👷','설비':'🔧','안전조치':'✅','위험':'⚠️','BOSS':'👑','BONUS':'⭐','BOMB':'💣','SHIELD':'🛡️'};
+
+const WAVE_CONFIG_S2=[
+  {count:4,speed:0.55,spawnInterval:2200,maxOnScreen:3},
+  {count:6,speed:0.82,spawnInterval:1800,maxOnScreen:4},
+  {count:8,speed:1.13,spawnInterval:1500,maxOnScreen:5},
   {count:10,speed:1.40,spawnInterval:1200,maxOnScreen:6},
   {count:12,speed:1.72,spawnInterval:1000,maxOnScreen:7}
 ];
 
-/* ─── 샘플 랭킹 ─── */
-const SAMPLE=[
-  {nickname:'안전왕',char:'안전모',wpm:180,acc:96,score:1037,stage2:480,total:1037,passage:'제1조, 제2조'},
-  {nickname:'현장달인',char:'현장반장',wpm:155,acc:94,score:875,stage2:390,total:875,passage:'제36조, 제38조'},
-  {nickname:'보건마스터',char:'보건관리자',wpm:142,acc:91,score:776,stage2:320,total:776,passage:'제51조~제54조'},
-  {nickname:'소방영웅',char:'소방관',wpm:130,acc:88,score:687,stage2:250,total:687,passage:'제63조, 제167조'},
-  {nickname:'안전조끼맨',char:'안전조끼',wpm:118,acc:85,score:603,stage2:190,total:603,passage:'제5조, 제6조'}
+// S3 웨이브 설정
+const WAVE_CONFIG_S3=[
+  {count:6,  speed:0.7,  spawnInterval:2000,maxOnScreen:4,  bossChance:0,   bonusChance:0.1, bombChance:0.05, shieldChance:0.05},
+  {count:8,  speed:1.0,  spawnInterval:1700,maxOnScreen:5,  bossChance:0.05,bonusChance:0.12,bombChance:0.08, shieldChance:0.07},
+  {count:10, speed:1.35, spawnInterval:1400,maxOnScreen:6,  bossChance:0.1, bonusChance:0.12,bombChance:0.1,  shieldChance:0.08},
+  {count:12, speed:1.7,  spawnInterval:1100,maxOnScreen:7,  bossChance:0.15,bonusChance:0.15,bombChance:0.12, shieldChance:0.1},
+  {count:15, speed:2.1,  spawnInterval:900, maxOnScreen:9,  bossChance:0.2, bonusChance:0.15,bombChance:0.15, shieldChance:0.1}
 ];
 
-/* ─── 전역 상태 ─── */
+const SAMPLE=[
+  {nickname:'안전왕',char:'안전모',wpm:180,acc:96,score:3456,stage2:3200,stage3:3500,total:10156,passage:'제1조, 제2조'},
+  {nickname:'현장달인',char:'현장반장',wpm:155,acc:94,score:2914,stage2:2600,stage3:2900,total:8414,passage:'제36조, 제38조'},
+  {nickname:'보건마스터',char:'보건관리자',wpm:142,acc:91,score:2584,stage2:2100,stage3:2200,total:6884,passage:'제51조~제54조'},
+  {nickname:'소방영웅',char:'소방관',wpm:130,acc:88,score:2288,stage2:1700,stage3:1500,total:5488,passage:'제63조, 제167조'},
+  {nickname:'안전조끼맨',char:'안전조끼',wpm:118,acc:85,score:2006,stage2:1200,stage3:1000,total:4206,passage:'제5조, 제6조'}
+];
+
+/* ───────────────────────────────────
+   전역 상태
+─────────────────────────────────── */
 let selChar=0,selPassage=0,nickname='';
 let stage1Score=0,stage1Wpm=0,stage1Acc=0,stage1Chars=0;
 let stage2Score=0,stage2Kills=0;
+let stage3Score=0,stage3Kills=0,stage3ReversalBonus=0;
+let stageClearNextFn=null;
 
-/* ─── STAGE 1 상태 ─── */
+// S1
 let s1Lines=[],s1CurLine=0,s1LineTyped='';
 let s1CorrectChars=0,s1TotalTyped=0,s1StartTime=null,s1TimerIv=null;
 let s1TimeLeft=60,s1Ended=false;
 const TIME_LIMIT=60;
 
-/* ─── STAGE 2 상태 ─── */
+// S2
 let g_words=[],g_gameActive=false,g_spawnTimer=null,g_rafId=null;
 let g_targetWord=null,g_typed='';
 let g_wordPool=[],g_waveTarget=0;
 let g_score=0,g_lives=3,g_combo=1,g_wave=1,g_waveKills=0;
-let g_lastTime=0;
+let g_lastTime=0,g_stageLimitTimer=null;
 
-/* ─── 데모 ─── */
+// S3
+let c_blocks=[],c_gameActive=false,c_spawnTimer=null,c_rafId=null;
+let c_targetBlock=null,c_typed='';
+let c_wordPoolNormal=[],c_score=0,c_lives=3,c_combo=1,c_wave=1,c_waveKills=0;
+let c_lastTime=0,c_stageTimer=null,c_timeLeft=90,c_timerIv=null;
+let c_shieldActive=false,c_shieldCount=0;
+let c_bonusCount=0,c_bonusGoal=5,c_bgCtx=null,c_bgStars=[];
+let c_waveTarget=0,c_bgAnimId=null;
+
+// 데모
 let demoTimerIv=null,demoTypeIv=null,demoCurLine=0,demoCurChar=0,demoTimeLeft=30;
 let demoWpm=0,demoAcc=100,demoCorrect=0,demoTotal=0;
 
-/* ─── 유틸 ─── */
+/* ───────────────────────────────────
+   유틸
+─────────────────────────────────── */
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function escChar(ch){return ch===' '?'&nbsp;':esc(ch);}
 function nvl(v,f=''){return v===undefined||v===null||v===''?f:v;}
 function num(v,f=0){const n=Number(v);return Number.isFinite(n)?n:f;}
-function safeCharSvg(charName){const k=String(charName||'').trim();const f=DOT_CHARS.find(d=>d&&d.name===k);return(f||DOT_CHARS[0]).svg;}
-function shortPassage(p){if(!p)return'—';const m=p.match(/^((?:제\d+조(?:~|,\s*)?)+)/);if(m)return m[1].replace(/[,~]\s*$/,'');return p.substring(0,12);}
+function safeCharSvg(charName){const f=DOT_CHARS.find(d=>d.name===String(charName||'').trim());return(f||DOT_CHARS[0]).svg;}
+function shortPassage(p){if(!p)return'—';const m=p.match(/^((?:제\d+조(?:~|,\s*)?)+)/);if(m)return m[1];return p.substring(0,12);}
 function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.random()*i|0;[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+function setEl(id,prop,val){const e=document.getElementById(id);if(e)e[prop]=val;}
 
 function normalizeRankRows(payload){
   let rows=payload;
@@ -902,28 +969,27 @@ function normalizeRankRows(payload){
     acc:num(nvl(r.acc,nvl(r.accuracy,r.ACC)),0),
     score:num(nvl(r.score,r.점수),0),
     stage2:num(nvl(r.stage2,r.stage2Score),0),
+    stage3:num(nvl(r.stage3,r.stage3Score),0),
     total:num(nvl(r.total,nvl(r.totalScore,0)),0),
     passage:String(nvl(r.passage,nvl(r.stage,nvl(r.title,'')))).trim()
   }))
   .filter(r=>r.nickname&&(Number.isFinite(r.total)||Number.isFinite(r.score)))
-  .map(r=>{if(!r.total)r.total=r.score+r.stage2;return r;})
+  .map(r=>{if(!r.total)r.total=r.score+r.stage2+r.stage3;return r;})
   .sort((a,b)=>b.total-a.total||b.wpm-a.wpm);
 }
 
 function buildQuery(params){return Object.entries(params).filter(([,v])=>v!==undefined&&v!==null).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(String(v))).join('&');}
+
 function requestGas(action,params={},onSuccess=()=>{},onFail=()=>{}){
   if(!GAS_URL||GAS_URL.includes('YOUR_GAS')){onFail(new Error('GAS_URL 미설정'));return;}
-  /* file:// 환경에서는 외부 스크립트 차단 → 즉시 폴백 */
   if(location.protocol==='file:'){setTimeout(()=>onFail(new Error('file:// 환경')),0);return;}
-  /* file:// 프로토콜에서는 외부 스크립트 로드 차단 → 즉시 샘플 폴백 */
-  if(location.protocol==='file:'){onFail(new Error('file:// 환경 — GAS 사용 불가, 샘플 데이터로 대체'));return;}
   const cbName='gas_cb_'+action+'_'+Date.now()+'_'+Math.random().toString(36).slice(2);
   let done=false;let scriptEl=null;
   const cleanup=()=>{try{delete window[cbName];}catch(e){window[cbName]=undefined;}if(scriptEl&&scriptEl.parentNode)scriptEl.parentNode.removeChild(scriptEl);};
   const timer=setTimeout(()=>{if(done)return;done=true;cleanup();onFail(new Error('GAS 시간 초과'));},GAS_TIMEOUT_MS);
   window[cbName]=payload=>{if(done)return;done=true;clearTimeout(timer);cleanup();onSuccess(payload);};
   const now=Date.now();
-  const qs=buildQuery({action,callback:cbName,...params,_t:now,_ts:now,_nocache:now+'_'+Math.random().toString(36).slice(2)});
+  const qs=buildQuery({action,callback:cbName,...params,_t:now,_nocache:now+'_'+Math.random().toString(36).slice(2)});
   scriptEl=document.createElement('script');
   scriptEl.src=GAS_URL+(GAS_URL.includes('?')?'&':'?')+qs;
   scriptEl.onerror=()=>{if(done)return;done=true;clearTimeout(timer);cleanup();onFail(new Error('GAS 로드 실패'));};
@@ -933,31 +999,19 @@ function requestGas(action,params={},onSuccess=()=>{},onFail=()=>{}){
 function loadRankingAll(){
   requestGas('rank',{},payload=>{
     const rows=normalizeRankRows(payload);const viewRows=rows.length?rows:SAMPLE;
-    ['rank-list-body','rank-list-body-training','rank-list-body-galaga','rank-list-body-result'].forEach(id=>renderSidebarRanking(viewRows,null,id));
+    ['rank-list-body','rank-list-body-training','rank-list-body-galaga','rank-list-body-chaos','rank-list-body-result'].forEach(id=>renderSidebarRanking(viewRows,null,id));
     renderMainRanking(viewRows);updateTop1(viewRows);
   },()=>{
-    ['rank-list-body','rank-list-body-training','rank-list-body-galaga','rank-list-body-result'].forEach(id=>renderSidebarRanking(SAMPLE,null,id));
+    ['rank-list-body','rank-list-body-training','rank-list-body-galaga','rank-list-body-chaos','rank-list-body-result'].forEach(id=>renderSidebarRanking(SAMPLE,null,id));
     renderMainRanking(SAMPLE);updateTop1(SAMPLE);
   });
 }
 
-function setEl(id,prop,val){const e=document.getElementById(id);if(e)e[prop]=val;}
 function updateTop1(rows){
-  if(!rows.length){
-    setEl('top1-name','textContent','기록 없음');
-    setEl('top1-score','textContent','0');
-    setEl('challenge-msg','innerHTML','<em>도전하시겠어요?</em>');
-    setEl('ic-total','textContent','0');
-    setEl('ic-top','textContent','0');
-    setEl('ic-avg','textContent','0');
-    return;
-  }
+  if(!rows.length){setEl('top1-name','textContent','기록 없음');setEl('top1-score','textContent','0');setEl('ic-total','textContent','0');setEl('ic-top','textContent','0');setEl('ic-avg','textContent','0');return;}
   const top=rows[0];
-  setEl('top1-name','textContent',top.nickname);
-  setEl('top1-score','textContent',top.total||top.score);
-  setEl('challenge-msg','innerHTML','<em>도전하시겠어요?</em>');
-  setEl('ic-total','textContent',rows.length);
-  setEl('ic-top','textContent',Math.max(...rows.map(r=>num(r.total,0))));
+  setEl('top1-name','textContent',top.nickname);setEl('top1-score','textContent',top.total||top.score);
+  setEl('ic-total','textContent',rows.length);setEl('ic-top','textContent',Math.max(...rows.map(r=>num(r.total,0))));
   setEl('ic-avg','textContent',Math.round(rows.reduce((s,r)=>s+num(r.wpm,0),0)/rows.length));
 }
 
@@ -969,7 +1023,7 @@ function renderSidebarRanking(data,myNick,bodyId){
   rows.slice(0,20).forEach((r,i)=>{
     const row=document.createElement('div');row.className='rank-row'+(r.nickname===myNick?' mine':'');
     const nc=i<3?`rr-no n${i+1}`:'rr-no';const cSvg=safeCharSvg(r.char);
-    row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="rr-ch" style="width:18px;height:18px;display:inline-block;">${cSvg}</span><span class="rr-nick${i===0?' top':''}">${esc(r.nickname)}</span><span class="rr-sc">${r.total||r.score}</span><span class="rr-wpm">${esc(r.wpm)}</span>`;
+    row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="rr-ch" style="width:16px;height:16px;display:inline-block;">${cSvg}</span><span class="rr-nick${i===0?' top':''}">${esc(r.nickname)}</span><span class="rr-sc">${r.total||r.score}</span><span class="rr-wpm">${esc(r.wpm)}</span>`;
     body.appendChild(row);
   });
 }
@@ -982,25 +1036,35 @@ function renderMainRanking(data){
   rows.slice(0,20).forEach((r,i)=>{
     const row=document.createElement('div');row.className='im-rank-row'+(r.nickname===nickname?' mine':'');
     const nc=i<3?`im-rr-no n${i+1}`:'im-rr-no';const cSvg=safeCharSvg(r.char);
-    row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="im-rr-ch" style="width:22px;height:22px;display:inline-block;">${cSvg}</span><span class="im-rr-nick${i===0?' top':''}">${esc(r.nickname)}</span><span class="im-rr-stage">${esc(shortPassage(r.passage))}</span><span class="im-rr-sc">${r.total||r.score}</span><span class="im-rr-wpm">${esc(r.wpm)}</span><span class="im-rr-acc">${r.acc?esc(r.acc):'—'}%</span>`;
+    row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="im-rr-ch" style="width:20px;height:20px;display:inline-block;">${cSvg}</span><span class="im-rr-nick${i===0?' top':''}">${esc(r.nickname)}</span><span class="im-rr-stage">${esc(shortPassage(r.passage))}</span><span class="im-rr-sc">${r.total||r.score}</span><span class="im-rr-wpm">${esc(r.wpm)}</span><span class="im-rr-acc">${r.acc?esc(r.acc):'—'}%</span>`;
     body.appendChild(row);
   });
 }
 
-/* ─── 화면 전환 ─── */
+/* ───────────────────────────────────
+   화면 전환
+─────────────────────────────────── */
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';});
   const el=document.getElementById(id);el.style.display='flex';el.classList.add('active');
 }
+
 function goIntro(){
   clearInterval(s1TimerIv);clearInterval(demoTimerIv);clearInterval(demoTypeIv);
-  clearTimeout(g_stageLimitTimer);
+  clearTimeout(g_stageLimitTimer);clearTimeout(c_stageTimer);clearInterval(c_timerIv);
   if(g_rafId)cancelAnimationFrame(g_rafId);clearTimeout(g_spawnTimer);
-  g_gameActive=false;g_words.forEach(w=>w.el.remove());g_words=[];
+  if(c_rafId)cancelAnimationFrame(c_rafId);clearTimeout(c_spawnTimer);
+  if(c_bgAnimId)cancelAnimationFrame(c_bgAnimId);
+  g_gameActive=false;c_gameActive=false;
+  g_words.forEach(w=>{try{w.el.remove();}catch(e){}});g_words=[];
+  c_blocks.forEach(b=>{try{b.el.remove();}catch(e){}});c_blocks=[];
+  document.getElementById('stage-clear-overlay').classList.remove('open');
   showScreen('intro-screen');loadRankingAll();startDemo();
 }
 
-/* ─── SETUP POPUP ─── */
+/* ───────────────────────────────────
+   SETUP POPUP
+─────────────────────────────────── */
 function openSetupPopup(){document.getElementById('setup-popup').classList.add('open');setTimeout(()=>document.getElementById('nick-input').focus(),100);}
 function closeSetupPopup(){document.getElementById('setup-popup').classList.remove('open');}
 
@@ -1018,7 +1082,7 @@ function buildPassageList(){
   const g=document.getElementById('passage-list');g.innerHTML='';
   PASSAGES.forEach((p,i)=>{
     const b=document.createElement('button');b.className='passage-btn'+(i===selPassage?' selected':'');
-    b.innerHTML=`<div class="pb-title${i===selPassage?' sel':''}">${esc(p.title)}</div><div class="pb-meta">${esc(p.lines.join('').length)}자</div>`;
+    b.innerHTML=`<div class="pb-title${i===selPassage?' sel':''}">${esc(p.title)}</div><div class="pb-meta">${p.lines.join('').length}자</div>`;
     b.onclick=()=>{document.querySelectorAll('.passage-btn').forEach(e=>{e.classList.remove('selected');const t=e.querySelector('.pb-title');if(t)t.classList.remove('sel');});b.classList.add('selected');const t=b.querySelector('.pb-title');if(t)t.classList.add('sel');selPassage=i;updateSidebarSummary();};
     g.appendChild(b);
   });
@@ -1028,28 +1092,30 @@ function buildPassageList(){
 function updateSidebarSummary(){
   const nick=document.getElementById('nick-input').value.trim()||'- - -';
   const char=CHARS[selChar];const stage=PASSAGES[selPassage];
-  ['intro','training','galaga','result'].forEach(sc=>{
+  ['intro','training','galaga','chaos','result'].forEach(sc=>{
     const av=document.getElementById(`sb-avatar-${sc}`);const nm=document.getElementById(`sb-name-${sc}`);
     const ch=document.getElementById(`sb-char-${sc}`);const st=document.getElementById(`sb-stage-${sc}`);
     if(av)av.innerHTML=char.svg;if(nm)nm.textContent=nick;if(ch)ch.textContent=char.name;
-    if(st&&sc!=='galaga')st.textContent=stage.title;
+    if(st&&sc!=='galaga'&&sc!=='chaos')st.textContent=stage.title;
   });
 }
 document.addEventListener('input',e=>{if(e.target.id==='nick-input')updateSidebarSummary();});
 
 function updateScoreSidebar(){
-  const s1=stage1Score,s2=stage2Score,total=s1+s2;
-  ['intro','training','galaga','result'].forEach(sc=>{
+  const s1=stage1Score,s2=stage2Score,s3=stage3Score,total=s1+s2+s3;
+  ['intro','training','galaga','chaos','result'].forEach(sc=>{
     const e1=document.getElementById(`sb-s1-${sc}`);
     const e2=document.getElementById(`sb-s2-${sc}`);
+    const e3=document.getElementById(`sb-s3-${sc}`);
     const et=document.getElementById(`sb-total-${sc}`);
-    if(e1)e1.textContent=s1||'—';
-    if(e2)e2.textContent=s2||'—';
-    if(et)et.textContent=(s1||s2)?total:'—';
+    if(e1)e1.textContent=s1||'—';if(e2)e2.textContent=s2||'—';if(e3)e3.textContent=s3||'—';
+    if(et)et.textContent=(s1||s2||s3)?total:'—';
   });
 }
 
-/* ─── 데모 ─── */
+/* ───────────────────────────────────
+   데모
+─────────────────────────────────── */
 function startDemo(){
   const passage=PASSAGES[0];demoCurLine=0;demoCurChar=0;demoTimeLeft=30;
   demoWpm=0;demoAcc=100;demoCorrect=0;demoTotal=0;
@@ -1062,12 +1128,13 @@ function startDemo(){
     const line=passage.lines[demoCurLine];
     if(demoCurChar<line.length){
       const correct=Math.random()>0.05;demoCorrect+=(correct?1:0);demoTotal++;
-      const el=document.getElementById('demo-disp-'+demoCurLine);if(el){const typed=line.substring(0,demoCurChar+1);renderDemoLine(el,typed,line);}
+      const el=document.getElementById('demo-disp-'+demoCurLine);if(el){renderDemoLine(el,line.substring(0,demoCurChar+1),line);}
       demoCurChar++;
       const elapsed=(Date.now()-demoStart)/60000;demoWpm=elapsed>0?Math.round((demoCorrect/2)/elapsed):0;demoAcc=demoTotal>0?Math.round((demoCorrect/demoTotal)*100):100;
       const score=Math.round(demoWpm*(demoAcc/100));
-      const acc=document.getElementById('demo-acc');const wpm=document.getElementById('demo-wpm');const sc=document.getElementById('demo-score');const barA=document.getElementById('demo-bar-acc');const barW=document.getElementById('demo-bar-wpm');const pg=document.getElementById('demo-pg');
-      if(acc)acc.textContent=demoAcc+'%';if(wpm)wpm.textContent=demoWpm;if(sc)sc.textContent=score;if(barA)barA.style.width=Math.min(100,demoAcc)+'%';if(barW)barW.style.width=Math.min(100,demoWpm/2.5)+'%';if(pg)pg.textContent=`${demoCurLine+1}/${passage.lines.length}`;
+      setEl('demo-acc','textContent',demoAcc+'%');setEl('demo-wpm','textContent',demoWpm);setEl('demo-score','textContent',score);
+      const barA=document.getElementById('demo-bar-acc');const barW=document.getElementById('demo-bar-wpm');const pg=document.getElementById('demo-pg');
+      if(barA)barA.style.width=Math.min(100,demoAcc)+'%';if(barW)barW.style.width=Math.min(100,demoWpm/2.5)+'%';if(pg)pg.textContent=`${demoCurLine+1}/${passage.lines.length}`;
     } else {demoCurLine++;demoCurChar=0;renderDemoLines(passage);}
   },55);
 }
@@ -1097,16 +1164,14 @@ function renderDemoLine(el,typed,target){
 }
 
 /* ═══════════════════════════════════
-   STAGE 1 — 타이핑 훈련
+   STAGE 1 — 타이핑
 ═══════════════════════════════════ */
 function startTraining(){
   clearInterval(demoTimerIv);clearInterval(demoTypeIv);
-  clearTimeout(g_stageLimitTimer);clearTimeout(g_spawnTimer);
-  if(g_rafId)cancelAnimationFrame(g_rafId);
-  g_gameActive=false;g_words.forEach(w=>w.el&&w.el.remove());g_words=[];
+  clearAllGameTimers();
   nickname=document.getElementById('nick-input').value.trim()||'사용자';
   updateSidebarSummary();closeSetupPopup();
-  stage1Score=0;stage1Wpm=0;stage1Acc=0;stage1Chars=0;stage2Score=0;stage2Kills=0;
+  stage1Score=0;stage1Wpm=0;stage1Acc=0;stage1Chars=0;stage2Score=0;stage2Kills=0;stage3Score=0;stage3Kills=0;stage3ReversalBonus=0;
   updateScoreSidebar();
   const passage=PASSAGES[selPassage];
   s1Lines=[...passage.lines];s1CurLine=0;s1LineTyped='';s1CorrectChars=0;s1TotalTyped=0;
@@ -1114,10 +1179,21 @@ function startTraining(){
   document.getElementById('gt-sub').textContent=passage.title;
   document.getElementById('pip-s1').className='stage-pip active';
   document.getElementById('pip-s2').className='stage-pip';
+  document.getElementById('pip-s3').className='stage-pip';
   buildS1Lines();showScreen('training-screen');clearInterval(s1TimerIv);updateTimerDisplay();
   const inp=document.getElementById('hidden-input');
   inp.value='';inp.disabled=false;inp.oninput=s1OnInput;inp.onkeydown=s1OnKeyDown;
   setTimeout(()=>inp.focus(),100);
+}
+
+function clearAllGameTimers(){
+  clearTimeout(g_stageLimitTimer);clearTimeout(c_stageTimer);clearInterval(c_timerIv);
+  if(g_rafId)cancelAnimationFrame(g_rafId);clearTimeout(g_spawnTimer);
+  if(c_rafId)cancelAnimationFrame(c_rafId);clearTimeout(c_spawnTimer);
+  if(c_bgAnimId)cancelAnimationFrame(c_bgAnimId);
+  g_gameActive=false;c_gameActive=false;
+  g_words.forEach(w=>{try{w.el.remove();}catch(e){}});g_words=[];
+  c_blocks.forEach(b=>{try{b.el.remove();}catch(e){}});c_blocks=[];
 }
 
 function buildS1Lines(){
@@ -1168,7 +1244,7 @@ function s1UpdateStats(){
   let tmpOk=s1CorrectChars;const target=s1Lines[s1CurLine]||'';
   for(let i=0;i<Math.min(s1LineTyped.length,target.length);i++)if(s1LineTyped[i]===target[i])tmpOk++;
   const tmpTyped=s1TotalTyped+s1LineTyped.length;
-  const wpm=el>0?Math.round((tmpOk/2)/el):0;const acc=tmpTyped>0?Math.round((tmpOk/tmpTyped)*100):100;const score=Math.round(wpm*(acc/100)*6);
+  const wpm=el>0?Math.round((tmpOk/2)/el):0;const acc=tmpTyped>0?Math.round((tmpOk/tmpTyped)*100):100;const score=Math.round(wpm*(acc/100)*20);
   document.getElementById('stat-wpm').textContent=wpm;document.getElementById('stat-acc').textContent=acc+'%';document.getElementById('stat-score').textContent=score;
   document.getElementById('bar-acc').style.width=Math.min(100,acc)+'%';document.getElementById('bar-wpm').style.width=Math.min(100,wpm/2.5)+'%';
   document.getElementById('sb-s1-training').textContent=score;document.getElementById('sb-total-training').textContent=score;
@@ -1179,7 +1255,6 @@ function updateTimerDisplay(){
   const el=document.getElementById('timer-val');el.textContent=`${m}:${s}`;
   if(s1TimeLeft<=10)el.className='timer-val danger';else if(s1TimeLeft<=20)el.className='timer-val warn';else el.className='timer-val';
 }
-
 function s1FinishTraining(){
   if(s1Ended)return;s1Ended=true;clearInterval(s1TimerIv);
   document.getElementById('hidden-input').disabled=true;
@@ -1188,44 +1263,67 @@ function s1FinishTraining(){
   const elapsed=s1StartTime?(Date.now()-s1StartTime)/60000:TIME_LIMIT/60;
   stage1Wpm=elapsed>0?Math.round((finalCorrect/2)/elapsed):0;
   stage1Acc=finalTyped>0?Math.round((finalCorrect/finalTyped)*100):0;
-  stage1Score=Math.round(stage1Wpm*(stage1Acc/100)*6);
+  stage1Score=Math.round(stage1Wpm*(stage1Acc/100)*20);
   stage1Chars=finalCorrect;
   updateScoreSidebar();
-  showStageClear();
+  showStageClearToGalaga();
 }
 
-/* ─── Stage Clear 오버레이 ─── */
-function showStageClear(){
-  document.getElementById('sc-s1-val').textContent=stage1Score;
-  document.getElementById('sc-total-val').textContent=stage1Score+' + ???';
+/* ───────────────────────────────────
+   STAGE CLEAR 범용 오버레이
+─────────────────────────────────── */
+function showStageClearGeneric({title,sub,scoreRow,note,btnLabel,nextFn}){
+  document.getElementById('sc-title-text').textContent=title;
+  document.getElementById('sc-sub-text').textContent=sub;
+  document.getElementById('sc-score-row').innerHTML=scoreRow;
+  const noteEl=document.getElementById('sc-s3-note');if(note){noteEl.style.display='';noteEl.innerHTML=note;}else{noteEl.style.display='none';}
+  document.getElementById('sc-next-btn').textContent=btnLabel;
+  stageClearNextFn=nextFn;
   document.getElementById('stage-clear-overlay').classList.add('open');
 }
-function hideStageClear(){document.getElementById('stage-clear-overlay').classList.remove('open');}
+function handleStageClearNext(){
+  document.getElementById('stage-clear-overlay').classList.remove('open');
+  if(stageClearNextFn)stageClearNextFn();
+}
+function showStageClearToGalaga(){
+  showStageClearGeneric({
+    title:'STAGE 1 CLEAR!',sub:'이제 STAGE 2 갤러그로 진행합니다',
+    scoreRow:`<div class="sc-score-box"><span class="sc-score-lbl">STAGE 1 점수</span><span class="sc-score-val stage1">${stage1Score}</span></div><span class="sc-plus">+</span><div class="sc-score-box"><span class="sc-score-lbl">STAGE 2</span><span class="sc-score-val" style="color:var(--lo);">???</span></div><span class="sc-plus">=</span><div class="sc-total-box"><span class="sc-total-lbl">TOTAL</span><span class="sc-total-val">${stage1Score} + ???</span></div>`,
+    note:null,btnLabel:'▶ STAGE 2 시작',nextFn:startGalaga
+  });
+}
+function showStageClearToChaos(){
+  showStageClearGeneric({
+    title:'STAGE 2 CLEAR!',sub:'이제 STAGE 3 CHAOS MODE로 진행합니다',
+    scoreRow:`<div class="sc-score-box"><span class="sc-score-lbl">STAGE 1</span><span class="sc-score-val stage1">${stage1Score}</span></div><span class="sc-plus">+</span><div class="sc-score-box"><span class="sc-score-lbl">STAGE 2</span><span class="sc-score-val stage2">${stage2Score}</span></div><span class="sc-plus">+</span><div class="sc-score-box"><span class="sc-score-lbl">STAGE 3</span><span class="sc-score-val" style="color:var(--purple);">???</span></div><span class="sc-plus">=</span><div class="sc-total-box"><span class="sc-total-lbl">TOTAL</span><span class="sc-total-val">${stage1Score+stage2Score} + ???</span></div>`,
+    note:`⚡ STAGE 3 — CHAOS MODE ⚡<br>4방향(상/하/좌/우)에서 단어 출현<br>회전/파동/무지개 특수효과<br>👑 BOSS · ⭐ BONUS · 💣 BOMB · 🛡️ SHIELD<br>💥 역전 가능! S3에서 S1+S2 합산 초과 시<br>역전 보너스 +500점 획득!`,
+    btnLabel:'▶ STAGE 3 시작',nextFn:startChaos
+  });
+}
 
 /* ═══════════════════════════════════
    STAGE 2 — GALAGA
 ═══════════════════════════════════ */
 function startGalaga(){
-  hideStageClear();
-  clearTimeout(g_stageLimitTimer);clearTimeout(g_spawnTimer);
-  if(g_rafId)cancelAnimationFrame(g_rafId);
+  clearAllGameTimers();
   g_score=0;g_lives=3;g_combo=1;g_wave=1;g_waveKills=0;stage2Score=0;stage2Kills=0;
   g_words=[];g_targetWord=null;g_typed='';
   g_wordPool=shuffle([...GALAGA_WORDS]);
-  const cfg=getWaveCfg();g_waveTarget=cfg.count;
+  const cfg=getWaveCfgS2();g_waveTarget=cfg.count;
   updateGalagaHUD();
   document.getElementById('pip-s1').className='stage-pip done';
   document.getElementById('pip-s2').className='stage-pip active';
+  document.getElementById('pip-s3').className='stage-pip';
   document.getElementById('sb-s1-galaga').textContent=stage1Score;
   showScreen('galaga-screen');
   const inp=document.getElementById('galaga-input');inp.value='';inp.focus();
-  startGalagaTimer();
-  announceWave(g_wave,()=>{g_gameActive=true;scheduleGSpawn();g_lastTime=performance.now();g_rafId=requestAnimationFrame(gLoop);});
+  g_stageLimitTimer=setTimeout(()=>{if(g_gameActive){g_gameActive=false;clearTimeout(g_spawnTimer);cancelAnimationFrame(g_rafId);g_words.forEach(w=>{try{w.el.remove();}catch(e){}});g_words=[];stage2Score=g_score;showStageClearToChaos();}},90000);
+  announceWaveS2(g_wave,()=>{g_gameActive=true;scheduleGSpawn();g_lastTime=performance.now();g_rafId=requestAnimationFrame(gLoop);});
 }
 
-function getWaveCfg(){return WAVE_CONFIG[Math.min(g_wave-1,WAVE_CONFIG.length-1)];}
+function getWaveCfgS2(){return WAVE_CONFIG_S2[Math.min(g_wave-1,WAVE_CONFIG_S2.length-1)];}
 
-function announceWave(w,cb){
+function announceWaveS2(w,cb){
   const el=document.getElementById('wave-announce');const txt=document.getElementById('wa-text');
   txt.textContent=`WAVE ${w}`;el.style.display='block';txt.style.animation='none';void txt.offsetWidth;txt.style.animation='waPop 1.8s ease-out forwards';
   setTimeout(()=>{el.style.display='none';if(cb)cb();},1800);
@@ -1233,7 +1331,7 @@ function announceWave(w,cb){
 
 function scheduleGSpawn(){
   if(!g_gameActive)return;
-  const cfg=getWaveCfg();
+  const cfg=getWaveCfgS2();
   g_spawnTimer=setTimeout(()=>{
     if(g_gameActive&&g_words.length<cfg.maxOnScreen&&g_waveKills<g_waveTarget)gSpawnWord();
     scheduleGSpawn();
@@ -1246,7 +1344,7 @@ function gSpawnWord(){
   const existing=g_words.map(w=>w.data.t);if(existing.includes(data.t))return;
   const areaW=document.getElementById('game-area').clientWidth;
   const x=40+Math.random()*(areaW-180);
-  const cfg=getWaveCfg();const speed=cfg.speed*(0.8+Math.random()*0.4);
+  const cfg=getWaveCfgS2();const speed=cfg.speed*(0.8+Math.random()*0.4);
   const el=document.createElement('div');el.className='word-block';
   el.innerHTML=`<div class="wb-emoji">${CAT_EMOJIS[data.cat]||'📌'}</div><div class="wb-text">${data.t}</div>`;
   el.style.left=x+'px';el.style.top='-60px';
@@ -1269,7 +1367,7 @@ function gLoop(ts){
 function gUpdateMatchHighlight(){
   const t=g_typed.toLowerCase();
   g_words.forEach(w=>{
-    const txt=w.el.querySelector('.wb-text');const isT=w===g_targetWord;
+    const txt=w.el.querySelector('.wb-text');
     if(!t){txt.className='wb-text';txt.textContent=w.data.t;w.el.classList.remove('targeted');return;}
     if(w.data.t.toLowerCase().startsWith(t)){txt.className='wb-text targeted';const matched=w.data.t.substring(0,t.length);const rest=w.data.t.substring(t.length);txt.innerHTML=`<span class="match">${matched}</span>${rest}`;w.el.classList.add('targeted');}
     else{txt.className='wb-text';txt.textContent=w.data.t;w.el.classList.remove('targeted');}
@@ -1286,7 +1384,8 @@ function gFireAt(w){
   if(!w)return;
   const wRect=w.el.getBoundingClientRect();const aRect=document.getElementById('game-area').getBoundingClientRect();
   const tx=wRect.left-aRect.left+wRect.width/2;const ty=wRect.top-aRect.top+wRect.height/2;
-  const laser=document.createElement('div');laser.className='laser';
+  // 수직 레이저
+  const laser=document.createElement('div');laser.className='laser laser-v';
   const areaH=document.getElementById('game-area').clientHeight;
   laser.style.left=tx+'px';laser.style.top=ty+'px';laser.style.height=(areaH-ty)+'px';
   document.getElementById('game-area').appendChild(laser);setTimeout(()=>laser.remove(),300);
@@ -1299,11 +1398,11 @@ function gExplodeWord(w,tx,ty){
   const exp=document.createElement('div');exp.className='explosion';exp.style.left=(tx-22)+'px';exp.style.top=(ty-22)+'px';
   const emojis=['💥','✨','⚡','🔥'];exp.innerHTML=`<div class="exp-inner">${emojis[Math.floor(Math.random()*emojis.length)]}</div>`;
   document.getElementById('game-area').appendChild(exp);setTimeout(()=>exp.remove(),500);
-  const pts=50*g_combo;g_score+=pts;g_waveKills++;stage2Score=g_score;stage2Kills++;
+  const pts=150*g_combo;g_score+=pts;g_waveKills++;stage2Score=g_score;stage2Kills++;
   gShowScorePop(tx,ty,'+'+pts+(g_combo>1?` x${g_combo}`:''));
   g_combo=Math.min(g_combo+1,6);
   w.el.remove();const idx=g_words.indexOf(w);if(idx>-1)g_words.splice(idx,1);if(g_targetWord===w)g_targetWord=null;
-  updateScoreSidebar();gCheckWaveComplete();updateGalagaHUD();
+  updateScoreSidebar();gCheckWaveCompleteS2();updateGalagaHUD();
 }
 
 function gShowScorePop(x,y,txt){
@@ -1312,14 +1411,14 @@ function gShowScorePop(x,y,txt){
   el.className='';void el.offsetWidth;el.className='anim';
 }
 
-function gCheckWaveComplete(){
-  const cfg=getWaveCfg();
+function gCheckWaveCompleteS2(){
+  const cfg=getWaveCfgS2();
   if(g_waveKills>=cfg.count&&g_words.length===0){
     clearTimeout(g_spawnTimer);g_gameActive=false;
     setTimeout(()=>{
       g_wave++;g_waveKills=0;g_gameActive=true;updateGalagaHUD();
-      g_wordPool=shuffle([...GALAGA_WORDS]);const nextCfg=getWaveCfg();g_waveTarget=nextCfg.count;
-      announceWave(g_wave,()=>{scheduleGSpawn();g_lastTime=performance.now();g_rafId=requestAnimationFrame(gLoop);});
+      g_wordPool=shuffle([...GALAGA_WORDS]);const nextCfg=getWaveCfgS2();g_waveTarget=nextCfg.count;
+      announceWaveS2(g_wave,()=>{scheduleGSpawn();g_lastTime=performance.now();g_rafId=requestAnimationFrame(gLoop);});
     },1200);
   }
 }
@@ -1327,60 +1426,395 @@ function gCheckWaveComplete(){
 function gLoseLife(x,y){
   g_lives--;g_combo=1;
   const exp=document.createElement('div');exp.className='explosion';exp.style.left=(x-22)+'px';exp.style.top=(y-22)+'px';
-  exp.innerHTML=`<div class="exp-inner" style="font-size:32px;">💀</div>`;
+  exp.innerHTML=`<div class="exp-inner" style="font-size:30px;">💀</div>`;
   document.getElementById('game-area').appendChild(exp);setTimeout(()=>exp.remove(),600);
-  updateGalagaHUD();if(g_lives<=0)gGameOver();
+  updateGalagaHUD();if(g_lives<=0)gGameOverToS3();
 }
 
-function gGameOver(){
+function gGameOverToS3(){
   g_gameActive=false;clearTimeout(g_stageLimitTimer);clearTimeout(g_spawnTimer);cancelAnimationFrame(g_rafId);
-  g_words.forEach(w=>w.el.remove());g_words=[];
+  g_words.forEach(w=>{try{w.el.remove();}catch(e){}});g_words=[];
   stage2Score=g_score;updateScoreSidebar();
-  finishGame();
+  showStageClearToChaos();
 }
 
 function updateGalagaHUD(){
   document.getElementById('ghud-score').textContent=g_score;
   document.getElementById('ghud-combo').textContent='x'+g_combo;
   document.getElementById('ghud-wave').textContent=g_wave;
-  const cfg=getWaveCfg();document.getElementById('ghud-remain').textContent=Math.max(0,cfg.count-g_waveKills);
+  const cfg=getWaveCfgS2();document.getElementById('ghud-remain').textContent=Math.max(0,cfg.count-g_waveKills);
   const heartsMap=['','❤️','❤️❤️','❤️❤️❤️'];
   document.getElementById('ghud-lives').textContent=heartsMap[Math.max(0,Math.min(3,g_lives))];
   document.getElementById('sb-s2-galaga').textContent=g_score;
   document.getElementById('sb-total-galaga').textContent=stage1Score+g_score;
 }
 
-/* ─── 타임아웃 게임 종료 (60초 갤러그) ─── */
-let g_stageLimitTimer=null;
-function startGalagaTimer(){
-  clearTimeout(g_stageLimitTimer);
-  g_stageLimitTimer=setTimeout(()=>{
-    if(g_gameActive){g_gameActive=false;clearTimeout(g_spawnTimer);cancelAnimationFrame(g_rafId);g_words.forEach(w=>w.el.remove());g_words=[];stage2Score=g_score;finishGame();}
-  },90000);
+/* ═══════════════════════════════════
+   STAGE 3 — CHAOS (4방향, 회전, 특수효과)
+═══════════════════════════════════ */
+function initChaosBackground(){
+  const canvas=document.getElementById('chaos-bg-canvas');
+  const area=document.getElementById('chaos-area');
+  canvas.width=area.clientWidth;canvas.height=area.clientHeight;
+  c_bgCtx=canvas.getContext('2d');
+  c_bgStars=[];
+  for(let i=0;i<80;i++){c_bgStars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5,speed:0.2+Math.random()*0.8,opacity:Math.random()});}
+  animateChaosBackground();
 }
 
-/* ─── 최종 결과 ─── */
+function animateChaosBackground(){
+  const canvas=document.getElementById('chaos-bg-canvas');if(!canvas||!c_bgCtx)return;
+  c_bgCtx.clearRect(0,0,canvas.width,canvas.height);
+  c_bgStars.forEach(s=>{
+    s.opacity+=0.02*(Math.random()>0.5?1:-1);s.opacity=Math.max(0.1,Math.min(1,s.opacity));
+    c_bgCtx.beginPath();c_bgCtx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    c_bgCtx.fillStyle=`rgba(0,238,255,${s.opacity*0.4})`;c_bgCtx.fill();
+  });
+  c_bgAnimId=requestAnimationFrame(animateChaosBackground);
+}
+
+function startChaos(){
+  clearAllGameTimers();
+  c_score=0;c_lives=3;c_combo=1;c_wave=1;c_waveKills=0;stage3Score=0;stage3Kills=0;stage3ReversalBonus=0;
+  c_blocks=[];c_targetBlock=null;c_typed='';c_shieldActive=false;c_shieldCount=0;
+  c_bonusCount=0;c_wordPoolNormal=shuffle([...CHAOS_WORDS_NORMAL]);c_timeLeft=90;
+  document.getElementById('pip-s1').className='stage-pip done';
+  document.getElementById('pip-s2').className='stage-pip done';
+  document.getElementById('pip-s3').className='stage-pip active';
+  document.getElementById('sb-s1-chaos').textContent=stage1Score;
+  document.getElementById('sb-s2-chaos').textContent=stage2Score;
+  showScreen('chaos-screen');
+  initChaosBackground();
+  initChaosHUD();
+  updateBonusPips();
+  const inp=document.getElementById('chaos-input');inp.value='';inp.focus();
+  // 90초 타이머
+  c_timerIv=setInterval(()=>{
+    c_timeLeft--;
+    const el=document.getElementById('chud-time');
+    if(el){el.textContent=c_timeLeft;el.className='chud-val'+(c_timeLeft<=15?' danger':c_timeLeft<=30?' yellow':'');}
+    if(c_timeLeft<=0){clearInterval(c_timerIv);c_gameActive=false;clearTimeout(c_spawnTimer);cancelAnimationFrame(c_rafId);c_blocks.forEach(b=>{try{b.el.remove();}catch(e){}});c_blocks=[];stage3Score=c_score;finishGame();}
+  },1000);
+  const cfg=getWaveCfgS3();c_waveTarget=cfg.count;
+  announceWaveChaos(c_wave,()=>{c_gameActive=true;scheduleCSpawn();c_lastTime=performance.now();c_rafId=requestAnimationFrame(cLoop);});
+}
+
+function getWaveCfgS3(){return WAVE_CONFIG_S3[Math.min(c_wave-1,WAVE_CONFIG_S3.length-1)];}
+
+function announceWaveChaos(w,cb){
+  const area=document.getElementById('chaos-area');
+  const el=document.getElementById('wave-announce-chaos');const txt=document.getElementById('wa-text-chaos');
+  if(!el||!txt)return;
+  const labels=['CHAOS','MAYHEM','INFERNO','APOCALYPSE','EXTINCTION'];
+  txt.textContent=`WAVE ${w} — ${labels[Math.min(w-1,labels.length-1)]}`;
+  el.style.position='absolute';el.style.top='50%';el.style.left='50%';el.style.transform='translate(-50%,-50%)';el.style.display='block';el.style.zIndex='80';el.style.pointerEvents='none';
+  txt.style.animation='none';void txt.offsetWidth;txt.style.animation='waPop 1.8s ease-out forwards';
+  setTimeout(()=>{el.style.display='none';if(cb)cb();},1800);
+}
+
+/* 4방향 스폰 */
+function pickChaosWordData(cfg){
+  const r=Math.random();
+  if(r<cfg.bossChance)return{...CHAOS_WORDS_BOSS[Math.floor(Math.random()*CHAOS_WORDS_BOSS.length)],type:'boss'};
+  if(r<cfg.bossChance+cfg.bonusChance)return{...CHAOS_WORDS_BONUS[Math.floor(Math.random()*CHAOS_WORDS_BONUS.length)],type:'bonus'};
+  if(r<cfg.bossChance+cfg.bonusChance+cfg.bombChance)return{...CHAOS_WORDS_BOMB[Math.floor(Math.random()*CHAOS_WORDS_BOMB.length)],type:'bomb'};
+  if(r<cfg.bossChance+cfg.bonusChance+cfg.bombChance+cfg.shieldChance)return{...CHAOS_WORDS_SHIELD[Math.floor(Math.random()*CHAOS_WORDS_SHIELD.length)],type:'shield'};
+  if(c_wordPoolNormal.length===0)c_wordPoolNormal=shuffle([...CHAOS_WORDS_NORMAL]);
+  return{...c_wordPoolNormal.pop(),type:'normal'};
+}
+
+function scheduleCSpawn(){
+  if(!c_gameActive)return;
+  const cfg=getWaveCfgS3();
+  c_spawnTimer=setTimeout(()=>{
+    if(c_gameActive&&c_blocks.length<cfg.maxOnScreen&&c_waveKills<c_waveTarget)cSpawnBlock();
+    scheduleCSpawn();
+  },cfg.spawnInterval+(Math.random()-0.5)*600);
+}
+
+function cSpawnBlock(){
+  const cfg=getWaveCfgS3();
+  const data=pickChaosWordData(cfg);
+  const existing=c_blocks.map(b=>b.data.t);if(existing.includes(data.t))return;
+  const area=document.getElementById('chaos-area');
+  const aW=area.clientWidth,aH=area.clientHeight;
+  // 방향: 0=위, 1=왼쪽, 2=오른쪽, 3=아래
+  const dir=Math.floor(Math.random()*4);
+  const dirs=['top','left','right','bottom'];
+  const dirName=dirs[dir];
+  let x,y,vx,vy;
+  const spd=cfg.speed*(0.8+Math.random()*0.4);
+  const centerX=aW/2,centerY=aH/2;
+  if(dir===0){x=60+Math.random()*(aW-120);y=-60;vx=(centerX-x)*0.003;vy=spd;}
+  else if(dir===1){x=-80;y=60+Math.random()*(aH-120);vx=spd;vy=(centerY-y)*0.003;}
+  else if(dir===2){x=aW+80;y=60+Math.random()*(aH-120);vx=-spd;vy=(centerY-y)*0.003;}
+  else{x=60+Math.random()*(aW-120);y=aH+60;vx=(centerX-x)*0.003;vy=-spd;}
+
+  // 특수효과
+  const effects=[];
+  if(data.type==='boss'){effects.push('eff-wobble');}
+  else if(data.type==='bonus'){effects.push('eff-pulse');}
+  else if(data.type==='bomb'){effects.push('eff-spin');}
+  else if(Math.random()<0.2){effects.push(['eff-spin','eff-wobble','eff-pulse'][Math.floor(Math.random()*3)]);}
+
+  const el=document.createElement('div');
+  el.className=`chaos-block dir-${dirName} type-${data.type} ${effects.join(' ')}`;
+  el.innerHTML=`<div class="cb-inner"><div class="cb-emoji">${CAT_EMOJIS[data.cat]||'📌'}</div><div class="cb-text">${data.t}</div></div>`;
+  el.style.left=x+'px';el.style.top=y+'px';
+  area.appendChild(el);
+  c_blocks.push({el,data,x,y,vx,vy,dir:dirName,type:data.type,id:Date.now()+Math.random()});
+}
+
+function cLoop(ts){
+  if(!c_gameActive)return;
+  const dt=ts-c_lastTime;c_lastTime=ts;
+  const area=document.getElementById('chaos-area');
+  if(!area)return;
+  const aW=area.clientWidth,aH=area.clientHeight;
+  for(let i=c_blocks.length-1;i>=0;i--){
+    const b=c_blocks[i];
+    b.x+=b.vx*(dt/16);b.y+=b.vy*(dt/16);
+    b.el.style.left=b.x+'px';b.el.style.top=b.y+'px';
+    // 화면 밖으로 나가면
+    const margin=100;
+    if(b.x<-margin||b.x>aW+margin||b.y<-margin||b.y>aH+margin){
+      b.el.remove();c_blocks.splice(i,1);
+      if(b.type!=='bonus'&&b.type!=='shield'){cLoseLife(Math.max(0,Math.min(aW,b.x)),Math.max(0,Math.min(aH,b.y)));}
+      if(c_targetBlock===b)c_targetBlock=null;
+    }
+  }
+  cUpdateMatchHighlight();
+  c_rafId=requestAnimationFrame(cLoop);
+}
+
+function cUpdateMatchHighlight(){
+  const t=c_typed.toLowerCase();
+  c_blocks.forEach(b=>{
+    const txt=b.el.querySelector('.cb-text');if(!txt)return;
+    if(!t){b.el.classList.remove('targeted');txt.innerHTML=b.data.t;return;}
+    if(b.data.t.toLowerCase().startsWith(t)){
+      b.el.classList.add('targeted');
+      const matched=b.data.t.substring(0,t.length);const rest=b.data.t.substring(t.length);
+      txt.innerHTML=`<span class="match">${matched}</span>${rest}`;
+    } else {b.el.classList.remove('targeted');txt.innerHTML=b.data.t;}
+  });
+}
+
+function cFindBestMatch(t){
+  if(!t)return null;const tl=t.toLowerCase();let best=null,bestPriority=-Infinity;
+  c_blocks.forEach(b=>{
+    if(!b.data.t.toLowerCase().startsWith(tl))return;
+    // 우선순위: BOSS > BOMB > 화면 중심에 가까운 것
+    const area=document.getElementById('chaos-area');
+    const aW=area?area.clientWidth:800,aH=area?area.clientHeight:500;
+    let pri=-(Math.abs(b.x-aW/2)+Math.abs(b.y-aH/2));
+    if(b.type==='boss')pri+=10000;
+    if(b.type==='bomb')pri+=5000;
+    if(pri>bestPriority){bestPriority=pri;best=b;}
+  });
+  return best;
+}
+
+function cFireAt(b){
+  if(!b)return;
+  const area=document.getElementById('chaos-area');
+  const bRect=b.el.getBoundingClientRect();const aRect=area.getBoundingClientRect();
+  const tx=bRect.left-aRect.left+bRect.width/2;const ty=bRect.top-aRect.top+bRect.height/2;
+  // 방향별 레이저
+  drawChaosLaser(area,tx,ty,b.dir);
+  // 크로스헤어
+  const ch=document.getElementById('chaos-crosshair');if(ch){ch.style.left=(tx-12)+'px';ch.style.top=(ty-12)+'px';}
+  cProcessHit(b,tx,ty);
+}
+
+function drawChaosLaser(area,tx,ty,dir){
+  const aW=area.clientWidth,aH=area.clientHeight;
+  const laser=document.createElement('div');laser.className='laser';
+  if(dir==='top'||dir==='bottom'){
+    laser.classList.add('laser-v');
+    const h=dir==='top'?ty:aH-ty;
+    laser.style.left=tx+'px';
+    laser.style.top=dir==='top'?'0':ty+'px';
+    laser.style.height=h+'px';
+    laser.style.width='2px';
+    laser.style.background=dir==='top'?'linear-gradient(to bottom,transparent,var(--cyan))':'linear-gradient(to top,transparent,var(--cyan))';
+  } else {
+    laser.classList.add('laser-h');
+    const w=dir==='left'?tx:aW-tx;
+    laser.style.top=ty+'px';
+    laser.style.left=dir==='left'?'0':tx+'px';
+    laser.style.width=w+'px';
+    laser.style.height='2px';
+    laser.style.background=dir==='left'?'linear-gradient(to right,transparent,var(--cyan))':'linear-gradient(to left,transparent,var(--cyan))';
+  }
+  area.appendChild(laser);setTimeout(()=>laser.remove(),280);
+}
+
+function cProcessHit(b,tx,ty){
+  if(b.type==='shield'){
+    // 실드 획득
+    c_shieldActive=true;c_shieldCount=3;
+    document.getElementById('shield-overlay').classList.add('active');
+    document.getElementById('chud-shield').textContent=c_shieldCount;
+    showChaosBonus(tx,ty,'🛡️ SHIELD x3!','#8888ff');
+  } else if(b.type==='bomb'){
+    // 폭탄: 맞으면 점수 깎임 (실드로 방어 가능)
+    if(c_shieldActive){
+      c_shieldCount--;document.getElementById('chud-shield').textContent=c_shieldCount;
+      if(c_shieldCount<=0){c_shieldActive=false;document.getElementById('shield-overlay').classList.remove('active');document.getElementById('chud-shield').textContent='—';}
+      showChaosBonus(tx,ty,'🛡️ BLOCKED!','#8888ff');
+    } else {
+      const penalty=b.data.pts;c_score=Math.max(0,c_score+penalty);stage3Score=c_score;
+      showChaosBonus(tx,ty,`💣 ${penalty}`,b.data.pts<0?'#ff4444':'#fff');
+      // 작은 폭발
+      cExplode(tx,ty,'💥',0.8);
+      c_combo=1;
+    }
+  } else if(b.type==='bonus'){
+    // 보너스 별: 콤보 가속 + 점수
+    c_bonusCount++;updateBonusPips();
+    const bpts=b.data.pts*c_combo;c_score+=bpts;stage3Score=c_score;
+    showChaosBonus(tx,ty,`⭐ +${bpts}!`,'#00eeff');
+    if(c_bonusCount>=c_bonusGoal){triggerBonusFlash();}
+  } else {
+    // 일반/BOSS
+    const multiplier=b.type==='boss'?3:1;
+    const pts=b.data.pts*c_combo*multiplier;c_score+=pts;stage3Score=c_score;c_waveKills++;stage3Kills++;
+    showS3ScorePop(tx,ty,`+${pts}`+(c_combo>1?` ×${c_combo}`:'')+(b.type==='boss'?' 👑':''));
+    c_combo=Math.min(c_combo+(b.type==='boss'?2:1),10);
+    if(b.type==='boss')showChaosBonus(tx,ty,'👑 BOSS DOWN!','#ffd700');
+  }
+  // 폭발
+  cExplode(tx,ty,b.type==='boss'?'🌟':b.type==='bonus'?'⭐':'💥');
+  b.el.remove();const idx=c_blocks.indexOf(b);if(idx>-1)c_blocks.splice(idx,1);if(c_targetBlock===b)c_targetBlock=null;
+  updateScoreSidebar();updateChaosHUD();cCheckWaveComplete();
+}
+
+function cExplode(tx,ty,emoji,scale=1){
+  const area=document.getElementById('chaos-area');if(!area)return;
+  const exp=document.createElement('div');exp.className='explosion';
+  exp.style.left=(tx-22*scale)+'px';exp.style.top=(ty-22*scale)+'px';
+  exp.innerHTML=`<div class="exp-inner" style="font-size:${24*scale}px;">${emoji}</div>`;
+  area.appendChild(exp);setTimeout(()=>exp.remove(),500);
+}
+
+function showChaosBonus(x,y,text,color='var(--cyan)'){
+  const area=document.getElementById('chaos-area');if(!area)return;
+  const el=document.createElement('div');
+  el.style.cssText=`position:absolute;left:${x}px;top:${y-30}px;font-family:'Press Start 2P',monospace;font-size:12px;color:${color};pointer-events:none;z-index:100;white-space:nowrap;animation:scorePop .9s ease-out forwards;`;
+  el.textContent=text;area.appendChild(el);setTimeout(()=>el.remove(),900);
+}
+
+function showS3ScorePop(x,y,txt){
+  const el=document.getElementById('s3-score-pop');if(!el)return;
+  el.textContent=txt;el.style.left=x+'px';el.style.top=(y-20)+'px';el.style.display='block';el.style.color='var(--cyan)';
+  el.className='';void el.offsetWidth;el.className='anim';
+}
+
+function triggerBonusFlash(){
+  c_bonusCount=0;updateBonusPips();
+  const area=document.getElementById('chaos-area');if(!area)return;
+  const banner=document.createElement('div');banner.className='bonus-banner';
+  banner.innerHTML='⚡ COMBO BONUS ⚡<br>+2000점!';area.appendChild(banner);
+  c_score+=2000;stage3Score=c_score;updateScoreSidebar();updateChaosHUD();
+  setTimeout(()=>banner.remove(),1800);
+}
+
+function updateBonusPips(){
+  const container=document.getElementById('bonus-pips');if(!container)return;
+  container.innerHTML='';
+  for(let i=0;i<c_bonusGoal;i++){
+    const pip=document.createElement('span');pip.className='bonus-pip'+(i<c_bonusCount?' active':'');
+    pip.textContent='★';container.appendChild(pip);
+  }
+}
+
+function cLoseLife(x,y){
+  if(c_shieldActive){
+    c_shieldCount--;document.getElementById('chud-shield').textContent=c_shieldCount;
+    if(c_shieldCount<=0){c_shieldActive=false;document.getElementById('shield-overlay').classList.remove('active');document.getElementById('chud-shield').textContent='—';}
+    return;
+  }
+  c_lives--;c_combo=1;cExplode(x,y,'💀');updateChaosHUD();
+  if(c_lives<=0){c_gameActive=false;clearInterval(c_timerIv);clearTimeout(c_spawnTimer);cancelAnimationFrame(c_rafId);c_blocks.forEach(b=>{try{b.el.remove();}catch(e){}});c_blocks=[];stage3Score=c_score;finishGame();}
+}
+
+function cCheckWaveComplete(){
+  const cfg=getWaveCfgS3();
+  if(c_waveKills>=cfg.count&&c_blocks.filter(b=>b.type==='normal'||b.type==='boss').length===0){
+    clearTimeout(c_spawnTimer);g_gameActive=false;
+    setTimeout(()=>{
+      c_wave++;c_waveKills=0;c_gameActive=true;updateChaosHUD();
+      c_wordPoolNormal=shuffle([...CHAOS_WORDS_NORMAL]);const nextCfg=getWaveCfgS3();c_waveTarget=nextCfg.count;
+      announceWaveChaos(c_wave,()=>{scheduleCSpawn();c_lastTime=performance.now();c_rafId=requestAnimationFrame(cLoop);});
+    },1200);
+  }
+}
+
+function initChaosHUD(){updateChaosHUD();}
+
+function updateChaosHUD(){
+  setEl('chud-score','textContent',c_score);
+  setEl('chud-combo','textContent','x'+c_combo);setEl('chud-wave','textContent',c_wave);
+  const comboEl=document.getElementById('chud-combo');
+  if(comboEl){comboEl.className=c_combo>=5?'chud-val yellow':c_combo>=3?'chud-val cyan':'chud-val';}
+  const heartsMap=['','❤️','❤️❤️','❤️❤️❤️'];
+  setEl('chud-lives','textContent',heartsMap[Math.max(0,Math.min(3,c_lives))]);
+  if(!c_shieldActive){setEl('chud-shield','textContent','—');}
+  document.getElementById('sb-s3-chaos').textContent=c_score;
+  document.getElementById('sb-total-chaos').textContent=stage1Score+stage2Score+c_score;
+}
+
+/* ───────────────────────────────────
+   역전 판정 (S3 > S1+S2)
+─────────────────────────────────── */
+function checkReversal(){
+  const s1s2=stage1Score+stage2Score;const s3=stage3Score;
+  if(s3>s1s2&&s1s2>0){
+    stage3ReversalBonus=1000;stage3Score+=stage3ReversalBonus;
+    const banner=document.getElementById('reversal-banner');
+    const detail=document.getElementById('reversal-detail');
+    if(detail)detail.textContent=`S3 ${s3}점 > S1+S2 ${s1s2}점\n역전 보너스 +500점!`;
+    banner.classList.add('open');setTimeout(()=>banner.classList.remove('open'),2500);
+    return true;
+  }
+  return false;
+}
+
+/* ───────────────────────────────────
+   최종 결과
+─────────────────────────────────── */
 function finishGame(){
-  clearTimeout(g_stageLimitTimer);
-  const total=stage1Score+stage2Score;
+  clearInterval(c_timerIv);clearTimeout(c_stageTimer);clearTimeout(c_spawnTimer);cancelAnimationFrame(c_rafId);
+  if(c_bgAnimId)cancelAnimationFrame(c_bgAnimId);
+  // 역전 판정
+  const isReversal=checkReversal();
+  const total=stage1Score+stage2Score+stage3Score;
   document.getElementById('res-name').textContent=nickname;
-  document.getElementById('res-sub2').textContent=`${PASSAGES[selPassage].title} | GALAGA WAVE ${g_wave}`;
+  document.getElementById('res-sub2').textContent=`${PASSAGES[selPassage].title} | S2 WAVE ${g_wave} | S3 WAVE ${c_wave}`;
   document.getElementById('res-avatar').innerHTML=CHARS[selChar].svg;
   document.getElementById('res-s1-score').textContent=stage1Score;
   document.getElementById('res-s2-score').textContent=stage2Score;
+  document.getElementById('res-s3-score').textContent=stage3Score;
   document.getElementById('res-total-score').textContent=total;
+  if(isReversal){
+    document.getElementById('res-reversal-notice').style.display='';
+    document.getElementById('res-reversal-tag').style.display='';
+    document.getElementById('res-s3-score').className='rs-val reversal';
+  }
   document.getElementById('res-wpm').textContent=stage1Wpm;
   document.getElementById('res-acc').textContent=stage1Acc+'%';
   document.getElementById('res-chars').textContent=stage1Chars;
   document.getElementById('res-kills').textContent=stage2Kills;
-  ['sb-s1-result','sb-s2-result','sb-total-result'].forEach((id,idx)=>{
-    const el=document.getElementById(id);if(el)el.textContent=[stage1Score,stage2Score,total][idx];
+  document.getElementById('res-s3kills').textContent=stage3Kills;
+  ['sb-s1-result','sb-s2-result','sb-s3-result','sb-total-result'].forEach((id,idx)=>{
+    const el=document.getElementById(id);if(el)el.textContent=[stage1Score,stage2Score,stage3Score,total][idx];
   });
-  const comment=total>=900?'완벽한 합산 기록! 최상위권입니다.':total>=700?'우수한 통합 기록입니다.':total>=500?'좋습니다. 두 스테이지 모두 계속 훈련하세요.':total>=300?'좋은 시도입니다. 반복 훈련하세요.':'훈련 종료. 다시 도전하세요.';
-  document.getElementById('res-comment').textContent=comment;
-  document.getElementById('res-formula').textContent=`STAGE1 ${stage1Score}점 + STAGE2 ${stage2Score}점 = TOTAL ${total}점`;
+  const grade=total>=9000?'★★★ 전설급! 만점에 근접한 기록!':total>=7000?'★★ 우수한 종합 성적 (상위권)':total>=4000?'★ 좋은 결과입니다':total>=2000?'계속 훈련하세요':'다시 도전하세요';
+  document.getElementById('res-comment').textContent=grade+(isReversal?' ⚡역전 달성!':'');
+  document.getElementById('res-formula').textContent=`S1:${stage1Score} + S2:${stage2Score} + S3:${stage3Score}${stage3ReversalBonus?`(역전+${stage3ReversalBonus})`:''} = ${total}`;
   showScreen('result-screen');spawnParticles();
-  const scoreData={nickname,charEmoji:CHARS[selChar].svg,charName:CHARS[selChar].name,wpm:stage1Wpm,acc:stage1Acc,score:stage1Score,stage2:stage2Score,total,passage:PASSAGES[selPassage].title};
+  const scoreData={nickname,charEmoji:CHARS[selChar].svg,charName:CHARS[selChar].name,wpm:stage1Wpm,acc:stage1Acc,score:stage1Score,stage2:stage2Score,stage3:stage3Score,total,passage:PASSAGES[selPassage].title,kills:stage2Kills,s3kills:stage3Kills,wave:g_wave,s3wave:c_wave,reversal:isReversal?1:0};
   saveScore(scoreData);
   setTimeout(()=>{
     requestGas('rank',{},payload=>{
@@ -1401,24 +1835,15 @@ function finishGame(){
 function saveScore(d){
   if(!GAS_URL||GAS_URL.includes('YOUR_GAS'))return;
   requestGas('save',{
-    nickname:d.nickname,
-    char:d.charName||'',
-    wpm:d.wpm,
-    acc:d.acc,
-    score:d.score,
-    stage2:d.stage2,
-    total:d.total,
-    passage:d.passage,
-    kills:stage2Kills,
-    wave:g_wave
-  },res=>{
-    console.log('[GAS 저장]',res);
-  },err=>{
-    console.warn('[GAS 저장 실패]',err);
-  });
+    nickname:d.nickname,char:d.charName||'',wpm:d.wpm,acc:d.acc,score:d.score,
+    stage2:d.stage2,stage3:d.stage3,total:d.total,passage:d.passage,
+    kills:d.kills,s3kills:d.s3kills,wave:d.wave,s3wave:d.s3wave,reversal:d.reversal
+  },res=>{console.log('[GAS 저장]',res);},err=>{console.warn('[GAS 저장 실패]',err);});
 }
 
-/* ─── 랭킹 오버레이 ─── */
+/* ───────────────────────────────────
+   랭킹 오버레이
+─────────────────────────────────── */
 function showRankOverlay(){document.getElementById('rank-overlay').classList.add('open');loadOvRanking();}
 function hideRankOverlay(){document.getElementById('rank-overlay').classList.remove('open');}
 function loadOvRanking(){
@@ -1432,44 +1857,59 @@ function renderOvRanking(data){
   const medals=['🥇','🥈','🥉'];
   rows.slice(0,20).forEach((r,i)=>{
     const row=document.createElement('div');row.className='ov-rank-row';const nc=i<3?`rr-no n${i+1}`:'rr-no';
-    row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="rr-ch" style="width:18px;height:18px;display:inline-block;">${safeCharSvg(r.char)}</span><span class="rr-nick${i===0?' top':''}">${esc(r.nickname)}</span><span style="font-size:13px;color:var(--lo);">${esc(shortPassage(r.passage))}</span><span class="rr-sc">${r.total||r.score}</span><span class="rr-wpm">${esc(r.wpm)}</span>`;
+    row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="rr-ch" style="width:16px;height:16px;display:inline-block;">${safeCharSvg(r.char)}</span><span class="rr-nick${i===0?' top':''}">${esc(r.nickname)}</span><span style="font-size:12px;color:var(--lo);">${esc(shortPassage(r.passage))}</span><span class="rr-sc">${r.total||r.score}</span>`;
     body.appendChild(row);
   });
 }
 
-/* ─── 기타 ─── */
+/* ───────────────────────────────────
+   기타
+─────────────────────────────────── */
 function focusInput(){const inp=document.getElementById('hidden-input');if(inp&&!inp.disabled)inp.focus();}
 function spawnParticles(){
-  const c=document.getElementById('particles');c.innerHTML='';const cols=['#fff','#ccc','#aaa','#888','#00ff88','#555'];
-  for(let i=0;i<70;i++){const el=document.createElement('div');el.className='pt';const sz=3+Math.random()*6;el.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;background:${cols[~~(Math.random()*cols.length)]};animation-delay:${Math.random()*1.5}s;animation-duration:${2+Math.random()*1.5}s;opacity:.9;`;c.appendChild(el);}
+  const c=document.getElementById('particles');c.innerHTML='';
+  const cols=['#fff','#ccc','#aaa','#00ff88','#00eeff','#cc44ff','#ffd700','#ff8800'];
+  for(let i=0;i<80;i++){const el=document.createElement('div');el.className='pt';const sz=3+Math.random()*6;el.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;background:${cols[~~(Math.random()*cols.length)]};animation-delay:${Math.random()*1.5}s;animation-duration:${2+Math.random()*1.5}s;opacity:.9;`;c.appendChild(el);}
   setTimeout(()=>c.innerHTML='',5000);
 }
 
-/* ─── 갤러그 입력 ─── */
+/* ───────────────────────────────────
+   이벤트 리스너
+─────────────────────────────────── */
 document.addEventListener('DOMContentLoaded',()=>{
+  // S2 갤러그 입력
   const ginp=document.getElementById('galaga-input');
-  ginp.addEventListener('input',e=>{
-    g_typed=ginp.value;g_targetWord=gFindBestMatch(g_typed);
-  });
+  ginp.addEventListener('input',e=>{g_typed=ginp.value;g_targetWord=gFindBestMatch(g_typed);});
   ginp.addEventListener('keydown',e=>{
-    if((e.key==='Enter'||e.key===' ')){
-      e.preventDefault();if(!g_gameActive||!g_typed)return;
-      const match=gFindBestMatch(g_typed);
-      if(match){gFireAt(match);g_typed='';ginp.value='';g_targetWord=null;}
-    }
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();if(!g_gameActive||!g_typed)return;const match=gFindBestMatch(g_typed);if(match){gFireAt(match);g_typed='';ginp.value='';g_targetWord=null;}}
     if(e.key==='Escape'){g_typed='';ginp.value='';g_targetWord=null;}
   });
   document.getElementById('game-area').addEventListener('mousemove',e=>{
-    const r=document.getElementById('game-area').getBoundingClientRect();
-    const c=document.getElementById('crosshair');c.style.left=(e.clientX-r.left-10)+'px';c.style.top=(e.clientY-r.top-10)+'px';
+    const r=document.getElementById('game-area').getBoundingClientRect();const c=document.getElementById('crosshair');c.style.left=(e.clientX-r.left-10)+'px';c.style.top=(e.clientY-r.top-10)+'px';
   });
+
+  // S3 카오스 입력
+  const cinp=document.getElementById('chaos-input');
+  cinp.addEventListener('input',e=>{c_typed=cinp.value;c_targetBlock=cFindBestMatch(c_typed);});
+  cinp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();if(!c_gameActive||!c_typed)return;const match=cFindBestMatch(c_typed);if(match){cFireAt(match);c_typed='';cinp.value='';c_targetBlock=null;}}
+    if(e.key==='Escape'){c_typed='';cinp.value='';c_targetBlock=null;}
+  });
+  document.getElementById('chaos-area').addEventListener('mousemove',e=>{
+    const r=document.getElementById('chaos-area').getBoundingClientRect();const ch=document.getElementById('chaos-crosshair');
+    if(ch){ch.style.left=(e.clientX-r.left-12)+'px';ch.style.top=(e.clientY-r.top-12)+'px';}
+  });
+
   document.addEventListener('click',()=>{
     if(document.getElementById('training-screen').classList.contains('active'))focusInput();
     if(document.getElementById('galaga-screen').classList.contains('active'))document.getElementById('galaga-input').focus();
+    if(document.getElementById('chaos-screen').classList.contains('active'))document.getElementById('chaos-input').focus();
   });
 });
 
-/* ─── INIT ─── */
+/* ───────────────────────────────────
+   INIT
+─────────────────────────────────── */
 window.onload=()=>{
   buildCharGrid();buildPassageList();loadRankingAll();startDemo();
 };
