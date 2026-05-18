@@ -1,0 +1,1486 @@
+
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="cache-version" content="20260518_01">
+<title>천하제일 산업안전보건법 타이핑 대회</title>
+<script>
+/* 브라우저 뒤로가기 캐시(bfcache) 방지: 이전 화면 복원 시 최신 상태로 재로딩 */
+window.addEventListener('pageshow', function(event) {
+  if (event.persisted) {
+    window.location.reload();
+  }
+});
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap&v=20260518_01" rel="stylesheet">
+<style>
+@font-face{font-family:'DOSGothic';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_eight@1.0/DOSGothic.woff') format('woff');font-weight:normal;font-style:normal;font-display:block;}
+@font-face{font-family:'DungGeunMo';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff');font-weight:normal;font-style:normal;font-display:block;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#0e0e0e;--bg2:#111;--panel:#1a1a1a;--panel2:#222;
+  --hi:#ffffff;--mid:#aaaaaa;--lo:#555555;--dim:#2a2a2a;--dim2:#333;
+  --active:#1e2a1e;--green:#00ff88;--red:#ff4444;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'DOSGothic','DungGeunMo',monospace;color:var(--hi);}
+body::after{content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.09) 0,rgba(0,0,0,0.09) 1px,transparent 1px,transparent 4px);}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);background-size:36px 36px;}
+
+@keyframes blink{50%{opacity:0;}}
+@keyframes curBlink{50%{background:rgba(0,255,136,0.2);color:rgba(255,255,255,0.5);}}
+@keyframes titleFlicker{0%,92%,100%{opacity:1;}93%{opacity:.5;}94%{opacity:1;}95%{opacity:.6;}96%{opacity:1;}}
+@keyframes shine{0%{left:-100%}40%,100%{left:150%}}
+@keyframes startGlow{0%,100%{box-shadow:0 0 6px rgba(255,255,255,0.1);}50%{box-shadow:0 0 20px rgba(255,255,255,0.3);}}
+@keyframes popIn{from{transform:scale(.92) translateY(16px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+@keyframes ptFall{from{transform:translateY(-20px) rotate(0);opacity:1;}to{transform:translateY(110vh) rotate(540deg);opacity:0;}}
+@keyframes explode{0%{opacity:1;transform:scale(0.5);}100%{opacity:0;transform:scale(2.5);}}
+@keyframes laserFade{from{opacity:1;}to{opacity:0;}}
+@keyframes waPop{0%{opacity:0;transform:scale(0.7);}20%{opacity:1;transform:scale(1.05);}80%{opacity:1;}100%{opacity:0;transform:scale(0.95);}}
+@keyframes scorePop{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(-40px);}}
+@keyframes totalScorePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+
+.screen{display:none;position:relative;z-index:1;}
+.screen.active{display:flex;}
+.layout{width:100vw;height:100vh;display:flex;overflow:hidden;}
+
+/* ── 사이드바 ── */
+.sidebar{width:240px;height:100vh;background:#000;flex-shrink:0;border-right:2px solid var(--dim);display:flex;flex-direction:column;overflow:hidden;}
+.sb-current{padding:14px 16px;border-bottom:2px solid var(--dim);flex-shrink:0;}
+.sb-cur-label{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:2px;margin-bottom:12px;text-align:center;}
+.sb-cur-user{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:8px;text-align:center;}
+.sb-cur-avatar{width:64px;height:64px;background:var(--panel);border:2px solid var(--dim2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:4px;}
+.sb-cur-name{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--hi);line-height:1.6;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
+.sb-cur-char{font-size:13px;color:var(--lo);margin-top:2px;text-align:center;}
+.sb-cur-stage{font-size:13px;color:var(--mid);background:var(--panel);border:1px solid var(--dim);padding:6px 10px;line-height:1.5;word-break:keep-all;text-align:center;}
+.sb-cur-stage-lbl{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:1px;display:block;margin-bottom:3px;}
+
+/* 사이드바 점수 박스 */
+.sb-score-area{padding:10px 16px;border-bottom:2px solid var(--dim);flex-shrink:0;}
+.sb-score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.sb-score-lbl{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);letter-spacing:1px;}
+.sb-score-val{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--hi);}
+.sb-score-val.green{color:var(--green);}
+.sb-total-row{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--dim2);padding:6px 8px;margin-top:6px;}
+.sb-total-lbl{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--mid);letter-spacing:1px;}
+.sb-total-val{font-family:'Press Start 2P',monospace;font-size:16px;color:var(--hi);text-shadow:0 0 8px rgba(255,255,255,0.3);}
+
+/* 랭킹 */
+.sb-ranking{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+.sb-rank-header{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);padding:8px 16px;border-bottom:1px solid var(--dim);flex-shrink:0;letter-spacing:2px;display:flex;align-items:center;gap:6px;}
+.rank-scroll{flex:1;overflow-y:auto;min-height:0;}
+.rank-scroll::-webkit-scrollbar{width:3px;}
+.rank-scroll::-webkit-scrollbar-thumb{background:var(--dim2);}
+.rank-row{display:grid;grid-template-columns:24px 20px 1fr 48px 32px;align-items:center;gap:3px;padding:7px 14px;border-bottom:1px solid var(--dim);font-size:13px;transition:background .1s;}
+.rank-row:hover{background:var(--panel);}
+.rank-row.mine{background:rgba(255,255,255,0.04)!important;}
+.rank-row.rh{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);letter-spacing:1px;padding:4px 14px;border-bottom:2px solid var(--dim2);background:#000;position:sticky;top:0;z-index:2;}
+.rr-no{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--lo);}
+.rr-no.n1{color:var(--hi);}
+.rr-no.n2{color:var(--mid);}
+.rr-no.n3{color:var(--lo);}
+.rr-ch{font-size:16px;text-align:center;}
+.rr-nick{font-weight:700;color:var(--mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;}
+.rr-nick.top{color:var(--hi);}
+.rr-sc{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--hi);text-align:right;}
+.rr-wpm{font-size:12px;color:var(--lo);text-align:right;}
+.rank-loading{padding:14px;text-align:center;font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:2px;animation:blink 1s step-end infinite;}
+
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* ══════════════════════ INTRO ══════════════════════ */
+.intro-main{flex:1;display:flex;flex-direction:column;background:var(--bg2);overflow:hidden;position:relative;}
+.im-title-section{flex-shrink:0;background:#000;border-bottom:3px solid var(--hi);padding:0;display:flex;align-items:flex-end;position:relative;overflow:hidden;}
+.im-title-left{flex:1;padding:4px 24px 16px;display:flex;flex-direction:column;justify-content:flex-end;gap:5px;}
+.im-deco-stars{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:4px;display:flex;align-items:center;gap:8px;}
+.im-deco-stars::before,.im-deco-stars::after{content:'';flex:1;height:1px;background:var(--dim);}
+.im-title{font-family:'DOSGothic','DungGeunMo',sans-serif;font-size:30px;color:var(--hi);letter-spacing:4px;line-height:1.3;text-shadow:0 0 24px rgba(255,255,255,0.5);animation:titleFlicker 5s infinite;text-align:center;white-space:nowrap;font-weight:700;}
+.im-sub{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:4px;text-align:center;margin-top:3px;}
+.im-sub::before{content:'[ ';}
+.im-sub::after{content:' ]';}
+.im-title-right{display:flex;flex-direction:column;min-width:340px;flex-shrink:0;border-left:2px solid var(--dim2);margin-right:16px;}
+.im-top1-wrap{padding:14px 22px;border:2px solid var(--mid);display:flex;align-items:center;gap:14px;flex:1;position:relative;overflow:hidden;margin:10px;box-shadow:0 0 12px rgba(255,255,255,0.08);}
+.im-top1-wrap::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent 0,transparent 6px,rgba(255,255,255,0.012) 6px,rgba(255,255,255,0.012) 7px);}
+.im-top1-trophy-svg{width:40px;height:40px;flex-shrink:0;position:relative;}
+.im-top1-body{flex:1;min-width:0;position:relative;}
+.im-top1-label{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);letter-spacing:1px;margin-bottom:5px;}
+.im-top1-name{font-family:'DOSGothic','DungGeunMo',monospace;font-size:20px;color:var(--hi);text-shadow:0 0 10px rgba(255,255,255,0.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.im-top1-score-wrap{text-align:right;flex-shrink:0;}
+.im-top1-score{font-family:'Press Start 2P',monospace;font-size:24px;color:var(--hi);text-shadow:0 0 14px rgba(255,255,255,0.45);}
+.im-점{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);display:block;margin-top:3px;}
+
+.im-body{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:0;overflow:hidden;position:relative;}
+.im-start-section{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:auto;}
+.challenge-msg{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--mid);letter-spacing:1px;text-align:center;line-height:1.2;margin-bottom:3px;}
+.challenge-msg em{color:var(--hi);font-style:normal;animation:blink 1.2s step-end infinite;}
+.challenge-sub{display:none;}
+.start-action-btn{display:flex;align-items:center;gap:16px;padding:18px 56px;width:auto;min-width:400px;justify-content:center;font-family:'Press Start 2P',monospace;font-size:20px;letter-spacing:3px;background:#000;color:var(--hi);border:3px solid var(--hi);cursor:pointer;position:relative;overflow:hidden;animation:startGlow 1.8s ease-in-out infinite;transition:all .12s;}
+.start-action-btn::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);animation:shine 2.5s ease-in-out infinite;}
+.start-action-btn:hover{background:var(--hi);color:#000;}
+.start-icon{width:36px;height:36px;flex-shrink:0;}
+.im-stats{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--lo);display:flex;gap:16px;}
+.im-stats strong{color:var(--mid);}
+
+/* 데모 */
+.im-demo{display:flex;flex-direction:column;overflow:hidden;border-right:2px solid var(--dim);}
+.im-demo-header{background:var(--panel);border-bottom:1px solid var(--dim);padding:7px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.im-demo-title{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);letter-spacing:2px;}
+.im-demo-timer{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--hi);letter-spacing:2px;}
+.im-demo-statusbar{background:var(--panel2);border-bottom:1px solid var(--dim);padding:4px 14px;display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.im-demo-stat{display:flex;align-items:center;gap:5px;font-size:11px;}
+.im-demo-stat-lbl{font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);}
+.im-demo-bar{width:50px;height:3px;background:var(--dim);}
+.im-demo-bar-fill{height:100%;background:var(--mid);transition:width .3s;}
+.im-demo-val{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--hi);min-width:26px;}
+.im-demo-pg{margin-left:auto;font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);}
+.im-demo-score{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--hi);}
+.im-demo-lines{flex:1;padding:8px 14px;display:flex;flex-direction:column;gap:2px;overflow:hidden;background:#000;}
+.im-demo-unit{flex-shrink:0;}
+.im-demo-src{font-family:'DOSGothic',monospace;font-size:18px;font-weight:700;color:rgba(255,255,255,0.42);padding:2px 8px 1px;line-height:1.4;word-break:keep-all;}
+.im-demo-src.cur{color:rgba(255,255,255,0.55);}
+.im-demo-src.dim{color:rgba(255,255,255,0.18);}
+.im-demo-disp{font-family:'DOSGothic',monospace;font-size:18px;padding:4px 8px;line-height:1.4;word-break:keep-all;}
+.im-demo-disp.active{background:var(--active);border-left:2px solid var(--hi);}
+.im-demo-disp.pending{color:rgba(255,255,255,0.12);}
+.im-demo-disp.done-d{color:rgba(255,255,255,0.35);border-left:2px solid var(--dim);}
+.demo-ch-ok{color:rgba(255,255,255,0.92);}
+.demo-ch-err{color:rgba(255,255,255,0.2);text-decoration:line-through;}
+.demo-ch-cur{background:rgba(255,255,255,0.9);color:#000;animation:curBlink .5s step-end infinite;}
+.demo-ch-pend{color:rgba(255,255,255,0.15);}
+.im-demo-guide{border-top:1px solid var(--dim);background:var(--panel);padding:4px 14px;display:flex;justify-content:space-between;font-family:'Press Start 2P',monospace;font-size:8px;color:var(--lo);flex-shrink:0;}
+
+/* 랭킹 테이블 */
+.im-ranking{display:flex;flex-direction:column;overflow:hidden;min-height:0;}
+.im-rank-title{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--mid);letter-spacing:2px;text-align:center;padding:8px;border-bottom:1px solid var(--dim);flex-shrink:0;}
+.im-rank-title-deco{color:var(--lo);margin:0 5px;}
+.im-rank-table{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+.im-rank-head{display:grid;grid-template-columns:32px 24px 1fr 1fr 64px 46px 44px;gap:3px;padding:6px 14px;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);border-bottom:2px solid var(--dim2);background:var(--panel);flex-shrink:0;}
+.im-rank-body{flex:1;overflow-y:auto;min-height:0;}
+.im-rank-body::-webkit-scrollbar{width:3px;}
+.im-rank-body::-webkit-scrollbar-thumb{background:var(--dim2);}
+.im-rank-row{display:grid;grid-template-columns:32px 24px 1fr 1fr 64px 46px 44px;gap:3px;padding:7px 14px;border-bottom:1px solid var(--dim);font-size:13px;align-items:center;transition:background .1s;}
+.im-rank-row:hover{background:var(--panel);}
+.im-rank-row.mine{background:rgba(255,255,255,0.04)!important;}
+.im-rr-no{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--lo);}
+.im-rr-no.n1{color:var(--hi);}
+.im-rr-no.n2{color:var(--mid);}
+.im-rr-no.n3{color:var(--lo);}
+.im-rr-ch{width:24px;height:24px;flex-shrink:0;}
+.im-rr-nick{font-weight:700;color:var(--mid);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.im-rr-nick.top{color:var(--hi);}
+.im-rr-stage{font-size:12px;color:var(--lo);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.im-rr-sc{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--hi);text-align:right;}
+.im-rr-wpm{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--lo);text-align:right;}
+.im-rr-acc{font-size:12px;color:var(--lo);text-align:right;}
+.im-rank-loading{padding:14px;text-align:center;font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:2px;animation:blink 1s step-end infinite;}
+
+/* ══════════════════════ POPUP ══════════════════════ */
+#setup-popup{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:200;align-items:center;justify-content:center;padding:20px;}
+#setup-popup.open{display:flex;}
+.popup-card{background:#000;border:2px solid var(--dim2);width:100%;max-width:500px;animation:popIn .22s ease-out;box-shadow:0 0 40px rgba(255,255,255,0.06);display:flex;flex-direction:column;overflow:hidden;max-height:90vh;}
+.popup-header{background:var(--panel);border-bottom:2px solid var(--dim);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.popup-title{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--hi);letter-spacing:1px;}
+.popup-close{background:none;border:1px solid var(--dim2);font-size:16px;cursor:pointer;color:var(--lo);width:26px;height:26px;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.popup-close:hover{border-color:var(--mid);color:var(--mid);}
+.popup-body{padding:20px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;}
+.popup-body::-webkit-scrollbar{width:3px;}
+.popup-body::-webkit-scrollbar-thumb{background:var(--dim2);}
+.pop-label{font-family:'Press Start 2P',monospace;font-size:11px;color:var(--lo);letter-spacing:2px;margin-bottom:7px;}
+.nick-input{width:100%;padding:10px 12px;font-family:'DOSGothic','DungGeunMo',monospace;font-size:17px;font-weight:700;background:var(--panel);border:1px solid var(--dim2);color:var(--hi);outline:none;transition:border-color .2s;caret-color:var(--hi);}
+.nick-input::placeholder{color:var(--lo);}
+.nick-input:focus{border-color:var(--mid);}
+.char-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
+.char-btn{background:var(--panel);border:1px solid var(--dim);padding:5px 3px;cursor:pointer;text-align:center;transition:all .12s;position:relative;}
+.char-btn:hover{border-color:var(--mid);background:var(--panel2);}
+.char-btn.selected{border-color:var(--hi);background:var(--panel2);}
+.char-btn.selected::after{content:'▶';position:absolute;top:2px;right:3px;font-size:7px;color:var(--hi);animation:blink .5s step-end infinite;}
+.char-emoji{display:block;width:32px;height:32px;margin:0 auto 2px;}
+.char-name{font-size:11px;color:var(--mid);}
+.passage-list{display:flex;flex-direction:column;gap:3px;}
+.passage-btn{background:var(--panel);border:1px solid var(--dim);padding:8px 10px;cursor:pointer;text-align:left;transition:all .12s;position:relative;}
+.passage-btn:hover{border-color:var(--mid);background:var(--panel2);}
+.passage-btn.selected{border-color:var(--hi);background:var(--panel2);padding-left:18px;}
+.passage-btn.selected::before{content:'▶';position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:7px;color:var(--hi);animation:blink .5s step-end infinite;}
+.pb-title{font-size:14px;font-weight:700;color:var(--mid);}
+.pb-title.sel{color:var(--hi);}
+.pb-meta{font-size:12px;color:var(--lo);margin-top:2px;}
+.popup-footer{border-top:2px solid var(--dim);padding:14px 20px;flex-shrink:0;display:flex;gap:8px;}
+.pop-start-btn{flex:1;padding:12px;font-family:'Press Start 2P',monospace;font-size:14px;letter-spacing:2px;background:var(--hi);color:#000;border:none;cursor:pointer;transition:all .12s;}
+.pop-start-btn:hover{background:#ddd;}
+.pop-cancel-btn{padding:12px 16px;font-family:'Press Start 2P',monospace;font-size:14px;letter-spacing:1px;background:#000;color:var(--lo);border:1px solid var(--dim);cursor:pointer;transition:all .12s;}
+.pop-cancel-btn:hover{border-color:var(--mid);color:var(--mid);}
+
+/* ══════════════════════ STAGE 1 TRAINING ══════════════════════ */
+.training-main-area{flex:1;display:flex;flex-direction:column;padding:10px 16px 10px;overflow:hidden;}
+.training-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-shrink:0;}
+.gt-left{display:flex;align-items:center;gap:10px;}
+.gt-title{font-family:'Press Start 2P',monospace;font-size:16px;color:var(--hi);letter-spacing:1px;}
+.gt-sep{color:var(--dim);}
+.gt-sub{font-size:16px;color:var(--mid);}
+.gt-right{display:flex;gap:6px;}
+.gt-btn{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--mid);background:#000;border:1px solid var(--dim2);padding:7px 14px;cursor:pointer;letter-spacing:1px;transition:all .12s;}
+.gt-btn:hover{border-color:var(--mid);color:var(--mid);}
+
+/* 스테이지 배지 */
+.stage-indicator{display:flex;gap:8px;align-items:center;}
+.stage-pip{font-family:'Press Start 2P',monospace;font-size:10px;padding:5px 10px;border:1px solid var(--dim);color:var(--lo);letter-spacing:1px;}
+.stage-pip.active{border-color:var(--hi);color:var(--hi);background:rgba(255,255,255,0.05);}
+.stage-pip.done{border-color:var(--green);color:var(--green);}
+
+.timer-row{display:flex;justify-content:center;margin-bottom:8px;flex-shrink:0;}
+.timer-wrap{background:#000;border:2px solid var(--mid);padding:6px 24px;display:flex;align-items:center;gap:10px;}
+.timer-icon{font-size:24px;filter:grayscale(1);}
+.timer-val{font-family:'Press Start 2P',monospace;font-size:34px;color:var(--hi);letter-spacing:3px;}
+.timer-val.warn{color:var(--mid);}
+.timer-val.danger{color:var(--hi);animation:blink .4s step-end infinite;}
+
+.typing-box{flex:1;background:#000;border:2px solid var(--dim);display:flex;flex-direction:column;min-height:0;position:relative;cursor:text;}
+.status-bar{background:var(--panel);border-bottom:1px solid var(--dim);padding:5px 12px;display:flex;align-items:center;gap:14px;flex-shrink:0;}
+.stat-item{display:flex;align-items:center;gap:8px;font-size:15px;}
+.stat-lbl{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--mid);letter-spacing:1px;}
+.stat-bar-wrap{width:64px;height:4px;background:var(--dim);}
+.stat-bar{height:100%;transition:width .3s;background:var(--mid);}
+.stat-val{font-family:'Press Start 2P',monospace;font-size:16px;color:var(--hi);min-width:40px;}
+.stat-page{margin-left:auto;font-family:'Press Start 2P',monospace;font-size:13px;color:var(--mid);}
+.stat-score{font-family:'Press Start 2P',monospace;font-size:18px;color:var(--hi);}
+
+.lines-container{flex:1;overflow:hidden;padding:12px 18px;display:flex;flex-direction:column;gap:0;min-height:0;}
+.line-unit{flex-shrink:0;margin-bottom:2px;}
+.line-source{font-size:36px;font-weight:700;color:rgba(255,255,255,0.55);padding:3px 12px 2px;line-height:1.4;word-break:keep-all;}
+.line-source.done{color:rgba(255,255,255,0.18);font-size:30px;}
+.line-source.upcoming{color:rgba(255,255,255,0.12);font-size:30px;}
+.line-display{font-size:36px;padding:7px 12px;line-height:1.4;min-height:50px;word-break:keep-all;color:rgba(255,255,255,0.18);}
+.line-display.active-line{background:#0e1e0e;border-left:5px solid var(--green);box-shadow:inset 0 0 24px rgba(0,255,80,0.06);}
+.line-display.done-line{border-left:3px solid var(--dim);color:rgba(255,255,255,0.3);font-size:30px;}
+.active-line .ch-ok{color:var(--green);text-shadow:0 0 6px rgba(0,255,136,0.5);}
+.active-line .ch-err{color:var(--red);background:rgba(255,0,0,0.22);border-radius:2px;text-decoration:underline;text-decoration-color:var(--red);}
+.active-line .ch-cur{background:var(--green);color:#000;padding:0 3px;margin:0 1px;animation:curBlink .45s step-end infinite;font-weight:700;}
+.active-line .ch-pend{color:rgba(255,255,255,0.42);}
+.done-line .ch-ok{color:rgba(0,220,100,0.45);}
+.done-line .ch-err{color:rgba(255,60,60,0.4);text-decoration:line-through;}
+.done-line .ch-cur,.done-line .ch-pend{color:rgba(255,255,255,0.15);}
+.input-guide{display:flex;justify-content:space-between;align-items:center;padding:8px 18px;border-top:2px solid var(--dim2);background:var(--panel);font-family:'Press Start 2P',monospace;font-size:12px;color:var(--mid);letter-spacing:1px;flex-shrink:0;}
+.guide-key{background:#000;border:1px solid var(--mid);padding:2px 6px;font-family:'Press Start 2P',monospace;font-size:12px;color:var(--hi);margin:0 2px;}
+.hidden-input{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;z-index:10;cursor:text;resize:none;font-size:18px;background:transparent;border:none;outline:none;color:transparent;caret-color:transparent;}
+
+/* ══════════════════════ STAGE 2 GALAGA ══════════════════════ */
+.galaga-main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.galaga-hud{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:#000;border-bottom:2px solid var(--dim2);flex-shrink:0;height:48px;}
+.ghud-item{}
+.ghud-label{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--lo);letter-spacing:1px;}
+.ghud-val{font-family:'Press Start 2P',monospace;font-size:14px;color:var(--hi);margin-top:2px;}
+.ghud-lives{font-size:16px;letter-spacing:3px;margin-top:2px;}
+.ghud-badge{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);border:1px solid var(--dim);padding:4px 8px;}
+
+#game-area{flex:1;position:relative;overflow:hidden;cursor:none;}
+#galaga-input-bar{display:flex;align-items:center;gap:0;background:#000;border-top:2px solid var(--dim2);flex-shrink:0;height:52px;padding:0 16px;}
+#galaga-type-label{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);margin-right:12px;letter-spacing:1px;white-space:nowrap;}
+#galaga-input{flex:1;background:#000;border:none;border-bottom:2px solid var(--green);color:var(--green);font-family:'DOSGothic',monospace;font-size:22px;font-weight:700;padding:4px 8px;outline:none;caret-color:var(--green);}
+#galaga-input::placeholder{color:#222;}
+#galaga-enter-hint{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--dim2);margin-left:16px;white-space:nowrap;}
+
+.word-block{position:absolute;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:default;}
+.wb-emoji{font-size:24px;filter:grayscale(0.2);line-height:1;}
+.wb-text{font-family:'DOSGothic',monospace;font-size:14px;font-weight:700;color:rgba(255,255,255,0.9);background:#0a0a0a;border:1px solid #333;padding:2px 7px;white-space:nowrap;letter-spacing:1px;}
+.wb-text .match{color:var(--green);}
+.wb-text.targeted{border-color:var(--green);color:#fff;}
+.word-block.targeted .wb-emoji{filter:drop-shadow(0 0 4px rgba(0,255,136,0.6));}
+
+.explosion{position:absolute;pointer-events:none;z-index:50;animation:explode 0.5s steps(5) forwards;}
+.exp-inner{font-size:26px;text-align:center;}
+.laser{position:absolute;width:2px;background:linear-gradient(to top,var(--green),transparent);pointer-events:none;z-index:40;animation:laserFade 0.25s linear forwards;}
+
+#crosshair{position:absolute;width:20px;height:20px;pointer-events:none;z-index:30;}
+#crosshair::before,#crosshair::after{content:'';position:absolute;background:rgba(0,255,136,0.3);}
+#crosshair::before{width:2px;height:100%;left:50%;transform:translateX(-50%);}
+#crosshair::after{height:2px;width:100%;top:50%;transform:translateY(-50%);}
+
+#wave-announce{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:80;pointer-events:none;text-align:center;display:none;}
+.wa-text{font-family:'Press Start 2P',monospace;font-size:20px;color:#fff;letter-spacing:4px;animation:waPop 1.8s ease-out forwards;}
+#g-score-pop{position:absolute;pointer-events:none;z-index:60;font-family:'Press Start 2P',monospace;font-size:12px;color:var(--green);display:none;}
+#g-score-pop.anim{animation:scorePop 0.8s ease-out forwards;}
+
+/* ══════════════════════ STAGE CLEAR (stage1→stage2 전환) ══════════════════════ */
+#stage-clear-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:20px;}
+#stage-clear-overlay.open{display:flex;}
+.sc-title{font-family:'Press Start 2P',monospace;font-size:32px;color:var(--hi);letter-spacing:4px;text-align:center;line-height:1.6;animation:titleFlicker 3s infinite;}
+.sc-sub{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--mid);letter-spacing:3px;text-align:center;}
+.sc-score-row{display:flex;gap:40px;align-items:flex-end;justify-content:center;}
+.sc-score-box{text-align:center;}
+.sc-score-lbl{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:2px;display:block;margin-bottom:8px;}
+.sc-score-val{font-family:'Press Start 2P',monospace;font-size:28px;color:var(--hi);}
+.sc-score-val.stage1{color:var(--mid);}
+.sc-plus{font-family:'Press Start 2P',monospace;font-size:28px;color:var(--lo);align-self:center;}
+.sc-total-box{text-align:center;border:2px solid var(--hi);padding:16px 28px;}
+.sc-total-lbl{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--mid);letter-spacing:2px;display:block;margin-bottom:8px;}
+.sc-total-val{font-family:'Press Start 2P',monospace;font-size:36px;color:var(--hi);text-shadow:0 0 16px rgba(255,255,255,0.4);}
+.sc-btn{font-family:'Press Start 2P',monospace;font-size:16px;background:#000;color:var(--hi);border:3px solid var(--hi);padding:16px 48px;cursor:pointer;letter-spacing:2px;animation:startGlow 1.5s ease-in-out infinite;transition:all .12s;}
+.sc-btn:hover{background:var(--hi);color:#000;}
+
+/* ══════════════════════ FINAL RESULT ══════════════════════ */
+.result-main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#000;}
+.result-topbar{background:#000;height:48px;padding:0 24px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:2px solid var(--dim);}
+.result-topbar-title{font-family:'Press Start 2P',monospace;font-size:16px;color:var(--hi);letter-spacing:1px;}
+.result-content{flex:1;overflow:hidden;display:grid;grid-template-rows:auto auto 1fr auto auto;gap:0;padding:0;}
+.result-arcade-hd{text-align:center;padding:20px 0 16px;border-bottom:1px solid var(--dim);background:#000;}
+.rah-main{font-family:'Press Start 2P',monospace;font-size:36px;color:var(--hi);letter-spacing:6px;text-shadow:0 0 20px rgba(255,255,255,0.4);animation:titleFlicker 4s infinite;}
+.rah-sub{font-family:'DOSGothic','DungGeunMo',monospace;font-size:18px;color:var(--mid);letter-spacing:3px;margin-top:8px;}
+.result-user-row{display:flex;align-items:center;gap:20px;padding:16px 40px;border-bottom:1px solid var(--dim);background:var(--panel);flex-shrink:0;}
+.result-avatar{width:64px;height:64px;border:2px solid var(--dim2);background:#000;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:3px;overflow:hidden;}
+.result-name{font-family:'DOSGothic','DungGeunMo',monospace;font-size:24px;color:var(--hi);line-height:1.4;}
+.result-sub2{font-size:15px;color:var(--mid);margin-top:3px;}
+
+/* 점수 분리 표시 */
+.result-scores-combined{display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr;border-bottom:1px solid var(--dim);}
+.rs-box{background:var(--panel);border-right:1px solid var(--dim);padding:20px 16px;text-align:center;}
+.rs-box:last-child{border-right:none;}
+.rs-plus-box{display:flex;align-items:center;justify-content:center;background:#000;border-right:1px solid var(--dim);}
+.rs-plus-sym{font-family:'Press Start 2P',monospace;font-size:20px;color:var(--dim2);}
+.rs-val{font-family:'Press Start 2P',monospace;font-size:22px;color:var(--hi);display:block;}
+.rs-val.big{font-size:36px;text-shadow:0 0 20px rgba(255,255,255,0.45);animation:totalScorePulse 2s ease-in-out infinite;}
+.rs-val.stage-score{font-size:20px;color:var(--mid);}
+.rs-label{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);margin-top:8px;letter-spacing:1px;}
+.rs-sublabel{font-family:'DOSGothic',monospace;font-size:12px;color:var(--lo);margin-top:4px;}
+
+.result-stats-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-bottom:1px solid var(--dim);}
+.result-comment{padding:16px 40px;border-bottom:1px solid var(--dim);background:#000;}
+.result-comment strong{font-family:'DOSGothic','DungGeunMo',monospace;font-size:18px;color:var(--hi);display:block;margin-bottom:4px;}
+.result-comment span{font-family:'DOSGothic','DungGeunMo',monospace;font-size:13px;color:var(--lo);}
+.result-btns{display:grid;grid-template-columns:1fr 1fr;gap:0;flex-shrink:0;}
+.rb-retry{padding:20px;font-family:'Press Start 2P',monospace;font-size:16px;letter-spacing:3px;background:var(--hi);color:#000;border:none;cursor:pointer;transition:all .12s;border-right:2px solid #000;}
+.rb-retry:hover{background:#ddd;}
+.rb-home{padding:20px;font-family:'Press Start 2P',monospace;font-size:16px;letter-spacing:3px;background:#000;color:var(--hi);border:2px solid var(--hi);cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;}
+.rb-home:hover{background:var(--hi);color:#000;}
+
+#rank-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:300;align-items:center;justify-content:center;padding:20px;}
+#rank-overlay.open{display:flex;}
+.ov-card{background:#000;border:2px solid var(--dim2);padding:20px 24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;animation:popIn .2s ease-out;}
+.ov-card::-webkit-scrollbar{width:3px;}
+.ov-card::-webkit-scrollbar-thumb{background:var(--dim2);}
+.ov-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid var(--dim);padding-bottom:8px;}
+.ov-head-title{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--hi);letter-spacing:2px;}
+.ov-close{background:none;border:1px solid var(--dim);font-size:16px;cursor:pointer;color:var(--lo);width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.ov-close:hover{border-color:var(--mid);color:var(--mid);}
+.ov-rank-row{display:grid;grid-template-columns:22px 18px 1fr 56px 44px 34px;align-items:center;gap:3px;padding:7px 3px;border-bottom:1px solid var(--dim);font-size:13px;}
+.ov-rank-row.rh{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--lo);letter-spacing:1px;border-bottom:2px solid var(--dim2);}
+
+#particles{position:fixed;inset:0;pointer-events:none;z-index:500;overflow:hidden;}
+.pt{position:absolute;animation:ptFall linear forwards;}
+</style>
+</head>
+<body>
+<span style="position:fixed;top:-999px;left:-999px;font-family:'DOSGothic',monospace;font-size:1px;opacity:0;">산업안전보건법타이핑도장</span>
+<div id="particles"></div>
+
+<!-- ══════════════ INTRO ══════════════ -->
+<div id="intro-screen" class="screen active">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sb-current">
+        <div class="sb-cur-label">▶ 현재 사용자</div>
+        <div class="sb-cur-user">
+          <div class="sb-cur-avatar" id="sb-avatar-intro">⛑️</div>
+          <div>
+            <div class="sb-cur-name" id="sb-name-intro">- - -</div>
+            <div class="sb-cur-char" id="sb-char-intro">캐릭터 미선택</div>
+          </div>
+        </div>
+        <div class="sb-cur-stage"><span class="sb-cur-stage-lbl">단계</span><span id="sb-stage-intro">미선택</span></div>
+      </div>
+      <div class="sb-score-area">
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1</span><span class="sb-score-val" id="sb-s1-intro">—</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2</span><span class="sb-score-val green" id="sb-s2-intro">—</span></div>
+        <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-intro">—</span></div>
+      </div>
+      <div class="sb-ranking">
+        <div class="sb-rank-header">🏆 BEST RECORDS</div>
+        <div class="rank-scroll">
+          <div class="rank-row rh"><span>NO</span><span></span><span>이름</span><span style="text-align:right;">점수</span><span style="text-align:right;">WPM</span></div>
+          <div id="rank-list-body"><div class="rank-loading">불러오는 중...</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="main-area">
+      <div class="intro-main">
+        <div class="im-title-section">
+          <div class="im-title-left">
+            <div class="im-deco-stars">★ ★ ★ STAGE 1+2 COMBINED ★ ★ ★</div>
+            <div class="im-title">천하제일 산업안전보건법 타이핑 대회</div>
+            <div class="im-sub">SAFETY LAW TYPING + GALAGA TRAINING</div>
+          </div>
+          <div class="im-title-right">
+            <div class="im-top1-wrap">
+              <div class="im-top1-trophy-svg">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%">
+                  <rect x="3" y="1" width="10" height="2" fill="#FFD700"/><rect x="2" y="3" width="12" height="5" fill="#FFD700"/>
+                  <rect x="3" y="8" width="10" height="2" fill="#FFA500"/><rect x="1" y="3" width="2" height="3" fill="#FFA500"/>
+                  <rect x="13" y="3" width="2" height="3" fill="#FFA500"/><rect x="5" y="10" width="6" height="2" fill="#888"/>
+                  <rect x="4" y="12" width="8" height="2" fill="#888"/><rect x="6" y="5" width="4" height="1" fill="#fff" opacity="0.4"/>
+                </svg>
+              </div>
+              <div class="im-top1-body">
+                <div class="im-top1-label">▶ BEST RECORD NO.1</div>
+                <div class="im-top1-name" id="top1-name">- - - - -</div>
+              </div>
+              <div class="im-top1-score-wrap">
+                <div class="im-top1-score" id="top1-score">---</div>
+                <span class="im-점">점 (합산)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="im-body">
+          <div class="im-start-section">
+            <div class="challenge-msg" id="challenge-msg"><em>도전하시겠어요?</em></div>
+            <div class="challenge-sub">STAGE 1 + STAGE 2 합산 랭킹</div>
+            <button class="start-action-btn" onclick="openSetupPopup()">
+              <svg class="start-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;">
+                <rect x="4" y="1" width="8" height="1" fill="#FFD700"/><rect x="2" y="2" width="12" height="1" fill="#FFD700"/>
+                <rect x="1" y="3" width="14" height="10" fill="#FFD700"/><rect x="2" y="13" width="12" height="1" fill="#FFD700"/>
+                <rect x="4" y="14" width="8" height="1" fill="#FFD700"/><rect x="6" y="4" width="4" height="1" fill="#fff" opacity="0.5"/>
+                <rect x="7" y="5" width="2" height="6" fill="#E6A800"/><rect x="6" y="6" width="4" height="3" fill="#E6A800"/>
+              </svg>
+              ▶ 훈련 시작
+            </button>
+            <div class="im-stats"><span>참가자 <strong id="ic-total">--</strong></span><span>TOP <strong id="ic-top">--</strong></span><span>AVG <strong id="ic-avg">--</strong></span></div>
+          </div>
+          <div class="im-demo">
+            <div class="im-demo-header"><span class="im-demo-title">▶ STAGE 1 예시</span><span class="im-demo-timer" id="demo-timer">00:30</span></div>
+            <div class="im-demo-statusbar">
+              <div class="im-demo-stat"><span class="im-demo-stat-lbl">ACC</span><div class="im-demo-bar"><div class="im-demo-bar-fill" id="demo-bar-acc" style="width:0%"></div></div><span class="im-demo-val" id="demo-acc">—</span></div>
+              <div class="im-demo-stat"><span class="im-demo-stat-lbl">WPM</span><div class="im-demo-bar"><div class="im-demo-bar-fill" id="demo-bar-wpm" style="width:0%"></div></div><span class="im-demo-val" id="demo-wpm">—</span></div>
+              <div class="im-demo-stat"><span class="im-demo-stat-lbl">점수</span><span class="im-demo-score" id="demo-score">—</span></div>
+              <span class="im-demo-pg" id="demo-pg">— / —</span>
+            </div>
+            <div class="im-demo-lines" id="demo-lines"></div>
+            <div class="im-demo-guide"><span>Stage 1 → Stage 2 자동 진행</span><span>TAB / ENTER → 다음 줄</span></div>
+          </div>
+          <div class="im-ranking">
+            <div class="im-rank-title"><span class="im-rank-title-deco">★</span> BEST RECORDS — TOP 20 <span class="im-rank-title-deco">★</span></div>
+            <div class="im-rank-table">
+              <div class="im-rank-head"><span>NO</span><span></span><span>사용자</span><span>단계</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span><span style="text-align:right;">ACC</span></div>
+              <div class="im-rank-body" id="im-rank-body"><div class="im-rank-loading">불러오는 중...</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ STAGE 1 TRAINING ══════════════ -->
+<div id="training-screen" class="screen">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sb-current">
+        <div class="sb-cur-label">▶ 사용자</div>
+        <div class="sb-cur-user">
+          <div class="sb-cur-avatar" id="sb-avatar-training">⛑️</div>
+          <div><div class="sb-cur-name" id="sb-name-training">사용자</div><div class="sb-cur-char" id="sb-char-training"></div></div>
+        </div>
+        <div class="sb-cur-stage"><span class="sb-cur-stage-lbl">단계</span><span id="sb-stage-training">—</span></div>
+      </div>
+      <div class="sb-score-area">
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1 (진행중)</span><span class="sb-score-val" id="sb-s1-training">0</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2</span><span class="sb-score-val green" id="sb-s2-training">—</span></div>
+        <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-training">0</span></div>
+      </div>
+      <div class="sb-ranking">
+        <div class="sb-rank-header">🏆 BEST RECORDS</div>
+        <div class="rank-scroll">
+          <div class="rank-row rh"><span>NO</span><span></span><span>이름</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span></div>
+          <div id="rank-list-body-training"><div class="rank-loading">불러오는 중...</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="main-area">
+      <div class="training-main-area">
+        <div class="training-topbar">
+          <div class="gt-left">
+            <span class="gt-title">STAGE 1</span>
+            <span class="gt-sep">|</span>
+            <span class="gt-sub" id="gt-sub">산업안전보건법</span>
+          </div>
+          <div class="stage-indicator">
+            <div class="stage-pip active" id="pip-s1">S1 타이핑</div>
+            <div class="stage-pip" id="pip-s2">S2 갤러그</div>
+          </div>
+          <div class="gt-right">
+            <button class="gt-btn" onclick="goIntro()">◀ 이전</button>
+            <button class="gt-btn" onclick="showRankOverlay()">🏆 기록</button>
+          </div>
+        </div>
+        <div class="timer-row">
+          <div class="timer-wrap"><span class="timer-icon">⏱️</span><span class="timer-val" id="timer-val">01:00</span></div>
+        </div>
+        <div class="typing-box" onclick="focusInput()">
+          <textarea class="hidden-input" id="hidden-input" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+          <div class="status-bar">
+            <div class="stat-item"><span class="stat-lbl">ACC</span><div class="stat-bar-wrap"><div class="stat-bar" id="bar-acc" style="width:100%"></div></div><span class="stat-val" id="stat-acc">100%</span></div>
+            <div class="stat-item"><span class="stat-lbl">WPM</span><div class="stat-bar-wrap"><div class="stat-bar" id="bar-wpm" style="width:0%"></div></div><span class="stat-val" id="stat-wpm">0</span></div>
+            <div class="stat-item"><span class="stat-lbl">점수</span><span class="stat-score" id="stat-score">0</span></div>
+            <span class="stat-page" id="stat-page">1 / ?</span>
+          </div>
+          <div class="lines-container" id="lines-container"></div>
+          <div class="input-guide"><span>▶ STAGE 1 TYPING</span><span><kbd class="guide-key">TAB</kbd><kbd class="guide-key">ENTER</kbd> NEXT</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ STAGE 2 GALAGA ══════════════ -->
+<div id="galaga-screen" class="screen">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sb-current">
+        <div class="sb-cur-label">▶ 사용자</div>
+        <div class="sb-cur-user">
+          <div class="sb-cur-avatar" id="sb-avatar-galaga">⛑️</div>
+          <div><div class="sb-cur-name" id="sb-name-galaga">사용자</div><div class="sb-cur-char" id="sb-char-galaga"></div></div>
+        </div>
+        <div class="sb-cur-stage"><span class="sb-cur-stage-lbl">단계</span><span id="sb-stage-galaga">GALAGA</span></div>
+      </div>
+      <div class="sb-score-area">
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1 ✓</span><span class="sb-score-val" id="sb-s1-galaga">0</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2 (진행중)</span><span class="sb-score-val green" id="sb-s2-galaga">0</span></div>
+        <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-galaga">0</span></div>
+      </div>
+      <div class="sb-ranking">
+        <div class="sb-rank-header">🏆 BEST RECORDS</div>
+        <div class="rank-scroll">
+          <div class="rank-row rh"><span>NO</span><span></span><span>이름</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span></div>
+          <div id="rank-list-body-galaga"><div class="rank-loading">불러오는 중...</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="main-area">
+      <div class="galaga-main-area">
+        <div class="galaga-hud">
+          <div class="ghud-item"><div class="ghud-label">SCORE</div><div class="ghud-val" id="ghud-score">0</div></div>
+          <div class="ghud-item" style="text-align:center;"><div class="ghud-label">LIVES</div><div class="ghud-lives" id="ghud-lives">❤️❤️❤️</div></div>
+          <div class="ghud-item"><div class="ghud-label">COMBO</div><div class="ghud-val" id="ghud-combo">x1</div></div>
+          <div class="ghud-badge">STAGE 2 — GALAGA</div>
+          <div class="ghud-item" style="text-align:center;"><div class="ghud-label">WAVE</div><div class="ghud-val" id="ghud-wave">1</div></div>
+          <div class="ghud-item" style="text-align:right;"><div class="ghud-label">REMAIN</div><div class="ghud-val" id="ghud-remain">—</div></div>
+        </div>
+        <div id="game-area">
+          <div id="crosshair"></div>
+          <div id="wave-announce"><div class="wa-text" id="wa-text"></div></div>
+          <div id="g-score-pop"></div>
+        </div>
+        <div id="galaga-input-bar">
+          <span id="galaga-type-label">▶ TYPING</span>
+          <input id="galaga-input" type="text" placeholder="안전용어를 타이핑하세요..." autocomplete="off" autocorrect="off" spellcheck="false">
+          <span id="galaga-enter-hint">ENTER / SPACE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ FINAL RESULT ══════════════ -->
+<div id="result-screen" class="screen">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sb-current">
+        <div class="sb-cur-label">▶ 최종 결과</div>
+        <div class="sb-cur-user">
+          <div class="sb-cur-avatar" id="sb-avatar-result">⛑️</div>
+          <div><div class="sb-cur-name" id="sb-name-result">사용자</div><div class="sb-cur-char" id="sb-char-result"></div></div>
+        </div>
+        <div class="sb-cur-stage"><span class="sb-cur-stage-lbl">단계</span><span id="sb-stage-result">완료</span></div>
+      </div>
+      <div class="sb-score-area">
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 1</span><span class="sb-score-val" id="sb-s1-result">0</span></div>
+        <div class="sb-score-row"><span class="sb-score-lbl">STAGE 2</span><span class="sb-score-val green" id="sb-s2-result">0</span></div>
+        <div class="sb-total-row"><span class="sb-total-lbl">TOTAL</span><span class="sb-total-val" id="sb-total-result">0</span></div>
+      </div>
+      <div class="sb-ranking">
+        <div class="sb-rank-header">🏆 BEST RECORDS</div>
+        <div class="rank-scroll">
+          <div class="rank-row rh"><span>NO</span><span></span><span>이름</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span></div>
+          <div id="rank-list-body-result"><div class="rank-loading">불러오는 중...</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="main-area">
+      <div class="result-main-area">
+        <div class="result-topbar"><span style="font-size:18px;">🏆</span><span class="result-topbar-title">훈련 완료 — 최종 결과</span></div>
+        <div class="result-content">
+          <div class="result-arcade-hd">
+            <div class="rah-main">훈련 완료</div>
+            <div class="rah-sub">천하제일 산업안전보건법 타이핑 대회 — STAGE 1+2 합산</div>
+          </div>
+          <div class="result-user-row">
+            <div class="result-avatar" id="res-avatar">⛑️</div>
+            <div><div class="result-name" id="res-name">사용자</div><div class="result-sub2" id="res-sub2">—</div></div>
+          </div>
+          <!-- 점수 합산 표시 -->
+          <div class="result-scores-combined">
+            <div class="rs-box">
+              <span class="rs-val stage-score" id="res-s1-score">0</span>
+              <div class="rs-label">STAGE 1</div>
+              <div class="rs-sublabel">타이핑 점수</div>
+            </div>
+            <div class="rs-plus-box"><span class="rs-plus-sym">+</span></div>
+            <div class="rs-box">
+              <span class="rs-val stage-score" id="res-s2-score">0</span>
+              <div class="rs-label">STAGE 2</div>
+              <div class="rs-sublabel">갤러그 점수</div>
+            </div>
+            <div class="rs-plus-box"><span class="rs-plus-sym">=</span></div>
+            <div class="rs-box" style="background:#0a1a0a;border:1px solid var(--green);">
+              <span class="rs-val big" id="res-total-score">0</span>
+              <div class="rs-label" style="color:var(--green);">TOTAL 합산</div>
+              <div class="rs-sublabel" id="res-rank-pos">—</div>
+            </div>
+          </div>
+          <div class="result-stats-row">
+            <div class="rs-box"><span class="rs-val" id="res-wpm">0</span><div class="rs-label">WPM</div></div>
+            <div class="rs-box"><span class="rs-val" id="res-acc">0%</span><div class="rs-label">ACCURACY</div></div>
+            <div class="rs-box"><span class="rs-val" id="res-chars">0</span><div class="rs-label">CHARS</div></div>
+            <div class="rs-box"><span class="rs-val" id="res-kills">0</span><div class="rs-label">KILLS (S2)</div></div>
+          </div>
+          <div class="result-comment"><strong id="res-comment"></strong><span id="res-formula"></span></div>
+          <div class="result-btns">
+            <button class="rb-retry" onclick="openSetupPopup()">▶ 다시 훈련</button>
+            <button class="rb-home" onclick="goIntro()">🏠 처음으로</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stage Clear 오버레이 -->
+<div id="stage-clear-overlay">
+  <div class="sc-title">STAGE 1 CLEAR!</div>
+  <div class="sc-sub">이제 STAGE 2 갤러그로 진행합니다</div>
+  <div class="sc-score-row">
+    <div class="sc-score-box">
+      <span class="sc-score-lbl">STAGE 1 점수</span>
+      <span class="sc-score-val stage1" id="sc-s1-val">0</span>
+    </div>
+    <span class="sc-plus">+</span>
+    <div class="sc-score-box">
+      <span class="sc-score-lbl">STAGE 2 점수</span>
+      <span class="sc-score-val" style="color:var(--lo);">???</span>
+    </div>
+    <span class="sc-plus">=</span>
+    <div class="sc-total-box">
+      <span class="sc-total-lbl">TOTAL SCORE</span>
+      <span class="sc-total-val" id="sc-total-val">?</span>
+    </div>
+  </div>
+  <button class="sc-btn" onclick="startGalaga()">▶ STAGE 2 시작</button>
+</div>
+
+<!-- 설정 팝업 -->
+<div id="setup-popup">
+  <div class="popup-card">
+    <div class="popup-header"><div class="popup-title">▶ 도전하시겠어요?</div><button class="popup-close" onclick="closeSetupPopup()">✕</button></div>
+    <div class="popup-body">
+      <div><div class="pop-label">사용자 이름</div><input class="nick-input" id="nick-input" type="text" placeholder="닉네임을 입력하세요..." maxlength="12"></div>
+      <div><div class="pop-label">CHARACTER</div><div class="char-grid" id="char-grid"></div></div>
+      <div><div class="pop-label">SELECT 단계 (STAGE 1)</div><div class="passage-list" id="passage-list"></div></div>
+    </div>
+    <div class="popup-footer">
+      <button class="pop-start-btn" onclick="startTraining()">▶ STAGE 1 시작</button>
+      <button class="pop-cancel-btn" onclick="closeSetupPopup()">취소</button>
+    </div>
+  </div>
+</div>
+
+<!-- 랭킹 오버레이 -->
+<div id="rank-overlay">
+  <div class="ov-card">
+    <div class="ov-head"><div class="ov-head-title">BEST RECORDS (합산)</div><button class="ov-close" onclick="hideRankOverlay()">✕</button></div>
+    <div id="ov-loading" style="padding:18px;text-align:center;font-family:'Press Start 2P',monospace;font-size:12px;color:var(--lo);animation:blink 1s step-end infinite;">불러오는 중...</div>
+    <div id="ov-rank-list" style="display:none;">
+      <div class="ov-rank-row rh"><span>NO</span><span></span><span>이름</span><span>단계</span><span style="text-align:right;">합산</span><span style="text-align:right;">WPM</span></div>
+      <div id="ov-rank-body"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const GAS_URL='https://script.google.com/macros/s/AKfycbwry3taI8EQxe6eMl5iCp16CwNJPQkfjHomCif75afQvrswOkzNTn8rEj2QUdY6Yn9B/exec';
+const APP_CACHE_VERSION='20260518_01';
+const GAS_TIMEOUT_MS=8000;
+
+/* ─── 캐릭터 ─── */
+const DOT_CHARS=[
+  {name:'안전모',svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="5" y="1" width="6" height="1" fill="#FFD700"/><rect x="3" y="2" width="10" height="1" fill="#FFD700"/><rect x="2" y="3" width="12" height="2" fill="#FFD700"/><rect x="3" y="4" width="10" height="1" fill="#FFA500"/><rect x="4" y="5" width="8" height="4" fill="#FDDBB4"/><rect x="4" y="6" width="1" height="1" fill="#333"/><rect x="11" y="6" width="1" height="1" fill="#333"/><rect x="5" y="8" width="6" height="1" fill="#C47A50"/><rect x="4" y="9" width="8" height="3" fill="#4A90D9"/><rect x="3" y="11" width="10" height="2" fill="#4A90D9"/></svg>`},
+  {name:'안전조끼',svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="5" y="1" width="6" height="4" fill="#FDDBB4"/><rect x="4" y="2" width="1" height="2" fill="#FDDBB4"/><rect x="11" y="2" width="1" height="2" fill="#FDDBB4"/><rect x="4" y="5" width="1" height="7" fill="#FF6B00"/><rect x="5" y="5" width="2" height="7" fill="#FF6B00"/><rect x="9" y="5" width="2" height="7" fill="#FF6B00"/><rect x="11" y="5" width="1" height="7" fill="#FF6B00"/><rect x="7" y="5" width="2" height="9" fill="#FF6B00"/><rect x="5" y="6" width="6" height="1" fill="#FFD700"/><rect x="5" y="9" width="6" height="1" fill="#FFD700"/></svg>`},
+  {name:'현장반장',svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="4" y="1" width="8" height="2" fill="#FF8C00"/><rect x="3" y="2" width="10" height="1" fill="#FF8C00"/><rect x="4" y="3" width="8" height="3" fill="#FDDBB4"/><rect x="4" y="4" width="1" height="1" fill="#333"/><rect x="10" y="4" width="1" height="1" fill="#333"/><rect x="5" y="6" width="5" height="1" fill="#C47A50"/><rect x="3" y="7" width="10" height="5" fill="#4A5568"/><rect x="4" y="8" width="8" height="1" fill="#777"/><rect x="4" y="10" width="8" height="1" fill="#777"/></svg>`},
+  {name:'소방관',svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="5" y="0" width="6" height="2" fill="#CC0000"/><rect x="4" y="2" width="8" height="1" fill="#CC0000"/><rect x="3" y="3" width="10" height="1" fill="#CC0000"/><rect x="4" y="4" width="8" height="3" fill="#FDDBB4"/><rect x="4" y="5" width="1" height="1" fill="#333"/><rect x="11" y="5" width="1" height="1" fill="#333"/><rect x="3" y="7" width="10" height="5" fill="#CC0000"/><rect x="4" y="9" width="8" height="1" fill="#FFD700"/><rect x="4" y="11" width="8" height="1" fill="#FFD700"/></svg>`},
+  {name:'보건관리자',svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="5" y="1" width="6" height="4" fill="#FDDBB4"/><rect x="5" y="2" width="1" height="1" fill="#333"/><rect x="10" y="2" width="1" height="1" fill="#333"/><rect x="6" y="4" width="4" height="1" fill="#C47A50"/><rect x="3" y="5" width="10" height="6" fill="#fff"/><rect x="3" y="5" width="2" height="6" fill="#4299E1"/><rect x="11" y="5" width="2" height="6" fill="#4299E1"/><rect x="6" y="7" width="4" height="1" fill="#E53E3E"/><rect x="7" y="6" width="2" height="3" fill="#E53E3E"/></svg>`},
+  {name:'정비사',svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="5" y="1" width="6" height="4" fill="#FDDBB4"/><rect x="4" y="2" width="1" height="2" fill="#FDDBB4"/><rect x="11" y="2" width="1" height="2" fill="#FDDBB4"/><rect x="4" y="5" width="8" height="6" fill="#718096"/><rect x="6" y="6" width="4" height="3" fill="#4A5568"/><rect x="11" y="8" width="3" height="1" fill="#E2E8F0"/><rect x="12" y="7" width="1" height="3" fill="#E2E8F0"/></svg>`},
+  {name:'안전점검',svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="4" y="0" width="8" height="14" fill="#D4EDDA"/><rect x="5" y="2" width="6" height="1" fill="#2D6A4F"/><rect x="5" y="4" width="6" height="1" fill="#2D6A4F"/><rect x="5" y="6" width="6" height="1" fill="#2D6A4F"/><rect x="5" y="8" width="4" height="1" fill="#2D6A4F"/><rect x="8" y="10" width="1" height="3" fill="#27AE60"/><rect x="9" y="11" width="1" height="2" fill="#27AE60"/><rect x="10" y="9" width="1" height="4" fill="#27AE60"/></svg>`},
+  {name:'소화담당',svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="6" y="0" width="4" height="1" fill="#888"/><rect x="5" y="1" width="6" height="11" fill="#CC2222"/><rect x="4" y="3" width="8" height="7" fill="#CC2222"/><rect x="5" y="2" width="6" height="1" fill="#aaa"/><rect x="6" y="11" width="4" height="1" fill="#888"/><rect x="5" y="12" width="6" height="2" fill="#666"/><rect x="6" y="4" width="4" height="4" fill="#FF4444"/><rect x="7" y="5" width="2" height="2" fill="#fff"/></svg>`},
+  {name:'작업반장',svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="5" y="1" width="6" height="4" fill="#FDDBB4"/><rect x="5" y="2" width="1" height="1" fill="#333"/><rect x="10" y="2" width="1" height="1" fill="#333"/><rect x="6" y="4" width="4" height="1" fill="#C47A50"/><rect x="3" y="5" width="10" height="6" fill="#2D5A27"/><rect x="4" y="6" width="8" height="1" fill="#4A8A40"/><rect x="4" y="8" width="8" height="1" fill="#4A8A40"/><rect x="4" y="10" width="8" height="1" fill="#4A8A40"/><rect x="6" y="0" width="4" height="1" fill="#8B6347"/></svg>`},
+  {name:'전기안전',svg:`<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;width:100%;height:100%"><rect x="5" y="1" width="6" height="4" fill="#FDDBB4"/><rect x="5" y="2" width="1" height="1" fill="#333"/><rect x="10" y="2" width="1" height="1" fill="#333"/><rect x="6" y="4" width="4" height="1" fill="#C47A50"/><rect x="3" y="0" width="10" height="2" fill="#FFD700"/><rect x="2" y="1" width="12" height="1" fill="#FFD700"/><rect x="3" y="5" width="10" height="6" fill="#1A1A4E"/><rect x="7" y="5" width="2" height="7" fill="#FFD700"/><rect x="5" y="7" width="6" height="1" fill="#FFD700"/></svg>`}
+];
+const CHARS=DOT_CHARS.map(d=>({emoji:d.svg,name:d.name,svg:d.svg}));
+
+/* ─── STAGE 1 지문 ─── */
+const PASSAGES=[
+  {id:'p1',title:'제1조, 제2조 목적 및 정의',ref:'제1조, 제2조',lines:['제1조(목적) 이 법은 산업 안전 및 보건에 관한 기준을','확립하고 그 책임의 소재를 명확하게 하여 산업재해를','예방하고 쾌적한 작업환경을 조성함으로써 노무를 제공하는','사람의 안전 및 보건을 유지, 증진함을 목적으로 한다.','제2조(정의) "산업재해"란 노무를 제공하는 사람이 업무에','관계되는 건설물, 설비, 원재료, 가스, 증기, 분진 등에','의하거나 작업 또는 그 밖의 업무로 인하여 사망 또는','부상하거나 질병에 걸리는 것을 말한다.','"중대재해"란 산업재해 중 사망 등 재해 정도가 심하거나','다수의 재해자가 발생한 경우로서 고용노동부령으로 정하는 재해를 말한다.']},
+  {id:'p2',title:'제5조, 제6조 사업주, 근로자 의무',ref:'제5조, 제6조',lines:['제5조(사업주 등의 의무) 사업주는 다음 각 호의 사항을','이행함으로써 근로자의 안전 및 보건을 유지, 증진시켜야 한다.','1. 이 법과 이 법에 따른 명령으로 정하는','산업재해 예방을 위한 기준을 지킬 것','2. 근로자의 신체적 피로와 정신적 스트레스 등을 줄일 수 있는','쾌적한 작업환경을 조성하고 근로조건을 개선할 것','3. 해당 사업장의 안전 및 보건에 관한 정보를 근로자에게 제공할 것','제6조(근로자의 의무) 근로자는 이 법과 이 법에 따른','명령으로 정하는 산업재해 예방을 위한 기준을 지켜야 하며,','관계인이 실시하는 산업재해 예방에 관한 조치에 따라야 한다.']},
+  {id:'p3',title:'제16조, 제17조 관리감독자, 안전관리자',ref:'제16조, 제17조',lines:['제16조(관리감독자) 사업주는 사업장의 생산과 관련되는','업무와 그 소속 직원을 직접 지휘, 감독하는 직위에 있는','사람(이하 "관리감독자"라 한다)에게 산업 안전 및 보건에','관한 업무로서 대통령령으로 정하는 업무를 수행하도록','하여야 한다.','제17조(안전관리자) 사업주는 사업장에 안전에 관한','기술적인 사항에 관하여 사업주 또는 안전보건관리책임자를','보좌하고 관리감독자에게 지도, 조언하는 업무를 수행하는','사람(이하 "안전관리자"라 한다)을 두어야 한다.']},
+  {id:'p4',title:'제36조, 제38조 위험성평가, 안전조치',ref:'제36조, 제38조',lines:['제36조(위험성평가의 실시) 사업주는 건설물, 기계, 기구, 설비,','원재료, 가스, 증기, 분진, 근로자의 작업행동 또는 그 밖의','업무로 인한 유해, 위험 요인을 찾아내어 부상 및 질병으로','이어질 수 있는 위험성의 크기가 허용 가능한 수준인지를','결정하고 그 위험성을 줄이기 위한 조치를 하여야 한다.','제38조(안전조치) 사업주는 기계, 기구, 그 밖의 설비에 의한','위험, 폭발성, 발화성 및 인화성 물질 등에 의한 위험,','전기, 열, 그 밖의 에너지에 의한 위험으로 인한 산업재해를','예방하기 위하여 필요한 조치를 하여야 한다.']},
+  {id:'p5',title:'제51조~제54조 작업중지, 중대재해',ref:'제51조~제54조',lines:['제51조(사업주의 작업중지) 사업주는 산업재해가 발생할','급박한 위험이 있을 때에는 즉시 작업을 중지시키고','근로자를 작업장소에서 대피시키는 등 안전 및 보건에','관하여 필요한 조치를 하여야 한다.','제52조(근로자의 작업중지) 근로자는 산업재해가 발생할','급박한 위험이 있는 경우에는 작업을 중지하고 대피할 수 있다.','제54조(중대재해 발생 시 사업주의 조치) 사업주는 중대재해가','발생하였을 때에는 즉시 해당 작업을 중지시키고 근로자를','작업장소에서 대피시키는 등 필요한 조치를 하여야 하며,','지체 없이 고용노동부장관에게 보고하여야 한다.']},
+  {id:'p6',title:'제63조, 제167조 도급인 의무, 벌칙',ref:'제63조, 제167조',lines:['제63조(도급인의 안전조치 및 보건조치) 도급인은 관계수급인','근로자가 도급인의 사업장에서 작업을 하는 경우에 자신의','근로자와 관계수급인 근로자의 산업재해를 예방하기 위하여','안전 및 보건 시설의 설치 등 필요한 안전조치 및','보건조치를 하여야 한다. 다만, 보호구 착용의 지시 등','관계수급인 근로자의 작업행동에 관한 직접적인 조치는 제외한다.','제167조(벌칙) 제38조, 제39조, 제63조를 위반하여 근로자를','사망에 이르게 한 자는 7년 이하의 징역 또는','1억원 이하의 벌금에 처한다.']}
+];
+
+/* ─── STAGE 2 단어풀 ─── */
+const GALAGA_WORDS=[
+  {t:'굴삭기',cat:'중장비'},
+  {t:'호흡용보호구',cat:'보호구'},
+  {t:'안전모',cat:'보호구'},
+  {t:'추락방지',cat:'안전조치'},
+  {t:'위험성평가',cat:'법령'},
+  {t:'중대재해',cat:'법령'},
+  {t:'안전관리자',cat:'직책'},
+  {t:'보건조치',cat:'법령'},
+  {t:'작업중지',cat:'법령'},
+  {t:'관리감독자',cat:'직책'},
+  {t:'방호장치',cat:'설비'},
+  {t:'산업재해',cat:'법령'},
+  {t:'안전난간',cat:'설비'},
+  {t:'차량계기계',cat:'중장비'},
+  {t:'지게차',cat:'중장비'},
+  {t:'이동식비계',cat:'설비'},
+  {t:'안전조끼',cat:'보호구'},
+  {t:'전기안전',cat:'안전조치'},
+  {t:'도급인',cat:'법령'},
+  {t:'폭발위험',cat:'위험'},
+  {t:'보호구착용',cat:'보호구'},
+  {t:'밀폐공간',cat:'위험'},
+  {t:'질식위험',cat:'위험'},
+  {t:'화학물질',cat:'위험'},
+  {t:'작업발판',cat:'설비'},
+  {t:'안전벨트',cat:'보호구'},
+  {t:'TBM',cat:'안전조치'},
+  {t:'JSA',cat:'안전조치'},
+  {t:'PSM',cat:'법령'},
+  {t:'안전점검',cat:'안전조치'},
+  {t:'소화기',cat:'설비'},
+  {t:'화재예방',cat:'안전조치'},
+  {t:'크레인',cat:'중장비'},
+  {t:'와이어로프',cat:'설비'},
+  {t:'추락사고',cat:'위험'},
+  {t:'끼임사고',cat:'위험'},
+  {t:'낙하물',cat:'위험'},
+  {t:'절연장갑',cat:'보호구'},
+  {t:'안전작업',cat:'안전조치'},
+  {t:'보건관리자',cat:'직책'},
+  {t:'아차사고',cat:'안전조치'},
+  {t:'비상대피',cat:'안전조치'},
+  {t:'작업허가',cat:'안전조치'},
+  {t:'산소농도',cat:'위험'},
+  {t:'유해가스',cat:'위험'},
+  {t:'가스측정',cat:'설비'},
+  {t:'국소배기',cat:'설비'},
+  {t:'보호안경',cat:'보호구'},
+  {t:'귀마개',cat:'보호구'},
+  {t:'방진마스크',cat:'보호구'},
+  {t:'방독마스크',cat:'보호구'},
+  {t:'안전화',cat:'보호구'},
+  {t:'안전대',cat:'보호구'},
+  {t:'얼굴보호구',cat:'보호구'},
+  {t:'송기마스크',cat:'보호구'},
+  {t:'안전보건표지',cat:'안전조치'},
+  {t:'비상샤워',cat:'설비'},
+  {t:'세안설비',cat:'설비'},
+  {t:'잠금장치',cat:'설비'},
+  {t:'꼬리표부착',cat:'안전조치'},
+  {t:'LOTO',cat:'안전조치'},
+  {t:'정전작업',cat:'안전조치'},
+  {t:'활선작업',cat:'위험'},
+  {t:'감전위험',cat:'위험'},
+  {t:'접지설비',cat:'설비'},
+  {t:'누전차단기',cat:'설비'},
+  {t:'과부하',cat:'위험'},
+  {t:'화기작업',cat:'위험'},
+  {t:'용접작업',cat:'위험'},
+  {t:'불티비산',cat:'위험'},
+  {t:'가연성물질',cat:'위험'},
+  {t:'인화성액체',cat:'위험'},
+  {t:'고압가스',cat:'위험'},
+  {t:'산소결핍',cat:'위험'},
+  {t:'특별교육',cat:'법령'},
+  {t:'정기교육',cat:'법령'},
+  {t:'신규교육',cat:'법령'},
+  {t:'채용시교육',cat:'법령'},
+  {t:'안전보건관리책임자',cat:'직책'},
+  {t:'산업보건의',cat:'직책'},
+  {t:'명예산업안전감독관',cat:'직책'},
+  {t:'안전보건총괄책임자',cat:'직책'},
+  {t:'유해위험방지계획서',cat:'법령'},
+  {t:'공정안전보고서',cat:'법령'},
+  {t:'MSDS',cat:'법령'},
+  {t:'물질안전보건자료',cat:'법령'},
+  {t:'경고표지',cat:'안전조치'},
+  {t:'작업환경측정',cat:'법령'},
+  {t:'특수건강진단',cat:'법령'},
+  {t:'근골격계부담작업',cat:'위험'},
+  {t:'소음노출',cat:'위험'},
+  {t:'분진노출',cat:'위험'},
+  {t:'열사병',cat:'위험'},
+  {t:'한랭질환',cat:'위험'},
+  {t:'중량물취급',cat:'위험'},
+  {t:'사다리작업',cat:'위험'},
+  {t:'고소작업',cat:'위험'},
+  {t:'개구부방호',cat:'설비'},
+  {t:'안전블록',cat:'설비'},
+  {t:'비계해체',cat:'위험'}
+];
+const CAT_EMOJIS={'중장비':'🚜','보호구':'⛑️','법령':'📋','직책':'👷','설비':'🔧','안전조치':'✅','위험':'⚠️'};
+const WAVE_CONFIG=[
+  {count:4, speed:0.55,spawnInterval:2200,maxOnScreen:3},
+  {count:6, speed:0.82,spawnInterval:1800,maxOnScreen:4},
+  {count:8, speed:1.13,spawnInterval:1500,maxOnScreen:5},
+  {count:10,speed:1.40,spawnInterval:1200,maxOnScreen:6},
+  {count:12,speed:1.72,spawnInterval:1000,maxOnScreen:7}
+];
+
+/* ─── 샘플 랭킹 ─── */
+const SAMPLE=[
+  {nickname:'안전왕',char:'안전모',wpm:180,acc:96,score:1037,stage2:480,total:1037,passage:'제1조, 제2조'},
+  {nickname:'현장달인',char:'현장반장',wpm:155,acc:94,score:875,stage2:390,total:875,passage:'제36조, 제38조'},
+  {nickname:'보건마스터',char:'보건관리자',wpm:142,acc:91,score:776,stage2:320,total:776,passage:'제51조~제54조'},
+  {nickname:'소방영웅',char:'소방관',wpm:130,acc:88,score:687,stage2:250,total:687,passage:'제63조, 제167조'},
+  {nickname:'안전조끼맨',char:'안전조끼',wpm:118,acc:85,score:603,stage2:190,total:603,passage:'제5조, 제6조'}
+];
+
+/* ─── 전역 상태 ─── */
+let selChar=0,selPassage=0,nickname='';
+let stage1Score=0,stage1Wpm=0,stage1Acc=0,stage1Chars=0;
+let stage2Score=0,stage2Kills=0;
+
+/* ─── STAGE 1 상태 ─── */
+let s1Lines=[],s1CurLine=0,s1LineTyped='';
+let s1CorrectChars=0,s1TotalTyped=0,s1StartTime=null,s1TimerIv=null;
+let s1TimeLeft=60,s1Ended=false;
+const TIME_LIMIT=60;
+
+/* ─── STAGE 2 상태 ─── */
+let g_words=[],g_gameActive=false,g_spawnTimer=null,g_rafId=null;
+let g_targetWord=null,g_typed='';
+let g_wordPool=[],g_waveTarget=0;
+let g_score=0,g_lives=3,g_combo=1,g_wave=1,g_waveKills=0;
+let g_lastTime=0;
+
+/* ─── 데모 ─── */
+let demoTimerIv=null,demoTypeIv=null,demoCurLine=0,demoCurChar=0,demoTimeLeft=30;
+let demoWpm=0,demoAcc=100,demoCorrect=0,demoTotal=0;
+
+/* ─── 유틸 ─── */
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function escChar(ch){return ch===' '?'&nbsp;':esc(ch);}
+function nvl(v,f=''){return v===undefined||v===null||v===''?f:v;}
+function num(v,f=0){const n=Number(v);return Number.isFinite(n)?n:f;}
+function safeCharSvg(charName){const k=String(charName||'').trim();const f=DOT_CHARS.find(d=>d&&d.name===k);return(f||DOT_CHARS[0]).svg;}
+function shortPassage(p){if(!p)return'—';const m=p.match(/^((?:제\d+조(?:~|,\s*)?)+)/);if(m)return m[1].replace(/[,~]\s*$/,'');return p.substring(0,12);}
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.random()*i|0;[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
+
+function normalizeRankRows(payload){
+  let rows=payload;
+  if(payload&&!Array.isArray(payload)){rows=payload.data||payload.rows||payload.list||payload.rank||payload.ranking||payload.result||[];}
+  if(!Array.isArray(rows))rows=[];
+  return rows.map(r=>({
+    nickname:String(nvl(r.nickname,nvl(r.name,nvl(r.user,'사용자')))).trim().slice(0,20),
+    char:String(nvl(r.char,nvl(r.charName,nvl(r.character,'안전모')))).trim(),
+    wpm:num(nvl(r.wpm,r.WPM),0),
+    acc:num(nvl(r.acc,nvl(r.accuracy,r.ACC)),0),
+    score:num(nvl(r.score,r.점수),0),
+    stage2:num(nvl(r.stage2,r.stage2Score),0),
+    total:num(nvl(r.total,nvl(r.totalScore,0)),0),
+    passage:String(nvl(r.passage,nvl(r.stage,nvl(r.title,'')))).trim()
+  }))
+  .filter(r=>r.nickname&&(Number.isFinite(r.total)||Number.isFinite(r.score)))
+  .map(r=>{if(!r.total)r.total=r.score+r.stage2;return r;})
+  .sort((a,b)=>b.total-a.total||b.wpm-a.wpm);
+}
+
+function buildQuery(params){return Object.entries(params).filter(([,v])=>v!==undefined&&v!==null).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(String(v))).join('&');}
+function requestGas(action,params={},onSuccess=()=>{},onFail=()=>{}){
+  if(!GAS_URL||GAS_URL.includes('YOUR_GAS')){onFail(new Error('GAS_URL 미설정'));return;}
+  /* file:// 환경에서는 외부 스크립트 차단 → 즉시 폴백 */
+  if(location.protocol==='file:'){setTimeout(()=>onFail(new Error('file:// 환경')),0);return;}
+  /* file:// 프로토콜에서는 외부 스크립트 로드 차단 → 즉시 샘플 폴백 */
+  if(location.protocol==='file:'){onFail(new Error('file:// 환경 — GAS 사용 불가, 샘플 데이터로 대체'));return;}
+  const cbName='gas_cb_'+action+'_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+  let done=false;let scriptEl=null;
+  const cleanup=()=>{try{delete window[cbName];}catch(e){window[cbName]=undefined;}if(scriptEl&&scriptEl.parentNode)scriptEl.parentNode.removeChild(scriptEl);};
+  const timer=setTimeout(()=>{if(done)return;done=true;cleanup();onFail(new Error('GAS 시간 초과'));},GAS_TIMEOUT_MS);
+  window[cbName]=payload=>{if(done)return;done=true;clearTimeout(timer);cleanup();onSuccess(payload);};
+  const now=Date.now();
+  const qs=buildQuery({action,callback:cbName,...params,_t:now,_ts:now,_nocache:now+'_'+Math.random().toString(36).slice(2)});
+  scriptEl=document.createElement('script');
+  scriptEl.src=GAS_URL+(GAS_URL.includes('?')?'&':'?')+qs;
+  scriptEl.onerror=()=>{if(done)return;done=true;clearTimeout(timer);cleanup();onFail(new Error('GAS 로드 실패'));};
+  document.head.appendChild(scriptEl);
+}
+
+function loadRankingAll(){
+  requestGas('rank',{},payload=>{
+    const rows=normalizeRankRows(payload);const viewRows=rows.length?rows:SAMPLE;
+    ['rank-list-body','rank-list-body-training','rank-list-body-galaga','rank-list-body-result'].forEach(id=>renderSidebarRanking(viewRows,null,id));
+    renderMainRanking(viewRows);updateTop1(viewRows);
+  },()=>{
+    ['rank-list-body','rank-list-body-training','rank-list-body-galaga','rank-list-body-result'].forEach(id=>renderSidebarRanking(SAMPLE,null,id));
+    renderMainRanking(SAMPLE);updateTop1(SAMPLE);
+  });
+}
+
+function setEl(id,prop,val){const e=document.getElementById(id);if(e)e[prop]=val;}
+function updateTop1(rows){
+  if(!rows.length){
+    setEl('top1-name','textContent','기록 없음');
+    setEl('top1-score','textContent','0');
+    setEl('challenge-msg','innerHTML','<em>도전하시겠어요?</em>');
+    setEl('ic-total','textContent','0');
+    setEl('ic-top','textContent','0');
+    setEl('ic-avg','textContent','0');
+    return;
+  }
+  const top=rows[0];
+  setEl('top1-name','textContent',top.nickname);
+  setEl('top1-score','textContent',top.total||top.score);
+  setEl('challenge-msg','innerHTML','<em>도전하시겠어요?</em>');
+  setEl('ic-total','textContent',rows.length);
+  setEl('ic-top','textContent',Math.max(...rows.map(r=>num(r.total,0))));
+  setEl('ic-avg','textContent',Math.round(rows.reduce((s,r)=>s+num(r.wpm,0),0)/rows.length));
+}
+
+function renderSidebarRanking(data,myNick,bodyId){
+  const body=document.getElementById(bodyId);if(!body)return;
+  const rows=normalizeRankRows(data);
+  if(!rows.length){body.innerHTML='<div class="rank-loading">기록 없음</div>';return;}
+  body.innerHTML='';const medals=['🥇','🥈','🥉'];
+  rows.slice(0,20).forEach((r,i)=>{
+    const row=document.createElement('div');row.className='rank-row'+(r.nickname===myNick?' mine':'');
+    const nc=i<3?`rr-no n${i+1}`:'rr-no';const cSvg=safeCharSvg(r.char);
+    row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="rr-ch" style="width:18px;height:18px;display:inline-block;">${cSvg}</span><span class="rr-nick${i===0?' top':''}">${esc(r.nickname)}</span><span class="rr-sc">${r.total||r.score}</span><span class="rr-wpm">${esc(r.wpm)}</span>`;
+    body.appendChild(row);
+  });
+}
+
+function renderMainRanking(data){
+  const body=document.getElementById('im-rank-body');if(!body)return;
+  const rows=normalizeRankRows(data);
+  if(!rows.length){body.innerHTML='<div class="im-rank-loading">기록 없음</div>';return;}
+  body.innerHTML='';const medals=['🥇','🥈','🥉'];
+  rows.slice(0,20).forEach((r,i)=>{
+    const row=document.createElement('div');row.className='im-rank-row'+(r.nickname===nickname?' mine':'');
+    const nc=i<3?`im-rr-no n${i+1}`:'im-rr-no';const cSvg=safeCharSvg(r.char);
+    row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="im-rr-ch" style="width:22px;height:22px;display:inline-block;">${cSvg}</span><span class="im-rr-nick${i===0?' top':''}">${esc(r.nickname)}</span><span class="im-rr-stage">${esc(shortPassage(r.passage))}</span><span class="im-rr-sc">${r.total||r.score}</span><span class="im-rr-wpm">${esc(r.wpm)}</span><span class="im-rr-acc">${r.acc?esc(r.acc):'—'}%</span>`;
+    body.appendChild(row);
+  });
+}
+
+/* ─── 화면 전환 ─── */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';});
+  const el=document.getElementById(id);el.style.display='flex';el.classList.add('active');
+}
+function goIntro(){
+  clearInterval(s1TimerIv);clearInterval(demoTimerIv);clearInterval(demoTypeIv);
+  clearTimeout(g_stageLimitTimer);
+  if(g_rafId)cancelAnimationFrame(g_rafId);clearTimeout(g_spawnTimer);
+  g_gameActive=false;g_words.forEach(w=>w.el.remove());g_words=[];
+  showScreen('intro-screen');loadRankingAll();startDemo();
+}
+
+/* ─── SETUP POPUP ─── */
+function openSetupPopup(){document.getElementById('setup-popup').classList.add('open');setTimeout(()=>document.getElementById('nick-input').focus(),100);}
+function closeSetupPopup(){document.getElementById('setup-popup').classList.remove('open');}
+
+function buildCharGrid(){
+  const g=document.getElementById('char-grid');g.innerHTML='';
+  CHARS.forEach((c,i)=>{
+    const b=document.createElement('button');b.className='char-btn'+(i===selChar?' selected':'');
+    b.innerHTML=`<span class="char-emoji">${c.svg}</span><span class="char-name">${esc(c.name)}</span>`;
+    b.onclick=()=>{document.querySelectorAll('.char-btn').forEach(e=>e.classList.remove('selected'));b.classList.add('selected');selChar=i;updateSidebarSummary();};
+    g.appendChild(b);
+  });
+}
+
+function buildPassageList(){
+  const g=document.getElementById('passage-list');g.innerHTML='';
+  PASSAGES.forEach((p,i)=>{
+    const b=document.createElement('button');b.className='passage-btn'+(i===selPassage?' selected':'');
+    b.innerHTML=`<div class="pb-title${i===selPassage?' sel':''}">${esc(p.title)}</div><div class="pb-meta">${esc(p.lines.join('').length)}자</div>`;
+    b.onclick=()=>{document.querySelectorAll('.passage-btn').forEach(e=>{e.classList.remove('selected');const t=e.querySelector('.pb-title');if(t)t.classList.remove('sel');});b.classList.add('selected');const t=b.querySelector('.pb-title');if(t)t.classList.add('sel');selPassage=i;updateSidebarSummary();};
+    g.appendChild(b);
+  });
+  updateSidebarSummary();
+}
+
+function updateSidebarSummary(){
+  const nick=document.getElementById('nick-input').value.trim()||'- - -';
+  const char=CHARS[selChar];const stage=PASSAGES[selPassage];
+  ['intro','training','galaga','result'].forEach(sc=>{
+    const av=document.getElementById(`sb-avatar-${sc}`);const nm=document.getElementById(`sb-name-${sc}`);
+    const ch=document.getElementById(`sb-char-${sc}`);const st=document.getElementById(`sb-stage-${sc}`);
+    if(av)av.innerHTML=char.svg;if(nm)nm.textContent=nick;if(ch)ch.textContent=char.name;
+    if(st&&sc!=='galaga')st.textContent=stage.title;
+  });
+}
+document.addEventListener('input',e=>{if(e.target.id==='nick-input')updateSidebarSummary();});
+
+function updateScoreSidebar(){
+  const s1=stage1Score,s2=stage2Score,total=s1+s2;
+  ['intro','training','galaga','result'].forEach(sc=>{
+    const e1=document.getElementById(`sb-s1-${sc}`);
+    const e2=document.getElementById(`sb-s2-${sc}`);
+    const et=document.getElementById(`sb-total-${sc}`);
+    if(e1)e1.textContent=s1||'—';
+    if(e2)e2.textContent=s2||'—';
+    if(et)et.textContent=(s1||s2)?total:'—';
+  });
+}
+
+/* ─── 데모 ─── */
+function startDemo(){
+  const passage=PASSAGES[0];demoCurLine=0;demoCurChar=0;demoTimeLeft=30;
+  demoWpm=0;demoAcc=100;demoCorrect=0;demoTotal=0;
+  renderDemoLines(passage);clearInterval(demoTimerIv);clearInterval(demoTypeIv);
+  demoTimerIv=setInterval(()=>{demoTimeLeft--;const s=String(demoTimeLeft%60).padStart(2,'0');const m=String(Math.floor(demoTimeLeft/60)).padStart(2,'0');const el=document.getElementById('demo-timer');if(el)el.textContent=`${m}:${s}`;if(demoTimeLeft<=0){clearInterval(demoTimerIv);clearInterval(demoTypeIv);setTimeout(startDemo,2000);}},1000);
+  let demoStart=Date.now();
+  demoTypeIv=setInterval(()=>{
+    const passage=PASSAGES[0];
+    if(demoCurLine>=passage.lines.length){clearInterval(demoTypeIv);setTimeout(startDemo,2000);return;}
+    const line=passage.lines[demoCurLine];
+    if(demoCurChar<line.length){
+      const correct=Math.random()>0.05;demoCorrect+=(correct?1:0);demoTotal++;
+      const el=document.getElementById('demo-disp-'+demoCurLine);if(el){const typed=line.substring(0,demoCurChar+1);renderDemoLine(el,typed,line);}
+      demoCurChar++;
+      const elapsed=(Date.now()-demoStart)/60000;demoWpm=elapsed>0?Math.round((demoCorrect/2)/elapsed):0;demoAcc=demoTotal>0?Math.round((demoCorrect/demoTotal)*100):100;
+      const score=Math.round(demoWpm*(demoAcc/100));
+      const acc=document.getElementById('demo-acc');const wpm=document.getElementById('demo-wpm');const sc=document.getElementById('demo-score');const barA=document.getElementById('demo-bar-acc');const barW=document.getElementById('demo-bar-wpm');const pg=document.getElementById('demo-pg');
+      if(acc)acc.textContent=demoAcc+'%';if(wpm)wpm.textContent=demoWpm;if(sc)sc.textContent=score;if(barA)barA.style.width=Math.min(100,demoAcc)+'%';if(barW)barW.style.width=Math.min(100,demoWpm/2.5)+'%';if(pg)pg.textContent=`${demoCurLine+1}/${passage.lines.length}`;
+    } else {demoCurLine++;demoCurChar=0;renderDemoLines(passage);}
+  },55);
+}
+
+function renderDemoLines(passage){
+  const container=document.getElementById('demo-lines');if(!container)return;container.innerHTML='';
+  const start=Math.max(0,demoCurLine-1);const end=Math.min(passage.lines.length-1,demoCurLine+2);
+  for(let i=start;i<=end;i++){
+    const unit=document.createElement('div');unit.className='im-demo-unit';
+    const src=document.createElement('div');src.className='im-demo-src'+(i===demoCurLine?' cur':' dim');src.textContent=passage.lines[i];
+    const disp=document.createElement('div');
+    if(i<demoCurLine){disp.className='im-demo-disp done-d';disp.innerHTML=`<span class="demo-ch-ok">${passage.lines[i]}</span>`;}
+    else if(i===demoCurLine){disp.className='im-demo-disp active';disp.id='demo-disp-'+i;renderDemoLine(disp,'',passage.lines[i]);}
+    else{disp.className='im-demo-disp pending';disp.textContent=passage.lines[i];}
+    unit.appendChild(src);unit.appendChild(disp);container.appendChild(unit);
+  }
+}
+function renderDemoLine(el,typed,target){
+  let h='';
+  for(let i=0;i<target.length;i++){
+    const ch=target[i]===' '?'&nbsp;':target[i];
+    if(i<typed.length){const ok=typed[i]===target[i];h+=ok?`<span class="demo-ch-ok">${ch}</span>`:`<span class="demo-ch-err">${ch}</span>`;}
+    else if(i===typed.length){h+=`<span class="demo-ch-cur">${ch}</span>`;}
+    else{h+=`<span class="demo-ch-pend">${ch}</span>`;}
+  }
+  el.innerHTML=h;
+}
+
+/* ═══════════════════════════════════
+   STAGE 1 — 타이핑 훈련
+═══════════════════════════════════ */
+function startTraining(){
+  clearInterval(demoTimerIv);clearInterval(demoTypeIv);
+  clearTimeout(g_stageLimitTimer);clearTimeout(g_spawnTimer);
+  if(g_rafId)cancelAnimationFrame(g_rafId);
+  g_gameActive=false;g_words.forEach(w=>w.el&&w.el.remove());g_words=[];
+  nickname=document.getElementById('nick-input').value.trim()||'사용자';
+  updateSidebarSummary();closeSetupPopup();
+  stage1Score=0;stage1Wpm=0;stage1Acc=0;stage1Chars=0;stage2Score=0;stage2Kills=0;
+  updateScoreSidebar();
+  const passage=PASSAGES[selPassage];
+  s1Lines=[...passage.lines];s1CurLine=0;s1LineTyped='';s1CorrectChars=0;s1TotalTyped=0;
+  s1StartTime=null;s1TimeLeft=TIME_LIMIT;s1Ended=false;
+  document.getElementById('gt-sub').textContent=passage.title;
+  document.getElementById('pip-s1').className='stage-pip active';
+  document.getElementById('pip-s2').className='stage-pip';
+  buildS1Lines();showScreen('training-screen');clearInterval(s1TimerIv);updateTimerDisplay();
+  const inp=document.getElementById('hidden-input');
+  inp.value='';inp.disabled=false;inp.oninput=s1OnInput;inp.onkeydown=s1OnKeyDown;
+  setTimeout(()=>inp.focus(),100);
+}
+
+function buildS1Lines(){
+  const c=document.getElementById('lines-container');c.innerHTML='';
+  const start=Math.max(0,s1CurLine-1),end=Math.min(s1Lines.length-1,s1CurLine+3);
+  for(let i=start;i<=end;i++){
+    const unit=document.createElement('div');unit.className='line-unit';
+    const src=document.createElement('div');src.className='line-source '+(i<s1CurLine?'done':i>s1CurLine?'upcoming':'');src.textContent=s1Lines[i];
+    const disp=document.createElement('div');disp.className='line-display '+(i<s1CurLine?'done-line':i===s1CurLine?'active-line':'');disp.id=`ld-${i}`;
+    if(i<s1CurLine)disp.innerHTML=`<span style="color:rgba(255,255,255,0.35);">✓ ${s1Lines[i]}</span>`;
+    else if(i===s1CurLine)renderActiveLine(disp,s1LineTyped,s1Lines[i]);
+    else disp.innerHTML=`<span style="color:rgba(255,255,255,0.1);">${s1Lines[i]}</span>`;
+    unit.appendChild(src);unit.appendChild(disp);c.appendChild(unit);
+  }
+  document.getElementById('stat-page').textContent=`${s1CurLine+1} / ${s1Lines.length}`;
+}
+
+function renderActiveLine(el,typed,target){
+  let h='';
+  for(let i=0;i<target.length;i++){
+    const tch=escChar(target[i]);
+    if(i<typed.length){const ok=typed[i]===target[i];const uch=escChar(typed[i]);h+=ok?`<span class="ch-ok">${tch}</span>`:`<span class="ch-err" title="${tch}">${uch}</span>`;}
+    else if(i===typed.length){h+=`<span class="ch-cur">${tch}</span>`;}
+    else{h+=`<span class="ch-pend">${tch}</span>`;}
+  }
+  if(typed.length>target.length){for(let i=target.length;i<typed.length;i++){h+=`<span class="ch-err">${escChar(typed[i])}</span>`;}}
+  el.innerHTML=h;
+}
+
+function s1OnInput(){
+  if(s1Ended)return;
+  const val=document.getElementById('hidden-input').value;
+  if(!s1StartTime&&val.length>0){s1StartTime=Date.now();s1TimerIv=setInterval(s1Tick,1000);}
+  s1LineTyped=val;const d=document.getElementById(`ld-${s1CurLine}`);if(d)renderActiveLine(d,s1LineTyped,s1Lines[s1CurLine]);
+  s1UpdateStats();
+}
+function s1OnKeyDown(e){if(s1Ended)return;if(e.key==='Tab'||e.key==='Enter'){e.preventDefault();s1AdvanceLine();}}
+function s1AdvanceLine(){
+  const target=s1Lines[s1CurLine];let ok=0;
+  for(let i=0;i<Math.min(s1LineTyped.length,target.length);i++)if(s1LineTyped[i]===target[i])ok++;
+  s1CorrectChars+=ok;s1TotalTyped+=s1LineTyped.length;s1CurLine++;s1LineTyped='';document.getElementById('hidden-input').value='';
+  if(s1CurLine>=s1Lines.length){s1FinishTraining();return;}
+  buildS1Lines();s1UpdateStats();
+}
+function s1UpdateStats(){
+  if(!s1StartTime)return;
+  const el=(Date.now()-s1StartTime)/60000;
+  let tmpOk=s1CorrectChars;const target=s1Lines[s1CurLine]||'';
+  for(let i=0;i<Math.min(s1LineTyped.length,target.length);i++)if(s1LineTyped[i]===target[i])tmpOk++;
+  const tmpTyped=s1TotalTyped+s1LineTyped.length;
+  const wpm=el>0?Math.round((tmpOk/2)/el):0;const acc=tmpTyped>0?Math.round((tmpOk/tmpTyped)*100):100;const score=Math.round(wpm*(acc/100)*6);
+  document.getElementById('stat-wpm').textContent=wpm;document.getElementById('stat-acc').textContent=acc+'%';document.getElementById('stat-score').textContent=score;
+  document.getElementById('bar-acc').style.width=Math.min(100,acc)+'%';document.getElementById('bar-wpm').style.width=Math.min(100,wpm/2.5)+'%';
+  document.getElementById('sb-s1-training').textContent=score;document.getElementById('sb-total-training').textContent=score;
+}
+function s1Tick(){s1TimeLeft--;updateTimerDisplay();if(s1TimeLeft<=0)s1FinishTraining();}
+function updateTimerDisplay(){
+  const s=String(s1TimeLeft%60).padStart(2,'0'),m=String(Math.floor(s1TimeLeft/60)).padStart(2,'0');
+  const el=document.getElementById('timer-val');el.textContent=`${m}:${s}`;
+  if(s1TimeLeft<=10)el.className='timer-val danger';else if(s1TimeLeft<=20)el.className='timer-val warn';else el.className='timer-val';
+}
+
+function s1FinishTraining(){
+  if(s1Ended)return;s1Ended=true;clearInterval(s1TimerIv);
+  document.getElementById('hidden-input').disabled=true;
+  let finalCorrect=s1CorrectChars;let finalTyped=s1TotalTyped;
+  if(s1CurLine<s1Lines.length&&s1LineTyped){const target=s1Lines[s1CurLine]||'';for(let i=0;i<Math.min(s1LineTyped.length,target.length);i++){if(s1LineTyped[i]===target[i])finalCorrect++;}finalTyped+=s1LineTyped.length;}
+  const elapsed=s1StartTime?(Date.now()-s1StartTime)/60000:TIME_LIMIT/60;
+  stage1Wpm=elapsed>0?Math.round((finalCorrect/2)/elapsed):0;
+  stage1Acc=finalTyped>0?Math.round((finalCorrect/finalTyped)*100):0;
+  stage1Score=Math.round(stage1Wpm*(stage1Acc/100)*6);
+  stage1Chars=finalCorrect;
+  updateScoreSidebar();
+  showStageClear();
+}
+
+/* ─── Stage Clear 오버레이 ─── */
+function showStageClear(){
+  document.getElementById('sc-s1-val').textContent=stage1Score;
+  document.getElementById('sc-total-val').textContent=stage1Score+' + ???';
+  document.getElementById('stage-clear-overlay').classList.add('open');
+}
+function hideStageClear(){document.getElementById('stage-clear-overlay').classList.remove('open');}
+
+/* ═══════════════════════════════════
+   STAGE 2 — GALAGA
+═══════════════════════════════════ */
+function startGalaga(){
+  hideStageClear();
+  clearTimeout(g_stageLimitTimer);clearTimeout(g_spawnTimer);
+  if(g_rafId)cancelAnimationFrame(g_rafId);
+  g_score=0;g_lives=3;g_combo=1;g_wave=1;g_waveKills=0;stage2Score=0;stage2Kills=0;
+  g_words=[];g_targetWord=null;g_typed='';
+  g_wordPool=shuffle([...GALAGA_WORDS]);
+  const cfg=getWaveCfg();g_waveTarget=cfg.count;
+  updateGalagaHUD();
+  document.getElementById('pip-s1').className='stage-pip done';
+  document.getElementById('pip-s2').className='stage-pip active';
+  document.getElementById('sb-s1-galaga').textContent=stage1Score;
+  showScreen('galaga-screen');
+  const inp=document.getElementById('galaga-input');inp.value='';inp.focus();
+  startGalagaTimer();
+  announceWave(g_wave,()=>{g_gameActive=true;scheduleGSpawn();g_lastTime=performance.now();g_rafId=requestAnimationFrame(gLoop);});
+}
+
+function getWaveCfg(){return WAVE_CONFIG[Math.min(g_wave-1,WAVE_CONFIG.length-1)];}
+
+function announceWave(w,cb){
+  const el=document.getElementById('wave-announce');const txt=document.getElementById('wa-text');
+  txt.textContent=`WAVE ${w}`;el.style.display='block';txt.style.animation='none';void txt.offsetWidth;txt.style.animation='waPop 1.8s ease-out forwards';
+  setTimeout(()=>{el.style.display='none';if(cb)cb();},1800);
+}
+
+function scheduleGSpawn(){
+  if(!g_gameActive)return;
+  const cfg=getWaveCfg();
+  g_spawnTimer=setTimeout(()=>{
+    if(g_gameActive&&g_words.length<cfg.maxOnScreen&&g_waveKills<g_waveTarget)gSpawnWord();
+    scheduleGSpawn();
+  },cfg.spawnInterval+(Math.random()-0.5)*800);
+}
+
+function gSpawnWord(){
+  if(g_wordPool.length===0)g_wordPool=shuffle([...GALAGA_WORDS]);
+  const data=g_wordPool.pop();
+  const existing=g_words.map(w=>w.data.t);if(existing.includes(data.t))return;
+  const areaW=document.getElementById('game-area').clientWidth;
+  const x=40+Math.random()*(areaW-180);
+  const cfg=getWaveCfg();const speed=cfg.speed*(0.8+Math.random()*0.4);
+  const el=document.createElement('div');el.className='word-block';
+  el.innerHTML=`<div class="wb-emoji">${CAT_EMOJIS[data.cat]||'📌'}</div><div class="wb-text">${data.t}</div>`;
+  el.style.left=x+'px';el.style.top='-60px';
+  document.getElementById('game-area').appendChild(el);
+  g_words.push({el,data,x,y:-60,speed,id:Date.now()+Math.random()});
+}
+
+function gLoop(ts){
+  if(!g_gameActive)return;
+  const dt=ts-g_lastTime;g_lastTime=ts;
+  const areaH=document.getElementById('game-area').clientHeight;
+  for(let i=g_words.length-1;i>=0;i--){
+    const w=g_words[i];w.y+=w.speed*(dt/16);w.el.style.top=w.y+'px';
+    if(w.y>areaH-20){w.el.remove();g_words.splice(i,1);gLoseLife(w.x+40,areaH-30);if(g_targetWord===w)g_targetWord=null;}
+  }
+  gUpdateMatchHighlight();
+  g_rafId=requestAnimationFrame(gLoop);
+}
+
+function gUpdateMatchHighlight(){
+  const t=g_typed.toLowerCase();
+  g_words.forEach(w=>{
+    const txt=w.el.querySelector('.wb-text');const isT=w===g_targetWord;
+    if(!t){txt.className='wb-text';txt.textContent=w.data.t;w.el.classList.remove('targeted');return;}
+    if(w.data.t.toLowerCase().startsWith(t)){txt.className='wb-text targeted';const matched=w.data.t.substring(0,t.length);const rest=w.data.t.substring(t.length);txt.innerHTML=`<span class="match">${matched}</span>${rest}`;w.el.classList.add('targeted');}
+    else{txt.className='wb-text';txt.textContent=w.data.t;w.el.classList.remove('targeted');}
+  });
+}
+
+function gFindBestMatch(t){
+  if(!t)return null;const tl=t.toLowerCase();let best=null,bestY=-Infinity;
+  g_words.forEach(w=>{if(w.data.t.toLowerCase().startsWith(tl)&&w.y>bestY){bestY=w.y;best=w;}});
+  return best;
+}
+
+function gFireAt(w){
+  if(!w)return;
+  const wRect=w.el.getBoundingClientRect();const aRect=document.getElementById('game-area').getBoundingClientRect();
+  const tx=wRect.left-aRect.left+wRect.width/2;const ty=wRect.top-aRect.top+wRect.height/2;
+  const laser=document.createElement('div');laser.className='laser';
+  const areaH=document.getElementById('game-area').clientHeight;
+  laser.style.left=tx+'px';laser.style.top=ty+'px';laser.style.height=(areaH-ty)+'px';
+  document.getElementById('game-area').appendChild(laser);setTimeout(()=>laser.remove(),300);
+  gMoveCrosshair(tx,ty);gExplodeWord(w,tx,ty);
+}
+
+function gMoveCrosshair(x,y){const c=document.getElementById('crosshair');c.style.left=(x-10)+'px';c.style.top=(y-10)+'px';}
+
+function gExplodeWord(w,tx,ty){
+  const exp=document.createElement('div');exp.className='explosion';exp.style.left=(tx-22)+'px';exp.style.top=(ty-22)+'px';
+  const emojis=['💥','✨','⚡','🔥'];exp.innerHTML=`<div class="exp-inner">${emojis[Math.floor(Math.random()*emojis.length)]}</div>`;
+  document.getElementById('game-area').appendChild(exp);setTimeout(()=>exp.remove(),500);
+  const pts=50*g_combo;g_score+=pts;g_waveKills++;stage2Score=g_score;stage2Kills++;
+  gShowScorePop(tx,ty,'+'+pts+(g_combo>1?` x${g_combo}`:''));
+  g_combo=Math.min(g_combo+1,6);
+  w.el.remove();const idx=g_words.indexOf(w);if(idx>-1)g_words.splice(idx,1);if(g_targetWord===w)g_targetWord=null;
+  updateScoreSidebar();gCheckWaveComplete();updateGalagaHUD();
+}
+
+function gShowScorePop(x,y,txt){
+  const el=document.getElementById('g-score-pop');
+  el.textContent=txt;el.style.left=x+'px';el.style.top=(y-20)+'px';el.style.display='block';
+  el.className='';void el.offsetWidth;el.className='anim';
+}
+
+function gCheckWaveComplete(){
+  const cfg=getWaveCfg();
+  if(g_waveKills>=cfg.count&&g_words.length===0){
+    clearTimeout(g_spawnTimer);g_gameActive=false;
+    setTimeout(()=>{
+      g_wave++;g_waveKills=0;g_gameActive=true;updateGalagaHUD();
+      g_wordPool=shuffle([...GALAGA_WORDS]);const nextCfg=getWaveCfg();g_waveTarget=nextCfg.count;
+      announceWave(g_wave,()=>{scheduleGSpawn();g_lastTime=performance.now();g_rafId=requestAnimationFrame(gLoop);});
+    },1200);
+  }
+}
+
+function gLoseLife(x,y){
+  g_lives--;g_combo=1;
+  const exp=document.createElement('div');exp.className='explosion';exp.style.left=(x-22)+'px';exp.style.top=(y-22)+'px';
+  exp.innerHTML=`<div class="exp-inner" style="font-size:32px;">💀</div>`;
+  document.getElementById('game-area').appendChild(exp);setTimeout(()=>exp.remove(),600);
+  updateGalagaHUD();if(g_lives<=0)gGameOver();
+}
+
+function gGameOver(){
+  g_gameActive=false;clearTimeout(g_stageLimitTimer);clearTimeout(g_spawnTimer);cancelAnimationFrame(g_rafId);
+  g_words.forEach(w=>w.el.remove());g_words=[];
+  stage2Score=g_score;updateScoreSidebar();
+  finishGame();
+}
+
+function updateGalagaHUD(){
+  document.getElementById('ghud-score').textContent=g_score;
+  document.getElementById('ghud-combo').textContent='x'+g_combo;
+  document.getElementById('ghud-wave').textContent=g_wave;
+  const cfg=getWaveCfg();document.getElementById('ghud-remain').textContent=Math.max(0,cfg.count-g_waveKills);
+  const heartsMap=['','❤️','❤️❤️','❤️❤️❤️'];
+  document.getElementById('ghud-lives').textContent=heartsMap[Math.max(0,Math.min(3,g_lives))];
+  document.getElementById('sb-s2-galaga').textContent=g_score;
+  document.getElementById('sb-total-galaga').textContent=stage1Score+g_score;
+}
+
+/* ─── 타임아웃 게임 종료 (60초 갤러그) ─── */
+let g_stageLimitTimer=null;
+function startGalagaTimer(){
+  clearTimeout(g_stageLimitTimer);
+  g_stageLimitTimer=setTimeout(()=>{
+    if(g_gameActive){g_gameActive=false;clearTimeout(g_spawnTimer);cancelAnimationFrame(g_rafId);g_words.forEach(w=>w.el.remove());g_words=[];stage2Score=g_score;finishGame();}
+  },90000);
+}
+
+/* ─── 최종 결과 ─── */
+function finishGame(){
+  clearTimeout(g_stageLimitTimer);
+  const total=stage1Score+stage2Score;
+  document.getElementById('res-name').textContent=nickname;
+  document.getElementById('res-sub2').textContent=`${PASSAGES[selPassage].title} | GALAGA WAVE ${g_wave}`;
+  document.getElementById('res-avatar').innerHTML=CHARS[selChar].svg;
+  document.getElementById('res-s1-score').textContent=stage1Score;
+  document.getElementById('res-s2-score').textContent=stage2Score;
+  document.getElementById('res-total-score').textContent=total;
+  document.getElementById('res-wpm').textContent=stage1Wpm;
+  document.getElementById('res-acc').textContent=stage1Acc+'%';
+  document.getElementById('res-chars').textContent=stage1Chars;
+  document.getElementById('res-kills').textContent=stage2Kills;
+  ['sb-s1-result','sb-s2-result','sb-total-result'].forEach((id,idx)=>{
+    const el=document.getElementById(id);if(el)el.textContent=[stage1Score,stage2Score,total][idx];
+  });
+  const comment=total>=900?'완벽한 합산 기록! 최상위권입니다.':total>=700?'우수한 통합 기록입니다.':total>=500?'좋습니다. 두 스테이지 모두 계속 훈련하세요.':total>=300?'좋은 시도입니다. 반복 훈련하세요.':'훈련 종료. 다시 도전하세요.';
+  document.getElementById('res-comment').textContent=comment;
+  document.getElementById('res-formula').textContent=`STAGE1 ${stage1Score}점 + STAGE2 ${stage2Score}점 = TOTAL ${total}점`;
+  showScreen('result-screen');spawnParticles();
+  const scoreData={nickname,charEmoji:CHARS[selChar].svg,charName:CHARS[selChar].name,wpm:stage1Wpm,acc:stage1Acc,score:stage1Score,stage2:stage2Score,total,passage:PASSAGES[selPassage].title};
+  saveScore(scoreData);
+  setTimeout(()=>{
+    requestGas('rank',{},payload=>{
+      const rows=normalizeRankRows(payload);const viewRows=rows.length?rows:SAMPLE;
+      ['rank-list-body-result','rank-list-body'].forEach(id=>renderSidebarRanking(viewRows,nickname,id));
+      renderMainRanking(viewRows);updateTop1(viewRows);
+      let myPos='기록 없음';
+      normalizeRankRows(viewRows).slice(0,20).forEach((r,i)=>{if(r.nickname===nickname&&num(r.total)===total)myPos=(i+1)+'위';});
+      document.getElementById('res-rank-pos').textContent=myPos;
+    },()=>{
+      const fallback=normalizeRankRows([scoreData,...SAMPLE]);
+      renderSidebarRanking(fallback,nickname,'rank-list-body-result');
+      document.getElementById('res-rank-pos').textContent='LOCAL';
+    });
+  },1200);
+}
+
+function saveScore(d){
+  if(!GAS_URL||GAS_URL.includes('YOUR_GAS'))return;
+  requestGas('save',{
+    nickname:d.nickname,
+    char:d.charName||'',
+    wpm:d.wpm,
+    acc:d.acc,
+    score:d.score,
+    stage2:d.stage2,
+    total:d.total,
+    passage:d.passage,
+    kills:stage2Kills,
+    wave:g_wave
+  },res=>{
+    console.log('[GAS 저장]',res);
+  },err=>{
+    console.warn('[GAS 저장 실패]',err);
+  });
+}
+
+/* ─── 랭킹 오버레이 ─── */
+function showRankOverlay(){document.getElementById('rank-overlay').classList.add('open');loadOvRanking();}
+function hideRankOverlay(){document.getElementById('rank-overlay').classList.remove('open');}
+function loadOvRanking(){
+  document.getElementById('ov-loading').style.display='block';document.getElementById('ov-rank-list').style.display='none';
+  requestGas('rank',{},payload=>{renderOvRanking(normalizeRankRows(payload).length?normalizeRankRows(payload):SAMPLE);},()=>renderOvRanking(SAMPLE));
+}
+function renderOvRanking(data){
+  document.getElementById('ov-loading').style.display='none';document.getElementById('ov-rank-list').style.display='block';
+  const body=document.getElementById('ov-rank-body');body.innerHTML='';
+  const rows=normalizeRankRows(data);if(!rows.length){body.innerHTML='<div class="rank-loading">기록 없음</div>';return;}
+  const medals=['🥇','🥈','🥉'];
+  rows.slice(0,20).forEach((r,i)=>{
+    const row=document.createElement('div');row.className='ov-rank-row';const nc=i<3?`rr-no n${i+1}`:'rr-no';
+    row.innerHTML=`<span class="${nc}">${medals[i]||i+1}</span><span class="rr-ch" style="width:18px;height:18px;display:inline-block;">${safeCharSvg(r.char)}</span><span class="rr-nick${i===0?' top':''}">${esc(r.nickname)}</span><span style="font-size:13px;color:var(--lo);">${esc(shortPassage(r.passage))}</span><span class="rr-sc">${r.total||r.score}</span><span class="rr-wpm">${esc(r.wpm)}</span>`;
+    body.appendChild(row);
+  });
+}
+
+/* ─── 기타 ─── */
+function focusInput(){const inp=document.getElementById('hidden-input');if(inp&&!inp.disabled)inp.focus();}
+function spawnParticles(){
+  const c=document.getElementById('particles');c.innerHTML='';const cols=['#fff','#ccc','#aaa','#888','#00ff88','#555'];
+  for(let i=0;i<70;i++){const el=document.createElement('div');el.className='pt';const sz=3+Math.random()*6;el.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;background:${cols[~~(Math.random()*cols.length)]};animation-delay:${Math.random()*1.5}s;animation-duration:${2+Math.random()*1.5}s;opacity:.9;`;c.appendChild(el);}
+  setTimeout(()=>c.innerHTML='',5000);
+}
+
+/* ─── 갤러그 입력 ─── */
+document.addEventListener('DOMContentLoaded',()=>{
+  const ginp=document.getElementById('galaga-input');
+  ginp.addEventListener('input',e=>{
+    g_typed=ginp.value;g_targetWord=gFindBestMatch(g_typed);
+  });
+  ginp.addEventListener('keydown',e=>{
+    if((e.key==='Enter'||e.key===' ')){
+      e.preventDefault();if(!g_gameActive||!g_typed)return;
+      const match=gFindBestMatch(g_typed);
+      if(match){gFireAt(match);g_typed='';ginp.value='';g_targetWord=null;}
+    }
+    if(e.key==='Escape'){g_typed='';ginp.value='';g_targetWord=null;}
+  });
+  document.getElementById('game-area').addEventListener('mousemove',e=>{
+    const r=document.getElementById('game-area').getBoundingClientRect();
+    const c=document.getElementById('crosshair');c.style.left=(e.clientX-r.left-10)+'px';c.style.top=(e.clientY-r.top-10)+'px';
+  });
+  document.addEventListener('click',()=>{
+    if(document.getElementById('training-screen').classList.contains('active'))focusInput();
+    if(document.getElementById('galaga-screen').classList.contains('active'))document.getElementById('galaga-input').focus();
+  });
+});
+
+/* ─── INIT ─── */
+window.onload=()=>{
+  buildCharGrid();buildPassageList();loadRankingAll();startDemo();
+};
+
+(async function(){
+  try{
+    const f1=new FontFace('DOSGothic',"url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_eight@1.0/DOSGothic.woff') format('woff')");
+    const f2=new FontFace('DungGeunMo',"url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/DungGeunMo.woff') format('woff')");
+    await Promise.all([f1.load(),f2.load()]);document.fonts.add(f1);document.fonts.add(f2);
+  }catch(e){console.warn('폰트 로드 실패:',e);}
+})();
+</script>
+</body>
+</html>
