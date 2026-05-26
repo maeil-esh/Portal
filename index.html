@@ -19,6 +19,8 @@
   --amber: #D97706; --amber-lt: #FFFBEB; --amber-mid: #FDE68A;
   --violet: #7C3AED; --violet-lt: #F5F3FF; --violet-mid: #DDD6FE;
   --rose: #E11D48; --rose-lt: #FFF1F2; --rose-mid: #FECDD3;
+  /* 일시 보류용 회색 중립 톤 */
+  --hold: #64748B; --hold-dark: #334155; --hold-lt: #F1F5F9; --hold-mid: #CBD5E1;
   --text-h: #0F172A; --text-b: #334155; --text-m: #64748B; --text-s: #94A3B8;
   --border: #E2E8F0; --radius: 22px;
   --shadow-card: 0 2px 16px rgba(15,23,42,0.06), 0 1px 3px rgba(15,23,42,0.04);
@@ -56,46 +58,69 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card:nth-child(3) { animation-delay: 0.24s; }
 .card:nth-child(4) { animation-delay: 0.32s; }
 .card:nth-child(5) { animation-delay: 0.40s; }
-.card-dev { cursor: default; }
+.card-hold { cursor: default; }
 .card-b:hover, .card-t:hover, .card-a:hover, .card-r:hover { transform: translateY(-7px); box-shadow: var(--shadow-hover); }
 .card-b:hover { border-color: #BFDBFE; }
 .card-t:hover { border-color: #99F6E4; }
 .card-a:hover { border-color: #FCD34D; }
 .card-r:hover { border-color: var(--rose-mid); }
-.card-dev:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--violet-mid); }
+.card-hold:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--hold-mid); }
 .card-bar { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: var(--radius) var(--radius) 0 0; }
 .card-b .card-bar   { background: linear-gradient(90deg, #2563EB 0%, #60A5FA 100%); }
 .card-t .card-bar   { background: linear-gradient(90deg, #0D9488 0%, #34D399 100%); }
 .card-a .card-bar   { background: linear-gradient(90deg, #D97706 0%, #FCD34D 100%); }
-.card-dev .card-bar { background: linear-gradient(90deg, #7C3AED 0%, #A78BFA 100%); background-size: 200% 100%; animation: shimmer 2.2s linear infinite; }
+.card-hold .card-bar { background: linear-gradient(90deg, #64748B 0%, #94A3B8 100%); }
 .card-r .card-bar   { background: linear-gradient(90deg, #E11D48 0%, #FB7185 100%); }
 .card-no { position: absolute; top: 16px; right: 18px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: var(--text-s); }
 .icon-box { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; flex-shrink: 0; }
-.card-b   .icon-box { background: var(--blue-lt);   border: 1px solid var(--blue-mid); }
-.card-t   .icon-box { background: var(--teal-lt);   border: 1px solid var(--teal-mid); }
-.card-a   .icon-box { background: var(--amber-lt);  border: 1px solid var(--amber-mid); }
-.card-dev .icon-box { background: var(--violet-lt); border: 1px solid var(--violet-mid); }
-.card-r   .icon-box { background: var(--rose-lt);   border: 1px solid var(--rose-mid); }
+.card-b    .icon-box { background: var(--blue-lt);   border: 1px solid var(--blue-mid); }
+.card-t    .icon-box { background: var(--teal-lt);   border: 1px solid var(--teal-mid); }
+.card-a    .icon-box { background: var(--amber-lt);  border: 1px solid var(--amber-mid); }
+.card-hold .icon-box { background: var(--hold-lt);   border: 1px solid var(--hold-mid); }
+.card-r    .icon-box { background: var(--rose-lt);   border: 1px solid var(--rose-mid); }
 .icon-box svg { width: 17px; height: 17px; }
 .card-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 5px; }
-.card-b   .card-tag { color: var(--blue); }
-.card-t   .card-tag { color: var(--teal); }
-.card-a   .card-tag { color: var(--amber); }
-.card-dev .card-tag { color: var(--violet); }
-.card-r   .card-tag { color: var(--rose); }
+.card-b    .card-tag { color: var(--blue); }
+.card-t    .card-tag { color: var(--teal); }
+.card-a    .card-tag { color: var(--amber); }
+.card-hold .card-tag { color: var(--hold-dark); }
+.card-r    .card-tag { color: var(--rose); }
 .card-title { font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 700; line-height: 1.45; color: var(--text-h); margin-bottom: 7px; word-break: keep-all; }
 .card-desc { font-family: 'Noto Sans KR', sans-serif; font-size: 11.5px; font-weight: 400; color: var(--text-m); line-height: 1.7; word-break: keep-all; flex: 1; }
 .card-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
 .status { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 400; color: var(--text-m); }
-.s-dot     { width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 0 2px rgba(16,185,129,0.2); animation: blink 2.4s ease-in-out infinite; }
-.s-dot-dev { width: 7px; height: 7px; border-radius: 50%; background: var(--violet); box-shadow: 0 0 0 2px rgba(124,58,237,0.2); animation: blink 1.8s ease-in-out infinite; }
-.s-dot-rose{ width: 7px; height: 7px; border-radius: 50%; background: var(--rose); box-shadow: 0 0 0 2px rgba(225,29,72,0.2); animation: blink 2s ease-in-out infinite; }
-.dday-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--violet-lt); border: 1px solid var(--violet-mid); border-radius: 100px; padding: 5px 12px; font-size: 12px; font-weight: 700; color: var(--violet); letter-spacing: 0.04em; font-family: 'Outfit', monospace; }
-.dday-badge .dday-num { font-size: 13px; font-variant-numeric: tabular-nums; }
-.dev-progress-wrap { margin-top: 10px; margin-bottom: 2px; }
-.dev-progress-label { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--text-s); margin-bottom: 6px; font-weight: 500; letter-spacing: 0.02em; }
-.dev-progress-track { height: 4px; background: var(--violet-mid); border-radius: 100px; overflow: hidden; }
-.dev-progress-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, #7C3AED 0%, #A78BFA 100%); transition: width 0.4s ease; }
+.s-dot      { width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 0 2px rgba(16,185,129,0.2); animation: blink 2.4s ease-in-out infinite; }
+.s-dot-hold { width: 7px; height: 7px; border-radius: 50%; background: var(--hold); box-shadow: 0 0 0 2px rgba(100,116,139,0.2); }
+.s-dot-rose { width: 7px; height: 7px; border-radius: 50%; background: var(--rose); box-shadow: 0 0 0 2px rgba(225,29,72,0.2); animation: blink 2s ease-in-out infinite; }
+
+/* 일시 보류 상태 박스 */
+.hold-notice {
+  background: var(--hold-lt); border: 1px solid var(--hold-mid);
+  border-radius: 10px; padding: 9px 11px;
+  margin-top: 10px; margin-bottom: 2px;
+}
+.hold-notice-title {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; color: var(--hold-dark);
+  letter-spacing: 0.02em;
+}
+.hold-notice-title svg { width: 12px; height: 12px; flex-shrink: 0; }
+.hold-notice-sub {
+  font-size: 10.5px; color: var(--hold-dark); opacity: 0.8;
+  margin-top: 3px; line-height: 1.5; font-weight: 400;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 일시 보류 뱃지 */
+.hold-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--hold-lt); border: 1px solid var(--hold-mid);
+  border-radius: 100px; padding: 5px 12px;
+  font-size: 11.5px; font-weight: 700; color: var(--hold-dark);
+  letter-spacing: 0.06em; font-family: 'Outfit', monospace;
+}
+.hold-badge svg { width: 11px; height: 11px; }
+
 .arrow-btn { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 6px 14px 6px 12px; border-radius: 100px; border: 1px solid var(--border); transition: all 0.22s ease; color: var(--text-m); }
 .arrow-btn svg { width: 13px; height: 13px; transition: transform 0.22s ease; }
 .card-b:hover .arrow-btn { background: var(--blue-lt);  border-color: #BFDBFE; color: var(--blue); }
@@ -104,15 +129,6 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card-r:hover .arrow-btn { background: var(--rose-lt);  border-color: var(--rose-mid); color: var(--rose); }
 .card:hover .arrow-btn svg { transform: translate(2px, -2px); }
 
-/* 랭킹 뱃지 */
-.rank-badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  background: var(--rose-lt); border: 1px solid var(--rose-mid);
-  border-radius: 100px; padding: 4px 10px;
-  font-size: 11px; font-weight: 700; color: var(--rose);
-  letter-spacing: 0.04em; font-family: 'Outfit', monospace;
-}
-
 .footer { margin-top: 52px; text-align: center; animation: fadeUp 0.7s 0.45s cubic-bezier(.22,1,.36,1) both; }
 .footer-contact { margin-top: 14px; font-size: 11px; color: var(--text-s); letter-spacing: 0.01em; }
 .footer-contact a { color: var(--blue); text-decoration: none; font-weight: 500; }
@@ -120,7 +136,6 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 @keyframes fadeDown { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeUp   { from { opacity: 0; transform: translateY(22px);  } to { opacity: 1; transform: translateY(0); } }
 @keyframes blink    { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-@keyframes shimmer  { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 .card:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
 
 /* ── 전광판 뉴스 티커 ── */
@@ -185,7 +200,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
       <span class="logo-name">YESS <span>Your (Intelligent) ESH Support System</span></span>
       <div class="divider"></div>
-      <div class="header-pill"><span class="pill-dot"></span>4 Services Active · 1 Coming Soon</div>
+      <div class="header-pill"><span class="pill-dot"></span>4 Services Active · 1 On Hold</div>
     </div>
     <h1>지능형 안전보건<br><em>업무지원 시스템</em></h1>
     <p class="header-sub"><b>매일유업</b> · Environment · Safety · Health</p>
@@ -246,26 +261,29 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
     </a>
 
-    <!-- 04 AI-JSA (개발중) -->
-    <div class="card card-dev" id="card-jsa">
+    <!-- 04 AI-JSA (일시 보류) -->
+    <div class="card card-hold" id="card-jsa">
       <div class="card-bar"></div><span class="card-no">04</span>
       <div class="icon-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>
         </svg>
       </div>
       <span class="card-tag">AI Risk Assessment</span>
       <h2 class="card-title">AI-JSA<br>위험성평가</h2>
       <p class="card-desc">작업 내용을 입력하면 AI가 유해·위험요인을 자동 도출하고 감소대책을 제안합니다. (작업안전분석 기반)</p>
-      <div class="dev-progress-wrap">
-        <div class="dev-progress-label"><span>개발 진행률</span><span id="progress-pct">—</span></div>
-        <div class="dev-progress-track"><div class="dev-progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="hold-notice">
+        <div class="hold-notice-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          <span>일시 보류 ON HOLD</span>
+        </div>
+        <div class="hold-notice-sub">재개 일정은 별도 공지 예정</div>
       </div>
       <div class="card-foot">
-        <span class="status"><span class="s-dot-dev"></span>개발 중</span>
-        <div class="dday-badge">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span id="dday-text" class="dday-num">D-?</span>
+        <span class="status"><span class="s-dot-hold"></span>일시 보류</span>
+        <div class="hold-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="9" x2="10" y2="15"/><line x1="14" y1="9" x2="14" y2="15"/></svg>
+          <span>HOLD</span>
         </div>
       </div>
     </div>
@@ -296,32 +314,6 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 </div>
 
 <script>
-  // ── D-Day Countdown ──────────────────────────────────────────
-  const START_DATE  = new Date('2026-04-16T00:00:00+09:00');
-  const LAUNCH_DATE = new Date('2026-06-05T00:00:00+09:00');
-  const MS_TOTAL    = LAUNCH_DATE - START_DATE;
-
-  function updateDday() {
-    const now      = new Date();
-    const msLeft   = LAUNCH_DATE - now;
-    const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
-    const ddayEl   = document.getElementById('dday-text');
-    const fillEl   = document.getElementById('progress-fill');
-    const pctEl    = document.getElementById('progress-pct');
-    if (msLeft > 0) {
-      ddayEl.textContent = `D-${daysLeft}`;
-      const pct = Math.min(100, Math.max(0, (((now - START_DATE) / MS_TOTAL) * 100).toFixed(1)));
-      fillEl.style.width = pct + '%';
-      pctEl.textContent  = pct + '%';
-    } else {
-      ddayEl.textContent = 'D-Day';
-      fillEl.style.width = '100%';
-      pctEl.textContent  = '100%';
-    }
-  }
-  updateDday();
-  setInterval(updateDday, 1000 * 60 * 60);
-
   // ── 전광판 티커 ───────────────────────────────────────────────
   const TK = {
     inner:      document.getElementById('tk-inner'),
