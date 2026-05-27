@@ -12,6 +12,7 @@
   --gray800:#333d4b; --gray900:#191f28;
   --green50:#e8f9f0; --green100:#b3eedd; --green500:#00b493;
   --red50:#fff0f0; --red500:#f04452;
+  --orange500:#f59e0b;
   --orange50:#fff7e6; --orange500:#f59e0b;
   --white:#fff;
   --r6:6px; --r8:8px; --r12:12px;
@@ -243,8 +244,7 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
       <div class="dash-hero-title">관리감독자<br><span>유해위험작업 대상 현황</span></div>
       <div class="dash-hero-sub">담당 공정 내 유해위험작업 대상 여부를 관리감독자별로 파악합니다 &nbsp;·&nbsp; 산업안전보건법 제16조 / 안전보건규칙 별표3</div>
       <div class="dash-hero-actions">
-        <button class="btn btn-success" onclick="saveAllToGAS()">Sheets 저장</button>
-        <button class="btn" onclick="loadAllFromGAS()">Sheets 불러오기</button>
+        <span id="autoSyncMsg" style="font-size:12px;color:var(--gray400)">● 자동 동기화 대기 중...</span>
       </div>
     </div>
     <div class="site-grid" id="siteGrid"></div>
@@ -258,8 +258,9 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
     <span class="work-site-label" id="workSiteLabel"></span>
     <span class="work-site-badge" id="workSiteBadge"></span>
     <div style="margin-left:auto;display:flex;gap:6px">
-      <button class="btn btn-primary btn-sm" onclick="addRow()">+ 행 추가</button>
-      <button class="btn btn-success btn-sm" onclick="saveToGAS()">Sheets 저장</button>
+      <button class="btn btn-primary btn-sm" id="addRowBtn" onclick="addRow()">+ 행 추가</button>
+      <button class="btn btn-sm btn-primary" id="lockBtn" onclick="isUnlocked()?lockSite():requireAuth(()=>{})">🔒 편집</button>
+      <button class="btn btn-sm" id="autoSaveIndicator" style="color:var(--gray400);cursor:default">● 자동저장</button>
       <button class="btn btn-sm" onclick="exportExcel()">엑셀</button>
       <button class="btn btn-sm" onclick="printPDF()">PDF</button>
     </div>
@@ -270,6 +271,7 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
     </select>
     <input class="search-box" id="searchBox" placeholder="이름·사번·팀 검색" oninput="renderTable()">
     <div class="divider"></div>
+    <button class="btn btn-sm" onclick="pingGAS()" title="GAS 서버 연결 확인">🔌 연결확인</button>
     <span class="hint">기계명 클릭→점검기준 &nbsp;|&nbsp; Tab·방향키 이동 &nbsp;|&nbsp; 스페이스바 체크</span>
   </div>
   <div class="print-head" id="printHead"><h2 id="printTitle"></h2><p id="printSub"></p></div>
@@ -314,6 +316,38 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
     </div>
     <!-- 기준정보 카드 -->
     <div class="master-cards" id="masterCards"></div>
+  </div>
+</div>
+
+<!-- 기준정보 편집 잠금 해제 모달 -->
+<div class="modal-bg" id="masterEditPwModalBg">
+  <div class="modal" style="max-width:340px">
+    <h3>기준정보 편집 잠금 해제</h3>
+    <p style="font-size:12px;color:var(--gray500);margin-bottom:14px;margin-top:-8px">
+      <strong id="masterEditSiteLabel"></strong> 사업장의 편집 비밀번호를 입력하세요.
+    </p>
+    <input id="masterEditPwInput" type="password" placeholder="비밀번호 입력"
+      onkeydown="if(event.key==='Enter')confirmMasterEditPw()" style="margin-bottom:10px">
+    <div class="modal-btns">
+      <button class="btn" onclick="closeMasterEditPwModal()">취소</button>
+      <button class="btn btn-primary" onclick="confirmMasterEditPw()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 편집 잠금 해제 모달 -->
+<div class="modal-bg" id="editPwModalBg">
+  <div class="modal" style="max-width:340px">
+    <h3>편집 잠금 해제</h3>
+    <p style="font-size:12px;color:var(--gray500);margin-bottom:14px;margin-top:-8px">
+      <strong id="editSiteLabel"></strong> 사업장의 편집 비밀번호를 입력하세요.
+    </p>
+    <input id="editPwInput" type="password" placeholder="비밀번호 입력"
+      onkeydown="if(event.key==='Enter')confirmEditPw()" style="margin-bottom:10px">
+    <div class="modal-btns">
+      <button class="btn" onclick="closeEditPwModal()">취소</button>
+      <button class="btn btn-primary" onclick="confirmEditPw()">확인</button>
+    </div>
   </div>
 </div>
 
@@ -399,13 +433,17 @@ const MACHINES = [
 /* ══════════════════════════════════════════
    상태
 ══════════════════════════════════════════ */
-function defMaster(){ return { team:['생산1팀','생산2팀','품질보증팀','공무환경팀','물류팀','낙농운영팀','지원팀'], process:['전처리','충전','포장','공정검사','기기분석','기기분석'], position:['팀장','일반','직장'] }; }
+function defMaster(){ return { team:['생산1팀','생산2팀','품질보증팀','공무환경팀','물류팀','지원팀'], process:['전처리','충전','포장','냉동기관','동력','정비'], position:['팀장','직장','일반'], editPw:'1234' }; }
 
 let sites = ['본사공장'];
 let siteData = { '본사공장': { rows:[], nextId:1, master:defMaster() } };
 let curSite  = '본사공장';   // 현황 페이지 기준 사업장
 let curMasterSite = '본사공장'; // 기준정보 선택 사업장
 let curPage  = 'home';
+let unlockedSites = new Set();       // 현황 편집 인증된 사업장
+let unlockedMasterSites = new Set();  // 기준정보 편집 인증된 사업장
+let editPwCallback = null;
+let masterPwCallback = null;
 
 function sd(s){ return siteData[s||curSite]; }
 function getMaster(key, s){ return sd(s||curMasterSite).master[key]; }
@@ -506,6 +544,7 @@ function renderDashboard(){
 ══════════════════════════════════════════ */
 function renderWorkPage(){
   document.getElementById('workSiteLabel').textContent = curSite;
+  updateLockUI();
   const cnt = sd().rows.length;
   document.getElementById('workSiteBadge').textContent = `총 ${cnt}명`;
   updateFilterDept();
@@ -537,19 +576,25 @@ function updateFilterDept(){
 }
 
 function addRow(){
-  const d = sd();
-  const row = { id:d.nextId++, team:'', process:'', position:'', empno:'', name:'',
-    machines:Object.fromEntries(MACHINES.map(m=>[m.id,false])), bigo:'', date:today() };
-  d.rows.push(row);
-  renderTable();
-  document.getElementById('workSiteBadge').textContent = `총 ${d.rows.length}명`;
-  setTimeout(()=>{ const c=document.querySelector(`tr[data-id="${row.id}"] td[data-col="team"]`); if(c) focusCell(c); },50);
+  requireAuth(()=>{
+    const d = sd();
+    const row = { id:d.nextId++, team:'', process:'', position:'', empno:'', name:'',
+      machines:Object.fromEntries(MACHINES.map(m=>[m.id,false])), bigo:'', date:today() };
+    d.rows.push(row);
+    renderTable();
+    document.getElementById('workSiteBadge').textContent = `총 ${d.rows.length}명`;
+    triggerAutoSave();
+    setTimeout(()=>{ const c=document.querySelector(`tr[data-id="${row.id}"] td[data-col="team"]`); if(c) focusCell(c); },50);
+  });
 }
 
 function deleteRow(id){
-  sd().rows = sd().rows.filter(r=>r.id!==id);
-  renderTable();
-  document.getElementById('workSiteBadge').textContent = `총 ${sd().rows.length}명`;
+  requireAuth(()=>{
+    sd().rows = sd().rows.filter(r=>r.id!==id);
+    renderTable();
+    document.getElementById('workSiteBadge').textContent = `총 ${sd().rows.length}명`;
+    triggerAutoSave();
+  });
 }
 
 function renderTable(){
@@ -580,24 +625,24 @@ function renderTable(){
     return `<tr data-id="${r.id}">
       <td class="td-no">${i+1}</td>
       <td class="td-text" data-col="team" tabindex="0" onkeydown="onCellKey(event,this)">
-        <select class="cell-edit" onchange="setF(${r.id},'team',this.value)" onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
+        <select class="cell-edit" onchange="setF(${r.id},'team',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
           <option value=""></option>${teamOpts.replace(`"${esc(r.team)}"`,`"${esc(r.team)}" selected`)}</select></td>
       <td class="td-process" data-col="process" tabindex="0" onkeydown="onCellKey(event,this)">
-        <input class="cell-edit" value="${esc(r.process)}" placeholder="공정명" onchange="setF(${r.id},'process',this.value)" onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
+        <input class="cell-edit" value="${esc(r.process)}" placeholder="공정명" onchange="setF(${r.id},'process',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
       <td class="td-text" data-col="position" tabindex="0" onkeydown="onCellKey(event,this)">
-        <select class="cell-edit" onchange="setF(${r.id},'position',this.value)" onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
+        <select class="cell-edit" onchange="setF(${r.id},'position',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
           <option value=""></option>${posOpts.replace(`"${esc(r.position)}"`,`"${esc(r.position)}" selected`)}</select></td>
       <td class="td-empno" data-col="empno" tabindex="0" onkeydown="onCellKey(event,this)">
-        <input class="cell-edit" value="${esc(r.empno)}" placeholder="사번" onchange="setF(${r.id},'empno',this.value)" onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
+        <input class="cell-edit" value="${esc(r.empno)}" placeholder="사번" onchange="setF(${r.id},'empno',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
       <td class="td-name" data-col="name" tabindex="0" onkeydown="onCellKey(event,this)">
-        <input class="cell-edit" value="${esc(r.name)}" placeholder="이름" onchange="setF(${r.id},'name',this.value)" onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
+        <input class="cell-edit" value="${esc(r.name)}" placeholder="이름" onchange="setF(${r.id},'name',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
       <td class="td-total" data-col="total" tabindex="0" onkeydown="onCellKey(event,this)" onclick="showTotalTT(${r.id},event)">
         <span class="total-badge${total===0?' zero':''}">${total}</span></td>
       ${checks}
       <td class="td-bigo" data-col="bigo" tabindex="0" onkeydown="onCellKey(event,this)">
-        <input class="cell-edit" value="${esc(r.bigo)}" placeholder="비고" onchange="setF(${r.id},'bigo',this.value)" onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
+        <input class="cell-edit" value="${esc(r.bigo)}" placeholder="비고" onchange="setF(${r.id},'bigo',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
       <td class="td-date">${r.date}</td>
-      <td class="td-del"><button class="del-btn" onclick="deleteRow(${r.id})">✕</button></td>
+      <td class="td-del">${isUnlocked()?`<button class="del-btn" onclick="deleteRow(${r.id})">✕</button>`:''}</td>
     </tr>`;
   }).join('');
   const totalAll = filtered.reduce((s,r)=>s+MACHINES.filter(m=>r.machines[m.id]).length,0);
@@ -609,8 +654,8 @@ function renderTable(){
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
-function setF(id,f,v){ const r=sd().rows.find(r=>r.id===id); if(!r)return; r[f]=v; if(['name','empno','team'].includes(f))renderTable(); }
-function toggleCheck(id,mid){ const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); }
+function setF(id,f,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r[f]=v; if(['name','empno','team'].includes(f))renderTable(); triggerAutoSave(); }
+function toggleCheck(id,mid){ if(!isUnlocked()){ requireAuth(()=>{ const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }); return; } const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }
 
 /* ════ 키보드 ════ */
 function getAllCells(){ return [...document.querySelectorAll('#tableBody td[tabindex="0"]')]; }
@@ -645,29 +690,67 @@ function switchMasterSite(name){
 }
 
 function renderMasterCards(){
-  const keys = ['team','process','position'];
-  const labels = {team:'팀 목록', process:'공정명 목록', position:'직책 목록'};
-  const placeholders = {team:'팀명 입력', process:'공정명 입력', position:'직책 입력'};
-  document.getElementById('masterCards').innerHTML = keys.map(key=>`
-    <div class="master-card">
-      <div class="master-card-head">
-        ${labels[key]}
-        <span class="master-card-site">${esc(curMasterSite)}</span>
-      </div>
-      <div class="master-list" id="mList-${key}">
-        ${getMaster(key).map((v,i)=>`
-          <div class="master-item">
-            <span>${esc(v)}</span>
-            <button class="master-item-del" onclick="delMasterItem('${key}',${i})">✕</button>
-          </div>`).join('') || '<div class="master-item" style="color:var(--gray400)">항목 없음</div>'}
-      </div>
-      <div class="master-add-row">
-        <input class="master-inp" id="mInp-${key}" placeholder="${placeholders[key]}" style="flex:1" onkeydown="if(event.key==='Enter')addMasterItem('${key}')">
-        <button class="btn btn-primary btn-sm" onclick="addMasterItem('${key}')">추가</button>
-      </div>
-    </div>`).join('');
-}
+  const isMasterUnlocked = unlockedMasterSites.has(curMasterSite);
+  const keys    = ['team','process','position'];
+  const labels  = {team:'팀 목록', process:'공정명 목록', position:'직책 목록'};
+  const phs     = {team:'팀명 입력', process:'공정명 입력', position:'직책 입력'};
 
+  // 비밀번호 카드
+  let html = '<div class="master-card">';
+  html += '<div class="master-card-head">편집 비밀번호 <span class="master-card-site">' + esc(curMasterSite) + '</span></div>';
+  html += '<div class="master-list" style="padding:16px">';
+  html += '<div style="font-size:12px;color:var(--gray600);margin-bottom:10px">현황 데이터 수정 시 요구하는 비밀번호입니다.<br>미설정 시 기본값 <b>1234</b>가 적용됩니다.</div>';
+  html += '<div style="display:flex;gap:8px;align-items:center">';
+  html += '<input class="master-inp" id="newPwInput" type="password" placeholder="새 비밀번호 입력" style="flex:1" onkeydown="if(event.key===\'Enter\')changeSitePw()">';
+  html += '<input class="master-inp" id="newPwConfirm" type="password" placeholder="확인" style="flex:1" onkeydown="if(event.key===\'Enter\')changeSitePw()">';
+  html += '</div>';
+  html += '<div style="margin-top:8px;font-size:11px;color:var(--gray500)">현재: <b>' + (sd(curMasterSite).master.editPw ? '설정됨' : '기본값(1234)') + '</b></div>';
+  html += '</div>';
+  html += '<div class="master-add-row"><div style="display:flex;gap:8px">';
+  if(isMasterUnlocked){
+    html += '<button class="btn btn-primary btn-sm" onclick="changeSitePw()" style="flex:1">비밀번호 변경</button>';
+    html += '<button class="btn btn-red btn-sm" onclick="lockMasterSite()">🔒 잠금</button>';
+  } else {
+    html += '<button class="btn btn-primary btn-sm" onclick="requireMasterAuth(()=>{})" style="width:100%">🔓 편집 잠금 해제</button>';
+  }
+  html += '</div></div></div>';
+
+  // 팀/공정/직책 카드
+  keys.forEach(function(key){
+    html += '<div class="master-card">';
+    html += '<div class="master-card-head">' + labels[key] + ' <span class="master-card-site">' + esc(curMasterSite) + '</span></div>';
+    html += '<div class="master-list" id="mList-' + key + '">';
+    var list = getMaster(key);
+    if(list.length === 0){
+      html += '<div class="master-item" style="color:var(--gray400)">항목 없음</div>';
+    } else {
+      list.forEach(function(v, i){
+        html += '<div class="master-item"><span>' + esc(v) + '</span>';
+        if(isMasterUnlocked){
+          html += '<button class="master-item-del" onclick="delMasterItem(\'' + key + '\',' + i + ')">✕</button>';
+        }
+        html += '</div>';
+      });
+    }
+    html += '</div>';
+    // 추가 입력란 - 항상 표시
+    html += '<div class="master-add-row">';
+    if(isMasterUnlocked){
+      html += '<input class="master-inp" id="mInp-' + key + '" placeholder="' + phs[key] + '" style="flex:1" onkeydown="if(event.key===\'Enter\')addMasterItem(\'' + key + '\')">';
+      html += '<button class="btn btn-primary btn-sm" onclick="addMasterItem(\'' + key + '\')">추가</button>';
+    } else {
+      html += '<input class="master-inp" placeholder="' + phs[key] + '" style="flex:1;opacity:.4;cursor:not-allowed" readonly>';
+      html += '<button class="btn btn-primary btn-sm" disabled style="opacity:.4;cursor:not-allowed">추가</button>';
+    }
+    html += '</div>';
+    if(!isMasterUnlocked){
+      html += '<div style="padding:2px 16px 10px;font-size:11px;color:var(--gray400)">🔒 잠금 해제 후 편집 가능합니다</div>';
+    }
+    html += '</div>';
+  });
+
+  document.getElementById('masterCards').innerHTML = html;
+}
 function addMasterItem(key){
   const inp = document.getElementById('mInp-'+key);
   const v = inp.value.trim();
@@ -677,6 +760,61 @@ function addMasterItem(key){
   inp.value='';
   renderMasterCards();
   toast(v+' 추가됨','ok');
+}
+
+function requireMasterAuth(cb){
+  const s = curMasterSite;
+  if(unlockedMasterSites.has(s)){ cb(); return; }
+  masterPwCallback = cb;
+  document.getElementById('masterEditSiteLabel').textContent = s;
+  document.getElementById('masterEditPwInput').value='';
+  document.getElementById('masterEditPwInput').style.borderColor='';
+  document.getElementById('masterEditPwInput').placeholder='비밀번호 입력';
+  document.getElementById('masterEditPwModalBg').classList.add('show');
+  setTimeout(()=>document.getElementById('masterEditPwInput').focus(),100);
+}
+
+function confirmMasterEditPw(){
+  const s = curMasterSite;
+  const entered = document.getElementById('masterEditPwInput').value;
+  const correct = sd(s).master.editPw || '1234';
+  if(entered === correct){
+    unlockedMasterSites.add(s);
+    closeMasterEditPwModal();
+    renderMasterCards(); // 잠금 해제 후 UI 업데이트
+    if(masterPwCallback){ masterPwCallback(); masterPwCallback=null; }
+    toast('✅ '+s+' 기준정보 편집 잠금 해제','ok');
+  } else {
+    document.getElementById('masterEditPwInput').value='';
+    document.getElementById('masterEditPwInput').style.borderColor='var(--red500)';
+    document.getElementById('masterEditPwInput').placeholder='비밀번호가 틀렸습니다';
+    setTimeout(()=>{
+      document.getElementById('masterEditPwInput').style.borderColor='';
+      document.getElementById('masterEditPwInput').placeholder='비밀번호 입력';
+    },1500);
+    toast('❌ 비밀번호 오류','err');
+  }
+}
+function closeMasterEditPwModal(){ document.getElementById('masterEditPwModalBg').classList.remove('show'); masterPwCallback=null; }
+
+function lockMasterSite(){
+  unlockedMasterSites.delete(curMasterSite);
+  renderMasterCards();
+  toast(curMasterSite+' 기준정보 잠금됨','');
+}
+
+function changeSitePw(){
+  requireMasterAuth(()=>{
+    const np = document.getElementById('newPwInput').value;
+    const nc = document.getElementById('newPwConfirm').value;
+    if(!np){ toast('새 비밀번호를 입력하세요','err'); return; }
+    if(np !== nc){ toast('비밀번호가 일치하지 않습니다','err'); return; }
+    sd(curMasterSite).master.editPw = np;
+    unlockedSites.delete(curMasterSite);
+    unlockedMasterSites.delete(curMasterSite);
+    renderMasterCards();
+    toast('✅ '+curMasterSite+' 비밀번호 변경 완료','ok');
+  });
 }
 
 function delMasterItem(key,i){
@@ -754,14 +892,33 @@ document.addEventListener('click',e=>{
 ══════════════════════════════════════════ */
 function gasCall(action,params,cb){
   if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL'){ toast('GAS URL을 설정하세요','err'); return; }
-  const cbN='gcb_'+Date.now(); window[cbN]=res=>{ delete window[cbN]; cb(res); };
-  const qs=Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+  const cbN='gcb_'+Date.now();
+  window[cbN]=res=>{ delete window[cbN]; cb(res); };
+  const qs=Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(String(v))).join('&');
+  const src=GAS_URL+'?action='+action+'&callback='+cbN+(qs?'&'+qs:'');
   const s=document.createElement('script');
-  s.src=GAS_URL+'?action='+action+'&callback='+cbN+(qs?'&'+qs:'');
-  document.body.appendChild(s);
-  setTimeout(()=>{ if(window[cbN]){ toast('서버 응답 없음','err'); delete window[cbN]; }},9000);
+  s.src=src;
+  s.onerror=()=>{
+    delete window[cbN];
+    toast('❌ GAS 연결 오류 — 배포 설정을 확인하세요','err');
+    console.error('[GAS] script load error:', src);
+  };
+  document.head.appendChild(s);
+  setTimeout(()=>{ if(window[cbN]){ delete window[cbN]; toast('❌ 서버 응답 없음 (10초 초과)','err'); }},10000);
 }
 function setGasOk(){ document.getElementById('gasDot').className='gas-dot ok'; document.getElementById('gasMsg').textContent='연결됨'; }
+
+function pingGAS(){
+  toast('GAS 연결 확인 중...','');
+  gasCall('ping',{},res=>{
+    if(res?.result==='success'){
+      toast('✅ GAS 연결 정상 — '+res.time,'ok');
+      setGasOk();
+    } else {
+      toast('❌ GAS 응답 오류: '+(res?.error||'알 수 없음'),'err');
+    }
+  });
+}
 
 function saveToGAS(){
   const rows=sd().rows;
@@ -771,8 +928,8 @@ function saveToGAS(){
     total:MACHINES.filter(m=>r.machines[m.id]).length, bigo:r.bigo, date:r.date }));
   toast('저장 중...','');
   gasCall('save',{data:JSON.stringify(payload)},res=>{
-    if(res?.result==='success'){ toast('저장 완료 ('+res.count+'건)','ok'); setGasOk(); renderDashboard(); }
-    else toast('저장 실패','err');
+    if(res?.result==='success'){ toast('✅ 저장 완료 ('+res.count+'건)','ok'); setGasOk(); renderDashboard(); }
+    else toast('❌ 저장 실패: '+(res?.error||'오류'),'err');
   });
 }
 function saveAllToGAS(){ sites.forEach(s=>{ const tmp=curSite; curSite=s; saveToGAS(); curSite=tmp; }); }
@@ -861,10 +1018,159 @@ function confirmPw(){
 }
 
 /* ══════════════════════════════════════════
+   편집 잠금 / 비밀번호 인증
+══════════════════════════════════════════ */
+function isUnlocked(site){ return unlockedSites.has(site||curSite); }
+
+// 편집 필요 시 호출 — 잠금 해제돼 있으면 바로 cb 실행, 아니면 비번 모달
+function requireAuth(cb, site){
+  const s = site||curSite;
+  if(isUnlocked(s)){ cb(); return; }
+  editPwCallback = cb;
+  document.getElementById('editSiteLabel').textContent = s;
+  document.getElementById('editPwInput').value='';
+  document.getElementById('editPwInput').style.borderColor='';
+  document.getElementById('editPwInput').placeholder='비밀번호 입력';
+  document.getElementById('editPwModalBg').classList.add('show');
+  setTimeout(()=>document.getElementById('editPwInput').focus(),100);
+}
+
+function confirmEditPw(){
+  const s = curSite;
+  const entered = document.getElementById('editPwInput').value;
+  const correct = sd(s).master.editPw || '1234';
+  if(entered === correct){
+    unlockedSites.add(s);
+    closeEditPwModal();
+    updateLockUI();
+    if(editPwCallback){ editPwCallback(); editPwCallback=null; }
+    toast('✅ '+s+' 편집 잠금 해제됨','ok');
+  } else {
+    document.getElementById('editPwInput').value='';
+    document.getElementById('editPwInput').style.borderColor='var(--red500)';
+    document.getElementById('editPwInput').placeholder='비밀번호가 틀렸습니다';
+    setTimeout(()=>{
+      document.getElementById('editPwInput').style.borderColor='';
+      document.getElementById('editPwInput').placeholder='비밀번호 입력';
+    },1500);
+    toast('❌ 비밀번호 오류','err');
+  }
+}
+function closeEditPwModal(){ document.getElementById('editPwModalBg').classList.remove('show'); editPwCallback=null; }
+
+// 잠금 해제
+function lockSite(){
+  unlockedSites.delete(curSite);
+  updateLockUI();
+  renderTable();
+  toast(curSite+' 편집 잠금됨','');
+}
+
+// 잠금 상태에 따라 툴바 UI 업데이트
+function updateLockUI(){
+  const unlocked = isUnlocked();
+  // 행 추가 버튼
+  const addBtn = document.getElementById('addRowBtn');
+  if(addBtn){
+    addBtn.style.opacity = unlocked?'1':'0.4';
+    addBtn.title = unlocked?'행 추가':'편집하려면 잠금 해제 필요';
+  }
+  // 잠금/해제 버튼 텍스트
+  const lockBtn = document.getElementById('lockBtn');
+  if(lockBtn){
+    lockBtn.textContent = unlocked?'🔓 잠금':'🔒 편집';
+    lockBtn.className = unlocked?'btn btn-sm btn-red':'btn btn-sm btn-primary';
+  }
+  // 테이블 재렌더 (읽기전용 적용)
+  if(curPage==='work') renderTable();
+}
+
+/* ══════════════════════════════════════════
+   자동 동기화
+══════════════════════════════════════════ */
+let autoSaveTimer = null;
+let isSyncing = false;
+
+function setSyncMsg(msg, color){
+  const el = document.getElementById('autoSyncMsg');
+  if(el){ el.textContent = msg; el.style.color = color||'var(--gray400)'; }
+  const ind = document.getElementById('autoSaveIndicator');
+  if(ind){ ind.textContent = msg; ind.style.color = color||'var(--gray400)'; }
+}
+
+// 데이터 변경 시 호출 → 2초 디바운스 후 자동 저장
+function triggerAutoSave(){
+  clearTimeout(autoSaveTimer);
+  setSyncMsg('● 변경사항 있음...', 'var(--orange500)');
+  autoSaveTimer = setTimeout(()=>{ autoSaveAll(); }, 2000);
+}
+
+function autoSaveAll(){
+  if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
+  if(isSyncing) return;
+  isSyncing = true;
+  setSyncMsg('↑ 저장 중...', 'var(--blue500)');
+  let pending = sites.length;
+  let hasError = false;
+  sites.forEach(s=>{
+    const rows = siteData[s].rows;
+    if(!rows.length){ pending--; if(pending===0) onSaveDone(hasError); return; }
+    const payload = rows.map(r=>({ site:s, team:r.team, process:r.process, position:r.position,
+      empno:r.empno, name:r.name,
+      ...Object.fromEntries(MACHINES.map(m=>[m.id,r.machines[m.id]?'O':''])),
+      total:MACHINES.filter(m=>r.machines[m.id]).length, bigo:r.bigo, date:r.date }));
+    gasCall('save',{data:JSON.stringify(payload)},res=>{
+      if(res?.result!=='success') hasError=true;
+      pending--;
+      if(pending===0) onSaveDone(hasError);
+    });
+  });
+}
+
+function onSaveDone(hasError){
+  isSyncing = false;
+  if(hasError){
+    setSyncMsg('● 저장 오류', 'var(--red500)');
+  } else {
+    setGasOk();
+    setSyncMsg('✓ 저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
+  }
+}
+
+// 페이지 로드 시 전체 불러오기
+function autoLoadAll(){
+  if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
+  setSyncMsg('↓ 불러오는 중...', 'var(--blue500)');
+  gasCall('loadAll',{},res=>{
+    if(res?.result==='success'&&Array.isArray(res.data)&&res.data.length){
+      // 기존 데이터 초기화 후 채우기
+      sites.forEach(s=>{ siteData[s].rows=[]; siteData[s].nextId=1; });
+      res.data.forEach(row=>{
+        if(!row.site) return;
+        if(!siteData[row.site]){ sites.push(row.site); siteData[row.site]={rows:[],nextId:1,master:defMaster()}; }
+        const d=siteData[row.site];
+        d.rows.push({ id:d.nextId++, team:row.team||'', process:row.process||'',
+          position:row.position||'', empno:row.empno||'', name:row.name||'',
+          bigo:row.bigo||'', date:row.date||'',
+          machines:Object.fromEntries(MACHINES.map(m=>[m.id,row[m.id]==='O'])) });
+      });
+      renderNavTabs(); renderDashboard(); setGasOk();
+      setSyncMsg('✓ 최신화됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
+    } else {
+      setSyncMsg('● 데이터 없음', 'var(--gray400)');
+    }
+  });
+}
+
+/* ══════════════════════════════════════════
    초기화
 ══════════════════════════════════════════ */
 renderNavTabs();
 goPage('home');
+// 페이지 로드 후 자동 불러오기
+setTimeout(()=>{ autoLoadAll(); }, 500);
+// 5분마다 자동 최신화
+setInterval(()=>{ autoLoadAll(); }, 5 * 60 * 1000);
 </script>
 </body>
 </html>
