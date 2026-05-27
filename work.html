@@ -1104,19 +1104,56 @@ document.addEventListener('click',e=>{
 ══════════════════════════════════════════ */
 function gasCall(action,params,cb){
   if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL'){ toast('GAS URL을 설정하세요','err'); return; }
-  const cbN='gcb_'+Date.now();
-  window[cbN]=res=>{ delete window[cbN]; cb(res); };
-  const qs=Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(String(v))).join('&');
-  const src=GAS_URL+'?action='+action+'&callback='+cbN+(qs?'&'+qs:'');
-  const s=document.createElement('script');
-  s.src=src;
-  s.onerror=()=>{
+
+  // data가 있으면 POST, 없으면 GET(JSONP)
+  const hasData = params && params.data;
+
+  if(hasData){
+    // POST + fetch (GAS는 CORS 허용)
+    const body = Object.assign({ action }, params);
+    fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' }, // GAS는 application/json을 preflight 발생시킴
+      body: JSON.stringify(body)
+    })
+    .then(r => r.text())
+    .then(text => {
+      // GAS doPost 응답은 순수 JSON (callback 없음)
+      try {
+        const res = JSON.parse(text);
+        cb(res);
+      } catch(e){
+        console.error('[GAS POST] parse error:', text);
+        cb({ result:'error', error:'응답 파싱 실패: '+text.slice(0,100) });
+      }
+    })
+    .catch(err => {
+      console.error('[GAS POST] fetch error:', err);
+      // fallback: JSONP
+      gasCallJSONP(action, params, cb);
+    });
+  } else {
+    // GET JSONP
+    gasCallJSONP(action, params, cb);
+  }
+}
+
+function gasCallJSONP(action, params, cb){
+  const cbN = 'gcb_'+Date.now();
+  window[cbN] = res => { delete window[cbN]; cb(res); };
+  const qs = params ? Object.entries(params)
+    .filter(([k])=>k!=='data')
+    .map(([k,v])=>k+'='+encodeURIComponent(String(v))).join('&') : '';
+  const src = GAS_URL+'?action='+action+'&callback='+cbN+(qs?'&'+qs:'');
+  const s = document.createElement('script');
+  s.src = src;
+  s.onerror = ()=>{
     delete window[cbN];
-    toast('❌ GAS 연결 오류 — 배포 설정을 확인하세요','err');
-    console.error('[GAS] script load error:', src);
+    toast('❌ GAS 연결 오류','err');
+    console.error('[GAS JSONP] load error:', src);
   };
   document.head.appendChild(s);
-  setTimeout(()=>{ if(window[cbN]){ delete window[cbN]; toast('❌ 서버 응답 없음 (10초 초과)','err'); }},10000);
+  setTimeout(()=>{ if(window[cbN]){ delete window[cbN]; toast('❌ 서버 응답 없음 (12초 초과)','err'); }},12000);
 }
 function setGasOk(){ document.getElementById('gasDot').className='gas-dot ok'; document.getElementById('gasMsg').textContent='연결됨'; }
 
