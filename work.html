@@ -122,6 +122,16 @@ td:last-child{border-right:none}
 td.td-no,th.th-no{position:sticky;left:0;background:var(--gray100);z-index:5;min-width:40px;width:40px;font-weight:600;color:var(--gray500);border-right:1px solid var(--gray300);font-size:11px}
 tbody tr:nth-child(even) td.td-no{background:var(--gray100)}
 tbody tr:hover td.td-no{background:var(--blue50)!important}
+/* 좌측 고정 컬럼들 */
+.col-sticky{position:sticky!important;z-index:4;background:var(--white)}
+th.col-sticky{background:var(--gray800)!important;z-index:15!important}
+tbody tr:nth-child(even) td.col-sticky{background:var(--gray50)}
+tbody tr:hover td.col-sticky{background:var(--blue50)!important}
+/* 기계 헤더 정렬 버튼 */
+.sort-btn{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:2px;border:none;background:rgba(255,255,255,.15);color:rgba(255,255,255,.7);font-size:9px;cursor:pointer;margin-left:2px;vertical-align:middle;padding:0;line-height:1;transition:all .1s}
+.sort-btn:hover{background:rgba(255,255,255,.35);color:#fff}
+.sort-btn.asc{background:var(--blue500);color:#fff}
+.sort-btn.desc{background:var(--green500);color:#fff}
 .cell-edit{border:none;outline:none;background:transparent;font-family:inherit;font-size:12px;color:var(--gray800);width:100%;height:100%;padding:0 7px;text-align:center;cursor:text}
 .cell-edit:focus{background:var(--white);outline:2px solid var(--blue500);outline-offset:-2px;border-radius:2px}
 select.cell-edit{cursor:pointer}
@@ -204,13 +214,127 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
 
 /* ════ 인쇄 ════ */
 @media print{
-  .topbar,.navbar,.work-toolbar,.td-del,tfoot,.tt,.toast,.modal-bg,.work-header .btn{display:none!important}
-  .tbl-wrap{max-height:none!important;border:none!important;margin:0!important;box-shadow:none!important;overflow:visible!important}
-  .print-head{display:block!important;text-align:center;padding:12px 0 8px}
-  .print-head h2{font-size:16px;font-weight:700}
-  .print-head p{font-size:11px;color:#666;margin-top:4px}
-  thead th{background:#333d4b!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .chk.on{background:#3182f6!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{ size:A4 landscape; margin:8mm 6mm; }
+  @page :first{ margin-top:8mm; }
+
+  /* 숨김 */
+  .topbar,.navbar,.work-toolbar,.td-del,.tt,.toast,.modal-bg,
+  .work-header .btn, tfoot, .sort-btn, .autoSaveIndicator { display:none!important; }
+
+  /* 전체 폰트/배경 */
+  body{ font-size:7.5pt!important; background:#fff!important; color:#000!important; }
+
+  /* 페이지 헤더 */
+  .print-head{ display:block!important; text-align:center; padding:4px 0 6px; }
+  .print-head h2{ font-size:12pt; font-weight:700; margin-bottom:2px; }
+  .print-head p{ font-size:7pt; color:#555; }
+
+  /* 테이블 래퍼 */
+  .tbl-wrap{
+    max-height:none!important; border:none!important; margin:0!important;
+    box-shadow:none!important; overflow:visible!important;
+    padding:0!important;
+  }
+
+  /* sticky 해제 */
+  thead th, thead th.col-sticky, td.col-sticky, td.td-no, th.th-no{
+    position:static!important;
+  }
+
+  /* 테이블 */
+  table{
+    width:100%!important; table-layout:fixed!important;
+    border-collapse:collapse!important; font-size:7pt!important;
+    white-space:normal!important;
+  }
+
+  /* 컬럼 너비 — A4 가로(277mm 유효) 기준 */
+  table colgroup{ display:table-column-group!important; }
+  thead th:nth-child(1){ width:6mm!important; }   /* No. */
+  thead th:nth-child(2){ width:16mm!important; }  /* 팀 */
+  thead th:nth-child(3){ width:16mm!important; }  /* 공정명 */
+  thead th:nth-child(4){ width:12mm!important; }  /* 직책 */
+  thead th:nth-child(5){ width:14mm!important; }  /* 사번 */
+  thead th:nth-child(6){ width:14mm!important; }  /* 이름 */
+  /* 계 + 기계 11개 + 비고 + 업데이트일 = 나머지 */
+
+  /* 헤더 스타일 */
+  thead th{
+    background:#333d4b!important; color:#fff!important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    padding:2px 1px!important; font-size:6.5pt!important;
+    height:auto!important; line-height:1.2!important;
+    border:1px solid #666!important; text-align:center!important;
+    word-break:keep-all!important;
+  }
+  thead tr:nth-child(2) th{
+    background:#4e5968!important; font-size:6pt!important;
+  }
+
+  /* 데이터 행 */
+  tbody tr{ height:auto!important; page-break-inside:avoid!important; }
+  td{
+    padding:1.5px 1px!important; height:auto!important;
+    border:1px solid #ccc!important; font-size:7pt!important;
+    line-height:1.3!important; text-align:center!important;
+    word-break:keep-all!important; overflow:hidden!important;
+  }
+  td.td-text, td.td-process, td.td-name, td.td-bigo{ text-align:left!important; }
+
+  /* 체크박스 */
+  .chk{
+    width:10px!important; height:10px!important; font-size:7pt!important;
+    border:1px solid #999!important; border-radius:2px!important;
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+  }
+  .chk.on{
+    background:#1a5!important; border-color:#1a5!important; color:#fff!important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+
+  /* 합계 뱃지 */
+  .total-badge{
+    font-size:6.5pt!important; min-width:14px!important; height:14px!important;
+    padding:0 3px!important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  .total-badge.zero{ background:#ccc!important; }
+
+  /* 인라인 편집 요소 → 텍스트처럼 */
+  .cell-edit{
+    border:none!important; background:transparent!important;
+    font-size:7pt!important; padding:0!important; width:100%!important;
+  }
+  select.cell-edit{ -webkit-appearance:none; appearance:none; }
+
+  /* 짝수 행 배경 */
+  tbody tr:nth-child(even) td{
+    background:#f7f7f7!important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+
+  /* 점검기준표 - 2페이지 */
+  #checkCriteriaTable{
+    margin-top:0!important;
+    page-break-before:always!important;
+  }
+  #checkCriteriaTable table{
+    font-size:7pt!important; table-layout:fixed!important;
+    white-space:normal!important;
+  }
+  #checkCriteriaTable table td{
+    padding:3px 4px!important; font-size:7pt!important;
+    line-height:1.4!important; vertical-align:top!important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  #checkCriteriaTable table td[style*="background:#f5f5f5"]{
+    background:#f0f0f0!important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+
+  /* 헤더/푸터 숨김 */
+  .work-header{ display:none!important; }
+  #page-work .work-header{ display:none!important; }
 }
 .print-head{display:none}
 </style>
@@ -275,16 +399,83 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
     <span class="hint">기계명 클릭→점검기준 &nbsp;|&nbsp; Tab·방향키 이동 &nbsp;|&nbsp; 스페이스바 체크</span>
   </div>
   <div class="print-head" id="printHead"><h2 id="printTitle"></h2><p id="printSub"></p></div>
+
+<div id="checkCriteriaTable" style="display:none;margin-top:24px;page-break-before:always">
+  <div style="font-size:14px;font-weight:700;padding:10px 0 8px;border-top:2px solid #333">▶ 작업별 점검기준</div>
+  <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
+    <colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup>
+    <tr>
+      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">호이스트</td>
+      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">컨베이어</td>
+      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">산업용로봇</td>
+      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">리프트</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
+        - 권과방지장치, 브레이크, 클러치 및 운전장치의 기능<br>- 주행로의 상측 레일의 상태<br>- 와이어로프가 통하고 있는 곳의 상태<br>- 경보장치 등의 기능
+      </td>
+      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
+        - 원동기 및 풀리 기능의 이상 유무<br>- 이탈 등의 방지장치 기능의 이상 유무<br>- 비상정지장치 기능의 이상 유무<br>- 원동기·회전축·기어 및 풀리 등의 덮개 또는 울 등의 이상 유무
+      </td>
+      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
+        - 외부 전선의 피복 또는 외장의 손상 유무<br>- 매니퓰레이터 작동의 이상 유무<br>- 제동장치 및 비상정지장치의 기능
+      </td>
+      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
+        - 방호장치, 브레이크 및 클러치의 기능<br>- 와이어로프가 통하고 있는 곳의 상태
+      </td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">프레스</td>
+      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">공기압축기</td>
+      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">지게차</td>
+      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">용접/절단</td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
+        - 클러치 및 브레이크의 기능<br>- 크랭크축, 플라이휠, 슬라이드, 연결봉 및 연결 나사의 풀림 여부<br>- 1행정 1정지기구, 급정지장치 및 비상정지장치의 기능<br>- 슬라이드 또는 칼날에 의한 위험방지 기구의 기능<br>- 프레스의 금형 및 고정볼트 상태<br>- 방호장치의 기능<br>- 전단기의 칼날 및 테이블의 상태
+      </td>
+      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
+        - 공기저장 압력용기의 외관상태<br>- 드레인밸브의 조작 및 배수<br>- 압력방출장치의 기능<br>- 언로드밸브의 기능<br>- 윤활유의 상태<br>- 회전부의 덮개 또는 울<br>- 그 밖의 연결 부위의 이상 유무
+      </td>
+      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
+        - 제동장치 및 조종장치 기능의 이상 유무<br>- 하역장치 및 유압장치 기능의 이상 유무<br>- 바퀴의 이상 유무<br>- 전조등·후미등·방향지시기 및 경보장치 기능의 이상 유무<br>- 작업자 안전벨트 및 안전모 착용<br>- 유자격자 운전 여부 확인<br>- 시동키 관리상태 등 확인
+      </td>
+      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
+        - 작업 준비 및 작업 절차 수립 여부<br>- 화기작업에 따른 인근 가연성물질에 대한 방호조치 및 소화기구 비치 여부<br>- 용접불티 비산방지덮개 또는 용접 방화포 등 불꽃불티 비산 방지 조치 여부<br>- 인화성 액체의 증기 또는 인화성 가스가 남아있지 않도록 하는 환기 조치 여부<br>- 작업근로자에 대한 화재예방 및 피난 교육 등 비상조치 여부
+      </td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">와이어로프 등 (체인, 벨트 포함)</td>
+      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">중량물</td>
+      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">방사선기기</td>
+      <td style="border:1px solid #999;padding:6px 8px;background:#f5f5f5"></td>
+    </tr>
+    <tr>
+      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
+        - 와이어로프 및 벨트 이상유무 (찢어짐, 끊어짐 등)<br>- (훅이 있는 경우) 훅의 매달림 상태<br>- 훅해지장치 정상기능 여부
+      </td>
+      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
+        - 중량물 취급의 올바른 자세 및 복장<br>- 위험물이 날아 흩어짐에 따른 보호구의 착용<br>- 온도 상승이나 습기에 의하여 위험성이 존재하는 중량물의 취급방법<br>- 그 밖에 하역운반기계등의 적절한 사용방법
+      </td>
+      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
+        - 장비 외함상태, 장비 주변 청결<br>- 차폐체 무결성 (납커튼, 외함 등)<br>- 안전연동(interlock)장치 이상유무<br>- 경고등 작동 상태<br>- 비상정지 버튼 상태<br>- 전원 및 배선 상태<br>- 경고표지 부착 상태
+      </td>
+      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top;font-size:9px;color:#666">
+        ※ 육안점검을 기준으로 함. 필요 시 직접 작동 등을 통한 점검 실시.
+      </td>
+    </tr>
+  </table>
+</div>
   <div class="tbl-wrap">
     <table id="mainTable">
       <thead>
         <tr>
           <th class="th-no" rowspan="2"><div class="th-inner">No.</div></th>
-          <th style="min-width:85px" rowspan="2"><div class="th-inner">팀</div></th>
-          <th style="min-width:100px" rowspan="2"><div class="th-inner">공정명</div></th>
-          <th style="min-width:68px" rowspan="2"><div class="th-inner">직책</div></th>
-          <th style="min-width:80px" rowspan="2"><div class="th-inner">사번</div></th>
-          <th style="min-width:74px" rowspan="2"><div class="th-inner">이름</div></th>
+          <th class="col-sticky" style="min-width:85px;left:40px" rowspan="2"><div class="th-inner">팀</div></th>
+          <th class="col-sticky" style="min-width:100px;left:125px" rowspan="2"><div class="th-inner">공정명</div></th>
+          <th class="col-sticky" style="min-width:68px;left:225px" rowspan="2"><div class="th-inner">직책</div></th>
+          <th class="col-sticky" style="min-width:80px;left:293px" rowspan="2"><div class="th-inner">사번</div></th>
+          <th class="col-sticky" style="min-width:74px;left:373px;border-right:2px solid rgba(255,255,255,.2)" rowspan="2"><div class="th-inner">이름</div></th>
           <th colspan="12" class="th-group"><div class="th-inner" style="font-size:11px">유해위험작업 대상 &nbsp;(기계명 클릭 → 점검기준)</div></th>
           <th style="min-width:120px" rowspan="2"><div class="th-inner">비고</div></th>
           <th style="min-width:88px" rowspan="2"><div class="th-inner">업데이트일</div></th>
@@ -440,6 +631,7 @@ let siteData = { '본사공장': { rows:[], nextId:1, master:defMaster() } };
 let curSite  = '본사공장';   // 현황 페이지 기준 사업장
 let curMasterSite = '본사공장'; // 기준정보 선택 사업장
 let curPage  = 'home';
+let sortState = { mid: null, dir: 0 }; // dir: 0=없음 1=내림차순(체크O먼저) -1=오름차순
 let unlockedSites = new Set();       // 현황 편집 인증된 사업장
 let unlockedMasterSites = new Set();  // 기준정보 편집 인증된 사업장
 let editPwCallback = null;
@@ -531,10 +723,7 @@ function renderDashboard(){
       </div>
     </div>`;
   }).join('') +
-  `<div class="site-add-card" onclick="openAddSiteModal()">
-    <div class="site-add-icon">＋</div>
-    <div class="site-add-txt">사업장 추가</div>
-  </div>`;
+``;  // 추가 카드 제거
 
   document.getElementById('totalBadge').textContent = `전체 ${totalAll}명`;
 }
@@ -562,8 +751,11 @@ function buildMachineHeaders(){
   MACHINES.forEach(m=>{
     const th = document.createElement('th');
     th.className='th-machine'; th.style.minWidth='52px';
-    th.innerHTML=`<div class="th-inner" style="font-size:11px;line-height:1.25;text-align:center">${m.label.replace('\n','<br>')}</div>`;
-    th.addEventListener('click', e=>showMachineTT(m.id, e));
+    th.innerHTML=`<div class="th-inner" style="font-size:11px;line-height:1.25;text-align:center;gap:2px">
+      <span>${m.label.replace('\n','<br>')}</span>
+      <button class="sort-btn" id="sortBtn_${m.id}" onclick="event.stopPropagation();toggleSort('${m.id}')" title="${m.label.replace('\n',' ')} 정렬">↕</button>
+    </div>`;
+    th.addEventListener('click', e=>{ if(!e.target.classList.contains('sort-btn')) showMachineTT(m.id, e); });
     tr.appendChild(th);
   });
 }
@@ -624,17 +816,17 @@ function renderTable(){
     const focused = (el, tf) => `onfocus="this.parentElement.classList.${tf?'add':'remove'}('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"`;
     return `<tr data-id="${r.id}">
       <td class="td-no">${i+1}</td>
-      <td class="td-text" data-col="team" tabindex="0" onkeydown="onCellKey(event,this)">
+      <td class="td-text col-sticky" style="left:40px" data-col="team" tabindex="0" onkeydown="onCellKey(event,this)">
         <select class="cell-edit" onchange="setF(${r.id},'team',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
           <option value=""></option>${teamOpts.replace(`"${esc(r.team)}"`,`"${esc(r.team)}" selected`)}</select></td>
-      <td class="td-process" data-col="process" tabindex="0" onkeydown="onCellKey(event,this)">
+      <td class="td-process col-sticky" style="left:125px" data-col="process" tabindex="0" onkeydown="onCellKey(event,this)">
         <input class="cell-edit" value="${esc(r.process)}" placeholder="공정명" onchange="setF(${r.id},'process',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
-      <td class="td-text" data-col="position" tabindex="0" onkeydown="onCellKey(event,this)">
+      <td class="td-text col-sticky" style="left:225px" data-col="position" tabindex="0" onkeydown="onCellKey(event,this)">
         <select class="cell-edit" onchange="setF(${r.id},'position',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
           <option value=""></option>${posOpts.replace(`"${esc(r.position)}"`,`"${esc(r.position)}" selected`)}</select></td>
-      <td class="td-empno" data-col="empno" tabindex="0" onkeydown="onCellKey(event,this)">
+      <td class="td-empno col-sticky" style="left:293px" data-col="empno" tabindex="0" onkeydown="onCellKey(event,this)">
         <input class="cell-edit" value="${esc(r.empno)}" placeholder="사번" onchange="setF(${r.id},'empno',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
-      <td class="td-name" data-col="name" tabindex="0" onkeydown="onCellKey(event,this)">
+      <td class="td-name col-sticky" style="left:373px;border-right:2px solid var(--gray300)" data-col="name" tabindex="0" onkeydown="onCellKey(event,this)">
         <input class="cell-edit" value="${esc(r.name)}" placeholder="이름" onchange="setF(${r.id},'name',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
       <td class="td-total" data-col="total" tabindex="0" onkeydown="onCellKey(event,this)" onclick="showTotalTT(${r.id},event)">
         <span class="total-badge${total===0?' zero':''}">${total}</span></td>
@@ -658,6 +850,26 @@ function setF(id,f,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id=
 function toggleCheck(id,mid){ if(!isUnlocked()){ requireAuth(()=>{ const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }); return; } const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }
 
 /* ════ 키보드 ════ */
+function toggleSort(mid){
+  if(sortState.mid === mid){
+    sortState.dir = sortState.dir === 1 ? -1 : sortState.dir === -1 ? 0 : 1;
+  } else {
+    sortState.mid = mid; sortState.dir = 1;
+  }
+  // 버튼 UI 업데이트
+  document.querySelectorAll('.sort-btn').forEach(b=>{
+    b.classList.remove('asc','desc'); b.textContent='↕';
+  });
+  if(sortState.dir !== 0){
+    const btn = document.getElementById('sortBtn_'+sortState.mid);
+    if(btn){
+      btn.classList.add(sortState.dir===1?'desc':'asc');
+      btn.textContent = sortState.dir===1?'↓':'↑';
+    }
+  }
+  renderTable();
+}
+
 function getAllCells(){ return [...document.querySelectorAll('#tableBody td[tabindex="0"]')]; }
 function focusCell(td){ td.classList.add('cell-focused'); td.focus(); const inp=td.querySelector('input,select'); if(inp)inp.focus(); }
 function onCellKey(e,td){
@@ -969,16 +1181,95 @@ function exportExcel(){
   }
   const wb=XLSX.utils.book_new(), ws=XLSX.utils.aoa_to_sheet([headers,...data]);
   ws['!cols']=[{wch:10},{wch:12},{wch:8},{wch:10},{wch:8},{wch:5},...MACHINES.map(()=>({wch:6})),{wch:16},{wch:12}];
+  // 인쇄 설정: A4 가로, 1페이지 맞춤
+  ws['!pageSetup'] = { orientation:'landscape', paperSize:9, fitToPage:true, fitToWidth:1, fitToHeight:0 };
+  ws['!margins']   = { left:0.25, right:0.25, top:0.3, bottom:0.3, header:0.1, footer:0.1 };
   XLSX.utils.book_append_sheet(wb,ws,'유해위험작업현황');
+
+  // 점검기준표 시트 추가
+  const criteria = [
+    ['작업종류','점검기준'],
+    ['호이스트','권과방지장치, 브레이크, 클러치 및 운전장치의 기능'],
+    ['호이스트','주행로의 상측 레일의 상태'],
+    ['호이스트','와이어로프가 통하고 있는 곳의 상태'],
+    ['호이스트','경보장치 등의 기능'],
+    ['컨베이어','원동기 및 풀리 기능의 이상 유무'],
+    ['컨베이어','이탈 등의 방지장치 기능의 이상 유무'],
+    ['컨베이어','비상정지장치 기능의 이상 유무'],
+    ['컨베이어','원동기·회전축·기어 및 풀리 등의 덮개 또는 울 등의 이상 유무'],
+    ['산업용로봇','외부 전선의 피복 또는 외장의 손상 유무'],
+    ['산업용로봇','매니퓰레이터 작동의 이상 유무'],
+    ['산업용로봇','제동장치 및 비상정지장치의 기능'],
+    ['리프트','방호장치, 브레이크 및 클러치의 기능'],
+    ['리프트','와이어로프가 통하고 있는 곳의 상태'],
+    ['프레스','클러치 및 브레이크의 기능'],
+    ['프레스','크랭크축, 플라이휠, 슬라이드, 연결봉 및 연결 나사의 풀림 여부'],
+    ['프레스','1행정 1정지기구, 급정지장치 및 비상정지장치의 기능'],
+    ['프레스','슬라이드 또는 칼날에 의한 위험방지 기구의 기능'],
+    ['프레스','프레스의 금형 및 고정볼트 상태'],
+    ['프레스','방호장치의 기능'],
+    ['프레스','전단기의 칼날 및 테이블의 상태'],
+    ['공기압축기','공기저장 압력용기의 외관상태'],
+    ['공기압축기','드레인밸브의 조작 및 배수'],
+    ['공기압축기','압력방출장치의 기능'],
+    ['공기압축기','언로드밸브의 기능'],
+    ['공기압축기','윤활유의 상태'],
+    ['공기압축기','회전부의 덮개 또는 울'],
+    ['공기압축기','그 밖의 연결 부위의 이상 유무'],
+    ['지게차','제동장치 및 조종장치 기능의 이상 유무'],
+    ['지게차','하역장치 및 유압장치 기능의 이상 유무'],
+    ['지게차','바퀴의 이상 유무'],
+    ['지게차','전조등·후미등·방향지시기 및 경보장치 기능의 이상 유무'],
+    ['지게차','작업자 안전벨트 및 안전모 착용'],
+    ['지게차','유자격자 운전 여부 확인'],
+    ['지게차','시동키 관리상태 등 확인'],
+    ['용접·절단','작업 준비 및 작업 절차 수립 여부'],
+    ['용접·절단','화기작업에 따른 인근 가연성물질에 대한 방호조치 및 소화기구 비치 여부'],
+    ['용접·절단','용접불티 비산방지덮개 또는 용접 방화포 등 불꽃불티 비산 방지 조치 여부'],
+    ['용접·절단','인화성 액체의 증기 또는 인화성 가스가 남아있지 않도록 하는 환기 조치 여부'],
+    ['용접·절단','작업근로자에 대한 화재예방 및 피난 교육 등 비상조치 여부'],
+    ['와이어로프','와이어로프 및 벨트 이상유무 (찢어짐, 끊어짐 등)'],
+    ['와이어로프','(훅이 있는 경우) 훅의 매달림 상태'],
+    ['와이어로프','훅해지장치 정상기능 여부'],
+    ['중량물','중량물 취급의 올바른 자세 및 복장'],
+    ['중량물','위험물이 날아 흩어짐에 따른 보호구의 착용'],
+    ['중량물','온도 상승이나 습기에 의하여 위험성이 존재하는 중량물의 취급방법'],
+    ['중량물','그 밖에 하역운반기계등의 적절한 사용방법'],
+    ['방사선기기','장비 외함상태, 장비 주변 청결'],
+    ['방사선기기','차폐체 무결성 (납커튼, 외함 등)'],
+    ['방사선기기','안전연동(interlock)장치 이상유무'],
+    ['방사선기기','경고등 작동 상태'],
+    ['방사선기기','비상정지 버튼 상태'],
+    ['방사선기기','전원 및 배선 상태'],
+    ['방사선기기','경고표지 부착 상태'],
+    ['','※ 육안점검을 기준으로 함. 필요 시 직접 작동 등을 통한 점검 실시.'],
+  ];
+  const ws2 = XLSX.utils.aoa_to_sheet(criteria);
+  ws2['!cols'] = [{wch:14},{wch:70}];
+  ws2['!rows'] = [{hpt:15}];
+  ws2['!pageSetup'] = { orientation:'landscape', paperSize:9 };
+  ws2['!margins']   = { left:0.3, right:0.3, top:0.3, bottom:0.3, header:0.1, footer:0.1 };
+  XLSX.utils.book_append_sheet(wb,ws2,'작업별점검기준');
+
   XLSX.writeFile(wb,curSite+'_유해위험작업현황_'+today()+'.xlsx');
   toast('엑셀 다운로드 완료','ok');
 }
 
 function printPDF(){
-  document.getElementById('printTitle').textContent=curSite+' 관리감독자 유해위험작업 현황';
-  document.getElementById('printSub').textContent='출력일: '+new Date().toLocaleDateString('ko-KR')+'  /  총 '+sd().rows.length+'명';
-  window.print();
+  const dept = document.getElementById('filterDept').value;
+  document.getElementById('printTitle').textContent =
+    curSite + ' 관리감독자 유해위험작업 대상 현황' + (dept?' ['+dept+']':'');
+  document.getElementById('printSub').textContent =
+    '출력일: ' + new Date().toLocaleDateString('ko-KR') +
+    '  ·  사업장: ' + curSite +
+    '  ·  총 ' + document.querySelectorAll('#tableBody tr[data-id]').length + '명';
+  document.getElementById('checkCriteriaTable').style.display='block';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    window.print();
+    setTimeout(()=>{ document.getElementById('checkCriteriaTable').style.display='none'; },800);
+  }));
 }
+
 
 /* ══════════════════════════════════════════
    유틸
