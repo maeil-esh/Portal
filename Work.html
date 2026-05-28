@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리감독자 유해위험작업 현황</title>
+<style>
+:root {
+  --blue50:#f0f4ff; --blue100:#d6e4ff; --blue500:#3182f6; --blue600:#1b6ef3;
+  --gray50:#f9fafb; --gray100:#f2f4f6; --gray200:#e5e8eb; --gray300:#d1d6db;
+  --gray400:#b0b8c1; --gray500:#8b95a1; --gray600:#6b7684; --gray700:#4e5968;
+  --gray800:#333d4b; --gray900:#191f28;
+  --green50:#e8f9f0; --green100:#b3eedd; --green500:#00b493;
+  --red50:#fff0f0; --red500:#f04452;
+  --orange500:#f59e0b;
+  --orange50:#fff7e6; --orange500:#f59e0b;
+  --white:#fff;
+  --r6:6px; --r8:8px; --r12:12px;
+  --sh1:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.10);
+}
+
+/* ════ 로딩 스크린 ════ */
+#loading-screen{
+  position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(145deg,#f0f4ff 0%,#f9fafb 50%,#eaf9f4 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;transition:opacity .5s ease,visibility .5s ease;
+}
+#loading-screen.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+
+/* 배경 블롭 */
+.ld-blob{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.ld-blob::before{content:'';position:absolute;width:600px;height:600px;top:-150px;left:-100px;border-radius:50%;background:radial-gradient(circle,rgba(49,130,246,.08) 0%,transparent 70%)}
+.ld-blob::after{content:'';position:absolute;width:500px;height:500px;bottom:-100px;right:-80px;border-radius:50%;background:radial-gradient(circle,rgba(0,180,147,.07) 0%,transparent 70%)}
+.ld-dots-bg{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(15,23,42,.05) 1px,transparent 1px);background-size:28px 28px}
+
+/* 로고 영역 */
+.ld-logo-wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:28px;animation:ldFadeDown .7s cubic-bezier(.22,1,.36,1) both}
+.ld-icon{width:56px;height:56px;background:var(--blue500);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(49,130,246,.25);animation:ldPulse 2s ease-in-out infinite}
+.ld-title{text-align:center}
+.ld-title h1{font-size:clamp(22px,4vw,34px);font-weight:800;color:var(--gray900);letter-spacing:-.5px;line-height:1.2;margin-bottom:8px}
+.ld-title h1 span{color:var(--blue500)}
+.ld-title p{font-size:13px;color:var(--gray500);letter-spacing:-.1px}
+
+/* 프로그레스 바 */
+.ld-progress-wrap{position:relative;z-index:1;width:220px;margin-top:8px}
+.ld-progress-track{height:3px;background:var(--gray200);border-radius:2px;overflow:hidden}
+.ld-progress-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--blue500),var(--green500));width:0%;transition:width .3s ease}
+.ld-status{font-size:11px;color:var(--gray400);text-align:center;margin-top:8px;letter-spacing:-.1px;min-height:16px}
+
+/* 하단 뱃지 */
+.ld-badge{position:relative;z-index:1;margin-top:32px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.8);border:1px solid var(--gray200);border-radius:20px;padding:5px 14px 5px 10px;backdrop-filter:blur(4px)}
+.ld-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--green500);animation:ldBlink 2s ease-in-out infinite}
+.ld-badge span{font-size:11px;font-weight:600;color:var(--gray600);letter-spacing:.02em}
+
+@keyframes ldFadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ldPulse{0%,100%{box-shadow:0 8px 32px rgba(49,130,246,.25)}50%{box-shadow:0 8px 40px rgba(49,130,246,.45)}}
+@keyframes ldBlink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes ldSpin{to{transform:rotate(360deg)}}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Malgun Gothic','맑은 고딕',-apple-system,sans-serif;font-size:13px;background:var(--gray100);color:var(--gray900);-webkit-font-smoothing:antialiased}
+
+/* ════ 글로벌 컴포넌트 ════ */
+.btn{padding:7px 14px;border:1.5px solid var(--gray200);border-radius:var(--r6);font-size:12px;font-family:inherit;font-weight:600;cursor:pointer;background:var(--white);color:var(--gray700);display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:all .12s;letter-spacing:-.2px}
+.btn:hover{background:var(--gray50);border-color:var(--gray300)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-primary{background:var(--blue500);color:var(--white);border-color:var(--blue500)}
+.btn-primary:hover{background:var(--blue600);border-color:var(--blue600)}
+.btn-success{background:var(--green500);color:var(--white);border-color:var(--green500)}
+.btn-success:hover{background:#009e82}
+.btn-red{background:var(--red500);color:var(--white);border-color:var(--red500)}
+.btn-red:hover{background:#d93a47}
+.divider{width:1px;height:20px;background:var(--gray200);margin:0 3px}
+
+/* ════ 상단바 ════ */
+.topbar{background:var(--white);border-bottom:1px solid var(--gray200);height:56px;padding:0 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 var(--gray200)}
+.topbar-icon{width:34px;height:34px;background:var(--blue500);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.topbar-logo{font-size:14px;font-weight:800;color:var(--gray900);letter-spacing:-.3px}
+.topbar-logo span{color:var(--gray500);font-weight:400;font-size:12px;margin-left:6px}
+.topbar-badge{font-size:11px;font-weight:600;color:var(--blue500);background:var(--blue50);border:1px solid var(--blue100);padding:3px 10px;border-radius:20px}
+.topbar-space{flex:1}
+.gas-dot{width:7px;height:7px;border-radius:50%;background:var(--gray300);display:inline-block}
+.gas-dot.ok{background:var(--green500)}
+.gas-txt{font-size:11px;color:var(--gray500)}
+
+/* ════ 네비 탭바 ════ */
+.navbar{background:var(--white);border-bottom:2px solid var(--gray200);padding:0 24px;display:flex;align-items:flex-end;gap:0}
+.nav-tab{padding:12px 18px;font-size:13px;font-weight:600;font-family:inherit;color:var(--gray500);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;white-space:nowrap;transition:all .12s;letter-spacing:-.2px}
+.nav-tab:hover{color:var(--gray800)}
+.nav-tab.active{color:var(--blue500);border-bottom-color:var(--blue500)}
+.nav-sep{width:1px;height:20px;background:var(--gray200);margin:0 4px;align-self:center}
+
+/* ════ 페이지 공통 ════ */
+.page{display:none;min-height:calc(100vh - 110px)}
+.page.active{display:block}
+
+/* ════ 메인 대시보드 ════ */
+.dash-bg{min-height:calc(100vh - 110px);background:linear-gradient(145deg,#f0f4ff 0%,#f9fafb 50%,#eaf9f4 100%);padding:0 0 48px}
+/* 히어로 */
+.dash-hero{text-align:center;padding:48px 24px 36px}
+.dash-hero-title{font-size:36px;font-weight:800;color:var(--gray900);line-height:1.2;letter-spacing:-.8px;margin-bottom:10px}
+.dash-hero-title span{color:var(--blue500)}
+.dash-hero-sub{font-size:14px;color:var(--gray500);margin-bottom:24px;letter-spacing:-.2px}
+.dash-hero-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+/* 사업장 그리드 */
+.site-grid{padding:0 32px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;max-width:1400px;margin:0 auto}
+/* 사업장 카드 */
+.site-card{background:var(--white);border:1px solid var(--gray200);border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;cursor:pointer;transition:all .18s;position:relative}
+.site-card:hover{box-shadow:0 8px 32px rgba(49,130,246,.13);transform:translateY(-4px);border-color:var(--blue100)}
+.site-card-accent{height:4px;width:100%}
+.site-card-inner{padding:20px 22px 0}
+.site-card-num{font-size:11px;font-weight:700;color:var(--gray400);letter-spacing:.5px;float:right;margin-top:2px}
+.site-card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
+.site-card-category{font-size:10px;font-weight:700;letter-spacing:.8px;margin-bottom:4px}
+.site-card-name{font-size:17px;font-weight:800;color:var(--gray900);letter-spacing:-.4px;margin-bottom:8px;line-height:1.3}
+.site-card-desc{font-size:12px;color:var(--gray500);line-height:1.6;min-height:36px}
+.site-card-stats{display:flex;gap:16px;margin:14px 0 0;padding:14px 0;border-top:1px solid var(--gray100)}
+.site-stat{text-align:center;flex:1}
+.site-stat-num{font-size:22px;font-weight:800;color:var(--gray900);line-height:1}
+.site-stat-label{font-size:10px;color:var(--gray500);margin-top:3px;letter-spacing:-.1px}
+.site-card-footer{padding:12px 22px;display:flex;align-items:center;justify-content:space-between}
+.site-status{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green500)}
+.status-dot.hold{background:var(--orange500)}
+.site-goto{font-size:12px;font-weight:700;color:var(--blue500);background:var(--blue50);border:1.5px solid var(--blue100);border-radius:20px;padding:5px 14px;cursor:pointer;transition:all .12s;font-family:inherit}
+.site-goto:hover{background:var(--blue500);color:var(--white)}
+.machine-chips{display:flex;gap:5px;flex-wrap:wrap;padding:0 22px 14px}
+.machine-chip{font-size:10px;font-weight:600;color:var(--blue500);background:var(--blue50);border:1px solid var(--blue100);border-radius:10px;padding:2px 8px}
+/* 추가 카드 */
+.site-add-card{background:rgba(255,255,255,.7);border:2px dashed var(--gray300);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:260px;cursor:pointer;transition:all .18s;color:var(--gray400)}
+.site-add-card:hover{border-color:var(--blue500);color:var(--blue500);background:rgba(240,244,255,.8);transform:translateY(-4px)}
+.site-add-icon{font-size:32px;line-height:1}
+.site-add-txt{font-size:13px;font-weight:700}
+
+/* ════ 현황 페이지 ════ */
+.work-header{padding:16px 24px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.work-site-label{font-size:14px;font-weight:700;color:var(--gray900)}
+.work-site-badge{font-size:11px;color:var(--gray500);background:var(--gray100);padding:2px 8px;border-radius:10px}
+.work-toolbar{padding:8px 24px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.search-box,.filter-sel{border:1.5px solid var(--gray200);border-radius:var(--r6);padding:6px 10px;font-size:12px;font-family:inherit;color:var(--gray800);background:var(--white);transition:border-color .15s}
+.search-box{width:150px}.filter-sel{width:120px;cursor:pointer}
+.search-box:focus,.filter-sel:focus{outline:none;border-color:var(--blue500)}
+.hint{font-size:11px;color:var(--gray400)}
+
+/* ════ 테이블 ════ */
+.tbl-wrap{overflow:auto;max-height:calc(100vh - 220px);margin:12px 24px;border:1px solid var(--gray200);border-radius:var(--r8);box-shadow:var(--sh1);background:var(--white)}
+table{border-collapse:collapse;white-space:nowrap;font-size:12px;min-width:100%}
+thead th{background:var(--gray800);color:var(--white);padding:0;text-align:center;font-weight:600;border-right:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:10;height:36px;vertical-align:middle;letter-spacing:-.2px}
+thead th:first-child{position:sticky;left:0;z-index:20;background:var(--gray800)}
+thead tr:nth-child(2) th{background:var(--gray700);height:32px;font-size:11px;font-weight:600}
+.th-group{background:var(--gray700)!important;font-size:11px!important;color:rgba(255,255,255,.85)!important}
+.th-inner{display:flex;align-items:center;justify-content:center;padding:0 8px;height:36px;line-height:1.25}
+thead tr:nth-child(2) .th-inner{height:32px}
+.th-machine{cursor:pointer!important}.th-machine:hover{background:var(--gray600)!important}
+tbody tr{height:30px}
+tbody tr:nth-child(even) td{background:var(--gray50)}
+tbody tr:hover td{background:var(--blue50)!important}
+td{border-right:1px solid var(--gray200);border-bottom:1px solid var(--gray200);padding:0;vertical-align:middle;text-align:center;height:30px}
+td:last-child{border-right:none}
+td.td-no,th.th-no{position:sticky;left:0;background:var(--gray100);z-index:5;min-width:40px;width:40px;font-weight:600;color:var(--gray500);border-right:1px solid var(--gray300);font-size:11px}
+tbody tr:nth-child(even) td.td-no{background:var(--gray100)}
+tbody tr:hover td.td-no{background:var(--blue50)!important}
+/* 좌측 고정 컬럼들 */
+.col-sticky{position:sticky!important;z-index:4;background:var(--white)}
+th.col-sticky{background:var(--gray800)!important;z-index:15!important}
+tbody tr:nth-child(even) td.col-sticky{background:var(--gray50)}
+tbody tr:hover td.col-sticky{background:var(--blue50)!important}
+/* 기계 헤더 정렬 버튼 */
+.sort-btn{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:2px;border:none;background:rgba(255,255,255,.15);color:rgba(255,255,255,.7);font-size:9px;cursor:pointer;margin-left:2px;vertical-align:middle;padding:0;line-height:1;transition:all .1s}
+.sort-btn:hover{background:rgba(255,255,255,.35);color:#fff}
+.sort-btn.asc{background:var(--blue500);color:#fff}
+.sort-btn.desc{background:var(--green500);color:#fff}
+.cell-edit{border:none;outline:none;background:transparent;font-family:inherit;font-size:12px;color:var(--gray800);width:100%;height:100%;padding:0 7px;text-align:center;cursor:text}
+.cell-edit:focus{background:var(--white);outline:2px solid var(--blue500);outline-offset:-2px;border-radius:2px}
+select.cell-edit{cursor:pointer}
+td.cell-focused{outline:2px solid var(--blue500);outline-offset:-2px;position:relative;z-index:3}
+td.td-text{min-width:88px;text-align:left}
+td.td-name{min-width:78px;font-weight:700;color:var(--gray900)}
+td.td-empno{min-width:80px}
+td.td-process{min-width:100px;text-align:left}
+td.td-bigo{min-width:120px;text-align:left}
+td.td-date{min-width:90px;font-size:11px;color:var(--gray500)}
+td.td-check{min-width:46px;width:46px;cursor:pointer;user-select:none}
+td.td-check:hover{background:var(--blue50)!important}
+.chk{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;border:1.5px solid var(--gray300);font-size:11px;color:transparent;transition:all .1s}
+.chk.on{background:var(--blue500);border-color:var(--blue500);color:var(--white)}
+.total-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:18px;border-radius:9px;background:var(--blue500);color:var(--white);font-size:11px;font-weight:700;padding:0 6px;cursor:pointer}
+.total-badge.zero{background:var(--gray300);color:var(--gray600)}
+td.td-total{min-width:46px;width:46px}
+td.td-del{min-width:34px;width:34px}
+.del-btn{background:none;border:none;color:var(--gray300);font-size:13px;cursor:pointer;padding:3px 5px;border-radius:4px;transition:all .1s}
+.del-btn:hover{color:var(--red500);background:var(--red50)}
+.empty-row td{color:var(--gray400);padding:32px;text-align:center;border:none}
+tfoot td{background:var(--gray100);font-weight:700;font-size:12px;color:var(--gray700);border-top:1.5px solid var(--gray300);border-right:1px solid var(--gray200);padding:0 6px;height:28px;text-align:center;vertical-align:middle}
+tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border-right:1px solid var(--gray300)}
+
+/* ════ 기준정보 페이지 ════ */
+.master-wrap{padding:24px}
+.master-site-bar{background:var(--white);border:1px solid var(--gray200);border-radius:var(--r8);margin-bottom:20px;overflow:hidden}
+.master-site-bar-head{padding:14px 20px;border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.master-site-bar-title{font-size:13px;font-weight:700;color:var(--gray900)}
+.master-site-tabs{display:flex;gap:6px;flex:1;flex-wrap:wrap;padding:14px 20px}
+.master-site-tab{padding:6px 14px;border:1.5px solid var(--gray200);border-radius:20px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;background:var(--white);color:var(--gray600);transition:all .12s}
+.master-site-tab:hover{border-color:var(--blue500);color:var(--blue500)}
+.master-site-tab.active{background:var(--blue500);color:var(--white);border-color:var(--blue500)}
+.master-site-add{display:flex;gap:8px;align-items:center;padding:0 20px 14px}
+.master-inp{border:1.5px solid var(--gray200);border-radius:var(--r6);padding:7px 10px;font-size:12px;font-family:inherit;color:var(--gray800);transition:border-color .15s;background:var(--white)}
+.master-inp:focus{outline:none;border-color:var(--blue500)}
+
+.master-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.master-card{background:var(--white);border:1px solid var(--gray200);border-radius:var(--r8);box-shadow:var(--sh1);overflow:hidden}
+.master-card-head{background:var(--gray800);color:var(--white);padding:12px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.master-item{padding:7px 12px;border-bottom:1px solid var(--gray100);display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray800);cursor:default;transition:background .1s}
+.master-item:hover{background:var(--gray50)}
+.master-item.dragging{opacity:.4;background:var(--blue50)!important}
+.master-item.drag-over{background:var(--blue100)!important;border-top:2px solid var(--blue500)!important}
+.drag-handle{color:var(--gray400);cursor:grab;font-size:14px;flex-shrink:0;padding:0 2px;user-select:none}
+.drag-handle:active{cursor:grabbing}
+.master-item-del{background:none;border:none;color:var(--gray300);cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;transition:all .1s;margin-left:auto;flex-shrink:0}
+.master-item-del:hover{color:var(--red500);background:var(--red50)}
+.master-card-site{font-size:11px;font-weight:400;opacity:.7}
+.master-list{max-height:260px;overflow-y:auto}
+.master-item{padding:8px 16px;border-bottom:1px solid var(--gray100);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--gray800)}
+.master-item:last-child{border-bottom:none}
+.master-item:hover{background:var(--gray50)}
+.master-item-del{background:none;border:none;color:var(--gray300);cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;transition:all .1s}
+.master-item-del:hover{color:var(--red500);background:var(--red50)}
+.master-add-row{display:flex;gap:8px;padding:10px 16px;border-top:1px solid var(--gray200)}
+
+/* ════ 툴팁 팝업 ════ */
+.tt{display:none;position:fixed;z-index:9999;background:var(--white);border:1px solid var(--gray200);border-radius:var(--r8);box-shadow:var(--sh2);min-width:272px;max-width:360px;overflow:hidden;animation:fadeUp .12s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.tt.show{display:block}
+.tt-head{background:var(--gray900);color:var(--white);padding:10px 14px;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:space-between}
+.tt-close{background:none;border:none;color:rgba(255,255,255,.6);font-size:15px;cursor:pointer;padding:0;transition:color .1s}
+.tt-close:hover{color:var(--white)}
+.tt-body{padding:10px 14px}
+.tt-item{font-size:12px;line-height:1.65;color:var(--gray700);padding:3px 0;border-bottom:1px solid var(--gray100);display:flex;gap:6px}
+.tt-item:last-of-type{border-bottom:none}
+.tt-item::before{content:'·';color:var(--blue500);font-weight:700;flex-shrink:0}
+.tt-ref{margin-top:8px;font-size:11px;color:var(--gray400);padding-top:8px;border-top:1px solid var(--gray100)}
+.tt-note{margin-top:6px;font-size:11px;color:var(--blue500);background:var(--blue50);border-radius:4px;padding:5px 8px;line-height:1.5}
+.tt-total-item{font-size:12px;color:var(--gray700);padding:4px 0;border-bottom:1px solid var(--gray100);display:flex;align-items:center;gap:7px}
+.tt-total-item:last-child{border-bottom:none}
+.tt-total-item::before{content:'✓';color:var(--blue500);font-weight:700;font-size:11px;flex-shrink:0}
+
+/* ════ 모달 ════ */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:500;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:var(--white);border-radius:var(--r8);box-shadow:var(--sh2);padding:24px;min-width:320px;max-width:420px;width:90%}
+.modal h3{font-size:15px;font-weight:700;margin-bottom:16px;color:var(--gray900)}
+.modal input{width:100%;border:1.5px solid var(--gray200);border-radius:var(--r6);padding:9px 11px;font-size:13px;font-family:inherit;color:var(--gray800);margin-bottom:14px}
+.modal input:focus{outline:none;border-color:var(--blue500)}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end}
+
+/* ════ 토스트 ════ */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--gray800);color:var(--white);padding:10px 20px;border-radius:20px;font-size:13px;font-weight:600;box-shadow:var(--sh2);z-index:99999;opacity:0;transition:all .2s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--green500)}.toast.err{background:var(--red500)}
+
+/* ════ 인쇄 ════ */
+@media print{
+  @page{ size:A4 landscape; margin:8mm 6mm; }
+  @page :first{ margin-top:8mm; }
+
+  /* 숨김 */
+  .topbar,.navbar,.work-toolbar,.td-del,.tt,.toast,.modal-bg,
+  .work-header .btn, tfoot, .sort-btn, .autoSaveIndicator { display:none!important; }
+
+  /* 전체 폰트/배경 */
+  body{ font-size:7.5pt!important; background:#fff!important; color:#000!important; }
+
+  /* 페이지 헤더 */
+  .print-head{ display:block!important; text-align:center; padding:4px 0 6px; }
+  .print-head h2{ font-size:12pt; font-weight:700; margin-bottom:2px; }
+  .print-head p{ font-size:7pt; color:#555; }
+
+  /* 테이블 래퍼 */
+  .tbl-wrap{
+    max-height:none!important; border:none!important; margin:0!important;
+    box-shadow:none!important; overflow:visible!important;
+    padding:0!important;
+  }
+
+  /* sticky 해제 */
+  thead th, thead th.col-sticky, td.col-sticky, td.td-no, th.th-no{
+    position:static!important;
+  }
+
+  /* 테이블 */
+  table{
+    width:100%!important; table-layout:fixed!important;
+    border-collapse:collapse!important; font-size:7pt!important;
+    white-space:normal!important;
+  }
+
+  /* 컬럼 너비 — A4 가로(277mm 유효) 기준 */
+  table colgroup{ display:table-column-group!important; }
+  thead th:nth-child(1){ width:6mm!important; }   /* No. */
+  thead th:nth-child(2){ width:16mm!important; }  /* 팀 */
+  thead th:nth-child(3){ width:16mm!important; }  /* 공정명 */
+  thead th:nth-child(4){ width:12mm!important; }  /* 직책 */
+  thead th:nth-child(5){ width:14mm!important; }  /* 사번 */
+  thead th:nth-child(6){ width:14mm!important; }  /* 이름 */
+  /* 계 + 기계 11개 + 비고 + 업데이트일 = 나머지 */
+
+  /* 헤더 스타일 */
+  thead th{
+    background:#333d4b!important; color:#fff!important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    padding:2px 1px!important; font-size:6.5pt!important;
+    height:auto!important; line-height:1.2!important;
+    border:1px solid #666!important; text-align:center!important;
+    word-break:keep-all!important;
+  }
+  thead tr:nth-child(2) th{
+    background:#4e5968!important; font-size:6pt!important;
+  }
+
+  /* 데이터 행 */
+  tbody tr{ height:auto!important; page-break-inside:avoid!important; }
+  td{
+    padding:1.5px 1px!important; height:auto!important;
+    border:1px solid #ccc!important; font-size:7pt!important;
+    line-height:1.3!important; text-align:center!important;
+    word-break:keep-all!important; overflow:hidden!important;
+  }
+  td.td-text, td.td-process, td.td-name, td.td-bigo{ text-align:left!important; }
+
+  /* 체크박스 */
+  .chk{
+    width:10px!important; height:10px!important; font-size:7pt!important;
+    border:1px solid #999!important; border-radius:2px!important;
+    display:inline-flex!important; align-items:center!important; justify-content:center!important;
+  }
+  .chk.on{
+    background:#1a5!important; border-color:#1a5!important; color:#fff!important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+
+  /* 합계 뱃지 */
+  .total-badge{
+    font-size:6.5pt!important; min-width:14px!important; height:14px!important;
+    padding:0 3px!important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  .total-badge.zero{ background:#ccc!important; }
+
+  /* 인라인 편집 요소 → 텍스트처럼 */
+  .cell-edit{
+    border:none!important; background:transparent!important;
+    font-size:7pt!important; padding:0!important; width:100%!important;
+  }
+  select.cell-edit{ -webkit-appearance:none; appearance:none; }
+
+  /* 짝수 행 배경 */
+  tbody tr:nth-child(even) td{
+    background:#f7f7f7!important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+
+  /* 점검기준표 - A4 가로 마지막 1장 꽉 차게 */
+  #checkCriteriaTable{
+    page-break-before: always!important;
+    margin: 0!important; padding: 0!important;
+    width: 277mm!important;
+    height: 185mm!important;
+    display: flex!important;
+    flex-direction: column!important;
+    overflow: hidden!important;
+  }
+  #checkCriteriaTable > div:first-child{
+    font-size: 10pt!important; font-weight: 700!important;
+    padding: 4px 0 5px!important;
+    border-top: 2px solid #222!important;
+    margin-bottom: 3px!important;
+    flex-shrink: 0!important;
+  }
+  #checkCriteriaTable table{
+    flex: 1!important;
+    width: 100%!important;
+    table-layout: fixed!important;
+    border-collapse: collapse!important;
+    white-space: normal!important;
+    height: 100%!important;
+    overflow: hidden!important;
+  }
+  #checkCriteriaTable table tr{
+    height: 33%!important;
+  }
+  #checkCriteriaTable table td{
+    padding: 4px 6px!important;
+    font-size: 7.5pt!important;
+    line-height: 1.55!important;
+    vertical-align: top!important;
+    border: 1px solid #999!important;
+    word-break: keep-all!important;
+    overflow: hidden!important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  #checkCriteriaTable table td.ct-head{
+    background: #e8e8e8!important;
+    font-size: 8.5pt!important;
+    font-weight: 700!important;
+    text-align: center!important;
+    vertical-align: middle!important;
+    height: 20px!important;
+    padding: 3px 4px!important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  #checkCriteriaTable .ct-note{
+    font-size: 7pt!important;
+    color: #444!important;
+    padding: 4px 0 0!important;
+    flex-shrink: 0!important;
+  }
+
+  /* 헤더/푸터 숨김 */
+  .work-header{ display:none!important; }
+  #page-work .work-header{ display:none!important; }
+}
+.print-head{display:none}
+</style>
+</head>
+<body>
+
+<!-- ════ 로딩 스크린 ════ -->
+<div id="loading-screen">
+  <div class="ld-blob"></div>
+  <div class="ld-dots-bg"></div>
+  <div class="ld-logo-wrap">
+    <div class="ld-icon">
+      <svg viewBox="0 0 28 28" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26">
+        <path d="M14 3L22 7.5V17.5L14 22L6 17.5V7.5L14 3Z"/>
+        <path d="M14 3V22M6 7.5L22 17.5M22 7.5L6 17.5"/>
+      </svg>
+    </div>
+    <div class="ld-title">
+      <h1>유해위험작업 <span>대상 현황</span></h1>
+      <p>관리감독자 지정 관리 시스템</p>
+    </div>
+    <div class="ld-progress-wrap">
+      <div class="ld-progress-track">
+        <div class="ld-progress-bar" id="ldBar"></div>
+      </div>
+      <div class="ld-status" id="ldStatus">시스템 초기화 중...</div>
+    </div>
+  </div>
+  <div class="ld-badge">
+    <span class="ld-badge-dot"></span>
+    <span>산업안전보건법 제16조 / 안전보건규칙 별표3</span>
+  </div>
+</div>
+
+
+<!-- ══ 상단바 ══ -->
+<div class="topbar">
+  <div class="topbar-icon">🛡️</div>
+  <div class="topbar-logo">유해위험작업 대상 현황 <span>관리감독자 지정 관리 시스템</span></div>
+  <div class="topbar-badge" id="totalBadge">전체 0명</div>
+  <div class="topbar-space"></div>
+  <span class="gas-dot" id="gasDot"></span>
+  <span class="gas-txt" id="gasMsg">GAS 미연결</span>
+</div>
+
+<!-- ══ 네비 탭바 ══ -->
+<div class="navbar" id="navbar">
+  <button class="nav-tab active" id="tab-home" onclick="goPage('home')">전체 현황</button>
+  <div class="nav-sep"></div>
+  <!-- 사업장 탭: JS 생성 -->
+  <div id="siteTabs" style="display:flex;gap:0;align-items:flex-end"></div>
+  <div class="nav-sep"></div>
+  <button class="nav-tab" id="tab-master" onclick="checkMasterPw()">기준정보</button>
+</div>
+
+<!-- ══ PAGE: 메인 대시보드 ══ -->
+<div class="page active" id="page-home">
+  <div class="dash-bg">
+    <div class="dash-hero">
+      <div class="dash-hero-title">관리감독자<br><span>유해위험작업 대상 현황</span></div>
+      <div class="dash-hero-sub">담당 공정 내 유해위험작업 대상 여부를 관리감독자별로 파악합니다 &nbsp;·&nbsp; 산업안전보건법 제16조 / 안전보건규칙 별표3</div>
+      <div class="dash-hero-actions">
+        <span id="autoSyncMsg" style="font-size:12px;color:var(--gray400)">● 자동 동기화 대기 중...</span>
+      </div>
+    </div>
+    <div class="site-grid" id="siteGrid"></div>
+  </div>
+</div>
+
+<!-- ══ PAGE: 사업장별 현황 (동적 생성) ══ -->
+<div class="page" id="page-work">
+  <div class="work-header">
+    <button class="btn btn-sm" onclick="goPage('home')">← 전체 현황</button>
+    <span class="work-site-label" id="workSiteLabel"></span>
+    <span class="work-site-badge" id="workSiteBadge"></span>
+    <div style="margin-left:auto;display:flex;gap:6px">
+      <button class="btn btn-primary btn-sm" id="addRowBtn" onclick="addRow()">+ 행 추가</button>
+      <button class="btn btn-sm btn-primary" id="lockBtn" onclick="isUnlocked()?lockSite():requireAuth(()=>{})">🔒 편집</button>
+      <button class="btn btn-sm" id="autoSaveIndicator" style="color:var(--gray400);cursor:default">● 자동저장</button>
+      <button class="btn btn-sm" onclick="exportExcel()">엑셀</button>
+      <button class="btn btn-sm" onclick="printPDF()">PDF</button>
+    </div>
+  </div>
+  <div class="work-toolbar">
+    <select class="filter-sel" id="filterDept" onchange="renderTable()">
+      <option value="">전체 부서</option>
+    </select>
+    <input class="search-box" id="searchBox" placeholder="이름·사번·팀 검색" oninput="renderTable()">
+    <div class="divider"></div>
+    <button class="btn btn-sm" onclick="pingGAS()" title="GAS 서버 연결 확인">🔌 연결확인</button>
+    <span class="hint">기계명 클릭→점검기준 &nbsp;|&nbsp; Tab·방향키 이동 &nbsp;|&nbsp; 스페이스바 체크</span>
+  </div>
+  <div class="print-head" id="printHead"><h2 id="printTitle"></h2><p id="printSub"></p></div>
+
+<div id="checkCriteriaTable" style="display:none">
+  <div>▶ 작업별 점검기준</div>
+  <table>
+    <colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup>
+    <tr>
+      <td class="ct-head">호이스트</td>
+      <td class="ct-head">컨베이어</td>
+      <td class="ct-head">산업용로봇</td>
+      <td class="ct-head">리프트</td>
+    </tr>
+    <tr>
+      <td>- 권과방지장치, 브레이크, 클러치 및 운전장치의 기능<br>- 주행로의 상측 레일의 상태<br>- 와이어로프가 통하고 있는 곳의 상태<br>- 경보장치 등의 기능</td>
+      <td>- 원동기 및 풀리 기능의 이상 유무<br>- 이탈 등의 방지장치 기능의 이상 유무<br>- 비상정지장치 기능의 이상 유무<br>- 원동기·회전축·기어 및 풀리 등의 덮개 또는 울 등의 이상 유무</td>
+      <td>- 외부 전선의 피복 또는 외장의 손상 유무<br>- 매니퓰레이터 작동의 이상 유무<br>- 제동장치 및 비상정지장치의 기능</td>
+      <td>- 방호장치, 브레이크 및 클러치의 기능<br>- 와이어로프가 통하고 있는 곳의 상태</td>
+    </tr>
+    <tr>
+      <td class="ct-head">프레스</td>
+      <td class="ct-head">공기압축기</td>
+      <td class="ct-head">지게차</td>
+      <td class="ct-head">용접/절단</td>
+    </tr>
+    <tr>
+      <td>- 클러치 및 브레이크의 기능<br>- 크랭크축, 플라이휠, 슬라이드, 연결봉 및 연결 나사의 풀림 여부<br>- 1행정 1정지기구, 급정지장치 및 비상정지장치의 기능<br>- 슬라이드 또는 칼날에 의한 위험방지 기구의 기능<br>- 프레스의 금형 및 고정볼트 상태<br>- 방호장치의 기능<br>- 전단기의 칼날 및 테이블의 상태</td>
+      <td>- 공기저장 압력용기의 외관상태<br>- 드레인밸브의 조작 및 배수<br>- 압력방출장치의 기능<br>- 언로드밸브의 기능<br>- 윤활유의 상태<br>- 회전부의 덮개 또는 울<br>- 그 밖의 연결 부위의 이상 유무</td>
+      <td>- 제동장치 및 조종장치 기능의 이상 유무<br>- 하역장치 및 유압장치 기능의 이상 유무<br>- 바퀴의 이상 유무<br>- 전조등·후미등·방향지시기 및 경보장치 기능의 이상 유무<br>- 작업자 안전벨트 및 안전모 착용<br>- 유자격자 운전 여부 확인<br>- 시동키 관리상태 등 확인</td>
+      <td>- 작업 준비 및 작업 절차 수립 여부<br>- 화기작업에 따른 인근 가연성물질에 대한 방호조치 및 소화기구 비치 여부<br>- 용접불티 비산방지덮개 또는 용접 방화포 등 불꽃불티 비산 방지 조치 여부<br>- 인화성 액체의 증기 또는 인화성 가스가 남아있지 않도록 하는 환기 조치 여부<br>- 작업근로자에 대한 화재예방 및 피난 교육 등 비상조치 여부</td>
+    </tr>
+    <tr>
+      <td class="ct-head">와이어로프 등 (체인, 벨트 포함)</td>
+      <td class="ct-head">중량물</td>
+      <td class="ct-head">방사선기기</td>
+      <td class="ct-head"></td>
+    </tr>
+    <tr>
+      <td>- 와이어로프 및 벨트 이상유무 (찢어짐, 끊어짐 등)<br>- (훅이 있는 경우) 훅의 매달림 상태<br>- 훅해지장치 정상기능 여부</td>
+      <td>- 중량물 취급의 올바른 자세 및 복장<br>- 위험물이 날아 흩어짐에 따른 보호구의 착용<br>- 온도 상승이나 습기에 의하여 위험성이 존재하는 중량물의 취급방법<br>- 그 밖에 하역운반기계등의 적절한 사용방법</td>
+      <td>- 장비 외함상태, 장비 주변 청결<br>- 차폐체 무결성 (납커튼, 외함 등)<br>- 안전연동(interlock)장치 이상유무<br>- 경고등 작동 상태<br>- 비상정지 버튼 상태<br>- 전원 및 배선 상태<br>- 경고표지 부착 상태</td>
+      <td style="vertical-align:bottom"><div class="ct-note">※ 육안점검을 기준으로 함.<br>필요 시 직접 작동 등을 통한 점검 실시.</div></td>
+    </tr>
+  </table>
+</div>
+  <div class="tbl-wrap">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th class="th-no" rowspan="2"><div class="th-inner">No.</div></th>
+          <th class="col-sticky" style="min-width:85px;left:40px" rowspan="2"><div class="th-inner">팀</div></th>
+          <th class="col-sticky" style="min-width:100px;left:125px" rowspan="2"><div class="th-inner">공정명</div></th>
+          <th class="col-sticky" style="min-width:68px;left:225px" rowspan="2"><div class="th-inner">직책</div></th>
+          <th class="col-sticky" style="min-width:80px;left:293px" rowspan="2"><div class="th-inner">사번</div></th>
+          <th class="col-sticky" style="min-width:74px;left:373px;border-right:2px solid rgba(255,255,255,.2)" rowspan="2"><div class="th-inner">이름</div></th>
+          <th colspan="12" class="th-group"><div class="th-inner" style="font-size:11px">유해위험작업 대상 &nbsp;(기계명 클릭 → 점검기준)</div></th>
+          <th style="min-width:120px" rowspan="2"><div class="th-inner">비고</div></th>
+          <th style="min-width:88px" rowspan="2"><div class="th-inner">업데이트일</div></th>
+          <th style="min-width:34px" rowspan="2"><div class="th-inner"></div></th>
+        </tr>
+        <tr id="machineHeaderRow"></tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+      <tfoot id="tableFoot"></tfoot>
+    </table>
+  </div>
+</div>
+
+<!-- ══ PAGE: 기준정보 ══ -->
+<div class="page" id="page-master">
+  <div class="master-wrap">
+    <!-- 사업장 선택 바 -->
+    <div class="master-site-bar">
+      <div class="master-site-bar-head">
+        <span class="master-site-bar-title">사업장 관리</span>
+        <span style="font-size:11px;color:var(--gray500)">사업장을 선택하면 해당 사업장의 기준정보를 편집합니다</span>
+      </div>
+      <div class="master-site-tabs" id="masterSiteTabs"></div>
+      <div class="master-site-add">
+        <input class="master-inp" id="newSiteInput" placeholder="새 사업장명 입력 (예: 평택공장)" style="width:220px" onkeydown="if(event.key==='Enter')addSite()">
+        <button class="btn btn-primary btn-sm" onclick="addSite()">사업장 추가</button>
+        <button class="btn btn-red btn-sm" onclick="delSite()">현 사업장 삭제</button>
+      </div>
+    </div>
+    <!-- 기준정보 카드 -->
+    <div class="master-cards" id="masterCards"></div>
+  </div>
+</div>
+
+<!-- 기준정보 편집 잠금 해제 모달 -->
+<div class="modal-bg" id="masterEditPwModalBg">
+  <div class="modal" style="max-width:340px">
+    <h3>기준정보 편집 잠금 해제</h3>
+    <p style="font-size:12px;color:var(--gray500);margin-bottom:14px;margin-top:-8px">
+      <strong id="masterEditSiteLabel"></strong> 사업장의 편집 비밀번호를 입력하세요.
+    </p>
+    <input id="masterEditPwInput" type="password" placeholder="비밀번호 입력"
+      onkeydown="if(event.key==='Enter')confirmMasterEditPw()" style="margin-bottom:10px">
+    <div class="modal-btns">
+      <button class="btn" onclick="closeMasterEditPwModal()">취소</button>
+      <button class="btn btn-primary" onclick="confirmMasterEditPw()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 편집 잠금 해제 모달 -->
+<div class="modal-bg" id="editPwModalBg">
+  <div class="modal" style="max-width:340px">
+    <h3>편집 잠금 해제</h3>
+    <p style="font-size:12px;color:var(--gray500);margin-bottom:14px;margin-top:-8px">
+      <strong id="editSiteLabel"></strong> 사업장의 편집 비밀번호를 입력하세요.
+    </p>
+    <input id="editPwInput" type="password" placeholder="비밀번호 입력"
+      onkeydown="if(event.key==='Enter')confirmEditPw()" style="margin-bottom:10px">
+    <div class="modal-btns">
+      <button class="btn" onclick="closeEditPwModal()">취소</button>
+      <button class="btn btn-primary" onclick="confirmEditPw()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 사업장 추가 모달 -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>사업장 추가</h3>
+    <input id="modalSiteInp" placeholder="사업장명 입력 (예: 평택공장)" onkeydown="if(event.key==='Enter')confirmModal()">
+    <div class="modal-btns">
+      <button class="btn" onclick="closeModal()">취소</button>
+      <button class="btn btn-primary" onclick="confirmModal()">추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- 비밀번호 모달 -->
+<div class="modal-bg" id="pwModalBg">
+  <div class="modal" style="max-width:340px">
+    <h3>기준정보 접근</h3>
+    <p style="font-size:12px;color:var(--gray500);margin-bottom:14px;margin-top:-8px">기준정보 관리는 담당자만 접근할 수 있습니다.</p>
+    <input id="pwInput" type="password" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')confirmPw()" style="margin-bottom:10px">
+    <div class="modal-btns">
+      <button class="btn" onclick="closePwModal()">취소</button>
+      <button class="btn btn-primary" onclick="confirmPw()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 툴팁 -->
+<div class="tt" id="ttPop">
+  <div class="tt-head"><span id="ttTitle"></span><button class="tt-close" onclick="closeTT()">✕</button></div>
+  <div class="tt-body" id="ttBody"></div>
+</div>
+
+<!-- 토스트 -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   GAS URL
+══════════════════════════════════════════ */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwS3l0GEBobEBS1GRGxHfziijuM7dH_HK5ElGrYV7PcI-oAQkNjFKM0nY7dcAj2tYzP/exec';
+
+/* ══════════════════════════════════════════
+   점검기준 데이터 (이미지 원본 기준)
+══════════════════════════════════════════ */
+const MACHINES = [
+  { id:'hoist', label:'호이스트',
+    items:['권과방지장치, 브레이크, 클러치 및 운전장치의 기능','주행로의 상측 레일의 상태','와이어로프가 통하고 있는 곳의 상태','경보장치 등의 기능'],
+    ref:'안전보건규칙 [별표3] 제4호(크레인 준용) / 제35조제2항' },
+  { id:'conveyor', label:'컨베이어',
+    items:['원동기 및 풀리 기능의 이상 유무','이탈 등의 방지장치 기능의 이상 유무','비상정지장치 기능의 이상 유무','원동기·회전축·기어 및 풀리 등의 덮개 또는 울 등의 이상 유무'],
+    ref:'안전보건규칙 [별표3] 제13호 / 제35조제2항' },
+  { id:'robot', label:'산업용\n로봇',
+    items:['외부 전선의 피복 또는 외장의 손상 유무','매니퓰레이터 작동의 이상 유무','제동장치 및 비상정지장치의 기능'],
+    ref:'안전보건규칙 [별표3] 제2호 / 제35조제2항', note:'로봇 동력원 미차단 교시 작업 시 해당' },
+  { id:'lift', label:'리프트',
+    items:['방호장치, 브레이크 및 클러치의 기능','와이어로프가 통하고 있는 곳의 상태'],
+    ref:'안전보건규칙 [별표3] 제6호 / 제35조제2항', note:'간이리프트 포함' },
+  { id:'press', label:'프레스',
+    items:['클러치 및 브레이크의 기능','크랭크축, 플라이휠, 슬라이드, 연결봉 및 연결 나사의 풀림 여부','1행정 1정지기구, 급정지장치 및 비상정지장치의 기능','슬라이드 또는 칼날에 의한 위험방지 기구의 기능','프레스의 금형 및 고정볼트 상태','방호장치의 기능','전단기의 칼날 및 테이블의 상태'],
+    ref:'안전보건규칙 [별표3] 제1호 / 제35조제2항' },
+  { id:'compressor', label:'공기\n압축기',
+    items:['공기저장 압력용기의 외관상태','드레인밸브의 조작 및 배수','압력방출장치의 기능','언로드밸브의 기능','윤활유의 상태','회전부의 덮개 또는 울','그 밖의 연결 부위의 이상 유무'],
+    ref:'안전보건규칙 [별표3] 제3호 / 제35조제2항' },
+  { id:'forklift', label:'지게차',
+    items:['제동장치 및 조종장치 기능의 이상 유무','하역장치 및 유압장치 기능의 이상 유무','바퀴의 이상 유무','전조등·후미등·방향지시기 및 경보장치 기능의 이상 유무','작업자 안전벨트 및 안전모 착용','유자격자 운전 여부 확인','시동키 관리상태 등 확인'],
+    ref:'안전보건규칙 [별표3] 제9호 / 제35조제2항' },
+  { id:'welding', label:'용접·절단',
+    items:['작업 준비 및 작업 절차 수립 여부','화기작업에 따른 인근 가연성물질에 대한 방호조치 및 소화기구 비치 여부','용접불티 비산방지덮개 또는 용접 방화포 등 불꽃불티 비산 방지 조치 여부','인화성 액체의 증기 또는 인화성 가스가 남아있지 않도록 하는 환기 조치 여부','작업근로자에 대한 화재예방 및 피난 교육 등 비상조치 여부'],
+    ref:'안전보건규칙 제241·289·291·292·294·296조', note:'별표3 직접 열거 없음 — 각 해당 조문 적용' },
+  { id:'wire', label:'와이어\n로프',
+    items:['와이어로프 및 벨트 이상유무 (찢어짐, 끊어짐 등)','(훅이 있는 경우) 훅의 매달림 상태','훅해지장치 정상기능 여부'],
+    ref:'안전보건규칙 [별표3] 제8호 / 제35조제2항', note:'양중기 고리걸이작업 시 해당. 체인·섬유벨트 포함' },
+  { id:'heavy', label:'중량물',
+    items:['중량물 취급의 올바른 자세 및 복장','위험물이 날아 흩어짐에 따른 보호구의 착용','온도 상승이나 습기에 의하여 위험성이 존재하는 중량물의 취급방법','그 밖에 하역운반기계등의 적절한 사용방법'],
+    ref:'안전보건규칙 [별표3] 제16호 / 제35조제2항', note:'반복·계속적 중량물 취급 작업 해당' },
+  { id:'radiation', label:'방사선\n기기',
+    items:['장비 외함상태, 장비 주변 청결','차폐체 무결성 (납커튼, 외함 등)','안전연동(interlock)장치 이상유무','경고등 작동 상태','비상정지 버튼 상태','전원 및 배선 상태','경고표지 부착 상태'],
+    ref:'안전보건규칙 제574~578조', note:'별표3 직접 열거 없음 — 제574조 이하 각 조문 적용' },
+];
+
+/* ══════════════════════════════════════════
+   상태
+══════════════════════════════════════════ */
+function defMaster(){ return { team:['생산1팀','생산2팀','품질보증팀','공무환경팀','물류팀','지원팀'], process:['전처리','충전','포장','냉동기관','동력','정비'], position:['팀장','직장','일반'], editPw:'1234' }; }
+
+function normalizeMaster(m){
+  const d = defMaster();
+  m = m || {};
+  return {
+    team: Array.isArray(m.team) ? m.team : d.team,
+    process: Array.isArray(m.process) ? m.process : d.process,
+    position: Array.isArray(m.position) ? m.position : d.position,
+    editPw: m.editPw || '1234'
+  };
+}
+
+let sites = ['본사공장'];
+let siteData = { '본사공장': { rows:[], nextId:1, master:defMaster() } };
+let curSite  = '본사공장';   // 현황 페이지 기준 사업장
+let curMasterSite = '본사공장'; // 기준정보 선택 사업장
+let curPage  = 'home';
+let sortState = { mid: null, dir: 0 }; // dir: 0=없음 1=내림차순(체크O먼저) -1=오름차순
+let unlockedSites = new Set();       // 현황 편집 인증된 사업장
+let unlockedMasterSites = new Set();  // 기준정보 편집 인증된 사업장
+let editPwCallback = null;
+let masterPwCallback = null;
+let gasSeq = 0;
+const SAVE_CHUNK_SIZE = 50;
+
+function sd(s){ return siteData[s||curSite]; }
+function getMaster(key, s){ return sd(s||curMasterSite).master[key]; }
+
+/* ══════════════════════════════════════════
+   페이지 전환
+══════════════════════════════════════════ */
+function goPage(page, site){
+  curPage = page;
+  if(site) curSite = site;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+
+  document.getElementById('page-'+page).classList.add('active');
+  if(page==='home')   document.getElementById('tab-home').classList.add('active');
+  if(page==='master') document.getElementById('tab-master').classList.add('active');
+
+  renderNavTabs();
+  if(page==='home')   renderDashboard();
+  if(page==='work')   renderWorkPage();
+  if(page==='master') renderMasterPage();
+}
+
+/* ══════════════════════════════════════════
+   네비 탭 렌더
+══════════════════════════════════════════ */
+function renderNavTabs(){
+  const el = document.getElementById('siteTabs');
+  el.innerHTML = sites.map(s=>
+    `<button class="nav-tab${curPage==='work'&&curSite===s?' active':''}"
+      onclick="goPage('work','${esc(s)}')">${esc(s)}</button>`
+  ).join('');
+}
+
+/* ══════════════════════════════════════════
+   대시보드
+══════════════════════════════════════════ */
+// 사업장별 카드 컬러 팔레트
+const CARD_COLORS = [
+  {accent:'#3182f6',cat:'#3182f6',icon:'#e8f0fe',bg:'#3182f6'},
+  {accent:'#00b493',cat:'#00b493',icon:'#e6f9f4',bg:'#00b493'},
+  {accent:'#f59e0b',cat:'#f59e0b',icon:'#fff7e6',bg:'#f59e0b'},
+  {accent:'#8b5cf6',cat:'#8b5cf6',icon:'#f3f0ff',bg:'#8b5cf6'},
+  {accent:'#f04452',cat:'#f04452',icon:'#fff0f0',bg:'#f04452'},
+  {accent:'#0ea5e9',cat:'#0ea5e9',icon:'#e0f2fe',bg:'#0ea5e9'},
+];
+
+function renderDashboard(){
+  const grid = document.getElementById('siteGrid');
+  let totalAll = 0;
+
+  grid.innerHTML = sites.map((s,idx)=>{
+    const d = sd(s);
+    const cnt = d.rows.length;
+    const col = CARD_COLORS[idx % CARD_COLORS.length];
+    const machineCounts = {};
+    MACHINES.forEach(m=>{ machineCounts[m.id]=d.rows.filter(r=>r.machines[m.id]).length; });
+    const topMachines = MACHINES.filter(m=>machineCounts[m.id]>0)
+      .sort((a,b)=>machineCounts[b.id]-machineCounts[a.id]).slice(0,4);
+    const totalWork = Object.values(machineCounts).reduce((a,b)=>a+b,0);
+    const activeTypes = MACHINES.filter(m=>machineCounts[m.id]>0).length;
+    totalAll += cnt;
+    const numStr = String(idx+1).padStart(2,'0');
+    return `<div class="site-card" onclick="goPage('work','${esc(s)}')">
+      <div class="site-card-accent" style="background:${col.accent}"></div>
+      <div class="site-card-inner">
+        <span class="site-card-num">${numStr}</span>
+        <div class="site-card-icon" style="background:${col.icon}">🏭</div>
+        <div class="site-card-category" style="color:${col.cat}">HAZARDOUS WORK TARGET</div>
+        <div class="site-card-name">${esc(s)}</div>
+        <div class="site-card-desc">등록된 관리감독자 ${cnt}명 · ${new Set(d.rows.map(r=>r.team).filter(Boolean)).size}개 부서 · ${activeTypes}개 작업 유형</div>
+        <div class="site-card-stats">
+          <div class="site-stat"><div class="site-stat-num">${cnt}</div><div class="site-stat-label">총 인원</div></div>
+          <div class="site-stat"><div class="site-stat-num">${new Set(d.rows.map(r=>r.team).filter(Boolean)).size}</div><div class="site-stat-label">부서 수</div></div>
+          <div class="site-stat"><div class="site-stat-num">${activeTypes}</div><div class="site-stat-label">유형 수</div></div>
+        </div>
+      </div>
+      ${topMachines.length ? `<div class="machine-chips">${topMachines.map(m=>`<span class="machine-chip">${m.label.replace('\n',' ')} ${machineCounts[m.id]}명</span>`).join('')}</div>` : '<div style="height:14px"></div>'}
+      <div class="site-card-footer">
+        <div class="site-status">
+          <span class="status-dot"></span>
+          <span style="color:var(--green500)">운영 중</span>
+        </div>
+        <button class="site-goto" onclick="event.stopPropagation();goPage('work','${esc(s)}')">바로가기 ↗</button>
+      </div>
+    </div>`;
+  }).join('') +
+``;  // 추가 카드 제거
+
+  document.getElementById('totalBadge').textContent = `전체 ${totalAll}명`;
+}
+
+/* ══════════════════════════════════════════
+   현황 페이지
+══════════════════════════════════════════ */
+function renderWorkPage(){
+  document.getElementById('workSiteLabel').textContent = curSite;
+  updateLockUI();
+  const cnt = sd().rows.length;
+  document.getElementById('workSiteBadge').textContent = `총 ${cnt}명`;
+  updateFilterDept();
+  renderTable();
+  if(!document.getElementById('machineHeaderRow').children.length) buildMachineHeaders();
+}
+
+function buildMachineHeaders(){
+  const tr = document.getElementById('machineHeaderRow');
+  tr.innerHTML = '';
+  const thT = document.createElement('th');
+  thT.style.minWidth='46px';
+  thT.innerHTML='<div class="th-inner" style="font-size:11px">계</div>';
+  tr.appendChild(thT);
+  MACHINES.forEach(m=>{
+    const th = document.createElement('th');
+    th.className='th-machine'; th.style.minWidth='52px';
+    th.innerHTML=`<div class="th-inner" style="font-size:11px;line-height:1.25;text-align:center;gap:2px">
+      <span>${m.label.replace('\n','<br>')}</span>
+      <button class="sort-btn" id="sortBtn_${m.id}" onclick="event.stopPropagation();toggleSort('${m.id}')" title="${m.label.replace('\n',' ')} 정렬">↕</button>
+    </div>`;
+    th.addEventListener('click', e=>{ if(!e.target.classList.contains('sort-btn')) showMachineTT(m.id, e); });
+    tr.appendChild(th);
+  });
+}
+
+function updateFilterDept(){
+  const sel = document.getElementById('filterDept');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">전체 부서</option>' +
+    sd().master.team.map(t=>`<option value="${esc(t)}"${t===cur?' selected':''}>${esc(t)}</option>`).join('');
+}
+
+function addRow(){
+  requireAuth(()=>{
+    const d = sd();
+    const row = { id:d.nextId++, team:'', process:'', position:'', empno:'', name:'',
+      machines:Object.fromEntries(MACHINES.map(m=>[m.id,false])), bigo:'', date:today() };
+    d.rows.push(row);
+    renderTable();
+    document.getElementById('workSiteBadge').textContent = `총 ${d.rows.length}명`;
+    triggerAutoSave();
+    setTimeout(()=>{ const c=document.querySelector(`tr[data-id="${row.id}"] td[data-col="team"]`); if(c) focusCell(c); },50);
+  });
+}
+
+function deleteRow(id){
+  requireAuth(()=>{
+    sd().rows = sd().rows.filter(r=>r.id!==id);
+    renderTable();
+    document.getElementById('workSiteBadge').textContent = `총 ${sd().rows.length}명`;
+    triggerAutoSave();
+  });
+}
+
+function renderTable(){
+  const q    = document.getElementById('searchBox').value.trim().toLowerCase();
+  const dept = document.getElementById('filterDept').value;
+  const rows = sd().rows;
+  const filtered = rows.filter(r=>
+    (!dept||r.team===dept)&&(!q||r.name.includes(q)||r.empno.includes(q)||r.team.includes(q)||r.process.includes(q))
+  );
+  const tbody = document.getElementById('tableBody');
+  const tfoot = document.getElementById('tableFoot');
+  if(!filtered.length){
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="${8+MACHINES.length+2}">데이터가 없습니다. [행 추가]를 클릭하세요.</td></tr>`;
+    tfoot.innerHTML=''; return;
+  }
+  const mT={};
+  MACHINES.forEach(m=>mT[m.id]=0);
+  filtered.forEach(r=>MACHINES.forEach(m=>{ if(r.machines[m.id])mT[m.id]++; }));
+  const teamOpts = sd().master.team.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');
+  const posOpts  = sd().master.position.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('');
+  tbody.innerHTML = filtered.map((r,i)=>{
+    const total = MACHINES.filter(m=>r.machines[m.id]).length;
+    const checks = MACHINES.map(m=>
+      `<td class="td-check" data-col="check" data-mid="${m.id}" tabindex="0"
+        onclick="toggleCheck(${r.id},'${m.id}')" onkeydown="onCellKey(event,this)">
+        <span class="chk${r.machines[m.id]?' on':''}">✓</span></td>`).join('');
+    const focused = (el, tf) => `onfocus="this.parentElement.classList.${tf?'add':'remove'}('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"`;
+    return `<tr data-id="${r.id}">
+      <td class="td-no">${i+1}</td>
+      <td class="td-text col-sticky" style="left:40px" data-col="team" tabindex="0" onkeydown="onCellKey(event,this)">
+        <select class="cell-edit" onchange="setF(${r.id},'team',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
+          <option value=""></option>${teamOpts.replace(`"${esc(r.team)}"`,`"${esc(r.team)}" selected`)}</select></td>
+      <td class="td-process col-sticky" style="left:125px" data-col="process" tabindex="0" onkeydown="onCellKey(event,this)">
+        <input class="cell-edit" value="${esc(r.process)}" placeholder="공정명" onchange="setF(${r.id},'process',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
+      <td class="td-text col-sticky" style="left:225px" data-col="position" tabindex="0" onkeydown="onCellKey(event,this)">
+        <select class="cell-edit" onchange="setF(${r.id},'position',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
+          <option value=""></option>${posOpts.replace(`"${esc(r.position)}"`,`"${esc(r.position)}" selected`)}</select></td>
+      <td class="td-empno col-sticky" style="left:293px" data-col="empno" tabindex="0" onkeydown="onCellKey(event,this)">
+        <input class="cell-edit" value="${esc(r.empno)}" placeholder="사번" onchange="setF(${r.id},'empno',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
+      <td class="td-name col-sticky" style="left:373px;border-right:2px solid var(--gray300)" data-col="name" tabindex="0" onkeydown="onCellKey(event,this)">
+        <input class="cell-edit" value="${esc(r.name)}" placeholder="이름" onchange="setF(${r.id},'name',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
+      <td class="td-total" data-col="total" tabindex="0" onkeydown="onCellKey(event,this)" onclick="showTotalTT(${r.id},event)">
+        <span class="total-badge${total===0?' zero':''}">${total}</span></td>
+      ${checks}
+      <td class="td-bigo" data-col="bigo" tabindex="0" onkeydown="onCellKey(event,this)">
+        <input class="cell-edit" value="${esc(r.bigo)}" placeholder="비고" onchange="setF(${r.id},'bigo',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
+      <td class="td-date">${r.date}</td>
+      <td class="td-del">${isUnlocked()?`<button class="del-btn" onclick="deleteRow(${r.id})">✕</button>`:''}</td>
+    </tr>`;
+  }).join('');
+  const totalAll = filtered.reduce((s,r)=>s+MACHINES.filter(m=>r.machines[m.id]).length,0);
+  tfoot.innerHTML=`<tr><td class="td-no">합계</td>
+    <td colspan="5" style="font-size:11px;color:var(--gray500)">${filtered.length}명</td>
+    <td>${totalAll}</td>
+    ${MACHINES.map(m=>`<td>${mT[m.id]||''}</td>`).join('')}
+    <td></td><td></td><td></td></tr>`;
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function setF(id,f,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r[f]=v; if(['name','empno','team'].includes(f))renderTable(); triggerAutoSave(); }
+function toggleCheck(id,mid){ if(!isUnlocked()){ requireAuth(()=>{ const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }); return; } const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }
+
+/* ════ 키보드 ════ */
+function toggleSort(mid){
+  if(sortState.mid === mid){
+    sortState.dir = sortState.dir === 1 ? -1 : sortState.dir === -1 ? 0 : 1;
+  } else {
+    sortState.mid = mid; sortState.dir = 1;
+  }
+  // 버튼 UI 업데이트
+  document.querySelectorAll('.sort-btn').forEach(b=>{
+    b.classList.remove('asc','desc'); b.textContent='↕';
+  });
+  if(sortState.dir !== 0){
+    const btn = document.getElementById('sortBtn_'+sortState.mid);
+    if(btn){
+      btn.classList.add(sortState.dir===1?'desc':'asc');
+      btn.textContent = sortState.dir===1?'↓':'↑';
+    }
+  }
+  renderTable();
+}
+
+function getAllCells(){ return [...document.querySelectorAll('#tableBody td[tabindex="0"]')]; }
+function focusCell(td){ td.classList.add('cell-focused'); td.focus(); const inp=td.querySelector('input,select'); if(inp)inp.focus(); }
+function onCellKey(e,td){
+  const cells=getAllCells(), idx=cells.indexOf(td);
+  const cols=document.querySelectorAll('#tableBody tr:first-child td[tabindex="0"]').length;
+  if(e.key==='Tab'){e.preventDefault();const n=cells[idx+(e.shiftKey?-1:1)];if(n)focusCell(n);return;}
+  if(e.key==='ArrowRight'){e.preventDefault();const n=cells[idx+1];if(n)focusCell(n);return;}
+  if(e.key==='ArrowLeft'){e.preventDefault();const n=cells[idx-1];if(n)focusCell(n);return;}
+  if(e.key==='ArrowDown'){e.preventDefault();const n=cells[idx+cols];if(n)focusCell(n);return;}
+  if(e.key==='ArrowUp'){e.preventDefault();const n=cells[idx-cols];if(n)focusCell(n);return;}
+  if(e.key===' '&&(td.dataset.col==='check'||td.dataset.col==='total')){e.preventDefault();td.click();}
+}
+
+/* ══════════════════════════════════════════
+   기준정보 페이지
+══════════════════════════════════════════ */
+function renderMasterPage(){
+  // 사업장 탭 칩
+  const el = document.getElementById('masterSiteTabs');
+  el.innerHTML = sites.map(s=>
+    `<button class="master-site-tab${s===curMasterSite?' active':''}" onclick="switchMasterSite('${esc(s)}')">${esc(s)}</button>`
+  ).join('');
+  // 카드
+  renderMasterCards();
+}
+
+function switchMasterSite(name){
+  curMasterSite = name;
+  renderMasterPage();
+}
+
+function renderMasterCards(){
+  const isMasterUnlocked = unlockedMasterSites.has(curMasterSite);
+  const keys    = ['team','process','position'];
+  const labels  = {team:'팀 목록', process:'공정명 목록', position:'직책 목록'};
+  const phs     = {team:'팀명 입력', process:'공정명 입력', position:'직책 입력'};
+
+  // 비밀번호 카드
+  let html = '<div class="master-card">';
+  html += '<div class="master-card-head">편집 비밀번호 <span class="master-card-site">' + esc(curMasterSite) + '</span></div>';
+  html += '<div class="master-list" style="padding:16px">';
+  html += '<div style="font-size:12px;color:var(--gray600);margin-bottom:10px">현황 데이터 수정 시 요구하는 비밀번호입니다.<br>미설정 시 기본값 <b>1234</b>가 적용됩니다.</div>';
+  html += '<div style="display:flex;gap:8px;align-items:center">';
+  html += '<input class="master-inp" id="newPwInput" type="password" placeholder="새 비밀번호 입력" style="flex:1" onkeydown="if(event.key===\'Enter\')changeSitePw()">';
+  html += '<input class="master-inp" id="newPwConfirm" type="password" placeholder="확인" style="flex:1" onkeydown="if(event.key===\'Enter\')changeSitePw()">';
+  html += '</div>';
+  html += '<div style="margin-top:8px;font-size:11px;color:var(--gray500)">현재: <b>' + (sd(curMasterSite).master.editPw ? '설정됨' : '기본값(1234)') + '</b></div>';
+  html += '</div>';
+  html += '<div class="master-add-row"><div style="display:flex;gap:8px">';
+  if(isMasterUnlocked){
+    html += '<button class="btn btn-primary btn-sm" onclick="changeSitePw()" style="flex:1">비밀번호 변경</button>';
+    html += '<button class="btn btn-red btn-sm" onclick="lockMasterSite()">🔒 잠금</button>';
+  } else {
+    html += '<button class="btn btn-primary btn-sm" onclick="requireMasterAuth(()=>{})" style="width:100%">🔓 편집 잠금 해제</button>';
+  }
+  html += '</div></div></div>';
+
+  // 팀/공정/직책 카드
+  keys.forEach(function(key){
+    html += '<div class="master-card">';
+    html += '<div class="master-card-head">' + labels[key] + ' <span class="master-card-site">' + esc(curMasterSite) + '</span></div>';
+    html += '<div class="master-list" id="mList-' + key + '">';
+    var list = getMaster(key);
+    if(list.length === 0){
+      html += '<div class="master-item" style="color:var(--gray400)">항목 없음</div>';
+    } else {
+      list.forEach(function(v, i){
+        if(isMasterUnlocked){
+          html += '<div class="master-item"'
+            + ' draggable="true"'
+            + ' data-key="' + key + '"'
+            + ' data-idx="' + i + '"'
+            + ' ondragstart="onMasterDragStart(event)"'
+            + ' ondragover="onMasterDragOver(event)"'
+            + ' ondragleave="onMasterDragLeave(event)"'
+            + ' ondrop="onMasterDrop(event,\'' + key + '\')"'
+            + '>';
+          html += '<span class="drag-handle" title="드래그하여 순서 변경">⠿</span>';
+          html += '<span style="flex:1">' + esc(v) + '</span>';
+          html += '<button class="master-item-del" onclick="delMasterItem(\'' + key + '\',' + i + ')" title="삭제">✕</button>';
+        } else {
+          html += '<div class="master-item">';
+          html += '<span style="flex:1">' + esc(v) + '</span>';
+        }
+        html += '</div>';
+      });
+    }
+    html += '</div>';
+    // 추가 입력란 - 항상 표시
+    html += '<div class="master-add-row">';
+    if(isMasterUnlocked){
+      html += '<input class="master-inp" id="mInp-' + key + '" placeholder="' + phs[key] + '" style="flex:1" onkeydown="if(event.key===\'Enter\')addMasterItem(\'' + key + '\')">';
+      html += '<button class="btn btn-primary btn-sm" onclick="addMasterItem(\'' + key + '\')">추가</button>';
+    } else {
+      html += '<input class="master-inp" placeholder="' + phs[key] + '" style="flex:1;opacity:.4;cursor:not-allowed" readonly>';
+      html += '<button class="btn btn-primary btn-sm" disabled style="opacity:.4;cursor:not-allowed">추가</button>';
+    }
+    html += '</div>';
+    if(!isMasterUnlocked){
+      html += '<div style="padding:2px 16px 10px;font-size:11px;color:var(--gray400)">🔒 잠금 해제 후 편집 가능합니다</div>';
+    }
+    html += '</div>';
+  });
+
+  document.getElementById('masterCards').innerHTML = html;
+}
+function addMasterItem(key){
+  const inp = document.getElementById('mInp-'+key);
+  const v = inp.value.trim();
+  if(!v) return;
+  if(getMaster(key).includes(v)){ toast('이미 존재합니다','err'); return; }
+  sd(curMasterSite).master[key].push(v);
+  inp.value='';
+  renderMasterCards();
+  saveMasterToGAS(curMasterSite, true);
+  toast(v+' 추가됨','ok');
+}
+
+function requireMasterAuth(cb){
+  const s = curMasterSite;
+  if(unlockedMasterSites.has(s)){ cb(); return; }
+  masterPwCallback = cb;
+  document.getElementById('masterEditSiteLabel').textContent = s;
+  document.getElementById('masterEditPwInput').value='';
+  document.getElementById('masterEditPwInput').style.borderColor='';
+  document.getElementById('masterEditPwInput').placeholder='비밀번호 입력';
+  document.getElementById('masterEditPwModalBg').classList.add('show');
+  setTimeout(()=>document.getElementById('masterEditPwInput').focus(),100);
+}
+
+function confirmMasterEditPw(){
+  const s = curMasterSite;
+  const entered = document.getElementById('masterEditPwInput').value;
+  const correct = sd(s).master.editPw || '1234';
+  if(entered === correct){
+    unlockedMasterSites.add(s);
+    closeMasterEditPwModal();
+    renderMasterCards(); // 잠금 해제 후 UI 업데이트
+    if(masterPwCallback){ masterPwCallback(); masterPwCallback=null; }
+    toast('✅ '+s+' 기준정보 편집 잠금 해제','ok');
+  } else {
+    document.getElementById('masterEditPwInput').value='';
+    document.getElementById('masterEditPwInput').style.borderColor='var(--red500)';
+    document.getElementById('masterEditPwInput').placeholder='비밀번호가 틀렸습니다';
+    setTimeout(()=>{
+      document.getElementById('masterEditPwInput').style.borderColor='';
+      document.getElementById('masterEditPwInput').placeholder='비밀번호 입력';
+    },1500);
+    toast('❌ 비밀번호 오류','err');
+  }
+}
+function closeMasterEditPwModal(){ document.getElementById('masterEditPwModalBg').classList.remove('show'); masterPwCallback=null; }
+
+function lockMasterSite(){
+  unlockedMasterSites.delete(curMasterSite);
+  renderMasterCards();
+  toast(curMasterSite+' 기준정보 잠금됨','');
+}
+
+/* 기준정보 드래그 순서변경 */
+let dragSrcIdx = -1;
+
+function onMasterDragStart(e){
+  dragSrcIdx = parseInt(e.currentTarget.dataset.idx);
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onMasterDragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+function onMasterDragLeave(e){
+  e.currentTarget.classList.remove('drag-over');
+}
+function onMasterDrop(e, key){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const destIdx = parseInt(e.currentTarget.dataset.idx);
+  if(dragSrcIdx === destIdx || dragSrcIdx < 0) return;
+  const list = sd(curMasterSite).master[key];
+  const moved = list.splice(dragSrcIdx, 1)[0];
+  list.splice(destIdx, 0, moved);
+  dragSrcIdx = -1;
+  renderMasterCards();
+  saveMasterToGAS(curMasterSite, true);
+  toast('순서가 변경됐습니다','ok');
+}
+
+function changeSitePw(){
+  requireMasterAuth(()=>{
+    const np = document.getElementById('newPwInput').value;
+    const nc = document.getElementById('newPwConfirm').value;
+    if(!np){ toast('새 비밀번호를 입력하세요','err'); return; }
+    if(np !== nc){ toast('비밀번호가 일치하지 않습니다','err'); return; }
+    sd(curMasterSite).master.editPw = np;
+    unlockedSites.delete(curMasterSite);
+    unlockedMasterSites.delete(curMasterSite);
+    renderMasterCards();
+    saveMasterToGAS(curMasterSite, false);
+    toast('✅ '+curMasterSite+' 비밀번호 변경 완료','ok');
+  });
+}
+
+function delMasterItem(key,i){
+  sd(curMasterSite).master[key].splice(i,1);
+  renderMasterCards();
+  saveMasterToGAS(curMasterSite, true);
+}
+
+function masterPayload(site){
+  const m = sd(site).master || defMaster();
+  return {
+    site: site,
+    team: [...(m.team||[])],
+    process: [...(m.process||[])],
+    position: [...(m.position||[])],
+    editPw: m.editPw || '1234'
+  };
+}
+
+function saveMasterToGAS(site, silent){
+  if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
+  if(!site || !siteData[site]) return;
+  gasCall('saveMaster', {data: JSON.stringify(masterPayload(site))}, res=>{
+    if(res?.result==='success'){
+      setGasOk();
+      if(!silent) setSyncMsg('✓ 기준정보 저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
+    } else if(!silent){
+      toast('❌ 기준정보 저장 실패: '+(res?.error||'오류'),'err');
+    }
+  });
+}
+
+/* ══════════════════════════════════════════
+   사업장 추가/삭제
+══════════════════════════════════════════ */
+function openAddSiteModal(){ document.getElementById('modalSiteInp').value=''; document.getElementById('modalBg').classList.add('show'); setTimeout(()=>document.getElementById('modalSiteInp').focus(),100); }
+function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
+function createSiteLocal(v){
+  if(!siteData[v]){
+    sites.push(v);
+    siteData[v]={rows:[],nextId:1,master:defMaster()};
+  }
+}
+function confirmModal(){
+  const v = document.getElementById('modalSiteInp').value.trim();
+  if(!v){ toast('사업장명을 입력하세요','err'); return; }
+  if(sites.includes(v)){ toast('이미 존재합니다','err'); return; }
+  createSiteLocal(v);
+  closeModal();
+  saveMasterToGAS(v, true);
+  saveRowsForSite(v, ()=>{});
+  goPage('work',v); toast(v+' 추가됨','ok');
+}
+function addSite(){
+  const v = document.getElementById('newSiteInput').value.trim();
+  if(!v){ toast('사업장명을 입력하세요','err'); return; }
+  if(sites.includes(v)){ toast('이미 존재합니다','err'); return; }
+  createSiteLocal(v);
+  document.getElementById('newSiteInput').value='';
+  curMasterSite=v;
+  saveMasterToGAS(v, true);
+  saveRowsForSite(v, ()=>{});
+  renderMasterPage(); renderNavTabs(); toast(v+' 추가됨','ok');
+}
+function delSite(){
+  if(sites.length<=1){ toast('최소 1개 사업장이 필요합니다','err'); return; }
+  const target = curMasterSite;
+  if(!confirm(target+' 사업장을 삭제하시겠습니까? 해당 데이터도 모두 삭제됩니다.')){ return; }
+  sites=sites.filter(s=>s!==target); delete siteData[target];
+  unlockedSites.delete(target); unlockedMasterSites.delete(target);
+  if(curSite===target) curSite=sites[0];
+  curMasterSite=sites[0];
+  if(GAS_URL!=='YOUR_GAS_DEPLOYMENT_URL'){
+    gasCall('deleteSite',{site:target},res=>{
+      if(res?.result==='success') setGasOk();
+      else toast('❌ 서버 사업장 삭제 실패: '+(res?.error||'오류'),'err');
+    });
+  }
+  renderMasterPage(); renderNavTabs(); renderDashboard(); toast('삭제됨','ok');
+}
+
+/* ══════════════════════════════════════════
+   툴팁
+══════════════════════════════════════════ */
+function posTT(el){
+  const p=document.getElementById('ttPop'); p.classList.add('show');
+  const r=el.getBoundingClientRect();
+  let left=r.left, top=r.bottom+4;
+  if(left+370>innerWidth) left=innerWidth-378;
+  if(top+300>innerHeight) top=r.top-310;
+  p.style.left=Math.max(8,left)+'px'; p.style.top=Math.max(8,top)+'px';
+}
+function showMachineTT(id,e){
+  const m=MACHINES.find(x=>x.id===id); if(!m)return;
+  document.getElementById('ttTitle').textContent=m.label.replace('\n',' ')+' — 작업시작 전 점검기준';
+  document.getElementById('ttBody').innerHTML=
+    m.items.map(it=>`<div class="tt-item">${it}</div>`).join('')+
+    `<div class="tt-ref">📌 법적 근거: ${m.ref}</div>`+
+    (m.note?`<div class="tt-note">ℹ️ ${m.note}</div>`:'');
+  posTT(e.currentTarget);
+}
+function showTotalTT(id,e){
+  const r=sd().rows.find(r=>r.id===id); if(!r)return;
+  const checked=MACHINES.filter(m=>r.machines[m.id]);
+  document.getElementById('ttTitle').textContent=(r.name||'해당 인원')+' — 유해위험작업 대상';
+  document.getElementById('ttBody').innerHTML= checked.length===0
+    ? '<div style="color:var(--gray400);font-size:12px;padding:4px 0">선택된 작업 없음</div>'
+    : checked.map(m=>`<div class="tt-total-item">${m.label.replace('\n',' ')}</div>`).join('')+
+      `<div class="tt-ref">총 ${checked.length}개 작업 대상</div>`;
+  posTT(e.currentTarget);
+}
+function closeTT(){ document.getElementById('ttPop').classList.remove('show'); }
+document.addEventListener('click',e=>{
+  const p=document.getElementById('ttPop');
+  if(!p.contains(e.target)&&!e.target.closest('.th-machine')&&!e.target.closest('.td-total')&&!e.target.closest('.total-badge')) closeTT();
+});
+
+/* ══════════════════════════════════════════
+   GAS
+══════════════════════════════════════════ */
+function gasCall(action, params, cb){
+  if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL'){ toast('GAS URL을 설정하세요','err'); return; }
+
+  const cbN = 'gcb_' + Date.now() + '_' + (++gasSeq) + '_' + Math.random().toString(36).slice(2);
+  let scriptEl = null;
+  let done = false;
+  const cleanup = () => {
+    if(scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
+    try{ delete window[cbN]; }catch(e){ window[cbN] = undefined; }
+  };
+  window[cbN] = res => {
+    if(done) return;
+    done = true;
+    cleanup();
+    if(typeof cb === 'function') cb(res || {});
+  };
+
+  let qs = 'action=' + encodeURIComponent(action) + '&callback=' + encodeURIComponent(cbN);
+  if(params){
+    Object.entries(params).forEach(([k,v]) => {
+      qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(String(v));
+    });
+  }
+
+  const src = GAS_URL + '?' + qs;
+  if(src.length > 180000){
+    console.warn('[GAS] URL length is large:', src.length);
+  }
+  scriptEl = document.createElement('script');
+  scriptEl.src = src;
+  scriptEl.onerror = () => {
+    if(done) return;
+    done = true;
+    cleanup();
+    toast('❌ GAS 연결 오류 — 배포 설정을 확인하세요','err');
+    console.error('[GAS] script load error:', action);
+  };
+  document.head.appendChild(scriptEl);
+  setTimeout(() => {
+    if(!done && window[cbN]){
+      done = true;
+      cleanup();
+      toast('❌ 서버 응답 없음 (12초 초과)','err');
+    }
+  }, 12000);
+}
+function setGasOk(){ document.getElementById('gasDot').className='gas-dot ok'; document.getElementById('gasMsg').textContent='연결됨'; }
+
+function pingGAS(){
+  toast('GAS 연결 확인 중...','');
+  gasCall('ping',{},res=>{
+    if(res?.result==='success'){
+      toast('✅ GAS 연결 정상 — '+res.time,'ok');
+      setGasOk();
+    } else {
+      toast('❌ GAS 응답 오류: '+(res?.error||'알 수 없음'),'err');
+    }
+  });
+}
+
+function rowPayloadForSite(site){
+  return (siteData[site]?.rows || []).map(r=>({ site:site, team:r.team, process:r.process, position:r.position, empno:r.empno, name:r.name,
+    ...Object.fromEntries(MACHINES.map(m=>[m.id,r.machines[m.id]?'O':''])),
+    total:MACHINES.filter(m=>r.machines[m.id]).length, bigo:r.bigo, date:r.date }));
+}
+
+function saveRowsForSite(site, cb){
+  const rows = rowPayloadForSite(site);
+  gasCall('clearSite',{site:site},res=>{
+    if(res?.result!=='success'){
+      if(typeof cb === 'function') cb({result:'error', error:res?.error||'clearSite 실패', site});
+      return;
+    }
+    if(!rows.length){
+      if(typeof cb === 'function') cb({result:'success', count:0, site});
+      return;
+    }
+    let idx = 0;
+    let saved = 0;
+    const sendNext = () => {
+      const chunk = rows.slice(idx, idx + SAVE_CHUNK_SIZE);
+      if(!chunk.length){
+        if(typeof cb === 'function') cb({result:'success', count:saved, site});
+        return;
+      }
+      idx += SAVE_CHUNK_SIZE;
+      gasCall('appendRows',{data:JSON.stringify({site:site, rows:chunk})},r=>{
+        if(r?.result!=='success'){
+          if(typeof cb === 'function') cb({result:'error', error:r?.error||'appendRows 실패', site});
+          return;
+        }
+        saved += Number(r.count)||chunk.length;
+        sendNext();
+      });
+    };
+    sendNext();
+  });
+}
+
+function saveToGAS(){
+  toast('저장 중...','');
+  saveRowsForSite(curSite, res=>{
+    if(res?.result==='success'){
+      toast('✅ 저장 완료 ('+res.count+'건)','ok'); setGasOk(); renderDashboard();
+    } else toast('❌ 저장 실패: '+(res?.error||'오류'),'err');
+  });
+}
+function saveAllToGAS(){ autoSaveAll(); }
+
+function ensureSite(site){
+  if(!site) return;
+  if(!siteData[site]){
+    sites.push(site);
+    siteData[site]={rows:[],nextId:1,master:defMaster()};
+  }
+}
+
+function applyMasterMap(map){
+  if(!map) return;
+  Object.keys(map).forEach(site=>{
+    ensureSite(site);
+    siteData[site].master = normalizeMaster(map[site]);
+  });
+}
+
+function resetAllRows(){
+  sites.forEach(s=>{ siteData[s].rows=[]; siteData[s].nextId=1; });
+}
+
+function appendLoadedRows(rows){
+  (rows||[]).forEach(row=>{
+    if(!row.site) return;
+    ensureSite(row.site);
+    const d=siteData[row.site];
+    d.rows.push({ id:d.nextId++, team:row.team||'', process:row.process||'', position:row.position||'',
+      empno:row.empno||'', name:row.name||'', bigo:row.bigo||'', date:row.date||'',
+      machines:Object.fromEntries(MACHINES.map(m=>[m.id,row[m.id]==='O'])) });
+  });
+}
+
+function loadAllFromGAS(){
+  toast('불러오는 중...','');
+  gasCall('loadAllMaster',{},mres=>{
+    if(mres?.result==='success') applyMasterMap(mres.data || {});
+    gasCall('loadAll',{},res=>{
+      if(res?.result==='success'&&Array.isArray(res.data)){
+        resetAllRows();
+        appendLoadedRows(res.data);
+        renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); setGasOk();
+        toast(res.data.length+'건 불러오기 완료','ok');
+      } else toast('불러오기 실패','err');
+    });
+  });
+}
+
+/* ══════════════════════════════════════════
+   엑셀 / PDF
+══════════════════════════════════════════ */
+(()=>{ const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; document.head.appendChild(s); })();
+
+function exportExcel(){
+  const dept=document.getElementById('filterDept').value;
+  const q=document.getElementById('searchBox').value.trim().toLowerCase();
+  const rows=sd().rows.filter(r=>(!dept||r.team===dept)&&(!q||r.name.includes(q)||r.empno.includes(q)||r.team.includes(q)||r.process.includes(q)));
+  if(!rows.length){ toast('데이터가 없습니다','err'); return; }
+  const headers=['팀','공정명','직책','사번','이름','계',...MACHINES.map(m=>m.label.replace('\n',' ')),'비고','업데이트일'];
+  const data=rows.map(r=>[r.team,r.process,r.position,r.empno,r.name,MACHINES.filter(m=>r.machines[m.id]).length,...MACHINES.map(m=>r.machines[m.id]?'O':''),r.bigo,r.date]);
+  if(typeof XLSX==='undefined'){
+    const csv='\uFEFF'+[headers,...data].map(r=>r.map(c=>'"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+    a.download=curSite+'_유해위험작업현황_'+today()+'.csv'; a.click(); toast('CSV 다운로드 완료','ok'); return;
+  }
+  const wb=XLSX.utils.book_new(), ws=XLSX.utils.aoa_to_sheet([headers,...data]);
+  ws['!cols']=[{wch:10},{wch:12},{wch:8},{wch:10},{wch:8},{wch:5},...MACHINES.map(()=>({wch:6})),{wch:16},{wch:12}];
+  // 인쇄 설정: A4 가로, 1페이지 맞춤
+  ws['!pageSetup'] = { orientation:'landscape', paperSize:9, fitToPage:true, fitToWidth:1, fitToHeight:0 };
+  ws['!margins']   = { left:0.25, right:0.25, top:0.3, bottom:0.3, header:0.1, footer:0.1 };
+  XLSX.utils.book_append_sheet(wb,ws,'유해위험작업현황');
+
+  // 점검기준표 시트 추가
+  const criteria = [
+    ['작업종류','점검기준'],
+    ['호이스트','권과방지장치, 브레이크, 클러치 및 운전장치의 기능'],
+    ['호이스트','주행로의 상측 레일의 상태'],
+    ['호이스트','와이어로프가 통하고 있는 곳의 상태'],
+    ['호이스트','경보장치 등의 기능'],
+    ['컨베이어','원동기 및 풀리 기능의 이상 유무'],
+    ['컨베이어','이탈 등의 방지장치 기능의 이상 유무'],
+    ['컨베이어','비상정지장치 기능의 이상 유무'],
+    ['컨베이어','원동기·회전축·기어 및 풀리 등의 덮개 또는 울 등의 이상 유무'],
+    ['산업용로봇','외부 전선의 피복 또는 외장의 손상 유무'],
+    ['산업용로봇','매니퓰레이터 작동의 이상 유무'],
+    ['산업용로봇','제동장치 및 비상정지장치의 기능'],
+    ['리프트','방호장치, 브레이크 및 클러치의 기능'],
+    ['리프트','와이어로프가 통하고 있는 곳의 상태'],
+    ['프레스','클러치 및 브레이크의 기능'],
+    ['프레스','크랭크축, 플라이휠, 슬라이드, 연결봉 및 연결 나사의 풀림 여부'],
+    ['프레스','1행정 1정지기구, 급정지장치 및 비상정지장치의 기능'],
+    ['프레스','슬라이드 또는 칼날에 의한 위험방지 기구의 기능'],
+    ['프레스','프레스의 금형 및 고정볼트 상태'],
+    ['프레스','방호장치의 기능'],
+    ['프레스','전단기의 칼날 및 테이블의 상태'],
+    ['공기압축기','공기저장 압력용기의 외관상태'],
+    ['공기압축기','드레인밸브의 조작 및 배수'],
+    ['공기압축기','압력방출장치의 기능'],
+    ['공기압축기','언로드밸브의 기능'],
+    ['공기압축기','윤활유의 상태'],
+    ['공기압축기','회전부의 덮개 또는 울'],
+    ['공기압축기','그 밖의 연결 부위의 이상 유무'],
+    ['지게차','제동장치 및 조종장치 기능의 이상 유무'],
+    ['지게차','하역장치 및 유압장치 기능의 이상 유무'],
+    ['지게차','바퀴의 이상 유무'],
+    ['지게차','전조등·후미등·방향지시기 및 경보장치 기능의 이상 유무'],
+    ['지게차','작업자 안전벨트 및 안전모 착용'],
+    ['지게차','유자격자 운전 여부 확인'],
+    ['지게차','시동키 관리상태 등 확인'],
+    ['용접·절단','작업 준비 및 작업 절차 수립 여부'],
+    ['용접·절단','화기작업에 따른 인근 가연성물질에 대한 방호조치 및 소화기구 비치 여부'],
+    ['용접·절단','용접불티 비산방지덮개 또는 용접 방화포 등 불꽃불티 비산 방지 조치 여부'],
+    ['용접·절단','인화성 액체의 증기 또는 인화성 가스가 남아있지 않도록 하는 환기 조치 여부'],
+    ['용접·절단','작업근로자에 대한 화재예방 및 피난 교육 등 비상조치 여부'],
+    ['와이어로프','와이어로프 및 벨트 이상유무 (찢어짐, 끊어짐 등)'],
+    ['와이어로프','(훅이 있는 경우) 훅의 매달림 상태'],
+    ['와이어로프','훅해지장치 정상기능 여부'],
+    ['중량물','중량물 취급의 올바른 자세 및 복장'],
+    ['중량물','위험물이 날아 흩어짐에 따른 보호구의 착용'],
+    ['중량물','온도 상승이나 습기에 의하여 위험성이 존재하는 중량물의 취급방법'],
+    ['중량물','그 밖에 하역운반기계등의 적절한 사용방법'],
+    ['방사선기기','장비 외함상태, 장비 주변 청결'],
+    ['방사선기기','차폐체 무결성 (납커튼, 외함 등)'],
+    ['방사선기기','안전연동(interlock)장치 이상유무'],
+    ['방사선기기','경고등 작동 상태'],
+    ['방사선기기','비상정지 버튼 상태'],
+    ['방사선기기','전원 및 배선 상태'],
+    ['방사선기기','경고표지 부착 상태'],
+    ['','※ 육안점검을 기준으로 함. 필요 시 직접 작동 등을 통한 점검 실시.'],
+  ];
+  const ws2 = XLSX.utils.aoa_to_sheet(criteria);
+  ws2['!cols'] = [{wch:14},{wch:70}];
+  ws2['!rows'] = [{hpt:15}];
+  ws2['!pageSetup'] = { orientation:'landscape', paperSize:9 };
+  ws2['!margins']   = { left:0.3, right:0.3, top:0.3, bottom:0.3, header:0.1, footer:0.1 };
+  XLSX.utils.book_append_sheet(wb,ws2,'작업별점검기준');
+
+  XLSX.writeFile(wb,curSite+'_유해위험작업현황_'+today()+'.xlsx');
+  toast('엑셀 다운로드 완료','ok');
+}
+
+function printPDF(){
+  const dept = document.getElementById('filterDept').value;
+  document.getElementById('printTitle').textContent =
+    curSite + ' 관리감독자 유해위험작업 대상 현황' + (dept?' ['+dept+']':'');
+  document.getElementById('printSub').textContent =
+    '출력일: ' + new Date().toLocaleDateString('ko-KR') +
+    '  ·  사업장: ' + curSite +
+    '  ·  총 ' + document.querySelectorAll('#tableBody tr[data-id]').length + '명';
+  document.getElementById('checkCriteriaTable').style.display='block';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    window.print();
+    setTimeout(()=>{ document.getElementById('checkCriteriaTable').style.display='none'; },800);
+  }));
+}
+
+
+/* ══════════════════════════════════════════
+   유틸
+══════════════════════════════════════════ */
+function today(){ return new Date().toLocaleDateString('ko-KR'); }
+let toastT;
+function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show'+(type?' '+type:''); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2800); }
+
+
+/* ════ 로딩 스크린 제어 ════ */
+const LD = {
+  bar: null, status: null, screen: null,
+  _pct: 0,          // 현재 진행률
+  _done: false,      // 실제 데이터 로드 완료 여부
+  _domReady: false,  // DOM 준비 여부
+
+  init() {
+    this.bar    = document.getElementById('ldBar');
+    this.status = document.getElementById('ldStatus');
+    this.screen = document.getElementById('loading-screen');
+    this._domReady = true;
+    // DOM 준비 즉시 15%
+    this._set(15, '시스템 초기화 중...');
+    // GAS URL 있으면 순차 진행, 없으면 3단계 후 완료
+    if (GAS_URL && GAS_URL !== 'YOUR_GAS_DEPLOYMENT_URL') {
+      // GAS 연결 있음 → 30%까지 빠르게, 이후 실제 로딩 대기
+      setTimeout(() => this._set(30, '서버 연결 중...'), 200);
+      setTimeout(() => this._set(50, '사업장 데이터 로딩 중...'), 500);
+      // 이후 progress()로 외부에서 제어
+    } else {
+      // GAS 없음 → 빠르게 완료
+      setTimeout(() => this._set(60, '화면 구성 중...'), 150);
+      setTimeout(() => this._set(100, '완료!'), 350);
+      setTimeout(() => this.hide(), 700);
+    }
+    // 최대 10초 타임아웃 (GAS 응답 없어도 닫힘)
+    setTimeout(() => { if (!this._done) this.complete('연결 시간 초과 — 오프라인 모드'); }, 10000);
+  },
+
+  // 외부에서 호출: 단계별 진행률 업데이트
+  progress(pct, msg) {
+    if (this._done) return;
+    this._set(Math.max(this._pct, pct), msg);
+  },
+
+  // 로딩 완료 (외부에서 호출)
+  complete(msg) {
+    if (this._done) return;
+    this._done = true;
+    this._set(100, msg || '완료!');
+    setTimeout(() => this.hide(), 400);
+  },
+
+  _set(pct, msg) {
+    this._pct = pct;
+    if (this.bar)    this.bar.style.width = pct + '%';
+    if (this.status) this.status.textContent = msg;
+  },
+
+  hide() {
+    if (this.screen) {
+      this.screen.classList.add('hidden');
+      setTimeout(() => { if (this.screen) this.screen.style.display = 'none'; }, 520);
+    }
+  }
+};
+document.addEventListener('DOMContentLoaded', () => LD.init());
+
+/* ══════════════════════════════════════════
+   기준정보 비밀번호
+══════════════════════════════════════════ */
+const MASTER_PW = '1234';
+
+function checkMasterPw(){
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwModalBg').classList.add('show');
+  setTimeout(()=>document.getElementById('pwInput').focus(), 100);
+}
+function closePwModal(){
+  document.getElementById('pwModalBg').classList.remove('show');
+}
+function confirmPw(){
+  const v = document.getElementById('pwInput').value;
+  if(v === MASTER_PW){
+    closePwModal();
+    goPage('master');
+  } else {
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwInput').style.borderColor='var(--red500)';
+    document.getElementById('pwInput').placeholder='비밀번호가 틀렸습니다';
+    setTimeout(()=>{
+      document.getElementById('pwInput').style.borderColor='';
+      document.getElementById('pwInput').placeholder='비밀번호 입력';
+    }, 1500);
+    toast('비밀번호가 틀렸습니다','err');
+  }
+}
+
+/* ══════════════════════════════════════════
+   편집 잠금 / 비밀번호 인증
+══════════════════════════════════════════ */
+function isUnlocked(site){ return unlockedSites.has(site||curSite); }
+
+// 편집 필요 시 호출 — 잠금 해제돼 있으면 바로 cb 실행, 아니면 비번 모달
+function requireAuth(cb, site){
+  const s = site||curSite;
+  if(isUnlocked(s)){ cb(); return; }
+  editPwCallback = cb;
+  document.getElementById('editSiteLabel').textContent = s;
+  document.getElementById('editPwInput').value='';
+  document.getElementById('editPwInput').style.borderColor='';
+  document.getElementById('editPwInput').placeholder='비밀번호 입력';
+  document.getElementById('editPwModalBg').classList.add('show');
+  setTimeout(()=>document.getElementById('editPwInput').focus(),100);
+}
+
+function confirmEditPw(){
+  const s = curSite;
+  const entered = document.getElementById('editPwInput').value;
+  const correct = sd(s).master.editPw || '1234';
+  if(entered === correct){
+    unlockedSites.add(s);
+    closeEditPwModal();
+    updateLockUI();
+    if(editPwCallback){ editPwCallback(); editPwCallback=null; }
+    toast('✅ '+s+' 편집 잠금 해제됨','ok');
+  } else {
+    document.getElementById('editPwInput').value='';
+    document.getElementById('editPwInput').style.borderColor='var(--red500)';
+    document.getElementById('editPwInput').placeholder='비밀번호가 틀렸습니다';
+    setTimeout(()=>{
+      document.getElementById('editPwInput').style.borderColor='';
+      document.getElementById('editPwInput').placeholder='비밀번호 입력';
+    },1500);
+    toast('❌ 비밀번호 오류','err');
+  }
+}
+function closeEditPwModal(){ document.getElementById('editPwModalBg').classList.remove('show'); editPwCallback=null; }
+
+// 잠금 해제
+function lockSite(){
+  unlockedSites.delete(curSite);
+  updateLockUI();
+  renderTable();
+  toast(curSite+' 편집 잠금됨','');
+}
+
+// 잠금 상태에 따라 툴바 UI 업데이트
+function updateLockUI(){
+  const unlocked = isUnlocked();
+  // 행 추가 버튼
+  const addBtn = document.getElementById('addRowBtn');
+  if(addBtn){
+    addBtn.style.opacity = unlocked?'1':'0.4';
+    addBtn.title = unlocked?'행 추가':'편집하려면 잠금 해제 필요';
+  }
+  // 잠금/해제 버튼 텍스트
+  const lockBtn = document.getElementById('lockBtn');
+  if(lockBtn){
+    lockBtn.textContent = unlocked?'🔓 잠금':'🔒 편집';
+    lockBtn.className = unlocked?'btn btn-sm btn-red':'btn btn-sm btn-primary';
+  }
+  // 테이블 재렌더 (읽기전용 적용)
+  if(curPage==='work') renderTable();
+}
+
+/* ══════════════════════════════════════════
+   자동 동기화
+══════════════════════════════════════════ */
+let autoSaveTimer = null;
+let isSyncing = false;
+
+function setSyncMsg(msg, color){
+  const el = document.getElementById('autoSyncMsg');
+  if(el){ el.textContent = msg; el.style.color = color||'var(--gray400)'; }
+  const ind = document.getElementById('autoSaveIndicator');
+  if(ind){ ind.textContent = msg; ind.style.color = color||'var(--gray400)'; }
+}
+
+// 데이터 변경 시 호출 → 2초 디바운스 후 자동 저장
+function triggerAutoSave(){
+  clearTimeout(autoSaveTimer);
+  setSyncMsg('● 변경사항 있음...', 'var(--orange500)');
+  autoSaveTimer = setTimeout(()=>{ autoSaveTimer = null; autoSaveAll(); }, 2000);
+}
+
+function autoSaveAll(){
+  if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
+  if(isSyncing) return;
+  isSyncing = true;
+  setSyncMsg('↑ 저장 중...', 'var(--blue500)');
+  let pending = sites.length;
+  let hasError = false;
+  if(pending === 0){ onSaveDone(false); return; }
+  sites.forEach(s=>{
+    saveRowsForSite(s,res=>{
+      if(res?.result!=='success') hasError=true;
+      pending--;
+      if(pending===0) onSaveDone(hasError);
+    });
+  });
+}
+
+function onSaveDone(hasError){
+  isSyncing = false;
+  if(hasError){
+    setSyncMsg('● 저장 오류', 'var(--red500)');
+  } else {
+    setGasOk();
+    setSyncMsg('✓ 저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
+  }
+}
+
+// 페이지 로드 시 전체 불러오기
+function autoLoadAll(){
+  if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
+  setSyncMsg('↓ 불러오는 중...', 'var(--blue500)');
+  LD.progress(60, '기준정보 불러오는 중...');
+  gasCall('loadAllMaster',{},mres=>{
+    if(mres?.result==='success') applyMasterMap(mres.data || {});
+    LD.progress(75, '사업장 현황 불러오는 중...');
+    gasCall('loadAll',{},res=>{
+      if(res?.result==='success'&&Array.isArray(res.data)){
+        LD.progress(88, '데이터 처리 중...');
+        resetAllRows();
+        appendLoadedRows(res.data);
+        renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); setGasOk();
+        setSyncMsg('✓ 최신화됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
+        LD.complete('✓ 데이터 로딩 완료 — '+res.data.length+'건');
+      } else {
+        setSyncMsg('● 데이터 없음', 'var(--gray400)');
+        LD.complete('연결됨 — 데이터 없음');
+      }
+    });
+  });
+}
+
+/* ══════════════════════════════════════════
+   초기화
+══════════════════════════════════════════ */
+renderNavTabs();
+goPage('home');
+// 페이지 로드 후 자동 불러오기
+setTimeout(()=>{ autoLoadAll(); }, 200);
+// 5분마다 자동 최신화
+setInterval(()=>{ if(!autoSaveTimer && !isSyncing) autoLoadAll(); }, 5 * 60 * 1000);
+</script>
+</body>
+</html>
