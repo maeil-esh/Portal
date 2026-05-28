@@ -958,9 +958,22 @@ function renderMasterCards(){
       html += '<div class="master-item" style="color:var(--gray400)">항목 없음</div>';
     } else {
       list.forEach(function(v, i){
-        html += '<div class="master-item"><span>' + esc(v) + '</span>';
         if(isMasterUnlocked){
-          html += '<button class="master-item-del" onclick="delMasterItem(\'' + key + '\',' + i + ')">✕</button>';
+          html += '<div class="master-item"'
+            + ' draggable="true"'
+            + ' data-key="' + key + '"'
+            + ' data-idx="' + i + '"'
+            + ' ondragstart="onMasterDragStart(event)"'
+            + ' ondragover="onMasterDragOver(event)"'
+            + ' ondragleave="onMasterDragLeave(event)"'
+            + ' ondrop="onMasterDrop(event,\'' + key + '\')"'
+            + '>';
+          html += '<span class="drag-handle" title="드래그하여 순서 변경">⠿</span>';
+          html += '<span style="flex:1">' + esc(v) + '</span>';
+          html += '<button class="master-item-del" onclick="delMasterItem(\'' + key + '\',' + i + ')" title="삭제">✕</button>';
+        } else {
+          html += '<div class="master-item">';
+          html += '<span style="flex:1">' + esc(v) + '</span>';
         }
         html += '</div>';
       });
