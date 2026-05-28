@@ -715,6 +715,17 @@ const MACHINES = [
 ══════════════════════════════════════════ */
 function defMaster(){ return { team:['생산1팀','생산2팀','품질보증팀','공무환경팀','물류팀','지원팀'], process:['전처리','충전','포장','냉동기관','동력','정비'], position:['팀장','직장','일반'], editPw:'1234' }; }
 
+function normalizeMaster(m){
+  const d = defMaster();
+  m = m || {};
+  return {
+    team: Array.isArray(m.team) ? m.team : d.team,
+    process: Array.isArray(m.process) ? m.process : d.process,
+    position: Array.isArray(m.position) ? m.position : d.position,
+    editPw: m.editPw || '1234'
+  };
+}
+
 let sites = ['본사공장'];
 let siteData = { '본사공장': { rows:[], nextId:1, master:defMaster() } };
 let curSite  = '본사공장';   // 현황 페이지 기준 사업장
@@ -725,6 +736,8 @@ let unlockedSites = new Set();       // 현황 편집 인증된 사업장
 let unlockedMasterSites = new Set();  // 기준정보 편집 인증된 사업장
 let editPwCallback = null;
 let masterPwCallback = null;
+let gasSeq = 0;
+const SAVE_CHUNK_SIZE = 50;
 
 function sd(s){ return siteData[s||curSite]; }
 function getMaster(key, s){ return sd(s||curMasterSite).master[key]; }
@@ -1073,6 +1086,7 @@ function addMasterItem(key){
   sd(curMasterSite).master[key].push(v);
   inp.value='';
   renderMasterCards();
+  saveMasterToGAS(curMasterSite, true);
   toast(v+' 추가됨','ok');
 }
 
@@ -1143,6 +1157,7 @@ function onMasterDrop(e, key){
   list.splice(destIdx, 0, moved);
   dragSrcIdx = -1;
   renderMasterCards();
+  saveMasterToGAS(curMasterSite, true);
   toast('순서가 변경됐습니다','ok');
 }
 
@@ -1156,6 +1171,7 @@ function changeSitePw(){
     unlockedSites.delete(curMasterSite);
     unlockedMasterSites.delete(curMasterSite);
     renderMasterCards();
+    saveMasterToGAS(curMasterSite, false);
     toast('✅ '+curMasterSite+' 비밀번호 변경 완료','ok');
   });
 }
@@ -1163,6 +1179,31 @@ function changeSitePw(){
 function delMasterItem(key,i){
   sd(curMasterSite).master[key].splice(i,1);
   renderMasterCards();
+  saveMasterToGAS(curMasterSite, true);
+}
+
+function masterPayload(site){
+  const m = sd(site).master || defMaster();
+  return {
+    site: site,
+    team: [...(m.team||[])],
+    process: [...(m.process||[])],
+    position: [...(m.position||[])],
+    editPw: m.editPw || '1234'
+  };
+}
+
+function saveMasterToGAS(site, silent){
+  if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
+  if(!site || !siteData[site]) return;
+  gasCall('saveMaster', {data: JSON.stringify(masterPayload(site))}, res=>{
+    if(res?.result==='success'){
+      setGasOk();
+      if(!silent) setSyncMsg('✓ 기준정보 저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
+    } else if(!silent){
+      toast('❌ 기준정보 저장 실패: '+(res?.error||'오류'),'err');
+    }
+  });
 }
 
 /* ══════════════════════════════════════════
@@ -1170,28 +1211,48 @@ function delMasterItem(key,i){
 ══════════════════════════════════════════ */
 function openAddSiteModal(){ document.getElementById('modalSiteInp').value=''; document.getElementById('modalBg').classList.add('show'); setTimeout(()=>document.getElementById('modalSiteInp').focus(),100); }
 function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
+function createSiteLocal(v){
+  if(!siteData[v]){
+    sites.push(v);
+    siteData[v]={rows:[],nextId:1,master:defMaster()};
+  }
+}
 function confirmModal(){
   const v = document.getElementById('modalSiteInp').value.trim();
   if(!v){ toast('사업장명을 입력하세요','err'); return; }
   if(sites.includes(v)){ toast('이미 존재합니다','err'); return; }
-  sites.push(v); siteData[v]={rows:[],nextId:1,master:defMaster()};
-  closeModal(); goPage('work',v); toast(v+' 추가됨','ok');
+  createSiteLocal(v);
+  closeModal();
+  saveMasterToGAS(v, true);
+  saveRowsForSite(v, ()=>{});
+  goPage('work',v); toast(v+' 추가됨','ok');
 }
 function addSite(){
   const v = document.getElementById('newSiteInput').value.trim();
   if(!v){ toast('사업장명을 입력하세요','err'); return; }
   if(sites.includes(v)){ toast('이미 존재합니다','err'); return; }
-  sites.push(v); siteData[v]={rows:[],nextId:1,master:defMaster()};
+  createSiteLocal(v);
   document.getElementById('newSiteInput').value='';
-  curMasterSite=v; renderMasterPage(); renderNavTabs(); toast(v+' 추가됨','ok');
+  curMasterSite=v;
+  saveMasterToGAS(v, true);
+  saveRowsForSite(v, ()=>{});
+  renderMasterPage(); renderNavTabs(); toast(v+' 추가됨','ok');
 }
 function delSite(){
   if(sites.length<=1){ toast('최소 1개 사업장이 필요합니다','err'); return; }
-  if(!confirm(curMasterSite+' 사업장을 삭제하시겠습니까? 해당 데이터도 모두 삭제됩니다.')){ return; }
-  sites=sites.filter(s=>s!==curMasterSite); delete siteData[curMasterSite];
-  if(curSite===curMasterSite) curSite=sites[0];
+  const target = curMasterSite;
+  if(!confirm(target+' 사업장을 삭제하시겠습니까? 해당 데이터도 모두 삭제됩니다.')){ return; }
+  sites=sites.filter(s=>s!==target); delete siteData[target];
+  unlockedSites.delete(target); unlockedMasterSites.delete(target);
+  if(curSite===target) curSite=sites[0];
   curMasterSite=sites[0];
-  renderMasterPage(); renderNavTabs(); toast('삭제됨','ok');
+  if(GAS_URL!=='YOUR_GAS_DEPLOYMENT_URL'){
+    gasCall('deleteSite',{site:target},res=>{
+      if(res?.result==='success') setGasOk();
+      else toast('❌ 서버 사업장 삭제 실패: '+(res?.error||'오류'),'err');
+    });
+  }
+  renderMasterPage(); renderNavTabs(); renderDashboard(); toast('삭제됨','ok');
 }
 
 /* ══════════════════════════════════════════
@@ -1236,30 +1297,47 @@ document.addEventListener('click',e=>{
 function gasCall(action, params, cb){
   if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL'){ toast('GAS URL을 설정하세요','err'); return; }
 
-  const cbN = 'gcb_' + Date.now();
-  window[cbN] = res => { delete window[cbN]; cb(res); };
+  const cbN = 'gcb_' + Date.now() + '_' + (++gasSeq) + '_' + Math.random().toString(36).slice(2);
+  let scriptEl = null;
+  let done = false;
+  const cleanup = () => {
+    if(scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
+    try{ delete window[cbN]; }catch(e){ window[cbN] = undefined; }
+  };
+  window[cbN] = res => {
+    if(done) return;
+    done = true;
+    cleanup();
+    if(typeof cb === 'function') cb(res || {});
+  };
 
-  // data 파라미터가 있으면 URL 분할 전송 (JSONP GET)
-  // GAS는 URL 길이 제한이 있으므로 data는 별도 파라미터로 전달
-  let qs = 'action=' + encodeURIComponent(action) + '&callback=' + cbN;
+  let qs = 'action=' + encodeURIComponent(action) + '&callback=' + encodeURIComponent(cbN);
   if(params){
     Object.entries(params).forEach(([k,v]) => {
-      // data는 JSON 문자열 — encodeURIComponent 적용
-      qs += '&' + k + '=' + encodeURIComponent(String(v));
+      qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(String(v));
     });
   }
 
   const src = GAS_URL + '?' + qs;
-  const s = document.createElement('script');
-  s.src = src;
-  s.onerror = () => {
-    delete window[cbN];
+  if(src.length > 180000){
+    console.warn('[GAS] URL length is large:', src.length);
+  }
+  scriptEl = document.createElement('script');
+  scriptEl.src = src;
+  scriptEl.onerror = () => {
+    if(done) return;
+    done = true;
+    cleanup();
     toast('❌ GAS 연결 오류 — 배포 설정을 확인하세요','err');
-    console.error('[GAS] script load error');
+    console.error('[GAS] script load error:', action);
   };
-  document.head.appendChild(s);
+  document.head.appendChild(scriptEl);
   setTimeout(() => {
-    if(window[cbN]){ delete window[cbN]; toast('❌ 서버 응답 없음 (12초 초과)','err'); }
+    if(!done && window[cbN]){
+      done = true;
+      cleanup();
+      toast('❌ 서버 응답 없음 (12초 초과)','err');
+    }
   }, 12000);
 }
 function setGasOk(){ document.getElementById('gasDot').className='gas-dot ok'; document.getElementById('gasMsg').textContent='연결됨'; }
@@ -1276,33 +1354,98 @@ function pingGAS(){
   });
 }
 
-function saveToGAS(){
-  const rows=sd().rows;
-  if(!rows.length){ toast('저장할 데이터가 없습니다','err'); return; }
-  const payload=rows.map(r=>({ site:curSite, team:r.team, process:r.process, position:r.position, empno:r.empno, name:r.name,
+function rowPayloadForSite(site){
+  return (siteData[site]?.rows || []).map(r=>({ site:site, team:r.team, process:r.process, position:r.position, empno:r.empno, name:r.name,
     ...Object.fromEntries(MACHINES.map(m=>[m.id,r.machines[m.id]?'O':''])),
     total:MACHINES.filter(m=>r.machines[m.id]).length, bigo:r.bigo, date:r.date }));
-  toast('저장 중...','');
-  gasCall('save',{data:JSON.stringify(payload)},res=>{
-    if(res?.result==='success'){ toast('✅ 저장 완료 ('+res.count+'건)','ok'); setGasOk(); renderDashboard(); }
-    else toast('❌ 저장 실패: '+(res?.error||'오류'),'err');
+}
+
+function saveRowsForSite(site, cb){
+  const rows = rowPayloadForSite(site);
+  gasCall('clearSite',{site:site},res=>{
+    if(res?.result!=='success'){
+      if(typeof cb === 'function') cb({result:'error', error:res?.error||'clearSite 실패', site});
+      return;
+    }
+    if(!rows.length){
+      if(typeof cb === 'function') cb({result:'success', count:0, site});
+      return;
+    }
+    let idx = 0;
+    let saved = 0;
+    const sendNext = () => {
+      const chunk = rows.slice(idx, idx + SAVE_CHUNK_SIZE);
+      if(!chunk.length){
+        if(typeof cb === 'function') cb({result:'success', count:saved, site});
+        return;
+      }
+      idx += SAVE_CHUNK_SIZE;
+      gasCall('appendRows',{data:JSON.stringify({site:site, rows:chunk})},r=>{
+        if(r?.result!=='success'){
+          if(typeof cb === 'function') cb({result:'error', error:r?.error||'appendRows 실패', site});
+          return;
+        }
+        saved += Number(r.count)||chunk.length;
+        sendNext();
+      });
+    };
+    sendNext();
   });
 }
-function saveAllToGAS(){ sites.forEach(s=>{ const tmp=curSite; curSite=s; saveToGAS(); curSite=tmp; }); }
+
+function saveToGAS(){
+  toast('저장 중...','');
+  saveRowsForSite(curSite, res=>{
+    if(res?.result==='success'){
+      toast('✅ 저장 완료 ('+res.count+'건)','ok'); setGasOk(); renderDashboard();
+    } else toast('❌ 저장 실패: '+(res?.error||'오류'),'err');
+  });
+}
+function saveAllToGAS(){ autoSaveAll(); }
+
+function ensureSite(site){
+  if(!site) return;
+  if(!siteData[site]){
+    sites.push(site);
+    siteData[site]={rows:[],nextId:1,master:defMaster()};
+  }
+}
+
+function applyMasterMap(map){
+  if(!map) return;
+  Object.keys(map).forEach(site=>{
+    ensureSite(site);
+    siteData[site].master = normalizeMaster(map[site]);
+  });
+}
+
+function resetAllRows(){
+  sites.forEach(s=>{ siteData[s].rows=[]; siteData[s].nextId=1; });
+}
+
+function appendLoadedRows(rows){
+  (rows||[]).forEach(row=>{
+    if(!row.site) return;
+    ensureSite(row.site);
+    const d=siteData[row.site];
+    d.rows.push({ id:d.nextId++, team:row.team||'', process:row.process||'', position:row.position||'',
+      empno:row.empno||'', name:row.name||'', bigo:row.bigo||'', date:row.date||'',
+      machines:Object.fromEntries(MACHINES.map(m=>[m.id,row[m.id]==='O'])) });
+  });
+}
+
 function loadAllFromGAS(){
   toast('불러오는 중...','');
-  gasCall('loadAll',{},res=>{
-    if(res?.result==='success'&&Array.isArray(res.data)){
-      res.data.forEach(row=>{
-        if(!siteData[row.site]){ sites.push(row.site); siteData[row.site]={rows:[],nextId:1,master:defMaster()}; }
-        const d=siteData[row.site];
-        d.rows.push({ id:d.nextId++, team:row.team||'', process:row.process||'', position:row.position||'',
-          empno:row.empno||'', name:row.name||'', bigo:row.bigo||'', date:row.date||'',
-          machines:Object.fromEntries(MACHINES.map(m=>[m.id,row[m.id]==='O'])) });
-      });
-      renderNavTabs(); renderDashboard(); setGasOk();
-      toast(res.data.length+'건 불러오기 완료','ok');
-    } else toast('불러오기 실패','err');
+  gasCall('loadAllMaster',{},mres=>{
+    if(mres?.result==='success') applyMasterMap(mres.data || {});
+    gasCall('loadAll',{},res=>{
+      if(res?.result==='success'&&Array.isArray(res.data)){
+        resetAllRows();
+        appendLoadedRows(res.data);
+        renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); setGasOk();
+        toast(res.data.length+'건 불러오기 완료','ok');
+      } else toast('불러오기 실패','err');
+    });
   });
 }
 
@@ -1597,7 +1740,7 @@ function setSyncMsg(msg, color){
 function triggerAutoSave(){
   clearTimeout(autoSaveTimer);
   setSyncMsg('● 변경사항 있음...', 'var(--orange500)');
-  autoSaveTimer = setTimeout(()=>{ autoSaveAll(); }, 2000);
+  autoSaveTimer = setTimeout(()=>{ autoSaveTimer = null; autoSaveAll(); }, 2000);
 }
 
 function autoSaveAll(){
@@ -1607,14 +1750,9 @@ function autoSaveAll(){
   setSyncMsg('↑ 저장 중...', 'var(--blue500)');
   let pending = sites.length;
   let hasError = false;
+  if(pending === 0){ onSaveDone(false); return; }
   sites.forEach(s=>{
-    const rows = siteData[s].rows;
-    if(!rows.length){ pending--; if(pending===0) onSaveDone(hasError); return; }
-    const payload = rows.map(r=>({ site:s, team:r.team, process:r.process, position:r.position,
-      empno:r.empno, name:r.name,
-      ...Object.fromEntries(MACHINES.map(m=>[m.id,r.machines[m.id]?'O':''])),
-      total:MACHINES.filter(m=>r.machines[m.id]).length, bigo:r.bigo, date:r.date }));
-    gasCall('save',{data:JSON.stringify(payload)},res=>{
+    saveRowsForSite(s,res=>{
       if(res?.result!=='success') hasError=true;
       pending--;
       if(pending===0) onSaveDone(hasError);
@@ -1636,28 +1774,23 @@ function onSaveDone(hasError){
 function autoLoadAll(){
   if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
   setSyncMsg('↓ 불러오는 중...', 'var(--blue500)');
-  LD.progress(65, '사업장 현황 불러오는 중...');
-  gasCall('loadAll',{},res=>{
-    if(res?.result==='success'&&Array.isArray(res.data)&&res.data.length){
-      LD.progress(85, '데이터 처리 중...');
-      // 기존 데이터 초기화 후 채우기
-      sites.forEach(s=>{ siteData[s].rows=[]; siteData[s].nextId=1; });
-      res.data.forEach(row=>{
-        if(!row.site) return;
-        if(!siteData[row.site]){ sites.push(row.site); siteData[row.site]={rows:[],nextId:1,master:defMaster()}; }
-        const d=siteData[row.site];
-        d.rows.push({ id:d.nextId++, team:row.team||'', process:row.process||'',
-          position:row.position||'', empno:row.empno||'', name:row.name||'',
-          bigo:row.bigo||'', date:row.date||'',
-          machines:Object.fromEntries(MACHINES.map(m=>[m.id,row[m.id]==='O'])) });
-      });
-      renderNavTabs(); renderDashboard(); setGasOk();
-      setSyncMsg('✓ 최신화됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
-      LD.complete('✓ 데이터 로딩 완료 — '+res.data.length+'건');
-    } else {
-      setSyncMsg('● 데이터 없음', 'var(--gray400)');
-      LD.complete('연결됨 — 데이터 없음');
-    }
+  LD.progress(60, '기준정보 불러오는 중...');
+  gasCall('loadAllMaster',{},mres=>{
+    if(mres?.result==='success') applyMasterMap(mres.data || {});
+    LD.progress(75, '사업장 현황 불러오는 중...');
+    gasCall('loadAll',{},res=>{
+      if(res?.result==='success'&&Array.isArray(res.data)){
+        LD.progress(88, '데이터 처리 중...');
+        resetAllRows();
+        appendLoadedRows(res.data);
+        renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); setGasOk();
+        setSyncMsg('✓ 최신화됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
+        LD.complete('✓ 데이터 로딩 완료 — '+res.data.length+'건');
+      } else {
+        setSyncMsg('● 데이터 없음', 'var(--gray400)');
+        LD.complete('연결됨 — 데이터 없음');
+      }
+    });
   });
 }
 
@@ -1669,7 +1802,7 @@ goPage('home');
 // 페이지 로드 후 자동 불러오기
 setTimeout(()=>{ autoLoadAll(); }, 200);
 // 5분마다 자동 최신화
-setInterval(()=>{ autoLoadAll(); }, 5 * 60 * 1000);
+setInterval(()=>{ if(!autoSaveTimer && !isSyncing) autoLoadAll(); }, 5 * 60 * 1000);
 </script>
 </body>
 </html>
