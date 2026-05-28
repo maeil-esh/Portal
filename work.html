@@ -19,6 +19,45 @@
   --sh1:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
   --sh2:0 4px 16px rgba(0,0,0,.10);
 }
+
+/* ════ 로딩 스크린 ════ */
+#loading-screen{
+  position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(145deg,#f0f4ff 0%,#f9fafb 50%,#eaf9f4 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;transition:opacity .5s ease,visibility .5s ease;
+}
+#loading-screen.hidden{opacity:0;visibility:hidden;pointer-events:none;}
+
+/* 배경 블롭 */
+.ld-blob{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.ld-blob::before{content:'';position:absolute;width:600px;height:600px;top:-150px;left:-100px;border-radius:50%;background:radial-gradient(circle,rgba(49,130,246,.08) 0%,transparent 70%)}
+.ld-blob::after{content:'';position:absolute;width:500px;height:500px;bottom:-100px;right:-80px;border-radius:50%;background:radial-gradient(circle,rgba(0,180,147,.07) 0%,transparent 70%)}
+.ld-dots-bg{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(15,23,42,.05) 1px,transparent 1px);background-size:28px 28px}
+
+/* 로고 영역 */
+.ld-logo-wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:28px;animation:ldFadeDown .7s cubic-bezier(.22,1,.36,1) both}
+.ld-icon{width:56px;height:56px;background:var(--blue500);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(49,130,246,.25);animation:ldPulse 2s ease-in-out infinite}
+.ld-title{text-align:center}
+.ld-title h1{font-size:clamp(22px,4vw,34px);font-weight:800;color:var(--gray900);letter-spacing:-.5px;line-height:1.2;margin-bottom:8px}
+.ld-title h1 span{color:var(--blue500)}
+.ld-title p{font-size:13px;color:var(--gray500);letter-spacing:-.1px}
+
+/* 프로그레스 바 */
+.ld-progress-wrap{position:relative;z-index:1;width:220px;margin-top:8px}
+.ld-progress-track{height:3px;background:var(--gray200);border-radius:2px;overflow:hidden}
+.ld-progress-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--blue500),var(--green500));width:0%;transition:width .3s ease}
+.ld-status{font-size:11px;color:var(--gray400);text-align:center;margin-top:8px;letter-spacing:-.1px;min-height:16px}
+
+/* 하단 뱃지 */
+.ld-badge{position:relative;z-index:1;margin-top:32px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.8);border:1px solid var(--gray200);border-radius:20px;padding:5px 14px 5px 10px;backdrop-filter:blur(4px)}
+.ld-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--green500);animation:ldBlink 2s ease-in-out infinite}
+.ld-badge span{font-size:11px;font-weight:600;color:var(--gray600);letter-spacing:.02em}
+
+@keyframes ldFadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ldPulse{0%,100%{box-shadow:0 8px 32px rgba(49,130,246,.25)}50%{box-shadow:0 8px 40px rgba(49,130,246,.45)}}
+@keyframes ldBlink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes ldSpin{to{transform:rotate(360deg)}}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Malgun Gothic','맑은 고딕',-apple-system,sans-serif;font-size:13px;background:var(--gray100);color:var(--gray900);-webkit-font-smoothing:antialiased}
 
@@ -385,6 +424,35 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
 </style>
 </head>
 <body>
+
+<!-- ════ 로딩 스크린 ════ -->
+<div id="loading-screen">
+  <div class="ld-blob"></div>
+  <div class="ld-dots-bg"></div>
+  <div class="ld-logo-wrap">
+    <div class="ld-icon">
+      <svg viewBox="0 0 28 28" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26">
+        <path d="M14 3L22 7.5V17.5L14 22L6 17.5V7.5L14 3Z"/>
+        <path d="M14 3V22M6 7.5L22 17.5M22 7.5L6 17.5"/>
+      </svg>
+    </div>
+    <div class="ld-title">
+      <h1>유해위험작업 <span>대상 현황</span></h1>
+      <p>관리감독자 지정 관리 시스템</p>
+    </div>
+    <div class="ld-progress-wrap">
+      <div class="ld-progress-track">
+        <div class="ld-progress-bar" id="ldBar"></div>
+      </div>
+      <div class="ld-status" id="ldStatus">시스템 초기화 중...</div>
+    </div>
+  </div>
+  <div class="ld-badge">
+    <span class="ld-badge-dot"></span>
+    <span>산업안전보건법 제16조 / 안전보건규칙 별표3</span>
+  </div>
+</div>
+
 
 <!-- ══ 상단바 ══ -->
 <div class="topbar">
@@ -1377,6 +1445,42 @@ function printPDF(){
 function today(){ return new Date().toLocaleDateString('ko-KR'); }
 let toastT;
 function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show'+(type?' '+type:''); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2800); }
+
+
+/* ════ 로딩 스크린 제어 ════ */
+const LD = {
+  bar: null, status: null, screen: null,
+  steps: [
+    { pct: 15, msg: '데이터 구조 초기화 중...' },
+    { pct: 35, msg: '기준정보 불러오는 중...' },
+    { pct: 55, msg: '사업장 데이터 로딩 중...' },
+    { pct: 75, msg: '화면 구성 중...' },
+    { pct: 90, msg: '자동 동기화 준비 중...' },
+    { pct: 100, msg: '완료!' },
+  ],
+  stepIdx: 0,
+  init() {
+    this.bar    = document.getElementById('ldBar');
+    this.status = document.getElementById('ldStatus');
+    this.screen = document.getElementById('loading-screen');
+    this.next();
+  },
+  next() {
+    if (this.stepIdx >= this.steps.length) { this.hide(); return; }
+    const s = this.steps[this.stepIdx++];
+    if (this.bar)    this.bar.style.width = s.pct + '%';
+    if (this.status) this.status.textContent = s.msg;
+    const delay = s.pct < 90 ? 280 : 400;
+    setTimeout(() => this.next(), delay);
+  },
+  hide() {
+    setTimeout(() => {
+      if (this.screen) this.screen.classList.add('hidden');
+      setTimeout(() => { if (this.screen) this.screen.style.display = 'none'; }, 500);
+    }, 300);
+  }
+};
+document.addEventListener('DOMContentLoaded', () => LD.init());
 
 /* ══════════════════════════════════════════
    기준정보 비밀번호
