@@ -1233,58 +1233,34 @@ document.addEventListener('click',e=>{
 /* ══════════════════════════════════════════
    GAS
 ══════════════════════════════════════════ */
-function gasCall(action,params,cb){
+function gasCall(action, params, cb){
   if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL'){ toast('GAS URL을 설정하세요','err'); return; }
 
-  // data가 있으면 POST, 없으면 GET(JSONP)
-  const hasData = params && params.data;
-
-  if(hasData){
-    // POST + fetch (GAS는 CORS 허용)
-    const body = Object.assign({ action }, params);
-    fetch(GAS_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' }, // GAS는 application/json을 preflight 발생시킴
-      body: JSON.stringify(body)
-    })
-    .then(r => r.text())
-    .then(text => {
-      // GAS doPost 응답은 순수 JSON (callback 없음)
-      try {
-        const res = JSON.parse(text);
-        cb(res);
-      } catch(e){
-        console.error('[GAS POST] parse error:', text);
-        cb({ result:'error', error:'응답 파싱 실패: '+text.slice(0,100) });
-      }
-    })
-    .catch(err => {
-      console.error('[GAS POST] fetch error:', err);
-      // fallback: JSONP
-      gasCallJSONP(action, params, cb);
-    });
-  } else {
-    // GET JSONP
-    gasCallJSONP(action, params, cb);
-  }
-}
-
-function gasCallJSONP(action, params, cb){
-  const cbN = 'gcb_'+Date.now();
+  const cbN = 'gcb_' + Date.now();
   window[cbN] = res => { delete window[cbN]; cb(res); };
-  const qs = params ? Object.entries(params)
-    .filter(([k])=>k!=='data')
-    .map(([k,v])=>k+'='+encodeURIComponent(String(v))).join('&') : '';
-  const src = GAS_URL+'?action='+action+'&callback='+cbN+(qs?'&'+qs:'');
+
+  // data 파라미터가 있으면 URL 분할 전송 (JSONP GET)
+  // GAS는 URL 길이 제한이 있으므로 data는 별도 파라미터로 전달
+  let qs = 'action=' + encodeURIComponent(action) + '&callback=' + cbN;
+  if(params){
+    Object.entries(params).forEach(([k,v]) => {
+      // data는 JSON 문자열 — encodeURIComponent 적용
+      qs += '&' + k + '=' + encodeURIComponent(String(v));
+    });
+  }
+
+  const src = GAS_URL + '?' + qs;
   const s = document.createElement('script');
   s.src = src;
-  s.onerror = ()=>{
+  s.onerror = () => {
     delete window[cbN];
-    toast('❌ GAS 연결 오류','err');
-    console.error('[GAS JSONP] load error:', src);
+    toast('❌ GAS 연결 오류 — 배포 설정을 확인하세요','err');
+    console.error('[GAS] script load error');
   };
   document.head.appendChild(s);
-  setTimeout(()=>{ if(window[cbN]){ delete window[cbN]; toast('❌ 서버 응답 없음 (12초 초과)','err'); }},12000);
+  setTimeout(() => {
+    if(window[cbN]){ delete window[cbN]; toast('❌ 서버 응답 없음 (12초 초과)','err'); }
+  }, 12000);
 }
 function setGasOk(){ document.getElementById('gasDot').className='gas-dot ok'; document.getElementById('gasMsg').textContent='연결됨'; }
 
@@ -1450,34 +1426,58 @@ function toast(msg,type){ const el=document.getElementById('toast'); el.textCont
 /* ════ 로딩 스크린 제어 ════ */
 const LD = {
   bar: null, status: null, screen: null,
-  steps: [
-    { pct: 15, msg: '데이터 구조 초기화 중...' },
-    { pct: 35, msg: '기준정보 불러오는 중...' },
-    { pct: 55, msg: '사업장 데이터 로딩 중...' },
-    { pct: 75, msg: '화면 구성 중...' },
-    { pct: 90, msg: '자동 동기화 준비 중...' },
-    { pct: 100, msg: '완료!' },
-  ],
-  stepIdx: 0,
+  _pct: 0,          // 현재 진행률
+  _done: false,      // 실제 데이터 로드 완료 여부
+  _domReady: false,  // DOM 준비 여부
+
   init() {
     this.bar    = document.getElementById('ldBar');
     this.status = document.getElementById('ldStatus');
     this.screen = document.getElementById('loading-screen');
-    this.next();
+    this._domReady = true;
+    // DOM 준비 즉시 15%
+    this._set(15, '시스템 초기화 중...');
+    // GAS URL 있으면 순차 진행, 없으면 3단계 후 완료
+    if (GAS_URL && GAS_URL !== 'YOUR_GAS_DEPLOYMENT_URL') {
+      // GAS 연결 있음 → 30%까지 빠르게, 이후 실제 로딩 대기
+      setTimeout(() => this._set(30, '서버 연결 중...'), 200);
+      setTimeout(() => this._set(50, '사업장 데이터 로딩 중...'), 500);
+      // 이후 progress()로 외부에서 제어
+    } else {
+      // GAS 없음 → 빠르게 완료
+      setTimeout(() => this._set(60, '화면 구성 중...'), 150);
+      setTimeout(() => this._set(100, '완료!'), 350);
+      setTimeout(() => this.hide(), 700);
+    }
+    // 최대 10초 타임아웃 (GAS 응답 없어도 닫힘)
+    setTimeout(() => { if (!this._done) this.complete('연결 시간 초과 — 오프라인 모드'); }, 10000);
   },
-  next() {
-    if (this.stepIdx >= this.steps.length) { this.hide(); return; }
-    const s = this.steps[this.stepIdx++];
-    if (this.bar)    this.bar.style.width = s.pct + '%';
-    if (this.status) this.status.textContent = s.msg;
-    const delay = s.pct < 90 ? 280 : 400;
-    setTimeout(() => this.next(), delay);
+
+  // 외부에서 호출: 단계별 진행률 업데이트
+  progress(pct, msg) {
+    if (this._done) return;
+    this._set(Math.max(this._pct, pct), msg);
   },
+
+  // 로딩 완료 (외부에서 호출)
+  complete(msg) {
+    if (this._done) return;
+    this._done = true;
+    this._set(100, msg || '완료!');
+    setTimeout(() => this.hide(), 400);
+  },
+
+  _set(pct, msg) {
+    this._pct = pct;
+    if (this.bar)    this.bar.style.width = pct + '%';
+    if (this.status) this.status.textContent = msg;
+  },
+
   hide() {
-    setTimeout(() => {
-      if (this.screen) this.screen.classList.add('hidden');
-      setTimeout(() => { if (this.screen) this.screen.style.display = 'none'; }, 500);
-    }, 300);
+    if (this.screen) {
+      this.screen.classList.add('hidden');
+      setTimeout(() => { if (this.screen) this.screen.style.display = 'none'; }, 520);
+    }
   }
 };
 document.addEventListener('DOMContentLoaded', () => LD.init());
@@ -1636,8 +1636,10 @@ function onSaveDone(hasError){
 function autoLoadAll(){
   if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
   setSyncMsg('↓ 불러오는 중...', 'var(--blue500)');
+  LD.progress(65, '사업장 현황 불러오는 중...');
   gasCall('loadAll',{},res=>{
     if(res?.result==='success'&&Array.isArray(res.data)&&res.data.length){
+      LD.progress(85, '데이터 처리 중...');
       // 기존 데이터 초기화 후 채우기
       sites.forEach(s=>{ siteData[s].rows=[]; siteData[s].nextId=1; });
       res.data.forEach(row=>{
@@ -1651,8 +1653,10 @@ function autoLoadAll(){
       });
       renderNavTabs(); renderDashboard(); setGasOk();
       setSyncMsg('✓ 최신화됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
+      LD.complete('✓ 데이터 로딩 완료 — '+res.data.length+'건');
     } else {
       setSyncMsg('● 데이터 없음', 'var(--gray400)');
+      LD.complete('연결됨 — 데이터 없음');
     }
   });
 }
@@ -1663,7 +1667,7 @@ function autoLoadAll(){
 renderNavTabs();
 goPage('home');
 // 페이지 로드 후 자동 불러오기
-setTimeout(()=>{ autoLoadAll(); }, 500);
+setTimeout(()=>{ autoLoadAll(); }, 200);
 // 5분마다 자동 최신화
 setInterval(()=>{ autoLoadAll(); }, 5 * 60 * 1000);
 </script>
