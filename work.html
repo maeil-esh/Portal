@@ -172,6 +172,14 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
 .master-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
 .master-card{background:var(--white);border:1px solid var(--gray200);border-radius:var(--r8);box-shadow:var(--sh1);overflow:hidden}
 .master-card-head{background:var(--gray800);color:var(--white);padding:12px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.master-item{padding:7px 12px;border-bottom:1px solid var(--gray100);display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray800);cursor:default;transition:background .1s}
+.master-item:hover{background:var(--gray50)}
+.master-item.dragging{opacity:.4;background:var(--blue50)!important}
+.master-item.drag-over{background:var(--blue100)!important;border-top:2px solid var(--blue500)!important}
+.drag-handle{color:var(--gray400);cursor:grab;font-size:14px;flex-shrink:0;padding:0 2px;user-select:none}
+.drag-handle:active{cursor:grabbing}
+.master-item-del{background:none;border:none;color:var(--gray300);cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;transition:all .1s;margin-left:auto;flex-shrink:0}
+.master-item-del:hover{color:var(--red500);background:var(--red50)}
 .master-card-site{font-size:11px;font-weight:400;opacity:.7}
 .master-list{max-height:260px;overflow-y:auto}
 .master-item{padding:8px 16px;border-bottom:1px solid var(--gray100);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--gray800)}
@@ -313,23 +321,60 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
     -webkit-print-color-adjust:exact; print-color-adjust:exact;
   }
 
-  /* 점검기준표 - 2페이지 */
+  /* 점검기준표 - A4 가로 마지막 1장 꽉 차게 */
   #checkCriteriaTable{
-    margin-top:0!important;
-    page-break-before:always!important;
+    page-break-before: always!important;
+    margin: 0!important; padding: 0!important;
+    width: 277mm!important;
+    height: 185mm!important;
+    display: flex!important;
+    flex-direction: column!important;
+    overflow: hidden!important;
+  }
+  #checkCriteriaTable > div:first-child{
+    font-size: 10pt!important; font-weight: 700!important;
+    padding: 4px 0 5px!important;
+    border-top: 2px solid #222!important;
+    margin-bottom: 3px!important;
+    flex-shrink: 0!important;
   }
   #checkCriteriaTable table{
-    font-size:7pt!important; table-layout:fixed!important;
-    white-space:normal!important;
+    flex: 1!important;
+    width: 100%!important;
+    table-layout: fixed!important;
+    border-collapse: collapse!important;
+    white-space: normal!important;
+    height: 100%!important;
+    overflow: hidden!important;
+  }
+  #checkCriteriaTable table tr{
+    height: 33%!important;
   }
   #checkCriteriaTable table td{
-    padding:3px 4px!important; font-size:7pt!important;
-    line-height:1.4!important; vertical-align:top!important;
-    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    padding: 4px 6px!important;
+    font-size: 7.5pt!important;
+    line-height: 1.55!important;
+    vertical-align: top!important;
+    border: 1px solid #999!important;
+    word-break: keep-all!important;
+    overflow: hidden!important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
-  #checkCriteriaTable table td[style*="background:#f5f5f5"]{
-    background:#f0f0f0!important;
-    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  #checkCriteriaTable table td.ct-head{
+    background: #e8e8e8!important;
+    font-size: 8.5pt!important;
+    font-weight: 700!important;
+    text-align: center!important;
+    vertical-align: middle!important;
+    height: 20px!important;
+    padding: 3px 4px!important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  #checkCriteriaTable .ct-note{
+    font-size: 7pt!important;
+    color: #444!important;
+    padding: 4px 0 0!important;
+    flex-shrink: 0!important;
   }
 
   /* 헤더/푸터 숨김 */
@@ -400,69 +445,45 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
   </div>
   <div class="print-head" id="printHead"><h2 id="printTitle"></h2><p id="printSub"></p></div>
 
-<div id="checkCriteriaTable" style="display:none;margin-top:24px;page-break-before:always">
-  <div style="font-size:14px;font-weight:700;padding:10px 0 8px;border-top:2px solid #333">▶ 작업별 점검기준</div>
-  <table style="width:100%;border-collapse:collapse;font-size:10px;table-layout:fixed">
+<div id="checkCriteriaTable" style="display:none">
+  <div>▶ 작업별 점검기준</div>
+  <table>
     <colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup>
     <tr>
-      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">호이스트</td>
-      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">컨베이어</td>
-      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">산업용로봇</td>
-      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">리프트</td>
+      <td class="ct-head">호이스트</td>
+      <td class="ct-head">컨베이어</td>
+      <td class="ct-head">산업용로봇</td>
+      <td class="ct-head">리프트</td>
     </tr>
     <tr>
-      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
-        - 권과방지장치, 브레이크, 클러치 및 운전장치의 기능<br>- 주행로의 상측 레일의 상태<br>- 와이어로프가 통하고 있는 곳의 상태<br>- 경보장치 등의 기능
-      </td>
-      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
-        - 원동기 및 풀리 기능의 이상 유무<br>- 이탈 등의 방지장치 기능의 이상 유무<br>- 비상정지장치 기능의 이상 유무<br>- 원동기·회전축·기어 및 풀리 등의 덮개 또는 울 등의 이상 유무
-      </td>
-      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
-        - 외부 전선의 피복 또는 외장의 손상 유무<br>- 매니퓰레이터 작동의 이상 유무<br>- 제동장치 및 비상정지장치의 기능
-      </td>
-      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
-        - 방호장치, 브레이크 및 클러치의 기능<br>- 와이어로프가 통하고 있는 곳의 상태
-      </td>
+      <td>- 권과방지장치, 브레이크, 클러치 및 운전장치의 기능<br>- 주행로의 상측 레일의 상태<br>- 와이어로프가 통하고 있는 곳의 상태<br>- 경보장치 등의 기능</td>
+      <td>- 원동기 및 풀리 기능의 이상 유무<br>- 이탈 등의 방지장치 기능의 이상 유무<br>- 비상정지장치 기능의 이상 유무<br>- 원동기·회전축·기어 및 풀리 등의 덮개 또는 울 등의 이상 유무</td>
+      <td>- 외부 전선의 피복 또는 외장의 손상 유무<br>- 매니퓰레이터 작동의 이상 유무<br>- 제동장치 및 비상정지장치의 기능</td>
+      <td>- 방호장치, 브레이크 및 클러치의 기능<br>- 와이어로프가 통하고 있는 곳의 상태</td>
     </tr>
     <tr>
-      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">프레스</td>
-      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">공기압축기</td>
-      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">지게차</td>
-      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">용접/절단</td>
+      <td class="ct-head">프레스</td>
+      <td class="ct-head">공기압축기</td>
+      <td class="ct-head">지게차</td>
+      <td class="ct-head">용접/절단</td>
     </tr>
     <tr>
-      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
-        - 클러치 및 브레이크의 기능<br>- 크랭크축, 플라이휠, 슬라이드, 연결봉 및 연결 나사의 풀림 여부<br>- 1행정 1정지기구, 급정지장치 및 비상정지장치의 기능<br>- 슬라이드 또는 칼날에 의한 위험방지 기구의 기능<br>- 프레스의 금형 및 고정볼트 상태<br>- 방호장치의 기능<br>- 전단기의 칼날 및 테이블의 상태
-      </td>
-      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
-        - 공기저장 압력용기의 외관상태<br>- 드레인밸브의 조작 및 배수<br>- 압력방출장치의 기능<br>- 언로드밸브의 기능<br>- 윤활유의 상태<br>- 회전부의 덮개 또는 울<br>- 그 밖의 연결 부위의 이상 유무
-      </td>
-      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
-        - 제동장치 및 조종장치 기능의 이상 유무<br>- 하역장치 및 유압장치 기능의 이상 유무<br>- 바퀴의 이상 유무<br>- 전조등·후미등·방향지시기 및 경보장치 기능의 이상 유무<br>- 작업자 안전벨트 및 안전모 착용<br>- 유자격자 운전 여부 확인<br>- 시동키 관리상태 등 확인
-      </td>
-      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
-        - 작업 준비 및 작업 절차 수립 여부<br>- 화기작업에 따른 인근 가연성물질에 대한 방호조치 및 소화기구 비치 여부<br>- 용접불티 비산방지덮개 또는 용접 방화포 등 불꽃불티 비산 방지 조치 여부<br>- 인화성 액체의 증기 또는 인화성 가스가 남아있지 않도록 하는 환기 조치 여부<br>- 작업근로자에 대한 화재예방 및 피난 교육 등 비상조치 여부
-      </td>
+      <td>- 클러치 및 브레이크의 기능<br>- 크랭크축, 플라이휠, 슬라이드, 연결봉 및 연결 나사의 풀림 여부<br>- 1행정 1정지기구, 급정지장치 및 비상정지장치의 기능<br>- 슬라이드 또는 칼날에 의한 위험방지 기구의 기능<br>- 프레스의 금형 및 고정볼트 상태<br>- 방호장치의 기능<br>- 전단기의 칼날 및 테이블의 상태</td>
+      <td>- 공기저장 압력용기의 외관상태<br>- 드레인밸브의 조작 및 배수<br>- 압력방출장치의 기능<br>- 언로드밸브의 기능<br>- 윤활유의 상태<br>- 회전부의 덮개 또는 울<br>- 그 밖의 연결 부위의 이상 유무</td>
+      <td>- 제동장치 및 조종장치 기능의 이상 유무<br>- 하역장치 및 유압장치 기능의 이상 유무<br>- 바퀴의 이상 유무<br>- 전조등·후미등·방향지시기 및 경보장치 기능의 이상 유무<br>- 작업자 안전벨트 및 안전모 착용<br>- 유자격자 운전 여부 확인<br>- 시동키 관리상태 등 확인</td>
+      <td>- 작업 준비 및 작업 절차 수립 여부<br>- 화기작업에 따른 인근 가연성물질에 대한 방호조치 및 소화기구 비치 여부<br>- 용접불티 비산방지덮개 또는 용접 방화포 등 불꽃불티 비산 방지 조치 여부<br>- 인화성 액체의 증기 또는 인화성 가스가 남아있지 않도록 하는 환기 조치 여부<br>- 작업근로자에 대한 화재예방 및 피난 교육 등 비상조치 여부</td>
     </tr>
     <tr>
-      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">와이어로프 등 (체인, 벨트 포함)</td>
-      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">중량물</td>
-      <td style="border:1px solid #999;padding:6px 8px;font-weight:700;text-align:center;background:#f5f5f5">방사선기기</td>
-      <td style="border:1px solid #999;padding:6px 8px;background:#f5f5f5"></td>
+      <td class="ct-head">와이어로프 등 (체인, 벨트 포함)</td>
+      <td class="ct-head">중량물</td>
+      <td class="ct-head">방사선기기</td>
+      <td class="ct-head"></td>
     </tr>
     <tr>
-      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
-        - 와이어로프 및 벨트 이상유무 (찢어짐, 끊어짐 등)<br>- (훅이 있는 경우) 훅의 매달림 상태<br>- 훅해지장치 정상기능 여부
-      </td>
-      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
-        - 중량물 취급의 올바른 자세 및 복장<br>- 위험물이 날아 흩어짐에 따른 보호구의 착용<br>- 온도 상승이나 습기에 의하여 위험성이 존재하는 중량물의 취급방법<br>- 그 밖에 하역운반기계등의 적절한 사용방법
-      </td>
-      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top">
-        - 장비 외함상태, 장비 주변 청결<br>- 차폐체 무결성 (납커튼, 외함 등)<br>- 안전연동(interlock)장치 이상유무<br>- 경고등 작동 상태<br>- 비상정지 버튼 상태<br>- 전원 및 배선 상태<br>- 경고표지 부착 상태
-      </td>
-      <td style="border:1px solid #999;padding:6px 8px;vertical-align:top;font-size:9px;color:#666">
-        ※ 육안점검을 기준으로 함. 필요 시 직접 작동 등을 통한 점검 실시.
-      </td>
+      <td>- 와이어로프 및 벨트 이상유무 (찢어짐, 끊어짐 등)<br>- (훅이 있는 경우) 훅의 매달림 상태<br>- 훅해지장치 정상기능 여부</td>
+      <td>- 중량물 취급의 올바른 자세 및 복장<br>- 위험물이 날아 흩어짐에 따른 보호구의 착용<br>- 온도 상승이나 습기에 의하여 위험성이 존재하는 중량물의 취급방법<br>- 그 밖에 하역운반기계등의 적절한 사용방법</td>
+      <td>- 장비 외함상태, 장비 주변 청결<br>- 차폐체 무결성 (납커튼, 외함 등)<br>- 안전연동(interlock)장치 이상유무<br>- 경고등 작동 상태<br>- 비상정지 버튼 상태<br>- 전원 및 배선 상태<br>- 경고표지 부착 상태</td>
+      <td style="vertical-align:bottom"><div class="ct-note">※ 육안점검을 기준으로 함.<br>필요 시 직접 작동 등을 통한 점검 실시.</div></td>
     </tr>
   </table>
 </div>
@@ -1013,6 +1034,35 @@ function lockMasterSite(){
   unlockedMasterSites.delete(curMasterSite);
   renderMasterCards();
   toast(curMasterSite+' 기준정보 잠금됨','');
+}
+
+/* 기준정보 드래그 순서변경 */
+let dragSrcIdx = -1;
+
+function onMasterDragStart(e){
+  dragSrcIdx = parseInt(e.currentTarget.dataset.idx);
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onMasterDragOver(e){
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+function onMasterDragLeave(e){
+  e.currentTarget.classList.remove('drag-over');
+}
+function onMasterDrop(e, key){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const destIdx = parseInt(e.currentTarget.dataset.idx);
+  if(dragSrcIdx === destIdx || dragSrcIdx < 0) return;
+  const list = sd(curMasterSite).master[key];
+  const moved = list.splice(dragSrcIdx, 1)[0];
+  list.splice(destIdx, 0, moved);
+  dragSrcIdx = -1;
+  renderMasterCards();
+  toast('순서가 변경됐습니다','ok');
 }
 
 function changeSitePw(){
