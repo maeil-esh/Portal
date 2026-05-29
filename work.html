@@ -204,6 +204,17 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
 .master-site-tab{padding:6px 14px;border:1.5px solid var(--gray200);border-radius:20px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;background:var(--white);color:var(--gray600);transition:all .12s}
 .master-site-tab:hover{border-color:var(--blue500);color:var(--blue500)}
 .master-site-tab.active{background:var(--blue500);color:var(--white);border-color:var(--blue500)}
+.site-order-pill{display:flex;align-items:center;gap:4px;border:1.5px solid var(--gray200);border-radius:22px;background:var(--white);padding:3px 5px 3px 4px;transition:all .12s;cursor:grab}
+.site-order-pill:hover{border-color:var(--blue500);box-shadow:var(--sh1)}
+.site-order-pill.dragging{opacity:.45;background:var(--blue50)}
+.site-order-pill.drag-over{border-color:var(--blue500);background:var(--blue50)}
+.site-order-pill.active{border-color:var(--blue500);background:var(--blue50)}
+.site-order-handle{font-size:13px;color:var(--gray400);padding:0 2px;user-select:none}
+.site-order-name{border:none;background:transparent;font-family:inherit;font-size:12px;font-weight:700;color:var(--gray600);padding:4px 8px;border-radius:16px;cursor:pointer;white-space:nowrap}
+.site-order-pill.active .site-order-name{color:var(--blue500)}
+.site-order-btn{width:20px;height:20px;border:1px solid var(--gray200);background:var(--gray50);border-radius:50%;font-size:10px;color:var(--gray500);cursor:pointer;line-height:1}
+.site-order-btn:hover{background:var(--blue500);border-color:var(--blue500);color:var(--white)}
+.site-order-btn:disabled{opacity:.25;cursor:not-allowed;background:var(--gray50);color:var(--gray400)}
 .master-site-add{display:flex;gap:8px;align-items:center;padding:0 20px 14px}
 .master-inp{border:1.5px solid var(--gray200);border-radius:var(--r6);padding:7px 10px;font-size:12px;font-family:inherit;color:var(--gray800);transition:border-color .15s;background:var(--white)}
 .master-inp:focus{outline:none;border-color:var(--blue500)}
@@ -585,7 +596,7 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
     <div class="master-site-bar">
       <div class="master-site-bar-head">
         <span class="master-site-bar-title">사업장 관리</span>
-        <span style="font-size:11px;color:var(--gray500)">사업장을 선택하면 해당 사업장의 기준정보를 편집합니다</span>
+        <span style="font-size:11px;color:var(--gray500)">사업장을 드래그하거나 ▲▼ 버튼으로 순서를 변경할 수 있습니다</span>
       </div>
       <div class="master-site-tabs" id="masterSiteTabs"></div>
       <div class="master-site-add">
@@ -726,10 +737,15 @@ function normalizeMaster(m){
   };
 }
 
-let sites = ['본사공장'];
-let siteData = { '본사공장': { rows:[], nextId:1, master:defMaster() } };
-let curSite  = '본사공장';   // 현황 페이지 기준 사업장
-let curMasterSite = '본사공장'; // 기준정보 선택 사업장
+const DEPRECATED_SITES = ['본사공장'];
+const DEFAULT_SITES = ['중부권역-아산','동부권역-경산','동부권역-영동','청양공장','상하공장','광주공장','중부권역-평택'];
+function isDeprecatedSite(site){ return DEPRECATED_SITES.includes(String(site||'').trim()); }
+function newSiteData(){ return { rows:[], nextId:1, master:defMaster() }; }
+
+let sites = DEFAULT_SITES.slice();
+let siteData = Object.fromEntries(DEFAULT_SITES.map(s=>[s,newSiteData()]));
+let curSite  = sites[0];   // 현황 페이지 기준 사업장
+let curMasterSite = sites[0]; // 기준정보 선택 사업장
 let curPage  = 'home';
 let sortState = { mid: null, dir: 0 }; // dir: 0=없음 1=내림차순(체크O먼저) -1=오름차순
 let unlockedSites = new Set();       // 현황 편집 인증된 사업장
@@ -989,18 +1005,66 @@ function onCellKey(e,td){
    기준정보 페이지
 ══════════════════════════════════════════ */
 function renderMasterPage(){
-  // 사업장 탭 칩
+  // 사업장 순서/선택 칩
   const el = document.getElementById('masterSiteTabs');
-  el.innerHTML = sites.map(s=>
-    `<button class="master-site-tab${s===curMasterSite?' active':''}" onclick="switchMasterSite('${esc(s)}')">${esc(s)}</button>`
+  el.innerHTML = sites.map((s,i)=>
+    `<div class="site-order-pill${s===curMasterSite?' active':''}" draggable="true" data-idx="${i}"
+      ondragstart="onSiteDragStart(event)" ondragover="onSiteDragOver(event)" ondragleave="onSiteDragLeave(event)" ondrop="onSiteDrop(event)">
+      <span class="site-order-handle" title="드래그하여 사업장 순서 변경">⠿</span>
+      <button class="site-order-name" onclick="switchMasterSite('${esc(s)}')">${esc(s)}</button>
+      <button class="site-order-btn" onclick="event.stopPropagation();moveSiteOrder(${i},-1)" ${i===0?'disabled':''} title="앞으로">▲</button>
+      <button class="site-order-btn" onclick="event.stopPropagation();moveSiteOrder(${i},1)" ${i===sites.length-1?'disabled':''} title="뒤로">▼</button>
+    </div>`
   ).join('');
   // 카드
   renderMasterCards();
 }
 
 function switchMasterSite(name){
+  if(isDeprecatedSite(name) || !siteData[name]) return;
   curMasterSite = name;
   renderMasterPage();
+}
+
+let siteDragIdx = -1;
+function onSiteDragStart(e){
+  siteDragIdx = parseInt(e.currentTarget.dataset.idx, 10);
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onSiteDragOver(e){
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+  e.dataTransfer.dropEffect = 'move';
+}
+function onSiteDragLeave(e){ e.currentTarget.classList.remove('drag-over'); }
+function onSiteDrop(e){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const destIdx = parseInt(e.currentTarget.dataset.idx, 10);
+  if(siteDragIdx < 0 || siteDragIdx === destIdx) return;
+  moveSiteIndex(siteDragIdx, destIdx);
+  siteDragIdx = -1;
+}
+function moveSiteOrder(idx, dir){ moveSiteIndex(idx, idx + dir); }
+function moveSiteIndex(from, to){
+  if(from < 0 || to < 0 || from >= sites.length || to >= sites.length || from === to) return;
+  const moved = sites.splice(from, 1)[0];
+  sites.splice(to, 0, moved);
+  renderNavTabs(); renderDashboard(); renderMasterPage();
+  saveSiteOrderToGAS(true);
+  toast('사업장 순서가 변경됐습니다','ok');
+}
+function saveSiteOrderToGAS(silent){
+  if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
+  gasCall('saveSiteOrder', {data: JSON.stringify({order: sites})}, res=>{
+    if(res?.result==='success'){
+      setGasOk();
+      if(!silent) toast('사업장 순서 저장 완료','ok');
+    } else if(!silent){
+      toast('❌ 사업장 순서 저장 실패: '+(res?.error||'오류'),'err');
+    }
+  });
 }
 
 function renderMasterCards(){
@@ -1212,9 +1276,13 @@ function saveMasterToGAS(site, silent){
 function openAddSiteModal(){ document.getElementById('modalSiteInp').value=''; document.getElementById('modalBg').classList.add('show'); setTimeout(()=>document.getElementById('modalSiteInp').focus(),100); }
 function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
 function createSiteLocal(v){
+  v = String(v||'').trim();
+  if(!v || isDeprecatedSite(v)) return;
   if(!siteData[v]){
     sites.push(v);
-    siteData[v]={rows:[],nextId:1,master:defMaster()};
+    siteData[v]=newSiteData();
+  } else if(!sites.includes(v)) {
+    sites.push(v);
   }
 }
 function confirmModal(){
@@ -1225,6 +1293,7 @@ function confirmModal(){
   closeModal();
   saveMasterToGAS(v, true);
   saveRowsForSite(v, ()=>{});
+  saveSiteOrderToGAS(true);
   goPage('work',v); toast(v+' 추가됨','ok');
 }
 function addSite(){
@@ -1236,7 +1305,8 @@ function addSite(){
   curMasterSite=v;
   saveMasterToGAS(v, true);
   saveRowsForSite(v, ()=>{});
-  renderMasterPage(); renderNavTabs(); toast(v+' 추가됨','ok');
+  saveSiteOrderToGAS(true);
+  renderMasterPage(); renderNavTabs(); renderDashboard(); toast(v+' 추가됨','ok');
 }
 function delSite(){
   if(sites.length<=1){ toast('최소 1개 사업장이 필요합니다','err'); return; }
@@ -1251,6 +1321,7 @@ function delSite(){
       if(res?.result==='success') setGasOk();
       else toast('❌ 서버 사업장 삭제 실패: '+(res?.error||'오류'),'err');
     });
+    saveSiteOrderToGAS(true);
   }
   renderMasterPage(); renderNavTabs(); renderDashboard(); toast('삭제됨','ok');
 }
@@ -1404,30 +1475,48 @@ function saveToGAS(){
 function saveAllToGAS(){ autoSaveAll(); }
 
 function ensureSite(site){
-  if(!site) return;
-  if(!siteData[site]){
-    sites.push(site);
-    siteData[site]={rows:[],nextId:1,master:defMaster()};
-  }
+  site = String(site||'').trim();
+  if(!site || isDeprecatedSite(site)) return;
+  if(!siteData[site]) siteData[site]=newSiteData();
+  if(!sites.includes(site)) sites.push(site);
 }
 
 function applyMasterMap(map){
   if(!map) return;
   Object.keys(map).forEach(site=>{
+    if(isDeprecatedSite(site) || site === '_siteOrder' || site === '__SYSTEM__') return;
     ensureSite(site);
-    siteData[site].master = normalizeMaster(map[site]);
+    if(siteData[site]) siteData[site].master = normalizeMaster(map[site]);
   });
 }
 
+function applyLoadedSiteOrder(order){
+  const ordered = [];
+  const add = s => {
+    s = String(s||'').trim();
+    if(!s || isDeprecatedSite(s)) return;
+    ensureSite(s);
+    if(!ordered.includes(s)) ordered.push(s);
+  };
+  if(Array.isArray(order) && order.length) order.forEach(add);
+  sites.forEach(add);
+  DEFAULT_SITES.forEach(add);
+  sites = ordered;
+  if(!sites.length){ DEFAULT_SITES.forEach(ensureSite); sites = DEFAULT_SITES.slice(); }
+  if(!sites.includes(curSite)) curSite = sites[0];
+  if(!sites.includes(curMasterSite)) curMasterSite = sites[0];
+}
+
 function resetAllRows(){
-  sites.forEach(s=>{ siteData[s].rows=[]; siteData[s].nextId=1; });
+  sites.forEach(s=>{ if(siteData[s]){ siteData[s].rows=[]; siteData[s].nextId=1; } });
 }
 
 function appendLoadedRows(rows){
   (rows||[]).forEach(row=>{
-    if(!row.site) return;
+    if(!row.site || isDeprecatedSite(row.site)) return;
     ensureSite(row.site);
     const d=siteData[row.site];
+    if(!d) return;
     d.rows.push({ id:d.nextId++, team:row.team||'', process:row.process||'', position:row.position||'',
       empno:row.empno||'', name:row.name||'', bigo:row.bigo||'', date:row.date||'',
       machines:Object.fromEntries(MACHINES.map(m=>[m.id,row[m.id]==='O'])) });
@@ -1437,13 +1526,15 @@ function appendLoadedRows(rows){
 function loadAllFromGAS(){
   toast('불러오는 중...','');
   gasCall('loadAllMaster',{},mres=>{
-    if(mres?.result==='success') applyMasterMap(mres.data || {});
+    const loadedOrder = (mres?.result==='success' && Array.isArray(mres.order)) ? mres.order : [];
+    if(mres?.result==='success') { applyMasterMap(mres.data || {}); applyLoadedSiteOrder(loadedOrder); }
     gasCall('loadAll',{},res=>{
       if(res?.result==='success'&&Array.isArray(res.data)){
         resetAllRows();
         appendLoadedRows(res.data);
+        applyLoadedSiteOrder(loadedOrder);
         renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); setGasOk();
-        toast(res.data.length+'건 불러오기 완료','ok');
+        toast(res.data.filter(r=>!isDeprecatedSite(r.site)).length+'건 불러오기 완료','ok');
       } else toast('불러오기 실패','err');
     });
   });
@@ -1740,7 +1831,7 @@ function setSyncMsg(msg, color){
 function triggerAutoSave(){
   clearTimeout(autoSaveTimer);
   setSyncMsg('● 변경사항 있음...', 'var(--orange500)');
-  autoSaveTimer = setTimeout(()=>{ autoSaveTimer = null; autoSaveAll(); }, 2000);
+  autoSaveTimer = setTimeout(()=>{ autoSaveAll(); }, 2000);
 }
 
 function autoSaveAll(){
@@ -1776,16 +1867,19 @@ function autoLoadAll(){
   setSyncMsg('↓ 불러오는 중...', 'var(--blue500)');
   LD.progress(60, '기준정보 불러오는 중...');
   gasCall('loadAllMaster',{},mres=>{
-    if(mres?.result==='success') applyMasterMap(mres.data || {});
+    const loadedOrder = (mres?.result==='success' && Array.isArray(mres.order)) ? mres.order : [];
+    if(mres?.result==='success') { applyMasterMap(mres.data || {}); applyLoadedSiteOrder(loadedOrder); }
     LD.progress(75, '사업장 현황 불러오는 중...');
     gasCall('loadAll',{},res=>{
       if(res?.result==='success'&&Array.isArray(res.data)){
         LD.progress(88, '데이터 처리 중...');
         resetAllRows();
         appendLoadedRows(res.data);
+        applyLoadedSiteOrder(loadedOrder);
         renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); setGasOk();
+        const visibleCount = res.data.filter(r=>!isDeprecatedSite(r.site)).length;
         setSyncMsg('✓ 최신화됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
-        LD.complete('✓ 데이터 로딩 완료 — '+res.data.length+'건');
+        LD.complete('✓ 데이터 로딩 완료 — '+visibleCount+'건');
       } else {
         setSyncMsg('● 데이터 없음', 'var(--gray400)');
         LD.complete('연결됨 — 데이터 없음');
@@ -1802,7 +1896,7 @@ goPage('home');
 // 페이지 로드 후 자동 불러오기
 setTimeout(()=>{ autoLoadAll(); }, 200);
 // 5분마다 자동 최신화
-setInterval(()=>{ if(!autoSaveTimer && !isSyncing) autoLoadAll(); }, 5 * 60 * 1000);
+setInterval(()=>{ autoLoadAll(); }, 5 * 60 * 1000);
 </script>
 </body>
 </html>
