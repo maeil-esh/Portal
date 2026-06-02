@@ -527,6 +527,27 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
   </div>
   <div class="print-head" id="printHead"><h2 id="printTitle"></h2><p id="printSub"></p></div>
 
+  <div class="tbl-wrap">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th class="th-no" rowspan="2"><div class="th-inner">No.</div></th>
+          <th class="col-sticky" style="min-width:85px;left:40px" rowspan="2"><div class="th-inner">팀</div></th>
+          <th class="col-sticky" style="min-width:100px;left:125px" rowspan="2"><div class="th-inner">공정명</div></th>
+          <th class="col-sticky" style="min-width:68px;left:225px" rowspan="2"><div class="th-inner">직책</div></th>
+          <th class="col-sticky" style="min-width:80px;left:293px" rowspan="2"><div class="th-inner">사번</div></th>
+          <th class="col-sticky" style="min-width:74px;left:373px;border-right:2px solid rgba(255,255,255,.2)" rowspan="2"><div class="th-inner">이름</div></th>
+          <th colspan="12" class="th-group"><div class="th-inner" style="font-size:11px">유해위험작업 대상 &nbsp;(기계명 클릭 → 점검기준)</div></th>
+          <th style="min-width:120px" rowspan="2"><div class="th-inner">비고</div></th>
+          <th style="min-width:88px" rowspan="2"><div class="th-inner">업데이트일</div></th>
+          <th class="th-del" rowspan="2"><div class="th-inner"></div></th>
+        </tr>
+        <tr id="machineHeaderRow"></tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+      <tfoot id="tableFoot"></tfoot>
+    </table>
+  </div>
 <div id="checkCriteriaTable" style="display:none">
   <div>▶ 작업별 점검기준</div>
   <table>
@@ -569,27 +590,7 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
     </tr>
   </table>
 </div>
-  <div class="tbl-wrap">
-    <table id="mainTable">
-      <thead>
-        <tr>
-          <th class="th-no" rowspan="2"><div class="th-inner">No.</div></th>
-          <th class="col-sticky" style="min-width:85px;left:40px" rowspan="2"><div class="th-inner">팀</div></th>
-          <th class="col-sticky" style="min-width:100px;left:125px" rowspan="2"><div class="th-inner">공정명</div></th>
-          <th class="col-sticky" style="min-width:68px;left:225px" rowspan="2"><div class="th-inner">직책</div></th>
-          <th class="col-sticky" style="min-width:80px;left:293px" rowspan="2"><div class="th-inner">사번</div></th>
-          <th class="col-sticky" style="min-width:74px;left:373px;border-right:2px solid rgba(255,255,255,.2)" rowspan="2"><div class="th-inner">이름</div></th>
-          <th colspan="12" class="th-group"><div class="th-inner" style="font-size:11px">유해위험작업 대상 &nbsp;(기계명 클릭 → 점검기준)</div></th>
-          <th style="min-width:120px" rowspan="2"><div class="th-inner">비고</div></th>
-          <th style="min-width:88px" rowspan="2"><div class="th-inner">업데이트일</div></th>
-          <th class="th-del" rowspan="2"><div class="th-inner"></div></th>
-        </tr>
-        <tr id="machineHeaderRow"></tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-      <tfoot id="tableFoot"></tfoot>
-    </table>
-  </div>
+
 </div>
 
 <!-- ══ PAGE: 기준정보 ══ -->
