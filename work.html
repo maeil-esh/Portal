@@ -179,7 +179,7 @@ td.td-text{min-width:88px;text-align:left}
 td.td-name{min-width:78px;font-weight:700;color:var(--gray900)}
 td.td-empno{min-width:80px}
 td.td-process{min-width:100px;text-align:left}
-td.td-bigo{min-width:120px;text-align:left}
+td.td-bigo{display:none}
 td.td-date{min-width:90px;font-size:11px;color:var(--gray500)}
 td.td-check{min-width:46px;width:46px;cursor:pointer;user-select:none}
 td.td-check:hover{background:var(--blue50)!important}
@@ -337,7 +337,7 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
     line-height:1.3!important; text-align:center!important;
     word-break:keep-all!important; overflow:hidden!important;
   }
-  td.td-text, td.td-process, td.td-name, td.td-bigo{ text-align:left!important; }
+  td.td-text, td.td-process, td.td-name{ text-align:left!important; }
 
   /* 체크박스 */
   .chk{
@@ -373,8 +373,8 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
 
   /* 점검기준표 - A4 가로 마지막 1장 꽉 차게 */
   #checkCriteriaTable{
-    page-break-before: auto!important;
-    margin: 10px 0 0 0!important; padding: 0!important;
+    page-break-before: always!important;
+    margin: 0!important; padding: 0!important;
     width: 277mm!important;
     display: block!important;
     overflow: hidden!important;
@@ -572,7 +572,6 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
           <th class="col-sticky" style="min-width:80px;left:293px" rowspan="2"><div class="th-inner">사번</div></th>
           <th class="col-sticky" style="min-width:74px;left:373px;border-right:2px solid rgba(255,255,255,.2)" rowspan="2"><div class="th-inner">이름</div></th>
           <th colspan="12" class="th-group"><div class="th-inner" style="font-size:11px">유해위험작업 대상 &nbsp;(기계명 클릭 → 점검기준)</div></th>
-          <th style="min-width:120px" rowspan="2"><div class="th-inner">비고</div></th>
           <th style="min-width:88px" rowspan="2"><div class="th-inner">업데이트일</div></th>
           <th style="min-width:34px" rowspan="2"><div class="th-inner"></div></th>
         </tr>
@@ -944,8 +943,6 @@ function renderTable(){
       <td class="td-total" data-col="total" tabindex="0" onkeydown="onCellKey(event,this)" onclick="showTotalTT(${r.id},event)">
         <span class="total-badge${total===0?' zero':''}">${total}</span></td>
       ${checks}
-      <td class="td-bigo" data-col="bigo" tabindex="0" onkeydown="onCellKey(event,this)">
-        <input class="cell-edit" value="${esc(r.bigo)}" placeholder="비고" onchange="setF(${r.id},'bigo',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
       <td class="td-date">${r.date}</td>
       <td class="td-del">${isUnlocked()?`<button class="del-btn" onclick="deleteRow(${r.id})">✕</button>`:''}</td>
     </tr>`;
@@ -955,7 +952,7 @@ function renderTable(){
     <td colspan="5" style="font-size:11px;color:var(--gray500)">${filtered.length}명</td>
     <td>${totalAll}</td>
     ${MACHINES.map(m=>`<td>${mT[m.id]||''}</td>`).join('')}
-    <td></td><td></td><td></td></tr>`;
+    <td></td><td></td></tr>`;
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
@@ -1545,8 +1542,8 @@ function exportExcel(){
   const q=document.getElementById('searchBox').value.trim().toLowerCase();
   const rows=sd().rows.filter(r=>(!dept||r.team===dept)&&(!q||r.name.includes(q)||r.empno.includes(q)||r.team.includes(q)||r.process.includes(q)));
   if(!rows.length){ toast('데이터가 없습니다','err'); return; }
-  const headers=['팀','공정명','직책','사번','이름','계',...MACHINES.map(m=>m.label.replace('\n',' ')),'비고','업데이트일'];
-  const data=rows.map(r=>[r.team,r.process,r.position,r.empno,r.name,MACHINES.filter(m=>r.machines[m.id]).length,...MACHINES.map(m=>r.machines[m.id]?'O':''),r.bigo,r.date]);
+  const headers=['팀','공정명','직책','사번','이름','계',...MACHINES.map(m=>m.label.replace('\n',' ')),'업데이트일'];
+  const data=rows.map(r=>[r.team,r.process,r.position,r.empno,r.name,MACHINES.filter(m=>r.machines[m.id]).length,...MACHINES.map(m=>r.machines[m.id]?'O':''),r.date]);
   if(typeof XLSX==='undefined'){
     const csv='\uFEFF'+[headers,...data].map(r=>r.map(c=>'"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
     const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
