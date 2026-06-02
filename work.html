@@ -189,6 +189,9 @@ td.td-check:hover{background:var(--blue50)!important}
 .total-badge.zero{background:var(--gray300);color:var(--gray600)}
 td.td-total{min-width:46px;width:46px}
 td.td-del{min-width:34px;width:34px}
+th.th-del{min-width:34px;width:34px}
+.locked td.td-del{display:none}
+.locked th.th-del{display:none}
 .del-btn{background:none;border:none;color:var(--gray300);font-size:13px;cursor:pointer;padding:3px 5px;border-radius:4px;transition:all .1s}
 .del-btn:hover{color:var(--red500);background:var(--red50)}
 .empty-row td{color:var(--gray400);padding:32px;text-align:center;border:none}
@@ -273,23 +276,25 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
 /* ════ 인쇄 ════ */
 @media print{
   @page{ size:A4 landscape; margin:8mm 6mm; }
+  @page :first{ margin-top:8mm; }
 
   /* 숨김 */
-  .topbar,.navbar,.work-toolbar,.td-del,.tt,.toast,.modal-bg,
-  .work-header, tfoot, .sort-btn, .autoSaveIndicator { display:none!important; }
+  .topbar,.navbar,.work-toolbar,.td-del,.th-del,.tt,.toast,.modal-bg,
+  .work-header .btn, tfoot, .sort-btn, .autoSaveIndicator { display:none!important; }
 
   /* 전체 폰트/배경 */
   body{ font-size:7.5pt!important; background:#fff!important; color:#000!important; }
 
-  /* 페이지 타이틀 반복 */
-  .print-head{ display:block!important; text-align:center; padding:3px 0 5px; }
-  .print-head h2{ font-size:11pt; font-weight:700; margin-bottom:2px; }
+  /* 페이지 헤더 */
+  .print-head{ display:block!important; text-align:center; padding:4px 0 6px; }
+  .print-head h2{ font-size:12pt; font-weight:700; margin-bottom:2px; }
   .print-head p{ font-size:7pt; color:#555; }
 
   /* 테이블 래퍼 */
   .tbl-wrap{
     max-height:none!important; border:none!important; margin:0!important;
-    box-shadow:none!important; overflow:visible!important; padding:0!important;
+    box-shadow:none!important; overflow:visible!important;
+    padding:0!important;
   }
 
   /* sticky 해제 */
@@ -297,21 +302,22 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
     position:static!important;
   }
 
-  /* 테이블 — thead 매 페이지 반복 */
-  #mainTable{
+  /* 테이블 */
+  table{
     width:100%!important; table-layout:fixed!important;
     border-collapse:collapse!important; font-size:7pt!important;
     white-space:normal!important;
   }
-  #mainTable thead{ display:table-header-group!important; }
 
-  /* 컬럼 너비 */
-  #mainTable thead th:nth-child(1){ width:6mm!important; }
-  #mainTable thead th:nth-child(2){ width:16mm!important; }
-  #mainTable thead th:nth-child(3){ width:16mm!important; }
-  #mainTable thead th:nth-child(4){ width:12mm!important; }
-  #mainTable thead th:nth-child(5){ width:14mm!important; }
-  #mainTable thead th:nth-child(6){ width:14mm!important; }
+  /* 컬럼 너비 — A4 가로(277mm 유효) 기준 */
+  table colgroup{ display:table-column-group!important; }
+  thead th:nth-child(1){ width:6mm!important; }   /* No. */
+  thead th:nth-child(2){ width:16mm!important; }  /* 팀 */
+  thead th:nth-child(3){ width:16mm!important; }  /* 공정명 */
+  thead th:nth-child(4){ width:12mm!important; }  /* 직책 */
+  thead th:nth-child(5){ width:14mm!important; }  /* 사번 */
+  thead th:nth-child(6){ width:14mm!important; }  /* 이름 */
+  /* 계 + 기계 11개 + 비고 + 업데이트일 = 나머지 */
 
   /* 헤더 스타일 */
   thead th{
@@ -319,10 +325,12 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
     -webkit-print-color-adjust:exact; print-color-adjust:exact;
     padding:2px 1px!important; font-size:6.5pt!important;
     height:auto!important; line-height:1.2!important;
-    border:1px solid #555!important; text-align:center!important;
+    border:1px solid #666!important; text-align:center!important;
     word-break:keep-all!important;
   }
-  thead tr:nth-child(2) th{ background:#4e5968!important; font-size:6pt!important; }
+  thead tr:nth-child(2) th{
+    background:#4e5968!important; font-size:6pt!important;
+  }
 
   /* 데이터 행 */
   tbody tr{ height:auto!important; page-break-inside:avoid!important; }
@@ -332,12 +340,12 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
     line-height:1.3!important; text-align:center!important;
     word-break:keep-all!important; overflow:hidden!important;
   }
-  td.td-text, td.td-process, td.td-name{ text-align:left!important; }
+  td.td-text, td.td-process, td.td-name, td.td-bigo{ text-align:left!important; }
 
   /* 체크박스 */
   .chk{
     width:10px!important; height:10px!important; font-size:7pt!important;
-    border:1px solid #aaa!important; border-radius:2px!important;
+    border:1px solid #999!important; border-radius:2px!important;
     display:inline-flex!important; align-items:center!important; justify-content:center!important;
   }
   .chk.on{
@@ -348,11 +356,12 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
   /* 합계 뱃지 */
   .total-badge{
     font-size:6.5pt!important; min-width:14px!important; height:14px!important;
-    padding:0 3px!important; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    padding:0 3px!important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
   }
   .total-badge.zero{ background:#ccc!important; }
 
-  /* 인라인 편집 요소 텍스트화 */
+  /* 인라인 편집 요소 → 텍스트처럼 */
   .cell-edit{
     border:none!important; background:transparent!important;
     font-size:7pt!important; padding:0!important; width:100%!important;
@@ -361,40 +370,69 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
 
   /* 짝수 행 배경 */
   tbody tr:nth-child(even) td{
-    background:#f5f5f5!important;
+    background:#f7f7f7!important;
     -webkit-print-color-adjust:exact; print-color-adjust:exact;
   }
 
-  /* 점검기준표 — 무조건 새 페이지 */
+  /* 점검기준표 - A4 가로 마지막 1장 꽉 차게 */
   #checkCriteriaTable{
     page-break-before: always!important;
-    margin:0!important; padding:0!important;
-    width:277mm!important; display:block!important; overflow:hidden!important;
+    margin: 0!important; padding: 0!important;
+    width: 277mm!important;
+    height: 185mm!important;
+    display: flex!important;
+    flex-direction: column!important;
+    overflow: hidden!important;
   }
   #checkCriteriaTable > div:first-child{
-    font-size:9pt!important; font-weight:700!important;
-    padding:3px 0 4px!important; border-top:2px solid #222!important; margin-bottom:3px!important;
+    font-size: 10pt!important; font-weight: 700!important;
+    padding: 4px 0 5px!important;
+    border-top: 2px solid #222!important;
+    margin-bottom: 3px!important;
+    flex-shrink: 0!important;
   }
   #checkCriteriaTable table{
-    width:100%!important; table-layout:fixed!important;
-    border-collapse:collapse!important; white-space:normal!important; height:auto!important;
+    flex: 1!important;
+    width: 100%!important;
+    table-layout: fixed!important;
+    border-collapse: collapse!important;
+    white-space: normal!important;
+    height: 100%!important;
+    overflow: hidden!important;
   }
-  #checkCriteriaTable table tr{ height:auto!important; }
+  #checkCriteriaTable table tr{
+    height: 33%!important;
+  }
   #checkCriteriaTable table td{
-    padding:4px 6px!important; font-size:7pt!important; line-height:1.55!important;
-    vertical-align:top!important; border:1px solid #999!important;
-    word-break:keep-all!important;
-    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    padding: 4px 6px!important;
+    font-size: 7.5pt!important;
+    line-height: 1.55!important;
+    vertical-align: top!important;
+    border: 1px solid #999!important;
+    word-break: keep-all!important;
+    overflow: hidden!important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
   #checkCriteriaTable table td.ct-head{
-    background:#e8e8e8!important; font-size:8pt!important; font-weight:700!important;
-    text-align:center!important; vertical-align:middle!important;
-    height:22px!important; padding:3px 4px!important;
-    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    background: #e8e8e8!important;
+    font-size: 8.5pt!important;
+    font-weight: 700!important;
+    text-align: center!important;
+    vertical-align: middle!important;
+    height: 20px!important;
+    padding: 3px 4px!important;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
   #checkCriteriaTable .ct-note{
-    font-size:6.5pt!important; color:#444!important; padding:3px 0 0!important;
+    font-size: 7pt!important;
+    color: #444!important;
+    padding: 4px 0 0!important;
+    flex-shrink: 0!important;
   }
+
+  /* 헤더/푸터 숨김 */
+  .work-header{ display:none!important; }
+  #page-work .work-header{ display:none!important; }
 }
 .print-head{display:none}
 </style>
@@ -544,7 +582,7 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
           <th colspan="12" class="th-group"><div class="th-inner" style="font-size:11px">유해위험작업 대상 &nbsp;(기계명 클릭 → 점검기준)</div></th>
           <th style="min-width:120px" rowspan="2"><div class="th-inner">비고</div></th>
           <th style="min-width:88px" rowspan="2"><div class="th-inner">업데이트일</div></th>
-          <th style="min-width:34px" rowspan="2"><div class="th-inner"></div></th>
+          <th class="th-del" rowspan="2"><div class="th-inner"></div></th>
         </tr>
         <tr id="machineHeaderRow"></tr>
       </thead>
@@ -1523,38 +1561,10 @@ function exportExcel(){
     a.download=curSite+'_유해위험작업현황_'+today()+'.csv'; a.click(); toast('CSV 다운로드 완료','ok'); return;
   }
   const wb=XLSX.utils.book_new(), ws=XLSX.utils.aoa_to_sheet([headers,...data]);
-  ws['!cols']=[{wch:12},{wch:14},{wch:9},{wch:11},{wch:9},{wch:5},...MACHINES.map(()=>({wch:7})),{wch:12}];
-  ws['!rows']=[{hpt:18},...data.map(()=>({hpt:16}))];
-  ws['!pageSetup']={ orientation:'landscape', paperSize:9, fitToPage:true, fitToWidth:1, fitToHeight:0 };
-  ws['!margins']={ left:0.25, right:0.25, top:0.3, bottom:0.3, header:0.1, footer:0.1 };
-  // 셀 스타일
-  const hdrFill={patternType:'solid',fgColor:{rgb:'333D4B'}};
-  const hdrFont={bold:true,color:{rgb:'FFFFFF'},sz:9};
-  const chkFill={patternType:'solid',fgColor:{rgb:'D4EDDA'}};
-  const chkFont={bold:true,color:{rgb:'1A5C32'},sz:9};
-  const bd={top:{style:'thin',color:{rgb:'CCCCCC'}},bottom:{style:'thin',color:{rgb:'CCCCCC'}},left:{style:'thin',color:{rgb:'CCCCCC'}},right:{style:'thin',color:{rgb:'CCCCCC'}}};
-  const hBd={top:{style:'thin',color:{rgb:'555555'}},bottom:{style:'thin',color:{rgb:'555555'}},left:{style:'thin',color:{rgb:'555555'}},right:{style:'thin',color:{rgb:'555555'}}};
-  const ca={horizontal:'center',vertical:'center',wrapText:true};
-  const la={horizontal:'left',vertical:'center',wrapText:true};
-  headers.forEach((h,ci)=>{
-    const addr=XLSX.utils.encode_cell({r:0,c:ci});
-    if(ws[addr]) ws[addr].s={fill:hdrFill,font:hdrFont,alignment:ca,border:hBd};
-  });
-  data.forEach((row,ri)=>{
-    const evBg=ri%2===1?{patternType:'solid',fgColor:{rgb:'F5F5F5'}}:{patternType:'solid',fgColor:{rgb:'FFFFFF'}};
-    row.forEach((val,ci)=>{
-      const addr=XLSX.utils.encode_cell({r:ri+1,c:ci});
-      if(!ws[addr]){ ws[addr]={v:val,t:typeof val==='number'?'n':'s'}; }
-      const isChk=(val==='O'&&ci>5&&ci<headers.length-1);
-      const isTot=(ci===5);
-      ws[addr].s={
-        fill:isChk?chkFill:evBg,
-        font:isChk?chkFont:(isTot?{bold:true,sz:9}:{sz:9}),
-        alignment:ci<=1||ci===headers.length-1?la:ca,
-        border:bd
-      };
-    });
-  });
+  ws['!cols']=[{wch:10},{wch:12},{wch:8},{wch:10},{wch:8},{wch:5},...MACHINES.map(()=>({wch:6})),{wch:16},{wch:12}];
+  // 인쇄 설정: A4 가로, 1페이지 맞춤
+  ws['!pageSetup'] = { orientation:'landscape', paperSize:9, fitToPage:true, fitToWidth:1, fitToHeight:0 };
+  ws['!margins']   = { left:0.25, right:0.25, top:0.3, bottom:0.3, header:0.1, footer:0.1 };
   XLSX.utils.book_append_sheet(wb,ws,'유해위험작업현황');
 
   // 점검기준표 시트 추가
@@ -1617,32 +1627,9 @@ function exportExcel(){
   ];
   const ws2 = XLSX.utils.aoa_to_sheet(criteria);
   ws2['!cols'] = [{wch:14},{wch:70}];
-  ws2['!pageSetup'] = { orientation:'portrait', paperSize:9 };
+  ws2['!rows'] = [{hpt:15}];
+  ws2['!pageSetup'] = { orientation:'landscape', paperSize:9 };
   ws2['!margins']   = { left:0.3, right:0.3, top:0.3, bottom:0.3, header:0.1, footer:0.1 };
-  // 점검기준표 헤더 스타일
-  let curType=''; let rowBg=false;
-  criteria.forEach((row,ri)=>{
-    const type=String(row[0]||'').trim();
-    if(ri===0){
-      ['A1','B1'].forEach(addr=>{
-        if(ws2[addr]) ws2[addr].s={fill:{patternType:'solid',fgColor:{rgb:'333D4B'}},font:{bold:true,color:{rgb:'FFFFFF'},sz:10},alignment:{horizontal:'center',vertical:'center'},border:{top:{style:'thin',color:{rgb:'555555'}},bottom:{style:'thin',color:{rgb:'555555'}},left:{style:'thin',color:{rgb:'555555'}},right:{style:'thin',color:{rgb:'555555'}}}};
-      });
-      return;
-    }
-    if(type && type!==curType){ curType=type; rowBg=!rowBg; }
-    const bg=rowBg?'EAF3FF':'F9F9F9';
-    const isTypeCell=type&&type===row[0];
-    ['A','B'].forEach((col,ci)=>{
-      const addr=col+(ri+1);
-      if(!ws2[addr]) return;
-      ws2[addr].s={
-        fill:{patternType:'solid',fgColor:{rgb:isTypeCell&&ci===0?'4E5968':bg}},
-        font:isTypeCell&&ci===0?{bold:true,color:{rgb:'FFFFFF'},sz:9}:{sz:9},
-        alignment:{horizontal:ci===0?'center':'left',vertical:'top',wrapText:true},
-        border:{top:{style:'thin',color:{rgb:'CCCCCC'}},bottom:{style:'thin',color:{rgb:'CCCCCC'}},left:{style:'thin',color:{rgb:'CCCCCC'}},right:{style:'thin',color:{rgb:'CCCCCC'}}}
-      };
-    });
-  });
   XLSX.utils.book_append_sheet(wb,ws2,'작업별점검기준');
 
   XLSX.writeFile(wb,curSite+'_유해위험작업현황_'+today()+'.xlsx');
@@ -1826,6 +1813,9 @@ function updateLockUI(){
     lockBtn.textContent = unlocked?'🔓 잠금':'🔒 편집';
     lockBtn.className = unlocked?'btn btn-sm btn-red':'btn btn-sm btn-primary';
   }
+  // 삭제열 표시/숨김
+  const tbl = document.getElementById('mainTable');
+  if(tbl) tbl.classList.toggle('locked', !unlocked);
   // 테이블 재렌더 (읽기전용 적용)
   if(curPage==='work') renderTable();
 }
