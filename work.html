@@ -373,37 +373,33 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
 
   /* 점검기준표 - A4 가로 마지막 1장 꽉 차게 */
   #checkCriteriaTable{
-    page-break-before: always!important;
-    margin: 0!important; padding: 0!important;
+    page-break-before: auto!important;
+    margin: 10px 0 0 0!important; padding: 0!important;
     width: 277mm!important;
-    height: 185mm!important;
-    display: flex!important;
-    flex-direction: column!important;
+    display: block!important;
     overflow: hidden!important;
   }
   #checkCriteriaTable > div:first-child{
-    font-size: 10pt!important; font-weight: 700!important;
-    padding: 4px 0 5px!important;
+    font-size: 9pt!important; font-weight: 700!important;
+    padding: 3px 0 4px!important;
     border-top: 2px solid #222!important;
-    margin-bottom: 3px!important;
-    flex-shrink: 0!important;
+    margin-bottom: 2px!important;
   }
   #checkCriteriaTable table{
-    flex: 1!important;
     width: 100%!important;
     table-layout: fixed!important;
     border-collapse: collapse!important;
     white-space: normal!important;
-    height: 100%!important;
+    height: auto!important;
     overflow: hidden!important;
   }
   #checkCriteriaTable table tr{
-    height: 33%!important;
+    height: auto!important;
   }
   #checkCriteriaTable table td{
-    padding: 4px 6px!important;
-    font-size: 7.5pt!important;
-    line-height: 1.55!important;
+    padding: 3px 5px!important;
+    font-size: 7pt!important;
+    line-height: 1.5!important;
     vertical-align: top!important;
     border: 1px solid #999!important;
     word-break: keep-all!important;
@@ -412,19 +408,18 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
   }
   #checkCriteriaTable table td.ct-head{
     background: #e8e8e8!important;
-    font-size: 8.5pt!important;
+    font-size: 8pt!important;
     font-weight: 700!important;
     text-align: center!important;
     vertical-align: middle!important;
-    height: 20px!important;
+    height: 22px!important;
     padding: 3px 4px!important;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
   #checkCriteriaTable .ct-note{
-    font-size: 7pt!important;
+    font-size: 6.5pt!important;
     color: #444!important;
-    padding: 4px 0 0!important;
-    flex-shrink: 0!important;
+    padding: 3px 0 0!important;
   }
 
   /* 헤더/푸터 숨김 */
