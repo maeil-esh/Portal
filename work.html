@@ -144,31 +144,43 @@ body{font-family:'Malgun Gothic','맑은 고딕',-apple-system,sans-serif;font-s
 .hint{font-size:11px;color:var(--gray400)}
 
 /* ════ 테이블 ════ */
-.tbl-wrap{overflow:auto;max-height:calc(100vh - 220px);margin:12px 24px;border:1px solid var(--gray200);border-radius:var(--r8);box-shadow:var(--sh1);background:var(--white)}
+.tbl-wrap{overflow:auto;max-height:calc(100vh - 220px);margin:12px 24px;border:1px solid #d8dee8;border-radius:var(--r8);box-shadow:0 2px 8px rgba(15,23,42,.07);background:var(--white)}
 table{border-collapse:collapse;white-space:nowrap;font-size:12px;min-width:100%}
-thead th{background:var(--gray800);color:var(--white);padding:0;text-align:center;font-weight:600;border-right:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:10;height:36px;vertical-align:middle;letter-spacing:-.2px}
-thead th:first-child{position:sticky;left:0;z-index:20;background:var(--gray800)}
-thead tr:nth-child(2) th{background:var(--gray700);height:32px;font-size:11px;font-weight:600}
-.th-group{background:var(--gray700)!important;font-size:11px!important;color:rgba(255,255,255,.85)!important}
-.th-inner{display:flex;align-items:center;justify-content:center;padding:0 8px;height:36px;line-height:1.25}
-thead tr:nth-child(2) .th-inner{height:32px}
-.th-machine{cursor:pointer!important}.th-machine:hover{background:var(--gray600)!important}
-tbody tr{height:30px}
-tbody tr:nth-child(even) td{background:var(--gray50)}
-tbody tr:hover td{background:var(--blue50)!important}
-td{border-right:1px solid var(--gray200);border-bottom:1px solid var(--gray200);padding:0;vertical-align:middle;text-align:center;height:30px}
+thead th{background:#344155;color:var(--white);padding:0;text-align:center;font-weight:700;border-right:1px solid rgba(255,255,255,.18);position:sticky;top:0;z-index:10;height:44px;vertical-align:middle;letter-spacing:-.2px}
+thead th:first-child{position:sticky;left:0;z-index:20;background:#344155}
+thead tr:nth-child(2) th{background:#445166;height:40px;font-size:11px;font-weight:700}
+/* 작업 대상 범위를 한눈에 구분할 수 있도록 상위 그룹 헤더만 파란색으로 강조 */
+.th-group{background:#2864a8!important;font-size:12px!important;color:#fff!important;letter-spacing:-.1px!important}
+.th-inner{display:flex;align-items:center;justify-content:center;padding:0 8px;height:44px;line-height:1.25}
+thead tr:nth-child(2) .th-inner{height:40px}
+.th-machine{cursor:pointer!important}.th-machine:hover{background:#56647a!important}
+/* 기본정보와 작업 대상 영역 사이, 작업 대상과 수정일 사이에 시각적 경계 추가 */
+th.sticky-end,td.td-name{border-right:2px solid #b7c1cf!important;box-shadow:4px 0 6px rgba(15,23,42,.08)}
+th.date-head,td.td-date{border-left:2px solid #b7c1cf!important}
+tbody tr{height:28px}
+tbody tr:nth-child(even) td{background:#f4f7fb}
+tbody tr:hover td{background:#eaf2ff!important}
+/* 행 순서 변경: 편집 잠금 해제 후 행에 마우스를 올리면 No. 영역의 핸들이 나타남 */
+.row-no-wrap{display:flex;align-items:center;justify-content:center;gap:3px;min-height:38px}
+.row-order-handle{display:inline-flex;align-items:center;justify-content:center;width:13px;height:22px;color:var(--gray400);font-size:14px;line-height:1;cursor:grab;user-select:none;touch-action:none;opacity:0;transition:opacity .12s,color .12s}
+tbody tr:hover .row-order-handle,.row-order-handle:focus{opacity:1}
+.row-order-handle:hover{color:var(--blue500)}
+.row-order-handle:active{cursor:grabbing}
+tbody tr.row-dragging td{opacity:.48;background:#eaf2ff!important}
+tbody tr.row-drag-over td{background:#dbeafe!important;border-top:3px solid var(--blue500)!important}
+td{border-right:1px solid #dce2ea;border-bottom:1px solid #dce2ea;padding:0;vertical-align:middle;text-align:center;height:38px}
 td:last-child{border-right:none}
-td.td-no,th.th-no{position:sticky;left:0;background:var(--gray100);z-index:5;min-width:40px;width:40px;font-weight:600;color:var(--gray500);border-right:1px solid var(--gray300);font-size:11px}
-tbody tr:nth-child(even) td.td-no{background:var(--gray100)}
-tbody tr:hover td.td-no{background:var(--blue50)!important}
+td.td-no,th.th-no{position:sticky;left:0;background:#f0f3f7;z-index:5;min-width:40px;width:40px;font-weight:700;color:#718096;border-right:1px solid #cbd4df;font-size:11px}
+tbody tr:nth-child(even) td.td-no{background:#edf1f6}
+tbody tr:hover td.td-no{background:#eaf2ff!important}
 /* 좌측 고정 컬럼들 */
 .col-sticky{position:sticky!important;z-index:4;background:var(--white)}
-th.col-sticky{background:var(--gray800)!important;z-index:15!important}
-tbody tr:nth-child(even) td.col-sticky{background:var(--gray50)}
-tbody tr:hover td.col-sticky{background:var(--blue50)!important}
+th.col-sticky{background:#344155!important;z-index:15!important}
+tbody tr:nth-child(even) td.col-sticky{background:#f4f7fb}
+tbody tr:hover td.col-sticky{background:#eaf2ff!important}
 /* 기계 헤더 정렬 버튼 */
-.sort-btn{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:2px;border:none;background:rgba(255,255,255,.15);color:rgba(255,255,255,.7);font-size:9px;cursor:pointer;margin-left:2px;vertical-align:middle;padding:0;line-height:1;transition:all .1s}
-.sort-btn:hover{background:rgba(255,255,255,.35);color:#fff}
+.sort-btn{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:3px;border:none;background:rgba(255,255,255,.18);color:rgba(255,255,255,.82);font-size:9px;cursor:pointer;margin-left:2px;vertical-align:middle;padding:0;line-height:1;transition:all .1s}
+.sort-btn:hover{background:rgba(255,255,255,.38);color:#fff}
 .sort-btn.asc{background:var(--blue500);color:#fff}
 .sort-btn.desc{background:var(--green500);color:#fff}
 .cell-edit{border:none;outline:none;background:transparent;font-family:inherit;font-size:12px;color:var(--gray800);width:100%;height:100%;padding:0 7px;text-align:center;cursor:text}
@@ -179,24 +191,28 @@ td.td-text{min-width:88px;text-align:left}
 td.td-name{min-width:78px;font-weight:700;color:var(--gray900)}
 td.td-empno{min-width:80px}
 td.td-process{min-width:100px;text-align:left}
-td.td-bigo{min-width:120px;text-align:left}
-td.td-date{min-width:90px;font-size:11px;color:var(--gray500)}
+td.td-date{min-width:90px;font-size:11px;color:#718096}
 td.td-check{min-width:46px;width:46px;cursor:pointer;user-select:none}
-td.td-check:hover{background:var(--blue50)!important}
-.chk{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;border:1.5px solid var(--gray300);font-size:11px;color:transparent;transition:all .1s}
-.chk.on{background:var(--blue500);border-color:var(--blue500);color:var(--white)}
-.total-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:18px;border-radius:9px;background:var(--blue500);color:var(--white);font-size:11px;font-weight:700;padding:0 6px;cursor:pointer}
-.total-badge.zero{background:var(--gray300);color:var(--gray600)}
+td.td-check:hover{background:#dbeafe!important}
+.chk{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;border:1.5px solid #cbd4df;background:rgba(255,255,255,.45);font-size:12px;color:transparent;transition:all .12s}
+td.td-check:hover .chk{border-color:var(--blue500);background:#fff}
+.chk.on{background:var(--blue500);border-color:var(--blue500);color:var(--white);box-shadow:0 2px 5px rgba(49,130,246,.28)}
+.total-badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:22px;border-radius:11px;background:var(--blue500);color:var(--white);font-size:12px;font-weight:800;padding:0 7px;cursor:pointer;box-shadow:0 2px 5px rgba(49,130,246,.18)}
+.total-badge.zero{background:#d1d8e2;color:#6b7684;box-shadow:none}
 td.td-total{min-width:46px;width:46px}
-td.td-del{min-width:34px;width:34px}
-th.th-del{min-width:34px;width:34px}
+td.td-del{min-width:56px;width:56px}
+th.th-del{min-width:56px;width:56px}
 .locked td.td-del{display:none}
 .locked th.th-del{display:none}
+.row-btns{display:flex;align-items:center;justify-content:center;gap:2px}
+.row-btn{background:none;border:1px solid var(--gray200);border-radius:4px;color:var(--gray400);font-size:11px;cursor:pointer;padding:1px 4px;line-height:1.2;transition:all .1s}
+.row-btn:hover{background:var(--blue50);border-color:var(--blue500);color:var(--blue500)}
+.row-btn:disabled{opacity:.25;cursor:not-allowed}
 .del-btn{background:none;border:none;color:var(--gray300);font-size:13px;cursor:pointer;padding:3px 5px;border-radius:4px;transition:all .1s}
 .del-btn:hover{color:var(--red500);background:var(--red50)}
 .empty-row td{color:var(--gray400);padding:32px;text-align:center;border:none}
-tfoot td{background:var(--gray100);font-weight:700;font-size:12px;color:var(--gray700);border-top:1.5px solid var(--gray300);border-right:1px solid var(--gray200);padding:0 6px;height:28px;text-align:center;vertical-align:middle}
-tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border-right:1px solid var(--gray300)}
+tfoot td{background:#edf1f6;font-weight:800;font-size:12px;color:#3f4d61;border-top:2px solid #b7c1cf;border-right:1px solid #d4dbe5;padding:0 6px;height:32px;text-align:center;vertical-align:middle}
+tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:1px solid #c3ccd8}
 
 /* ════ 기준정보 페이지 ════ */
 .master-wrap{padding:24px}
@@ -280,15 +296,16 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
 
   /* 숨김 */
   .topbar,.navbar,.work-toolbar,.td-del,.th-del,.tt,.toast,.modal-bg,
-  .work-header .btn, tfoot, .sort-btn, .autoSaveIndicator { display:none!important; }
+  .work-header .btn, .sort-btn, .autoSaveIndicator, .row-order-handle { display:none!important; }
 
   /* 전체 폰트/배경 */
-  body{ font-size:7.5pt!important; background:#fff!important; color:#000!important; }
+  body{ font-size:7.5pt!important; background:#fff!important; color:#000!important;
+    -webkit-print-color-adjust:exact!important; print-color-adjust:exact!important; }
 
   /* 페이지 헤더 */
-  .print-head{ display:block!important; text-align:center; padding:4px 0 6px; }
-  .print-head h2{ font-size:12pt; font-weight:700; margin-bottom:2px; }
-  .print-head p{ font-size:7pt; color:#555; }
+  .print-head{ display:block!important; text-align:center; padding:4px 0 7px; }
+  .print-head h2{ font-size:12.5pt; font-weight:800; margin-bottom:3px; letter-spacing:-.2px; }
+  .print-head p{ font-size:7.2pt; color:#5b6778; }
 
   /* 테이블 래퍼 */
   .tbl-wrap{
@@ -317,117 +334,120 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
   thead th:nth-child(4){ width:12mm!important; }  /* 직책 */
   thead th:nth-child(5){ width:14mm!important; }  /* 사번 */
   thead th:nth-child(6){ width:14mm!important; }  /* 이름 */
-  /* 계 + 기계 11개 + 비고 + 업데이트일 = 나머지 */
+  /* 계 + 기계 11개 + 수정일 = 나머지 */
 
   /* 헤더 스타일 */
+  thead{ display:table-header-group!important; }
   thead th{
-    background:#333d4b!important; color:#fff!important;
+    background:#344155!important; color:#fff!important;
     -webkit-print-color-adjust:exact; print-color-adjust:exact;
-    padding:2px 1px!important; font-size:6.5pt!important;
-    height:auto!important; line-height:1.2!important;
-    border:1px solid #666!important; text-align:center!important;
+    padding:2px 1px!important; font-size:6.7pt!important;
+    height:11mm!important; line-height:1.18!important;
+    border:1px solid #c7d0dc!important; text-align:center!important;
     word-break:keep-all!important;
   }
   thead tr:nth-child(2) th{
-    background:#4e5968!important; font-size:6pt!important;
+    background:#445166!important; font-size:6.2pt!important; height:9mm!important;
+  }
+  thead th.th-group{
+    background:#2864a8!important; color:#fff!important; font-size:7pt!important; height:9mm!important;
   }
 
   /* 데이터 행 */
-  tbody tr{ height:auto!important; page-break-inside:avoid!important; }
+  tbody tr{ height:6.5mm!important; page-break-inside:avoid!important; }
   td{
-    padding:1.5px 1px!important; height:auto!important;
-    border:1px solid #ccc!important; font-size:7pt!important;
-    line-height:1.3!important; text-align:center!important;
+    padding:1px 1px!important; height:6.5mm!important;
+    border:1px solid #dce2ea!important; font-size:7.1pt!important;
+    line-height:1.25!important; text-align:center!important;
     word-break:keep-all!important; overflow:hidden!important;
   }
-  td.td-text, td.td-process, td.td-name, td.td-bigo{ text-align:left!important; }
+  td.td-text, td.td-process, td.td-name{ text-align:left!important; }
 
   /* 체크박스 */
   .chk{
-    width:10px!important; height:10px!important; font-size:7pt!important;
-    border:1px solid #999!important; border-radius:2px!important;
+    width:13px!important; height:13px!important; font-size:8pt!important;
+    border:1px solid #cbd4df!important; border-radius:3px!important; background:#fff!important;
     display:inline-flex!important; align-items:center!important; justify-content:center!important;
   }
   .chk.on{
-    background:#1a5!important; border-color:#1a5!important; color:#fff!important;
+    background:#3182f6!important; border-color:#3182f6!important; color:#fff!important;
     -webkit-print-color-adjust:exact; print-color-adjust:exact;
   }
 
   /* 합계 뱃지 */
   .total-badge{
-    font-size:6.5pt!important; min-width:14px!important; height:14px!important;
-    padding:0 3px!important;
+    font-size:7pt!important; min-width:16px!important; height:16px!important;
+    padding:0 4px!important; border-radius:8px!important; background:#3182f6!important; color:#fff!important;
     -webkit-print-color-adjust:exact; print-color-adjust:exact;
   }
-  .total-badge.zero{ background:#ccc!important; }
+  .total-badge.zero{ background:#d1d8e2!important; color:#6b7684!important; }
 
   /* 인라인 편집 요소 → 텍스트처럼 */
   .cell-edit{
     border:none!important; background:transparent!important;
-    font-size:7pt!important; padding:0!important; width:100%!important;
+    font-size:7.1pt!important; padding:0!important; width:100%!important;
   }
   select.cell-edit{ -webkit-appearance:none; appearance:none; }
 
   /* 짝수 행 배경 */
   tbody tr:nth-child(even) td{
-    background:#f7f7f7!important;
+    background:#f4f7fb!important;
     -webkit-print-color-adjust:exact; print-color-adjust:exact;
   }
 
-  /* 점검기준표 - A4 가로 마지막 1장 꽉 차게 */
+  /* 화면과 동일한 구간 경계 및 하단 합계 행 */
+  th.sticky-end,td.td-name{ border-right:2px solid #b7c1cf!important; box-shadow:none!important; }
+  th.date-head,td.td-date{ border-left:2px solid #b7c1cf!important; }
+  tfoot{ display:table-row-group!important; }
+  tfoot td{
+    display:table-cell!important; height:7.4mm!important; padding:0 2px!important;
+    background:#edf1f6!important; color:#3f4d61!important; font-size:7.2pt!important; font-weight:800!important;
+    border-top:2px solid #b7c1cf!important; border-right:1px solid #d4dbe5!important; text-align:center!important;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  tfoot td.td-no{ background:#e4e9f0!important; }
+
+  /* 점검기준표 — 무조건 새 페이지, 내용 기준 자동 높이 */
   #checkCriteriaTable{
     page-break-before: always!important;
     margin: 0!important; padding: 0!important;
     width: 277mm!important;
-    height: 185mm!important;
-    display: flex!important;
-    flex-direction: column!important;
-    overflow: hidden!important;
+    display: block!important;
   }
   #checkCriteriaTable > div:first-child{
-    font-size: 10pt!important; font-weight: 700!important;
-    padding: 4px 0 5px!important;
-    border-top: 2px solid #222!important;
+    font-size: 9pt!important; font-weight: 700!important;
+    padding: 3px 0 4px!important;
+    border-top: 2px solid #333!important;
     margin-bottom: 3px!important;
-    flex-shrink: 0!important;
   }
   #checkCriteriaTable table{
-    flex: 1!important;
     width: 100%!important;
     table-layout: fixed!important;
     border-collapse: collapse!important;
     white-space: normal!important;
-    height: 100%!important;
-    overflow: hidden!important;
+    height: auto!important;
   }
-  #checkCriteriaTable table tr{
-    height: 33%!important;
-  }
-  #checkCriteriaTable table td{
-    padding: 4px 6px!important;
-    font-size: 7.5pt!important;
-    line-height: 1.55!important;
-    vertical-align: top!important;
-    border: 1px solid #999!important;
-    word-break: keep-all!important;
-    overflow: hidden!important;
+  /* 헤더행(ct-head): 좁게 고정 */
+  #checkCriteriaTable table td.ct-head{
+    background: #e0e4ea!important;
+    font-size: 8pt!important; font-weight: 700!important;
+    text-align: center!important; vertical-align: middle!important;
+    padding: 4px 4px!important; height: auto!important;
+    border: 1px solid #aaa!important;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
-  #checkCriteriaTable table td.ct-head{
-    background: #e8e8e8!important;
-    font-size: 8.5pt!important;
-    font-weight: 700!important;
-    text-align: center!important;
-    vertical-align: middle!important;
-    height: 20px!important;
-    padding: 3px 4px!important;
+  /* 내용행: 좌측정렬, 내용 기준 높이 */
+  #checkCriteriaTable table td:not(.ct-head){
+    padding: 5px 8px!important;
+    font-size: 7pt!important; line-height: 1.65!important;
+    vertical-align: top!important; text-align: left!important;
+    border: 1px solid #bbb!important;
+    word-break: keep-all!important;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
   #checkCriteriaTable .ct-note{
-    font-size: 7pt!important;
-    color: #444!important;
-    padding: 4px 0 0!important;
-    flex-shrink: 0!important;
+    font-size: 6.5pt!important; color: #555!important;
+    vertical-align: bottom!important; text-align: left!important;
   }
 
   /* 헤더/푸터 숨김 */
@@ -523,7 +543,7 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
     <input class="search-box" id="searchBox" placeholder="이름·사번·팀 검색" oninput="renderTable()">
     <div class="divider"></div>
     <button class="btn btn-sm" onclick="pingGAS()" title="GAS 서버 연결 확인">🔌 연결확인</button>
-    <span class="hint">기계명 클릭→점검기준 &nbsp;|&nbsp; Tab·방향키 이동 &nbsp;|&nbsp; 스페이스바 체크</span>
+    <span class="hint">기계명 클릭→점검기준 &nbsp;|&nbsp; 편집 후 No. 영역의 ⠿ 드래그→행 순서 변경 &nbsp;|&nbsp; Tab·방향키 이동 &nbsp;|&nbsp; 스페이스바 체크</span>
   </div>
   <div class="print-head" id="printHead"><h2 id="printTitle"></h2><p id="printSub"></p></div>
 
@@ -536,10 +556,9 @@ tfoot td.td-no{position:sticky;left:0;background:var(--gray200);z-index:5;border
           <th class="col-sticky" style="min-width:100px;left:125px" rowspan="2"><div class="th-inner">공정명</div></th>
           <th class="col-sticky" style="min-width:68px;left:225px" rowspan="2"><div class="th-inner">직책</div></th>
           <th class="col-sticky" style="min-width:80px;left:293px" rowspan="2"><div class="th-inner">사번</div></th>
-          <th class="col-sticky" style="min-width:74px;left:373px;border-right:2px solid rgba(255,255,255,.2)" rowspan="2"><div class="th-inner">이름</div></th>
+          <th class="col-sticky sticky-end" style="min-width:74px;left:373px" rowspan="2"><div class="th-inner">이름</div></th>
           <th colspan="12" class="th-group"><div class="th-inner" style="font-size:11px">유해위험작업 대상 &nbsp;(기계명 클릭 → 점검기준)</div></th>
-          <th style="min-width:120px" rowspan="2"><div class="th-inner">비고</div></th>
-          <th style="min-width:88px" rowspan="2"><div class="th-inner">업데이트일</div></th>
+          <th class="date-head" style="min-width:88px" rowspan="2"><div class="th-inner">수정일</div></th>
           <th class="th-del" rowspan="2"><div class="th-inner"></div></th>
         </tr>
         <tr id="machineHeaderRow"></tr>
@@ -911,6 +930,19 @@ function deleteRow(id){
   });
 }
 
+function moveRow(id, dir){
+  requireAuth(()=>{
+    const rows = sd().rows;
+    const idx = rows.findIndex(r=>r.id===id);
+    if(idx<0) return;
+    const to = idx+dir;
+    if(to<0||to>=rows.length) return;
+    [rows[idx],rows[to]] = [rows[to],rows[idx]];
+    renderTable();
+    triggerAutoSave();
+  });
+}
+
 function renderTable(){
   const q    = document.getElementById('searchBox').value.trim().toLowerCase();
   const dept = document.getElementById('filterDept').value;
@@ -921,7 +953,7 @@ function renderTable(){
   const tbody = document.getElementById('tableBody');
   const tfoot = document.getElementById('tableFoot');
   if(!filtered.length){
-    tbody.innerHTML=`<tr class="empty-row"><td colspan="${8+MACHINES.length+2}">데이터가 없습니다. [행 추가]를 클릭하세요.</td></tr>`;
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="${8+MACHINES.length+1}">데이터가 없습니다. [행 추가]를 클릭하세요.</td></tr>`;
     tfoot.innerHTML=''; return;
   }
   const mT={};
@@ -936,8 +968,11 @@ function renderTable(){
         onclick="toggleCheck(${r.id},'${m.id}')" onkeydown="onCellKey(event,this)">
         <span class="chk${r.machines[m.id]?' on':''}">✓</span></td>`).join('');
     const focused = (el, tf) => `onfocus="this.parentElement.classList.${tf?'add':'remove'}('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"`;
-    return `<tr data-id="${r.id}">
-      <td class="td-no">${i+1}</td>
+    return `<tr data-id="${r.id}"
+      ondragover="onRowDragOver(event,${r.id})"
+      ondragleave="onRowDragLeave(event)"
+      ondrop="onRowDrop(event,${r.id})">
+      <td class="td-no"><div class="row-no-wrap">${isUnlocked()?`<span class="row-order-handle" draggable="true" title="드래그하여 행 순서 변경" ondragstart="onRowDragStart(event,${r.id})" ondragend="onRowDragEnd(event)">⠿</span>`:''}<span>${i+1}</span></div></td>
       <td class="td-text col-sticky" style="left:40px" data-col="team" tabindex="0" onkeydown="onCellKey(event,this)">
         <select class="cell-edit" onchange="setF(${r.id},'team',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
           <option value=""></option>${teamOpts.replace(`"${esc(r.team)}"`,`"${esc(r.team)}" selected`)}</select></td>
@@ -948,15 +983,18 @@ function renderTable(){
           <option value=""></option>${posOpts.replace(`"${esc(r.position)}"`,`"${esc(r.position)}" selected`)}</select></td>
       <td class="td-empno col-sticky" style="left:293px" data-col="empno" tabindex="0" onkeydown="onCellKey(event,this)">
         <input class="cell-edit" value="${esc(r.empno)}" placeholder="사번" onchange="setF(${r.id},'empno',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
-      <td class="td-name col-sticky" style="left:373px;border-right:2px solid var(--gray300)" data-col="name" tabindex="0" onkeydown="onCellKey(event,this)">
+      <td class="td-name col-sticky" style="left:373px" data-col="name" tabindex="0" onkeydown="onCellKey(event,this)">
         <input class="cell-edit" value="${esc(r.name)}" placeholder="이름" onchange="setF(${r.id},'name',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
       <td class="td-total" data-col="total" tabindex="0" onkeydown="onCellKey(event,this)" onclick="showTotalTT(${r.id},event)">
         <span class="total-badge${total===0?' zero':''}">${total}</span></td>
       ${checks}
-      <td class="td-bigo" data-col="bigo" tabindex="0" onkeydown="onCellKey(event,this)">
-        <input class="cell-edit" value="${esc(r.bigo)}" placeholder="비고" onchange="setF(${r.id},'bigo',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
       <td class="td-date">${r.date}</td>
-      <td class="td-del">${isUnlocked()?`<button class="del-btn" onclick="deleteRow(${r.id})">✕</button>`:''}</td>
+      <td class="td-del">${isUnlocked()?`
+        <div class="row-btns">
+          <button class="row-btn" onclick="moveRow(${r.id},-1)" title="위로" ${i===0?'disabled':''}>▲</button>
+          <button class="row-btn" onclick="moveRow(${r.id},1)" title="아래로" ${i===filtered.length-1?'disabled':''}>▼</button>
+          <button class="del-btn" onclick="deleteRow(${r.id})" title="삭제">✕</button>
+        </div>`:''}</td>
     </tr>`;
   }).join('');
   const totalAll = filtered.reduce((s,r)=>s+MACHINES.filter(m=>r.machines[m.id]).length,0);
@@ -964,12 +1002,77 @@ function renderTable(){
     <td colspan="5" style="font-size:11px;color:var(--gray500)">${filtered.length}명</td>
     <td>${totalAll}</td>
     ${MACHINES.map(m=>`<td>${mT[m.id]||''}</td>`).join('')}
-    <td></td><td></td><td></td></tr>`;
+    <td></td></tr>`;
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function setF(id,f,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r[f]=v; if(['name','empno','team'].includes(f))renderTable(); triggerAutoSave(); }
 function toggleCheck(id,mid){ if(!isUnlocked()){ requireAuth(()=>{ const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }); return; } const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }
+
+/* ════ 행 순서 변경 ════ */
+let rowDragId = null;
+
+function clearRowDragClasses(){
+  document.querySelectorAll('#tableBody tr.row-dragging,#tableBody tr.row-drag-over').forEach(tr=>{
+    tr.classList.remove('row-dragging','row-drag-over');
+  });
+}
+
+function onRowDragStart(e,id){
+  if(!isUnlocked()){ e.preventDefault(); return; }
+  rowDragId = Number(id);
+  const tr = e.currentTarget.closest('tr');
+  if(tr) tr.classList.add('row-dragging');
+  if(e.dataTransfer){
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(id));
+  }
+}
+
+function onRowDragOver(e,targetId){
+  if(!isUnlocked() || rowDragId===null || Number(targetId)===rowDragId) return;
+  e.preventDefault();
+  if(e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+  document.querySelectorAll('#tableBody tr.row-drag-over').forEach(tr=>tr.classList.remove('row-drag-over'));
+  e.currentTarget.classList.add('row-drag-over');
+}
+
+function onRowDragLeave(e){
+  const tr = e.currentTarget;
+  if(!e.relatedTarget || !tr.contains(e.relatedTarget)) tr.classList.remove('row-drag-over');
+}
+
+function onRowDrop(e,targetId){
+  e.preventDefault();
+  if(!isUnlocked() || rowDragId===null){ onRowDragEnd(); return; }
+  const target = Number(targetId);
+  if(target===rowDragId){ onRowDragEnd(); return; }
+  const rect = e.currentTarget.getBoundingClientRect();
+  const insertAfter = e.clientY > rect.top + rect.height / 2;
+  moveRowOrder(rowDragId, target, insertAfter);
+  onRowDragEnd();
+}
+
+function onRowDragEnd(){
+  clearRowDragClasses();
+  rowDragId = null;
+}
+
+function moveRowOrder(sourceId,targetId,insertAfter){
+  const rows = sd().rows;
+  const from = rows.findIndex(r=>r.id===Number(sourceId));
+  if(from<0) return;
+  const [moved] = rows.splice(from,1);
+  let to = rows.findIndex(r=>r.id===Number(targetId));
+  if(to<0){ rows.splice(from,0,moved); return; }
+  if(insertAfter) to += 1;
+  rows.splice(to,0,moved);
+  sortState = { mid:null, dir:0 };
+  document.querySelectorAll('.sort-btn').forEach(b=>{ b.classList.remove('asc','desc'); b.textContent='↕'; });
+  renderTable();
+  triggerAutoSave();
+  toast('✅ 행 순서를 변경했습니다','ok');
+}
 
 /* ════ 키보드 ════ */
 function toggleSort(mid){
@@ -1547,96 +1650,152 @@ function loadAllFromGAS(){
 /* ══════════════════════════════════════════
    엑셀 / PDF
 ══════════════════════════════════════════ */
-(()=>{ const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; document.head.appendChild(s); })();
+let xlsxStyleLoadStarted = false;
+function loadXlsxStyle(){
+  if(window.XLSX || xlsxStyleLoadStarted) return;
+  xlsxStyleLoadStarted = true;
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';
+  s.onload = ()=>toast('엑셀 출력 모듈 준비 완료','ok');
+  s.onerror = ()=>{ xlsxStyleLoadStarted=false; toast('엑셀 출력 모듈을 불러오지 못했습니다','err'); };
+  document.head.appendChild(s);
+}
+loadXlsxStyle();
+
+function excelCell(ws, r, c){
+  const addr = XLSX.utils.encode_cell({r,c});
+  if(!ws[addr]) ws[addr] = { t:'s', v:'' };
+  return ws[addr];
+}
+function excelStyleRange(ws, sr, sc, er, ec, style){
+  for(let r=sr;r<=er;r++) for(let c=sc;c<=ec;c++) excelCell(ws,r,c).s = style;
+}
+function excelMerge(ws, sr, sc, er, ec){
+  ws['!merges'] = ws['!merges'] || [];
+  ws['!merges'].push({s:{r:sr,c:sc},e:{r:er,c:ec}});
+}
+function excelBorder(color='C9CED6', style='thin'){
+  return {top:{style,color:{rgb:color}},bottom:{style,color:{rgb:color}},left:{style,color:{rgb:color}},right:{style,color:{rgb:color}}};
+}
+function excelCriteriaText(mid){
+  const m=MACHINES.find(x=>x.id===mid);
+  return m ? m.items.map(v=>'- '+v).join('\n') : '';
+}
 
 function exportExcel(){
   const dept=document.getElementById('filterDept').value;
   const q=document.getElementById('searchBox').value.trim().toLowerCase();
-  const rows=sd().rows.filter(r=>(!dept||r.team===dept)&&(!q||r.name.includes(q)||r.empno.includes(q)||r.team.includes(q)||r.process.includes(q)));
+  const rows=sd().rows.filter(r=>(!dept||r.team===dept)&&(!q||r.name.toLowerCase().includes(q)||r.empno.toLowerCase().includes(q)||r.team.toLowerCase().includes(q)||r.process.toLowerCase().includes(q)));
   if(!rows.length){ toast('데이터가 없습니다','err'); return; }
-  const headers=['팀','공정명','직책','사번','이름','계',...MACHINES.map(m=>m.label.replace('\n',' ')),'비고','업데이트일'];
-  const data=rows.map(r=>[r.team,r.process,r.position,r.empno,r.name,MACHINES.filter(m=>r.machines[m.id]).length,...MACHINES.map(m=>r.machines[m.id]?'O':''),r.bigo,r.date]);
   if(typeof XLSX==='undefined'){
-    const csv='\uFEFF'+[headers,...data].map(r=>r.map(c=>'"'+String(c||'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
-    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-    a.download=curSite+'_유해위험작업현황_'+today()+'.csv'; a.click(); toast('CSV 다운로드 완료','ok'); return;
+    loadXlsxStyle();
+    toast('엑셀 출력 모듈 로딩 중입니다. 잠시 후 다시 눌러 주세요.','');
+    return;
   }
-  const wb=XLSX.utils.book_new(), ws=XLSX.utils.aoa_to_sheet([headers,...data]);
-  ws['!cols']=[{wch:10},{wch:12},{wch:8},{wch:10},{wch:8},{wch:5},...MACHINES.map(()=>({wch:6})),{wch:16},{wch:12}];
-  // 인쇄 설정: A4 가로, 1페이지 맞춤
-  ws['!pageSetup'] = { orientation:'landscape', paperSize:9, fitToPage:true, fitToWidth:1, fitToHeight:0 };
-  ws['!margins']   = { left:0.25, right:0.25, top:0.3, bottom:0.3, header:0.1, footer:0.1 };
+
+  const wb=XLSX.utils.book_new();
+  wb.Props={Title:curSite+' 관리감독자 유해위험작업 대상 현황',Subject:'관리감독자 지정 관리 시스템',Author:'유해위험작업 대상 현황',CreatedDate:new Date()};
+
+  const machineLabels=MACHINES.map(m=>m.label.replace('\n',' '));
+  const totalCols=19; // No. + 기본정보 5 + 계 + 기계 11 + 수정일
+  const lastCol=XLSX.utils.encode_col(totalCols-1);
+  const title=curSite+' 관리감독자 유해위험작업 대상 현황'+(dept?' ['+dept+']':'');
+  const sub='출력일: '+new Date().toLocaleDateString('ko-KR')+'  ·  사업장: '+curSite+'  ·  총 '+rows.length+'명';
+  const main=[];
+  main.push([title]);
+  main.push([sub]);
+  main.push([]);
+  main.push(['No.','팀','공정명','직책','사번','이름','유해위험작업 대상','','','','','','','','','','','','수정일']);
+  main.push(['','','','','','','계',...machineLabels,'']);
+  rows.forEach((r,idx)=>main.push([
+    idx+1,r.team,r.process,r.position,r.empno,r.name,
+    MACHINES.filter(m=>r.machines[m.id]).length,
+    ...MACHINES.map(m=>r.machines[m.id]?'✓':''),r.date
+  ]));
+  const totalRowIdx=main.length;
+  main.push(['합계','','','','','',
+    rows.reduce((sum,r)=>sum+MACHINES.filter(m=>r.machines[m.id]).length,0),
+    ...MACHINES.map(m=>rows.filter(r=>r.machines[m.id]).length),'']);
+
+  const ws=XLSX.utils.aoa_to_sheet(main);
+  excelMerge(ws,0,0,0,totalCols-1);
+  excelMerge(ws,1,0,1,totalCols-1);
+  for(let c=0;c<=5;c++) excelMerge(ws,3,c,4,c);
+  excelMerge(ws,3,6,3,17);
+  excelMerge(ws,3,18,4,18);
+  excelMerge(ws,totalRowIdx,0,totalRowIdx,5);
+
+  const thinBorder=excelBorder('C9CED6','thin');
+  const darkHeader={font:{name:'맑은 고딕',sz:10,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'333D4B'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:excelBorder('667085','thin')};
+  const midHeader={font:{name:'맑은 고딕',sz:9,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'4E5968'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:excelBorder('667085','thin')};
+  const blueGroupHeader={font:{name:'맑은 고딕',sz:10,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'2864A8'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:excelBorder('667085','thin')};
+  const bodyCenter={font:{name:'맑은 고딕',sz:9,color:{rgb:'333D4B'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:thinBorder};
+  const bodyLeft={font:{name:'맑은 고딕',sz:9,color:{rgb:'333D4B'}},alignment:{horizontal:'left',vertical:'center',wrapText:true},border:thinBorder};
+  const bodyAlt={font:{name:'맑은 고딕',sz:9,color:{rgb:'333D4B'}},fill:{patternType:'solid',fgColor:{rgb:'F7F7F7'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:thinBorder};
+  const bodyAltLeft={font:{name:'맑은 고딕',sz:9,color:{rgb:'333D4B'}},fill:{patternType:'solid',fgColor:{rgb:'F7F7F7'}},alignment:{horizontal:'left',vertical:'center',wrapText:true},border:thinBorder};
+  const countStyle={font:{name:'맑은 고딕',sz:9,bold:true,color:{rgb:'1B6EF3'}},fill:{patternType:'solid',fgColor:{rgb:'F0F4FF'}},alignment:{horizontal:'center',vertical:'center'},border:thinBorder};
+  const checkedStyle={font:{name:'맑은 고딕',sz:10,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'3182F6'}},alignment:{horizontal:'center',vertical:'center'},border:thinBorder};
+  const totalStyle={font:{name:'맑은 고딕',sz:9,bold:true,color:{rgb:'333D4B'}},fill:{patternType:'solid',fgColor:{rgb:'E5E8EB'}},alignment:{horizontal:'center',vertical:'center'},border:excelBorder('AEB4BC','thin')};
+
+  excelStyleRange(ws,3,0,3,18,darkHeader);
+  excelStyleRange(ws,4,0,4,18,midHeader);
+  // rowspan으로 보이는 헤더는 동일한 진한 배경 유지
+  [0,1,2,3,4,5,18].forEach(c=>excelStyleRange(ws,3,c,4,c,darkHeader));
+  // 상위 작업대상 그룹은 화면과 동일하게 파란색으로 강조
+  excelStyleRange(ws,3,6,3,17,blueGroupHeader);
+
+  for(let r=5;r<totalRowIdx;r++){
+    const alt=(r-5)%2===1;
+    for(let c=0;c<totalCols;c++){
+      excelCell(ws,r,c).s = (c===1||c===2) ? (alt?bodyAltLeft:bodyLeft) : (alt?bodyAlt:bodyCenter);
+    }
+    excelCell(ws,r,6).s=countStyle;
+    for(let c=7;c<=17;c++) if(excelCell(ws,r,c).v==='✓') excelCell(ws,r,c).s=checkedStyle;
+  }
+  excelStyleRange(ws,totalRowIdx,0,totalRowIdx,18,totalStyle);
+  excelCell(ws,0,0).s={font:{name:'맑은 고딕',sz:14,bold:true,color:{rgb:'191F28'}},alignment:{horizontal:'center',vertical:'center'}};
+  excelCell(ws,1,0).s={font:{name:'맑은 고딕',sz:9,color:{rgb:'6B7684'}},alignment:{horizontal:'center',vertical:'center'}};
+
+  ws['!cols']=[
+    {wch:5},{wch:13},{wch:15},{wch:9},{wch:11},{wch:10},{wch:6},
+    ...MACHINES.map(m=>({wch:(m.id==='compressor'||m.id==='radiation'?8:7)})),{wch:14}
+  ];
+  ws['!rows']=[{hpt:25},{hpt:17},{hpt:6},{hpt:22},{hpt:28},...rows.map(()=>({hpt:20})),{hpt:20}];
+  ws['!pageSetup']={orientation:'landscape',paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:0};
+  ws['!margins']={left:0.25,right:0.25,top:0.3,bottom:0.3,header:0.1,footer:0.1};
+  ws['!ref']='A1:'+lastCol+(totalRowIdx+1);
   XLSX.utils.book_append_sheet(wb,ws,'유해위험작업현황');
 
-  // 점검기준표 시트 추가
-  const criteria = [
-    ['작업종류','점검기준'],
-    ['호이스트','권과방지장치, 브레이크, 클러치 및 운전장치의 기능'],
-    ['호이스트','주행로의 상측 레일의 상태'],
-    ['호이스트','와이어로프가 통하고 있는 곳의 상태'],
-    ['호이스트','경보장치 등의 기능'],
-    ['컨베이어','원동기 및 풀리 기능의 이상 유무'],
-    ['컨베이어','이탈 등의 방지장치 기능의 이상 유무'],
-    ['컨베이어','비상정지장치 기능의 이상 유무'],
-    ['컨베이어','원동기·회전축·기어 및 풀리 등의 덮개 또는 울 등의 이상 유무'],
-    ['산업용로봇','외부 전선의 피복 또는 외장의 손상 유무'],
-    ['산업용로봇','매니퓰레이터 작동의 이상 유무'],
-    ['산업용로봇','제동장치 및 비상정지장치의 기능'],
-    ['리프트','방호장치, 브레이크 및 클러치의 기능'],
-    ['리프트','와이어로프가 통하고 있는 곳의 상태'],
-    ['프레스','클러치 및 브레이크의 기능'],
-    ['프레스','크랭크축, 플라이휠, 슬라이드, 연결봉 및 연결 나사의 풀림 여부'],
-    ['프레스','1행정 1정지기구, 급정지장치 및 비상정지장치의 기능'],
-    ['프레스','슬라이드 또는 칼날에 의한 위험방지 기구의 기능'],
-    ['프레스','프레스의 금형 및 고정볼트 상태'],
-    ['프레스','방호장치의 기능'],
-    ['프레스','전단기의 칼날 및 테이블의 상태'],
-    ['공기압축기','공기저장 압력용기의 외관상태'],
-    ['공기압축기','드레인밸브의 조작 및 배수'],
-    ['공기압축기','압력방출장치의 기능'],
-    ['공기압축기','언로드밸브의 기능'],
-    ['공기압축기','윤활유의 상태'],
-    ['공기압축기','회전부의 덮개 또는 울'],
-    ['공기압축기','그 밖의 연결 부위의 이상 유무'],
-    ['지게차','제동장치 및 조종장치 기능의 이상 유무'],
-    ['지게차','하역장치 및 유압장치 기능의 이상 유무'],
-    ['지게차','바퀴의 이상 유무'],
-    ['지게차','전조등·후미등·방향지시기 및 경보장치 기능의 이상 유무'],
-    ['지게차','작업자 안전벨트 및 안전모 착용'],
-    ['지게차','유자격자 운전 여부 확인'],
-    ['지게차','시동키 관리상태 등 확인'],
-    ['용접·절단','작업 준비 및 작업 절차 수립 여부'],
-    ['용접·절단','화기작업에 따른 인근 가연성물질에 대한 방호조치 및 소화기구 비치 여부'],
-    ['용접·절단','용접불티 비산방지덮개 또는 용접 방화포 등 불꽃불티 비산 방지 조치 여부'],
-    ['용접·절단','인화성 액체의 증기 또는 인화성 가스가 남아있지 않도록 하는 환기 조치 여부'],
-    ['용접·절단','작업근로자에 대한 화재예방 및 피난 교육 등 비상조치 여부'],
-    ['와이어로프','와이어로프 및 벨트 이상유무 (찢어짐, 끊어짐 등)'],
-    ['와이어로프','(훅이 있는 경우) 훅의 매달림 상태'],
-    ['와이어로프','훅해지장치 정상기능 여부'],
-    ['중량물','중량물 취급의 올바른 자세 및 복장'],
-    ['중량물','위험물이 날아 흩어짐에 따른 보호구의 착용'],
-    ['중량물','온도 상승이나 습기에 의하여 위험성이 존재하는 중량물의 취급방법'],
-    ['중량물','그 밖에 하역운반기계등의 적절한 사용방법'],
-    ['방사선기기','장비 외함상태, 장비 주변 청결'],
-    ['방사선기기','차폐체 무결성 (납커튼, 외함 등)'],
-    ['방사선기기','안전연동(interlock)장치 이상유무'],
-    ['방사선기기','경고등 작동 상태'],
-    ['방사선기기','비상정지 버튼 상태'],
-    ['방사선기기','전원 및 배선 상태'],
-    ['방사선기기','경고표지 부착 상태'],
-    ['','※ 육안점검을 기준으로 함. 필요 시 직접 작동 등을 통한 점검 실시.'],
+  // PDF의 4열 카드형 배치를 그대로 옮긴 작업별 점검기준 시트
+  const criteria=[
+    ['▶ 작업별 점검기준'],
+    [],
+    ['호이스트','컨베이어','산업용로봇','리프트'],
+    [excelCriteriaText('hoist'),excelCriteriaText('conveyor'),excelCriteriaText('robot'),excelCriteriaText('lift')],
+    ['프레스','공기압축기','지게차','용접/절단'],
+    [excelCriteriaText('press'),excelCriteriaText('compressor'),excelCriteriaText('forklift'),excelCriteriaText('welding')],
+    ['와이어로프 등 (체인, 벨트 포함)','중량물','방사선기기',''],
+    [excelCriteriaText('wire'),excelCriteriaText('heavy'),excelCriteriaText('radiation'),'※ 육안점검을 기준으로 함.\n필요 시 직접 작동 등을 통한 점검 실시.']
   ];
-  const ws2 = XLSX.utils.aoa_to_sheet(criteria);
-  ws2['!cols'] = [{wch:14},{wch:70}];
-  ws2['!rows'] = [{hpt:15}];
-  ws2['!pageSetup'] = { orientation:'landscape', paperSize:9 };
-  ws2['!margins']   = { left:0.3, right:0.3, top:0.3, bottom:0.3, header:0.1, footer:0.1 };
+  const ws2=XLSX.utils.aoa_to_sheet(criteria);
+  excelMerge(ws2,0,0,0,3);
+  const criteriaHead={font:{name:'맑은 고딕',sz:10,bold:true,color:{rgb:'191F28'}},fill:{patternType:'solid',fgColor:{rgb:'E8E8E8'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:excelBorder('999999','thin')};
+  const criteriaBody={font:{name:'맑은 고딕',sz:9,color:{rgb:'333333'}},alignment:{horizontal:'left',vertical:'top',wrapText:true},border:excelBorder('999999','thin')};
+  const criteriaNote={font:{name:'맑은 고딕',sz:8,color:{rgb:'555555'}},alignment:{horizontal:'left',vertical:'bottom',wrapText:true},border:excelBorder('999999','thin')};
+  excelCell(ws2,0,0).s={font:{name:'맑은 고딕',sz:12,bold:true,color:{rgb:'191F28'}},alignment:{horizontal:'left',vertical:'center'},border:{top:{style:'medium',color:{rgb:'222222'}}}};
+  [2,4,6].forEach(r=>excelStyleRange(ws2,r,0,r,3,criteriaHead));
+  [3,5,7].forEach(r=>excelStyleRange(ws2,r,0,r,3,criteriaBody));
+  excelCell(ws2,7,3).s=criteriaNote;
+  ws2['!cols']=[{wch:34},{wch:34},{wch:34},{wch:34}];
+  ws2['!rows']=[{hpt:23},{hpt:6},{hpt:22},{hpt:88},{hpt:22},{hpt:178},{hpt:26},{hpt:128}];
+  ws2['!pageSetup']={orientation:'landscape',paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:1};
+  ws2['!margins']={left:0.25,right:0.25,top:0.3,bottom:0.3,header:0.1,footer:0.1};
+  ws2['!ref']='A1:D8';
   XLSX.utils.book_append_sheet(wb,ws2,'작업별점검기준');
 
-  XLSX.writeFile(wb,curSite+'_유해위험작업현황_'+today()+'.xlsx');
+  XLSX.writeFile(wb,curSite+'_유해위험작업현황_'+today()+'.xlsx',{bookType:'xlsx',cellStyles:true});
   toast('엑셀 다운로드 완료','ok');
 }
-
 function printPDF(){
   const dept = document.getElementById('filterDept').value;
   document.getElementById('printTitle').textContent =
