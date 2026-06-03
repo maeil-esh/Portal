@@ -82,6 +82,7 @@ body{font-family:'Malgun Gothic','맑은 고딕',-apple-system,sans-serif;font-s
 .topbar-space{flex:1}
 .gas-dot{width:7px;height:7px;border-radius:50%;background:var(--gray300);display:inline-block}
 .gas-dot.ok{background:var(--green500)}
+.gas-dot.err{background:var(--red500)}
 .gas-txt{font-size:11px;color:var(--gray500)}
 
 /* ════ 네비 탭바 ════ */
@@ -132,6 +133,15 @@ body{font-family:'Malgun Gothic','맑은 고딕',-apple-system,sans-serif;font-s
 .site-add-card:hover{border-color:var(--blue500);color:var(--blue500);background:rgba(240,244,255,.8);transform:translateY(-4px)}
 .site-add-icon{font-size:32px;line-height:1}
 .site-add-txt{font-size:13px;font-weight:700}
+
+/* 접속 QR 카드 — PC 대시보드 우측 여유 공간에 표시 */
+.qr-access-card{background:rgba(255,255,255,.96);border:1px solid var(--gray200);border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100%;transition:all .18s}
+.qr-access-card:hover{box-shadow:0 8px 32px rgba(49,130,246,.13);transform:translateY(-4px);border-color:var(--blue100)}
+.qr-access-inner{width:100%;padding:22px 22px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.qr-access-title{font-size:18px;font-weight:800;color:var(--gray900);letter-spacing:-.35px;margin-bottom:13px}
+.qr-access-img-wrap{width:min(190px,78%);aspect-ratio:1/1;padding:10px;background:#fff;border:1px solid var(--gray200);border-radius:13px;box-shadow:0 2px 10px rgba(15,23,42,.07)}
+.qr-access-img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.qr-access-note{margin-top:12px;font-size:11px;color:var(--gray500);line-height:1.55;word-break:keep-all}
 
 /* ════ 현황 페이지 ════ */
 .work-header{padding:16px 24px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -289,6 +299,167 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{background:var(--green500)}.toast.err{background:var(--red500)}
 
+
+/* ════ 모바일 화면 최적화 ════ */
+.mobile-scroll-guide,.mobile-card-list{display:none}
+.mobile-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mobile-edit-field{display:flex;flex-direction:column;gap:5px}
+.mobile-edit-field span{font-size:11px;font-weight:700;color:var(--gray600)}
+.mobile-edit-field.full{grid-column:1/-1}
+.mobile-edit-control{width:100%;min-height:40px;border:1.5px solid var(--gray200);border-radius:var(--r6);padding:8px 10px;background:var(--white);font-family:inherit;font-size:13px;color:var(--gray800)}
+.mobile-edit-control:focus{outline:none;border-color:var(--blue500)}
+
+@media screen and (max-width:768px){
+  html,body{max-width:100%;overflow-x:hidden}
+  body{font-size:12px}
+
+  /* 로딩 화면 */
+  .ld-icon{width:50px;height:50px;border-radius:13px}
+  .ld-logo-wrap{gap:22px;padding:0 18px}
+  .ld-title h1{font-size:25px}
+  .ld-title p{font-size:12px}
+  .ld-badge{margin:28px 14px 0;padding:5px 11px}
+  .ld-badge span{font-size:10px}
+
+  /* 상단 상태 바 */
+  .topbar{
+    min-height:52px;height:auto;padding:8px 10px;gap:8px;
+    padding-left:max(10px,env(safe-area-inset-left));
+    padding-right:max(10px,env(safe-area-inset-right));
+  }
+  .topbar-icon{width:30px;height:30px;border-radius:8px;font-size:15px}
+  .topbar-logo{flex:1;min-width:0;font-size:13px;line-height:1.25;letter-spacing:-.35px}
+  .topbar-logo span{display:none}
+  .topbar-space{display:none}
+  .topbar-badge{font-size:10px;padding:3px 7px;flex-shrink:0}
+  .gas-txt{display:none}
+  .gas-dot{width:7px;height:7px;flex-shrink:0}
+
+  /* 사업장 탭: 한 줄 가로 스크롤 */
+  .navbar{
+    padding:0 4px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .navbar::-webkit-scrollbar{display:none}
+  #siteTabs{display:flex!important;flex:0 0 auto!important;min-width:max-content}
+  .nav-tab{padding:11px 12px;font-size:12px;flex:0 0 auto}
+  .nav-sep{flex:0 0 1px;margin:0 1px}
+  .page{min-height:calc(100dvh - 98px)}
+
+  /* 전체 현황 카드 */
+  .dash-bg{min-height:calc(100dvh - 98px);padding-bottom:24px}
+  .dash-hero{padding:28px 15px 20px}
+  .dash-hero-title{font-size:26px;letter-spacing:-.65px;margin-bottom:8px}
+  .dash-hero-sub{font-size:12px;line-height:1.65;margin-bottom:14px;word-break:keep-all}
+  .dash-hero-actions{font-size:11px}
+  .site-grid{grid-template-columns:1fr;gap:12px;padding:0 10px}
+  .site-card{border-radius:13px}
+  .site-card:hover{transform:none}
+  .site-card-inner{padding:16px 17px 0}
+  .site-card-icon{width:35px;height:35px;margin-bottom:9px;font-size:18px}
+  .site-card-name{font-size:16px;margin-bottom:6px}
+  .site-card-desc{font-size:11px;min-height:0;line-height:1.55}
+  .site-card-stats{margin-top:11px;padding:11px 0;gap:10px}
+  .site-stat-num{font-size:19px}
+  .machine-chips{padding:0 17px 11px;gap:4px}
+  .machine-chip{font-size:10px;padding:2px 7px}
+  .site-card-footer{padding:10px 17px}
+  .site-goto{font-size:11px;padding:5px 12px}
+  /* QR은 PC 화면에서 모바일 접속을 돕기 위한 카드이므로 모바일에서는 숨김 */
+  .qr-access-card{display:none}
+
+  /* 사업장 상세 헤더 */
+  .work-header{padding:9px 8px;gap:6px;align-items:center}
+  .work-header>.btn:first-child{padding:6px 8px}
+  .work-site-label{font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .work-site-badge{font-size:10px;padding:2px 7px}
+  .work-actions{
+    width:100%;margin-left:0!important;display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr));gap:5px!important;
+  }
+  .work-actions .btn{min-height:34px;justify-content:center;padding:6px 3px;font-size:10px;gap:3px}
+  #autoSaveIndicator{font-size:10px!important}
+
+  /* 검색·필터 */
+  .work-toolbar{padding:7px 8px;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.2fr);gap:6px}
+  .filter-sel,.search-box{width:100%;min-height:38px;padding:7px 8px;font-size:12px}
+  .work-toolbar .divider,.work-toolbar .hint{display:none}
+  .work-toolbar .btn{grid-column:1/-1;justify-content:center;min-height:34px}
+  .mobile-scroll-guide{
+    display:flex;align-items:center;gap:7px;margin:8px 8px 0;padding:8px 10px;
+    border:1px solid var(--blue100);border-radius:8px;background:var(--blue50);
+    color:var(--blue600);font-size:11px;font-weight:700;line-height:1.45;
+  }
+  .mobile-scroll-guide span:first-child{font-size:16px;line-height:1}
+
+  /* 모바일은 카드 보기, PC는 기존 표 보기 */
+  .tbl-wrap{display:none}
+  .mobile-card-list{display:block;padding:8px 8px 18px}
+  .mobile-empty{padding:34px 15px;text-align:center;color:var(--gray500);background:var(--white);border:1px solid var(--gray200);border-radius:10px;line-height:1.7}
+  .mobile-person-card{background:var(--white);border:1px solid #dce2ea;border-radius:11px;box-shadow:var(--sh1);overflow:hidden;margin-bottom:8px}
+  .mobile-person-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 12px 8px}
+  .mobile-person-title{display:flex;align-items:center;min-width:0;gap:8px}
+  .mobile-row-no{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--gray100);color:var(--gray600);font-size:10px;font-weight:800;flex-shrink:0}
+  .mobile-person-title strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;color:var(--gray900)}
+  .mobile-total{display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:23px;padding:0 8px;border-radius:12px;background:var(--blue50);border:1px solid var(--blue100);color:var(--blue600);font-size:11px;font-weight:800;flex-shrink:0}
+  .mobile-person-meta{padding:0 12px 9px;color:var(--gray600);font-size:11px;line-height:1.55;word-break:keep-all}
+  .mobile-person-date{display:block;margin-top:2px;color:var(--gray400);font-size:10px}
+  .mobile-machine-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:9px 10px 10px;border-top:1px solid var(--gray100);background:#fbfcfe}
+  .mobile-machine-btn{display:flex;align-items:center;justify-content:center;gap:4px;min-height:34px;padding:5px 3px;border:1px solid var(--gray200);border-radius:7px;background:var(--white);color:var(--gray500);font-family:inherit;font-size:10px;font-weight:700;line-height:1.15;word-break:keep-all;cursor:pointer}
+  .mobile-machine-btn.on{border-color:var(--blue500);background:var(--blue50);color:var(--blue600)}
+  .mobile-machine-btn b{font-size:11px;color:var(--blue500)}
+  .mobile-card-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:0 10px 10px;background:#fbfcfe}
+  .mobile-card-actions.locked{grid-template-columns:1fr}
+  .mobile-card-btn{display:flex;align-items:center;justify-content:center;min-height:32px;border:1px solid var(--gray200);border-radius:6px;background:var(--white);color:var(--gray600);font-family:inherit;font-size:10px;font-weight:700;cursor:pointer}
+  .mobile-card-btn.primary{border-color:var(--blue100);background:var(--blue50);color:var(--blue600)}
+  .mobile-card-btn.danger{border-color:#ffd5d8;background:var(--red50);color:var(--red500)}
+  .mobile-card-btn:disabled{opacity:.35;cursor:not-allowed}
+
+  /* 기준정보 */
+  .master-wrap{padding:9px}
+  .master-site-bar{margin-bottom:10px}
+  .master-site-bar-head{padding:11px 12px;display:block}
+  .master-site-bar-title{display:block;margin-bottom:4px}
+  .master-site-bar-head span:last-child{font-size:10px!important;line-height:1.55;display:block}
+  .master-site-tabs{padding:10px 10px;gap:5px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .master-site-tabs::-webkit-scrollbar{display:none}
+  .site-order-pill{flex:0 0 auto}
+  .site-order-handle{display:none}
+  .site-order-name{font-size:11px;padding:4px 6px}
+  .site-order-btn{width:19px;height:19px;font-size:9px}
+  .master-site-add{padding:0 10px 10px;flex-wrap:wrap;gap:6px}
+  .master-site-add .master-inp{width:100%!important;min-height:39px}
+  .master-site-add .btn{flex:1;justify-content:center;min-height:34px;padding-left:4px;padding-right:4px;font-size:10px}
+  .master-cards{grid-template-columns:1fr;gap:9px}
+  .master-card-head{padding:11px 12px;font-size:12px}
+  .master-item{padding:8px 12px;font-size:12px}
+  .master-add-row{padding:9px 10px;gap:6px;flex-wrap:wrap}
+  .master-add-row>div{width:100%;flex-wrap:wrap}
+  .master-add-row .master-inp{min-width:0!important;flex:1 1 150px}
+  .master-add-row .btn{justify-content:center}
+
+  /* 팝업은 하단 시트처럼 표시 */
+  .tt{left:8px!important;right:8px!important;bottom:8px!important;top:auto!important;min-width:0!important;max-width:none!important;max-height:72dvh;overflow:auto;border-radius:11px}
+  .tt-head{position:sticky;top:0;z-index:1;padding:11px 13px}
+  .tt-body{padding:10px 13px}
+  .modal{min-width:0;width:calc(100vw - 22px);max-width:420px;padding:18px;border-radius:11px}
+  .modal h3{font-size:15px;margin-bottom:14px}
+  .modal-btns .btn{min-height:37px;justify-content:center}
+  .toast{max-width:calc(100vw - 22px);white-space:normal;text-align:center;font-size:12px;line-height:1.45;padding:9px 14px;bottom:14px}
+}
+
+@media screen and (max-width:390px){
+  .topbar-logo{font-size:12px}
+  .topbar-badge{font-size:9px;padding:3px 6px}
+  .nav-tab{padding:10px 10px;font-size:11px}
+  .dash-hero-title{font-size:24px}
+  .mobile-machine-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mobile-card-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mobile-edit-grid{grid-template-columns:1fr}
+  .mobile-edit-field.full{grid-column:auto}
+}
+
+
 /* ════ 인쇄 ════ */
 @media print{
   @page{ size:A4 landscape; margin:8mm 6mm; }
@@ -296,7 +467,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 
   /* 숨김 */
   .topbar,.navbar,.work-toolbar,.td-del,.th-del,.tt,.toast,.modal-bg,
-  .work-header .btn, .sort-btn, .autoSaveIndicator, .row-order-handle { display:none!important; }
+  .work-header .btn, .sort-btn, .autoSaveIndicator, .row-order-handle, .qr-access-card { display:none!important; }
 
   /* 전체 폰트/배경 */
   body{ font-size:7.5pt!important; background:#fff!important; color:#000!important;
@@ -528,7 +699,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
     <button class="btn btn-sm" onclick="goPage('home')">← 전체 현황</button>
     <span class="work-site-label" id="workSiteLabel"></span>
     <span class="work-site-badge" id="workSiteBadge"></span>
-    <div style="margin-left:auto;display:flex;gap:6px">
+    <div class="work-actions" style="margin-left:auto;display:flex;gap:6px">
       <button class="btn btn-primary btn-sm" id="addRowBtn" onclick="addRow()">+ 행 추가</button>
       <button class="btn btn-sm btn-primary" id="lockBtn" onclick="isUnlocked()?lockSite():requireAuth(()=>{})">🔒 편집</button>
       <button class="btn btn-sm" id="autoSaveIndicator" style="color:var(--gray400);cursor:default">● 자동저장</button>
@@ -545,7 +716,9 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
     <button class="btn btn-sm" onclick="pingGAS()" title="GAS 서버 연결 확인">🔌 연결확인</button>
     <span class="hint">기계명 클릭→점검기준 &nbsp;|&nbsp; 편집 후 No. 영역의 ⠿ 드래그→행 순서 변경 &nbsp;|&nbsp; Tab·방향키 이동 &nbsp;|&nbsp; 스페이스바 체크</span>
   </div>
+  <div class="mobile-scroll-guide"><span>↔</span><span>모바일 카드에서 작업 대상을 바로 확인하고 선택할 수 있습니다. 상세 표는 PC 화면과 PDF·엑셀 출력에 유지됩니다.</span></div>
   <div class="print-head" id="printHead"><h2 id="printTitle"></h2><p id="printSub"></p></div>
+  <div class="mobile-card-list" id="mobileCardList"></div>
 
   <div class="tbl-wrap">
     <table id="mainTable">
@@ -690,6 +863,24 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   </div>
 </div>
 
+<!-- 모바일 관리감독자 기본정보 수정 모달 -->
+<div class="modal-bg" id="mobileEditModalBg">
+  <div class="modal" style="max-width:390px">
+    <h3>관리감독자 기본정보 수정</h3>
+    <div class="mobile-edit-grid">
+      <label class="mobile-edit-field"><span>팀</span><select class="mobile-edit-control" id="mobileEditTeam"></select></label>
+      <label class="mobile-edit-field"><span>공정명</span><input class="mobile-edit-control" id="mobileEditProcess" placeholder="공정명"></label>
+      <label class="mobile-edit-field"><span>직책</span><select class="mobile-edit-control" id="mobileEditPosition"></select></label>
+      <label class="mobile-edit-field"><span>사번</span><input class="mobile-edit-control" id="mobileEditEmpno" placeholder="사번"></label>
+      <label class="mobile-edit-field full"><span>이름</span><input class="mobile-edit-control" id="mobileEditName" placeholder="이름"></label>
+    </div>
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn" onclick="closeMobileEdit()">취소</button>
+      <button class="btn btn-primary" onclick="saveMobileEdit()">저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- 툴팁 -->
 <div class="tt" id="ttPop">
   <div class="tt-head"><span id="ttTitle"></span><button class="tt-close" onclick="closeTT()">✕</button></div>
@@ -776,7 +967,7 @@ let unlockedMasterSites = new Set();  // 기준정보 편집 인증된 사업장
 let editPwCallback = null;
 let masterPwCallback = null;
 let gasSeq = 0;
-const SAVE_CHUNK_SIZE = 50;
+const SAVE_CHUNK_SIZE = 15;
 
 function sd(s){ return siteData[s||curSite]; }
 function getMaster(key, s){ return sd(s||curMasterSite).master[key]; }
@@ -809,6 +1000,10 @@ function renderNavTabs(){
     `<button class="nav-tab${curPage==='work'&&curSite===s?' active':''}"
       onclick="goPage('work','${esc(s)}')">${esc(s)}</button>`
   ).join('');
+  requestAnimationFrame(()=>{
+    const active = el.querySelector('.nav-tab.active');
+    if(active) active.scrollIntoView({block:'nearest',inline:'center'});
+  });
 }
 
 /* ══════════════════════════════════════════
@@ -864,7 +1059,15 @@ function renderDashboard(){
       </div>
     </div>`;
   }).join('') +
-``;  // 추가 카드 제거
+  `<div class="qr-access-card" aria-label="모바일 접속 QR 코드">
+    <div class="qr-access-inner">
+      <div class="qr-access-title">접속 QR</div>
+      <div class="qr-access-img-wrap">
+        <img class="qr-access-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZoAAAGaAQAAAAAefbjOAAADGklEQVR4nO2cTW7cMAxGH2sBXtpADjBHkW/QI/VMuYF9lB4ggLUcwMbXhaT5SbpoMIU9iamFZwbwQyiAIMWPVEx8ek0/Ps+AQw455JBDDjn0PSErKwCsBilwfdiQ6gvDLuY5tD0UJUkz2JBamfXAdFpg6gFoJEm6h7Yzz6HtoFA+Uw/xFaA7G3RvJlJYLApEAoNm2dw8h/aHJmtFnBsRtaCRteaK//2XHPoSkEaAqV+NKR8rmo+KxRfbk0OfWTVrdAISQDcDqZXF+QWLry85V9z6xZPvyaH/AE1mZtaD/fodIM7vXltzqbGXeQ5tHSNuA0BXzo8iXR7cZ44n35NDj0M2AFWAMGPqVzM7LdiQw0PIYWQn8xzaqfqkW9DUX4pM1lBjhFefx4SSmf1SjQxZqzpJOXjEefUYcQCIokV2Cxo7CbqiXlYd87b6zMrl+OR7cugRqHpElR2qC7x7gKSleIl7xPeHsi4VJZn1q+XqM2rJuSKHjNLh2MM8hzaPETeRIc6gMbe2lvJthKxReNb4/tAla5CDQkkOc0kTxQU6XXod7hGHgKS5kcbUlrqCTippIpnZwGpX6eqL7MmhR/QIozubpp9nI76Cpv4tiBQwAJFaMZnrEUeAikIVXwMGrQBhECBqDYI1QHc273QdBArXr4LVqgu8BQMwulmQXlSixcbmObQb1C2YWSsbUkD63eZTZJ6ztNNCGa7ayTyHNodSK0lnY8r9Lbhq11IWsBufszwAVKrPeFNzXgZsaWqgoClCt+sRh4FSm1saZmZWFKoZNKaAxu5s5ZWdzHNoM+imr3Htal1lqhw8gNr48hhxDCi7AN2SXSDf1yjrkjqS3+A5AlQVqryaJQeJOK75J1P/FiDdj98++Z4cegS6nCxLu+va37ptc1wTi2eN7w5Vj5iBePEI1Ut/ZYoGKKM07hGHgyZrZWYBs5NkQ7La5EoBG/Y2z6EdoDoi8+7SRpRrlkeAPt7polksK9aphziuuQvKZK5ZHgH6i0i5lBPF2F1PlsvdAM2T78mhR6C7Lvc/Lv/PZA455JBDDjnkEMAfw9YR1n1dtlwAAAAASUVORK5CYII=" alt="https://maeil-esh.github.io/Portal/work.html 접속 QR 코드">
+      </div>
+      <div class="qr-access-note">휴대전화 카메라로 스캔하여<br>모바일 화면에 접속하세요.</div>
+    </div>
+  </div>`;
 
   document.getElementById('totalBadge').textContent = `전체 ${totalAll}명`;
 }
@@ -947,9 +1150,17 @@ function renderTable(){
   const q    = document.getElementById('searchBox').value.trim().toLowerCase();
   const dept = document.getElementById('filterDept').value;
   const rows = sd().rows;
-  const filtered = rows.filter(r=>
-    (!dept||r.team===dept)&&(!q||r.name.includes(q)||r.empno.includes(q)||r.team.includes(q)||r.process.includes(q))
+  let filtered = rows.filter(r=>
+    (!dept||r.team===dept)&&(!q||r.name.toLowerCase().includes(q)||r.empno.toLowerCase().includes(q)||r.team.toLowerCase().includes(q)||r.process.toLowerCase().includes(q))
   );
+  if(sortState.mid && sortState.dir!==0){
+    filtered = [...filtered].sort((a,b)=>{
+      const av = a.machines[sortState.mid] ? 1 : 0;
+      const bv = b.machines[sortState.mid] ? 1 : 0;
+      return sortState.dir===1 ? bv-av : av-bv;
+    });
+  }
+  renderMobileCards(filtered);
   const tbody = document.getElementById('tableBody');
   const tfoot = document.getElementById('tableFoot');
   if(!filtered.length){
@@ -1003,6 +1214,87 @@ function renderTable(){
     <td>${totalAll}</td>
     ${MACHINES.map(m=>`<td>${mT[m.id]||''}</td>`).join('')}
     <td></td></tr>`;
+}
+
+
+/* ══════════════════════════════════════════
+   모바일 카드 보기 / 기본정보 수정
+══════════════════════════════════════════ */
+let mobileEditRowId = null;
+
+function renderMobileCards(filtered){
+  const wrap = document.getElementById('mobileCardList');
+  if(!wrap) return;
+  if(!filtered.length){
+    wrap.innerHTML = '<div class="mobile-empty">등록된 데이터가 없습니다.<br>상단의 <b>[+ 행 추가]</b> 버튼으로 관리감독자를 등록하세요.</div>';
+    return;
+  }
+  const unlocked = isUnlocked();
+  wrap.innerHTML = filtered.map((r,i)=>{
+    const total = MACHINES.filter(m=>r.machines[m.id]).length;
+    const title = esc(r.name) || '이름 미입력';
+    const info = [r.team,r.process,r.position,r.empno].filter(Boolean).map(esc).join(' · ') || '기본정보 미입력';
+    const checks = MACHINES.map(m=>{
+      const on = !!r.machines[m.id];
+      return `<button type="button" class="mobile-machine-btn${on?' on':''}" onclick="toggleCheck(${r.id},'${m.id}')" title="${esc(m.label.replace('\n',' '))}">
+        <span>${esc(m.label.replace('\n',' '))}</span>${on?'<b>✓</b>':''}</button>`;
+    }).join('');
+    const actions = unlocked
+      ? `<div class="mobile-card-actions">
+          <button type="button" class="mobile-card-btn primary" onclick="openMobileEdit(${r.id})">기본정보 수정</button>
+          <button type="button" class="mobile-card-btn" onclick="moveRow(${r.id},-1)" ${i===0?'disabled':''}>▲ 위로</button>
+          <button type="button" class="mobile-card-btn" onclick="moveRow(${r.id},1)" ${i===filtered.length-1?'disabled':''}>▼ 아래로</button>
+          <button type="button" class="mobile-card-btn danger" onclick="deleteRow(${r.id})">삭제</button>
+        </div>`
+      : `<div class="mobile-card-actions locked"><button type="button" class="mobile-card-btn primary" onclick="requireAuth(()=>{updateLockUI();renderTable();})">🔒 편집 잠금 해제</button></div>`;
+    return `<article class="mobile-person-card">
+      <div class="mobile-person-head">
+        <div class="mobile-person-title"><span class="mobile-row-no">${i+1}</span><strong>${title}</strong></div>
+        <span class="mobile-total">${total}개 대상</span>
+      </div>
+      <div class="mobile-person-meta">${info}<span class="mobile-person-date">수정일 ${esc(r.date||'-')}</span></div>
+      <div class="mobile-machine-grid">${checks}</div>
+      ${actions}
+    </article>`;
+  }).join('');
+}
+
+function openMobileEdit(id){
+  requireAuth(()=>{
+    const r = sd().rows.find(x=>x.id===Number(id));
+    if(!r) return;
+    mobileEditRowId = Number(id);
+    const team = document.getElementById('mobileEditTeam');
+    const pos  = document.getElementById('mobileEditPosition');
+    team.innerHTML = '<option value=""></option>' + sd().master.team.map(v=>`<option value="${esc(v)}"${v===r.team?' selected':''}>${esc(v)}</option>`).join('');
+    pos.innerHTML  = '<option value=""></option>' + sd().master.position.map(v=>`<option value="${esc(v)}"${v===r.position?' selected':''}>${esc(v)}</option>`).join('');
+    document.getElementById('mobileEditProcess').value = r.process || '';
+    document.getElementById('mobileEditEmpno').value   = r.empno || '';
+    document.getElementById('mobileEditName').value    = r.name || '';
+    document.getElementById('mobileEditModalBg').classList.add('show');
+    setTimeout(()=>document.getElementById('mobileEditName').focus(),100);
+  });
+}
+
+function closeMobileEdit(){
+  document.getElementById('mobileEditModalBg').classList.remove('show');
+  mobileEditRowId = null;
+}
+
+function saveMobileEdit(){
+  if(!isUnlocked() || mobileEditRowId===null) return;
+  const r = sd().rows.find(x=>x.id===Number(mobileEditRowId));
+  if(!r) return;
+  r.team     = document.getElementById('mobileEditTeam').value;
+  r.process  = document.getElementById('mobileEditProcess').value.trim();
+  r.position = document.getElementById('mobileEditPosition').value;
+  r.empno    = document.getElementById('mobileEditEmpno').value.trim();
+  r.name     = document.getElementById('mobileEditName').value.trim();
+  r.date     = today();
+  closeMobileEdit();
+  renderTable();
+  triggerAutoSave();
+  toast('✅ 기본정보를 저장했습니다','ok');
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
@@ -1506,19 +1798,26 @@ function gasCall(action, params, cb){
     if(done) return;
     done = true;
     cleanup();
-    toast('❌ GAS 연결 오류 — 배포 설정을 확인하세요','err');
+    const err = {result:'error', error:'GAS 연결 오류 — 웹앱 배포 URL 또는 공개 권한을 확인하세요'};
+    setGasError('연결 오류');
+    toast('❌ '+err.error,'err');
     console.error('[GAS] script load error:', action);
+    if(typeof cb === 'function') cb(err);
   };
   document.head.appendChild(scriptEl);
   setTimeout(() => {
     if(!done && window[cbN]){
       done = true;
       cleanup();
-      toast('❌ 서버 응답 없음 (12초 초과)','err');
+      const err = {result:'error', error:'서버 응답 없음 (12초 초과)'};
+      setGasError('응답 없음');
+      toast('❌ '+err.error,'err');
+      if(typeof cb === 'function') cb(err);
     }
   }, 12000);
 }
 function setGasOk(){ document.getElementById('gasDot').className='gas-dot ok'; document.getElementById('gasMsg').textContent='연결됨'; }
+function setGasError(msg){ document.getElementById('gasDot').className='gas-dot err'; document.getElementById('gasMsg').textContent=msg||'연결 오류'; }
 
 function pingGAS(){
   toast('GAS 연결 확인 중...','');
@@ -1633,8 +1932,14 @@ function appendLoadedRows(rows){
 function loadAllFromGAS(){
   toast('불러오는 중...','');
   gasCall('loadAllMaster',{},mres=>{
-    const loadedOrder = (mres?.result==='success' && Array.isArray(mres.order)) ? mres.order : [];
-    if(mres?.result==='success') { applyMasterMap(mres.data || {}); applyLoadedSiteOrder(loadedOrder); }
+    if(mres?.result!=='success'){
+      const msg=mres?.error||'기준정보 불러오기 실패';
+      setGasError('불러오기 오류');
+      toast('❌ '+msg,'err');
+      return;
+    }
+    const loadedOrder = Array.isArray(mres.order) ? mres.order : [];
+    applyMasterMap(mres.data || {}); applyLoadedSiteOrder(loadedOrder);
     gasCall('loadAll',{},res=>{
       if(res?.result==='success'&&Array.isArray(res.data)){
         resetAllRows();
@@ -1642,7 +1947,11 @@ function loadAllFromGAS(){
         applyLoadedSiteOrder(loadedOrder);
         renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); setGasOk();
         toast(res.data.filter(r=>!isDeprecatedSite(r.site)).length+'건 불러오기 완료','ok');
-      } else toast('불러오기 실패','err');
+      } else {
+        const msg=res?.error||'현황 데이터 불러오기 실패';
+        setGasError('불러오기 오류');
+        toast('❌ '+msg,'err');
+      }
     });
   });
 }
@@ -1660,7 +1969,6 @@ function loadXlsxStyle(){
   s.onerror = ()=>{ xlsxStyleLoadStarted=false; toast('엑셀 출력 모듈을 불러오지 못했습니다','err'); };
   document.head.appendChild(s);
 }
-loadXlsxStyle();
 
 function excelCell(ws, r, c){
   const addr = XLSX.utils.encode_cell({r,c});
@@ -2033,8 +2341,16 @@ function autoLoadAll(){
   setSyncMsg('↓ 불러오는 중...', 'var(--blue500)');
   LD.progress(60, '기준정보 불러오는 중...');
   gasCall('loadAllMaster',{},mres=>{
-    const loadedOrder = (mres?.result==='success' && Array.isArray(mres.order)) ? mres.order : [];
-    if(mres?.result==='success') { applyMasterMap(mres.data || {}); applyLoadedSiteOrder(loadedOrder); }
+    if(mres?.result!=='success'){
+      const msg=mres?.error||'기준정보 불러오기 실패';
+      setGasError('불러오기 오류');
+      setSyncMsg('● 불러오기 오류', 'var(--red500)');
+      LD.complete('❌ '+msg);
+      toast('❌ '+msg,'err');
+      return;
+    }
+    const loadedOrder = Array.isArray(mres.order) ? mres.order : [];
+    applyMasterMap(mres.data || {}); applyLoadedSiteOrder(loadedOrder);
     LD.progress(75, '사업장 현황 불러오는 중...');
     gasCall('loadAll',{},res=>{
       if(res?.result==='success'&&Array.isArray(res.data)){
@@ -2047,8 +2363,11 @@ function autoLoadAll(){
         setSyncMsg('✓ 최신화됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
         LD.complete('✓ 데이터 로딩 완료 — '+visibleCount+'건');
       } else {
-        setSyncMsg('● 데이터 없음', 'var(--gray400)');
-        LD.complete('연결됨 — 데이터 없음');
+        const msg=res?.error||'현황 데이터 불러오기 실패';
+        setGasError('불러오기 오류');
+        setSyncMsg('● 불러오기 오류', 'var(--red500)');
+        LD.complete('❌ '+msg);
+        toast('❌ '+msg,'err');
       }
     });
   });
