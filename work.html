@@ -100,7 +100,7 @@ body{font-family:'Malgun Gothic','맑은 고딕',-apple-system,sans-serif;font-s
 /* ════ 메인 대시보드 ════ */
 .dash-bg{min-height:calc(100vh - 110px);background:linear-gradient(145deg,#f0f4ff 0%,#f9fafb 50%,#eaf9f4 100%);padding:0 0 48px}
 /* 히어로 */
-.dash-hero{text-align:center;padding:48px 24px 36px}
+.dash-hero{text-align:center;padding:48px 24px 36px;position:relative}
 .dash-hero-title{font-size:36px;font-weight:800;color:var(--gray900);line-height:1.2;letter-spacing:-.8px;margin-bottom:10px}
 .dash-hero-title span{color:var(--blue500)}
 .dash-hero-sub{font-size:14px;color:var(--gray500);margin-bottom:24px;letter-spacing:-.2px}
@@ -143,6 +143,43 @@ body{font-family:'Malgun Gothic','맑은 고딕',-apple-system,sans-serif;font-s
 .qr-access-img-wrap{width:min(190px,78%);aspect-ratio:1/1;padding:10px;background:#fff;border:1px solid var(--gray200);border-radius:13px;box-shadow:0 2px 10px rgba(15,23,42,.07)}
 .qr-access-img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 .qr-access-note{margin-top:12px;font-size:11px;color:var(--gray500);line-height:1.55;word-break:keep-all}
+
+/* 대시보드 상단: 작업별 점검기준 바로가기 */
+.criteria-guide-btn{
+  position:absolute;left:calc(50% + 370px);right:auto;top:50%;transform:translateY(-48%);
+  display:flex;align-items:center;gap:10px;min-width:190px;padding:13px 15px;
+  border:1px solid var(--blue100);border-radius:14px;background:rgba(255,255,255,.93);
+  box-shadow:0 4px 18px rgba(49,130,246,.10);cursor:pointer;text-align:left;
+  font-family:inherit;transition:all .16s;backdrop-filter:blur(5px)
+}
+.criteria-guide-btn:hover{transform:translateY(-52%);border-color:var(--blue500);box-shadow:0 9px 28px rgba(49,130,246,.18);background:#fff}
+.criteria-guide-icon{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:var(--blue50);color:var(--blue500);font-size:17px;font-weight:900;flex-shrink:0}
+.criteria-guide-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+.criteria-guide-text strong{font-size:13px;color:var(--gray900);letter-spacing:-.25px;white-space:nowrap}
+.criteria-guide-text small{font-size:10px;color:var(--gray500);letter-spacing:-.1px}
+.criteria-guide-arrow{margin-left:auto;color:var(--blue500);font-size:15px;font-weight:800}
+
+/* 작업별 점검기준 팝업 */
+.criteria-modal-bg{padding:22px}
+.modal.criteria-modal{
+  width:min(1180px,calc(100vw - 44px));max-width:1180px;max-height:calc(100dvh - 44px);
+  padding:0!important;border-radius:15px!important;overflow:hidden;display:flex;flex-direction:column
+}
+.criteria-modal-head{display:flex;align-items:center;gap:10px;padding:15px 18px;background:var(--gray800);color:#fff;flex-shrink:0}
+.criteria-modal-head-icon{display:flex;align-items:center;justify-content:center;width:29px;height:29px;border-radius:8px;background:rgba(255,255,255,.14);font-size:15px}
+.criteria-modal-head-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.criteria-modal-head-text strong{font-size:15px;letter-spacing:-.25px}
+.criteria-modal-head-text span{font-size:11px;color:rgba(255,255,255,.68)}
+.criteria-modal-close{margin-left:auto;width:32px;height:32px;border:1px solid rgba(255,255,255,.18);border-radius:8px;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-size:15px;transition:all .12s}
+.criteria-modal-close:hover{background:rgba(255,255,255,.20)}
+.criteria-modal-body{padding:15px 16px 16px;overflow:auto;background:#fff}
+.criteria-modal-content>div:first-child{display:none}
+.criteria-modal-content table{width:100%;min-width:930px;border-collapse:collapse;table-layout:fixed;white-space:normal;font-size:11px}
+.criteria-modal-content td{height:auto;padding:8px 9px;border:1px solid #b9c2ce;text-align:left;vertical-align:top;line-height:1.6;white-space:normal;word-break:keep-all;background:#fff;color:var(--gray800)}
+.criteria-modal-content td.ct-head{padding:7px 6px;background:#e0e4ea;color:var(--gray900);font-size:12px;font-weight:800;text-align:center;vertical-align:middle;line-height:1.35}
+.criteria-modal-content .ct-note{font-size:11px;color:var(--gray600);line-height:1.6}
+.criteria-modal-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;border-top:1px solid var(--gray200);background:var(--gray50);flex-shrink:0}
+.criteria-modal-foot span{font-size:11px;color:var(--gray500);line-height:1.5}
 
 /* ════ 현황 페이지 ════ */
 .work-header{padding:16px 24px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -301,6 +338,46 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 .toast.ok{background:var(--green500)}.toast.err{background:var(--red500)}
 
 
+/* ════ 저장 진행 오버레이 ════ */
+.save-overlay{
+  display:none;position:fixed;inset:0;z-index:99998;
+  align-items:center;justify-content:center;padding:20px;
+  background:rgba(25,31,40,.24);backdrop-filter:blur(2px);
+}
+.save-overlay.show{display:flex}
+.save-overlay-card{
+  width:min(360px,calc(100vw - 34px));padding:23px 22px 20px;
+  border:1px solid rgba(229,232,235,.95);border-radius:15px;
+  background:rgba(255,255,255,.98);box-shadow:0 16px 48px rgba(15,23,42,.18);
+  text-align:center;
+}
+.save-overlay-spinner{
+  width:38px;height:38px;margin:0 auto 14px;border-radius:50%;
+  border:4px solid var(--blue100);border-top-color:var(--blue500);
+  animation:saveSpin .8s linear infinite;
+}
+.save-overlay-card.done .save-overlay-spinner{
+  border:none;background:var(--green50);animation:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.save-overlay-card.done .save-overlay-spinner::after{
+  content:'✓';color:var(--green500);font-size:22px;font-weight:900;
+}
+.save-overlay-card.err .save-overlay-spinner{
+  border:none;background:var(--red50);animation:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.save-overlay-card.err .save-overlay-spinner::after{
+  content:'!';color:var(--red500);font-size:22px;font-weight:900;
+}
+.save-overlay-title{font-size:15px;font-weight:800;color:var(--gray900);letter-spacing:-.25px}
+.save-overlay-detail{margin-top:7px;min-height:18px;font-size:12px;line-height:1.55;color:var(--gray600);word-break:keep-all}
+.save-overlay-progress{height:5px;margin-top:15px;overflow:hidden;border-radius:4px;background:var(--gray100)}
+.save-overlay-progress-bar{height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--blue500),var(--green500));transition:width .2s ease}
+.save-overlay-note{margin-top:10px;font-size:10px;color:var(--gray400)}
+@keyframes saveSpin{to{transform:rotate(360deg)}}
+
+
 /* ════ 모바일 화면 최적화 ════ */
 .mobile-scroll-guide,.mobile-card-list{display:none}
 .mobile-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -309,6 +386,11 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 .mobile-edit-field.full{grid-column:1/-1}
 .mobile-edit-control{width:100%;min-height:40px;border:1.5px solid var(--gray200);border-radius:var(--r6);padding:8px 10px;background:var(--white);font-family:inherit;font-size:13px;color:var(--gray800)}
 .mobile-edit-control:focus{outline:none;border-color:var(--blue500)}
+
+@media screen and (max-width:1180px){
+  .criteria-guide-btn{position:static;transform:none;margin:15px auto 0;min-width:190px}
+  .criteria-guide-btn:hover{transform:translateY(-2px)}
+}
 
 @media screen and (max-width:768px){
   html,body{max-width:100%;overflow-x:hidden}
@@ -353,6 +435,20 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   .dash-hero-title{font-size:26px;letter-spacing:-.65px;margin-bottom:8px}
   .dash-hero-sub{font-size:12px;line-height:1.65;margin-bottom:14px;word-break:keep-all}
   .dash-hero-actions{font-size:11px}
+  .criteria-guide-btn{margin-top:13px;min-width:0;width:min(230px,100%);padding:11px 13px;border-radius:12px}
+  .criteria-guide-icon{width:30px;height:30px;font-size:15px}
+  .criteria-guide-text strong{font-size:12px}
+  .criteria-modal-bg{padding:8px}
+  .modal.criteria-modal{width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;max-height:calc(100dvh - 16px);border-radius:12px!important}
+  .criteria-modal-head{padding:12px 13px;gap:8px}
+  .criteria-modal-head-text strong{font-size:14px}
+  .criteria-modal-head-text span{font-size:10px}
+  .criteria-modal-body{padding:10px}
+  .criteria-modal-content table{min-width:900px;font-size:10px}
+  .criteria-modal-content td{padding:7px 8px;font-size:10px;line-height:1.55}
+  .criteria-modal-content td.ct-head{font-size:11px;padding:6px 5px}
+  .criteria-modal-foot{padding:9px 11px;align-items:flex-start;flex-direction:column;gap:6px}
+  .criteria-modal-foot .btn{align-self:flex-end}
   .site-grid{grid-template-columns:1fr;gap:12px;padding:0 10px}
   .site-card{border-radius:13px}
   .site-card:hover{transform:none}
@@ -447,6 +543,9 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   .modal h3{font-size:15px;margin-bottom:14px}
   .modal-btns .btn{min-height:37px;justify-content:center}
   .toast{max-width:calc(100vw - 22px);white-space:normal;text-align:center;font-size:12px;line-height:1.45;padding:9px 14px;bottom:14px}
+  .save-overlay-card{padding:20px 18px 17px;border-radius:13px}
+  .save-overlay-title{font-size:14px}
+  .save-overlay-detail{font-size:11px}
 }
 
 @media screen and (max-width:390px){
@@ -467,7 +566,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   @page :first{ margin-top:8mm; }
 
   /* 숨김 */
-  .topbar,.navbar,.work-toolbar,.td-del,.th-del,.tt,.toast,.modal-bg,
+  .topbar,.navbar,.work-toolbar,.td-del,.th-del,.tt,.toast,.modal-bg,.save-overlay,
   .work-header .btn, .sort-btn, .autoSaveIndicator, .row-order-handle, .qr-access-card { display:none!important; }
 
   /* 전체 폰트/배경 */
@@ -684,6 +783,11 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 <div class="page active" id="page-home">
   <div class="dash-bg">
     <div class="dash-hero">
+      <button type="button" class="criteria-guide-btn" onclick="openCriteriaGuide()" title="작업별 점검기준 보기">
+        <span class="criteria-guide-icon">✓</span>
+        <span class="criteria-guide-text"><strong>작업별 점검기준</strong><small>클릭하여 상세 기준 확인</small></span>
+        <span class="criteria-guide-arrow">↗</span>
+      </button>
       <div class="dash-hero-title">관리감독자<br><span>유해위험작업 대상 현황</span></div>
       <div class="dash-hero-sub">담당 공정 내 유해위험작업 대상 여부를 관리감독자별로 파악합니다 &nbsp;·&nbsp; 산업안전보건법 제16조 / 안전보건규칙 별표3</div>
       <div class="dash-hero-actions">
@@ -807,6 +911,27 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   </div>
 </div>
 
+<!-- 작업별 점검기준 팝업 -->
+<div class="modal-bg criteria-modal-bg" id="criteriaGuideModalBg" onclick="if(event.target===this)closeCriteriaGuide()" aria-hidden="true">
+  <div class="modal criteria-modal" role="dialog" aria-modal="true" aria-labelledby="criteriaGuideTitle">
+    <div class="criteria-modal-head">
+      <span class="criteria-modal-head-icon">✓</span>
+      <span class="criteria-modal-head-text">
+        <strong id="criteriaGuideTitle">작업별 점검기준</strong>
+        <span>관리감독자 점검 시 확인할 주요 항목입니다.</span>
+      </span>
+      <button type="button" class="criteria-modal-close" onclick="closeCriteriaGuide()" aria-label="닫기">✕</button>
+    </div>
+    <div class="criteria-modal-body">
+      <div class="criteria-modal-content" id="criteriaGuideContent"></div>
+    </div>
+    <div class="criteria-modal-foot">
+      <span>※ 육안점검을 기준으로 하며, 필요 시 직접 작동 등을 통한 점검을 실시합니다.</span>
+      <button type="button" class="btn btn-primary btn-sm" onclick="closeCriteriaGuide()">확인</button>
+    </div>
+  </div>
+</div>
+
 <!-- 기준정보 편집 잠금 해제 모달 -->
 <div class="modal-bg" id="masterEditPwModalBg">
   <div class="modal" style="max-width:340px">
@@ -888,10 +1013,45 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   <div class="tt-body" id="ttBody"></div>
 </div>
 
+<!-- 저장 진행 오버레이 -->
+<div class="save-overlay" id="saveOverlay" aria-hidden="true">
+  <div class="save-overlay-card" id="saveOverlayCard" role="status" aria-live="polite">
+    <div class="save-overlay-spinner"></div>
+    <div class="save-overlay-title" id="saveOverlayTitle">변경사항 저장 중...</div>
+    <div class="save-overlay-detail" id="saveOverlayDetail">서버에 안전하게 반영하고 있습니다.</div>
+    <div class="save-overlay-progress"><div class="save-overlay-progress-bar" id="saveOverlayBar"></div></div>
+    <div class="save-overlay-note">저장이 완료되면 자동으로 닫힙니다. 화면을 닫지 마세요.</div>
+  </div>
+</div>
+
 <!-- 토스트 -->
 <div class="toast" id="toast"></div>
 
 <script>
+/* ══════════════════════════════════════════
+   대시보드 작업별 점검기준 팝업
+══════════════════════════════════════════ */
+function openCriteriaGuide(){
+  const bg = document.getElementById('criteriaGuideModalBg');
+  const source = document.getElementById('checkCriteriaTable');
+  const target = document.getElementById('criteriaGuideContent');
+  if(!bg || !source || !target) return;
+  if(!target.innerHTML.trim()) target.innerHTML = source.innerHTML;
+  bg.classList.add('show');
+  bg.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+}
+function closeCriteriaGuide(){
+  const bg = document.getElementById('criteriaGuideModalBg');
+  if(!bg) return;
+  bg.classList.remove('show');
+  bg.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') closeCriteriaGuide();
+});
+
 /* ══════════════════════════════════════════
    GAS URL
 ══════════════════════════════════════════ */
@@ -968,7 +1128,9 @@ let unlockedMasterSites = new Set();  // 기준정보 편집 인증된 사업장
 let editPwCallback = null;
 let masterPwCallback = null;
 let gasSeq = 0;
-const SAVE_CHUNK_SIZE = 15;
+// JSONP는 GET URL 길이 제한을 받으므로 한 번에 보내는 URL을 안전 범위로 제한합니다.
+const MAX_JSONP_URL_LENGTH = 5200;
+const SAVE_CHUNK_ROW_CAP = 50;
 
 function sd(s){ return siteData[s||curSite]; }
 function getMaster(key, s){ return sd(s||curMasterSite).master[key]; }
@@ -1832,38 +1994,116 @@ function pingGAS(){
   });
 }
 
-function rowPayloadForSite(site){
-  return (siteData[site]?.rows || []).map(r=>({ site:site, team:r.team, process:r.process, position:r.position, empno:r.empno, name:r.name,
-    ...Object.fromEntries(MACHINES.map(m=>[m.id,r.machines[m.id]?'O':''])),
-    total:MACHINES.filter(m=>r.machines[m.id]).length, bigo:r.bigo, date:r.date }));
+function compactValue(obj, key, value){
+  if(value !== undefined && value !== null && String(value) !== '') obj[key] = value;
 }
 
-function saveRowsForSite(site, cb){
+// payload 최적화: 빈 값과 각 행의 중복 사업장명을 제거합니다.
+// GAS의 rowsToValues()는 누락된 필드를 빈 값으로 처리하므로 기존 백엔드와 호환됩니다.
+function rowPayloadForSite(site){
+  return (siteData[site]?.rows || []).map(r=>{
+    const out = {};
+    compactValue(out, 'team', r.team);
+    compactValue(out, 'process', r.process);
+    compactValue(out, 'position', r.position);
+    compactValue(out, 'empno', r.empno);
+    compactValue(out, 'name', r.name);
+    MACHINES.forEach(m=>{ if(r.machines[m.id]) out[m.id] = 'O'; });
+    const total = MACHINES.filter(m=>r.machines[m.id]).length;
+    if(total) out.total = total;
+    compactValue(out, 'bigo', r.bigo);
+    compactValue(out, 'date', r.date);
+    return out;
+  });
+}
+
+function estimateGasUrlLength(action, params){
+  let qs = 'action=' + encodeURIComponent(action) + '&callback=' + encodeURIComponent('gcb_0000000000000_000_abcdefghijkl');
+  Object.entries(params || {}).forEach(([k,v])=>{
+    qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(String(v));
+  });
+  return (GAS_URL + '?' + qs).length;
+}
+
+// 행 수뿐 아니라 실제 인코딩된 URL 길이를 기준으로 청크를 나눕니다.
+function buildSaveChunks(site, rows){
+  const chunks = [];
+  let current = [];
+  rows.forEach(row=>{
+    const candidate = current.concat([row]);
+    const data = JSON.stringify({site:site, rows:candidate});
+    const tooLong = estimateGasUrlLength('appendRows', {data:data}) > MAX_JSONP_URL_LENGTH;
+    const tooMany = candidate.length > SAVE_CHUNK_ROW_CAP;
+    if(current.length && (tooLong || tooMany)){
+      chunks.push(current);
+      current = [row];
+    } else {
+      current = candidate;
+    }
+  });
+  if(current.length) chunks.push(current);
+  return chunks;
+}
+
+function saveRowsForSite(site, cb, onProgress){
   const rows = rowPayloadForSite(site);
+  const report = (done,total,detail) => {
+    if(typeof onProgress === 'function') onProgress(done,total,detail||'');
+  };
+  const payload = JSON.stringify({site:site, rows:rows});
+
+  // 대부분의 사업장은 기존 GAS의 save 액션 한 번으로 교체 저장합니다.
+  // GET 주소가 안전 범위 안에 있으면 clearSite + appendRows 반복 호출이 필요하지 않습니다.
+  if(estimateGasUrlLength('save', {data:payload}) <= MAX_JSONP_URL_LENGTH){
+    report(0,1,'데이터 전송 중...');
+    gasCall('save',{data:payload},res=>{
+      if(res?.result!=='success'){
+        if(typeof cb === 'function') cb({result:'error', error:res?.error||'save 실패', site});
+        return;
+      }
+      report(1,1,'저장 완료');
+      if(typeof cb === 'function') cb({result:'success', count:Number(res.count)||rows.length, site});
+    });
+    return;
+  }
+
+  // 데이터가 많은 사업장만 URL 길이에 맞추어 여러 번 나누어 저장합니다.
+  const chunks = buildSaveChunks(site, rows);
+  const oversized = chunks.find(chunk=>estimateGasUrlLength('appendRows', {data:JSON.stringify({site:site, rows:chunk})}) > MAX_JSONP_URL_LENGTH);
+  if(oversized){
+    if(typeof cb === 'function') cb({result:'error', error:'입력 내용이 너무 긴 행이 있습니다. 비고 내용을 줄인 뒤 다시 저장하세요.', site});
+    return;
+  }
+
+  const totalSteps = chunks.length + 1;
+  report(0,totalSteps,'기존 데이터 정리 중...');
   gasCall('clearSite',{site:site},res=>{
     if(res?.result!=='success'){
       if(typeof cb === 'function') cb({result:'error', error:res?.error||'clearSite 실패', site});
       return;
     }
+    report(1,totalSteps,'데이터 분할 전송 준비 중...');
     if(!rows.length){
       if(typeof cb === 'function') cb({result:'success', count:0, site});
       return;
     }
+
     let idx = 0;
     let saved = 0;
     const sendNext = () => {
-      const chunk = rows.slice(idx, idx + SAVE_CHUNK_SIZE);
-      if(!chunk.length){
+      const chunk = chunks[idx++];
+      if(!chunk){
         if(typeof cb === 'function') cb({result:'success', count:saved, site});
         return;
       }
-      idx += SAVE_CHUNK_SIZE;
+      report(idx,totalSteps,'데이터 저장 중... ('+idx+'/'+chunks.length+')');
       gasCall('appendRows',{data:JSON.stringify({site:site, rows:chunk})},r=>{
         if(r?.result!=='success'){
           if(typeof cb === 'function') cb({result:'error', error:r?.error||'appendRows 실패', site});
           return;
         }
         saved += Number(r.count)||chunk.length;
+        report(idx+1,totalSteps,'데이터 저장 중... ('+idx+'/'+chunks.length+')');
         sendNext();
       });
     };
@@ -1872,11 +2112,18 @@ function saveRowsForSite(site, cb){
 }
 
 function saveToGAS(){
+  beginSaveOverlay('변경사항 저장 중...', curSite+' 데이터를 서버에 반영하고 있습니다.');
   toast('저장 중...','');
   saveRowsForSite(curSite, res=>{
     if(res?.result==='success'){
+      finishSaveOverlay(true, '저장 완료', res.count+'건을 안전하게 반영했습니다.');
       toast('✅ 저장 완료 ('+res.count+'건)','ok'); setGasOk(); renderDashboard();
-    } else toast('❌ 저장 실패: '+(res?.error||'오류'),'err');
+    } else {
+      finishSaveOverlay(false, '저장하지 못했습니다', res?.error||'오류');
+      toast('❌ 저장 실패: '+(res?.error||'오류'),'err');
+    }
+  }, (done,total,detail)=>{
+    setSaveOverlayProgress(total ? Math.round(done/total*100) : 0, curSite+' · '+detail);
   });
 }
 function saveAllToGAS(){ autoSaveAll(); }
@@ -2125,6 +2372,62 @@ function printPDF(){
    유틸
 ══════════════════════════════════════════ */
 function today(){ return new Date().toLocaleDateString('ko-KR'); }
+let saveOverlayShowTimer = null;
+let saveOverlayHideTimer = null;
+let saveOverlayPending = false;
+let saveOverlayVisibleAt = 0;
+
+function beginSaveOverlay(title, detail){
+  const el = document.getElementById('saveOverlay');
+  const card = document.getElementById('saveOverlayCard');
+  if(!el || !card) return;
+  saveOverlayPending = true;
+  clearTimeout(saveOverlayShowTimer);
+  clearTimeout(saveOverlayHideTimer);
+  card.className = 'save-overlay-card';
+  document.getElementById('saveOverlayTitle').textContent = title || '변경사항 저장 중...';
+  document.getElementById('saveOverlayDetail').textContent = detail || '서버에 안전하게 반영하고 있습니다.';
+  document.getElementById('saveOverlayBar').style.width = '4%';
+
+  // 짧은 저장은 화면을 깜빡이게 하지 않고, 지연될 때만 표시합니다.
+  saveOverlayShowTimer = setTimeout(()=>{
+    if(!saveOverlayPending) return;
+    el.classList.add('show');
+    el.setAttribute('aria-hidden','false');
+    saveOverlayVisibleAt = Date.now();
+  }, 280);
+}
+
+function setSaveOverlayProgress(percent, detail){
+  const bar = document.getElementById('saveOverlayBar');
+  const txt = document.getElementById('saveOverlayDetail');
+  if(bar) bar.style.width = Math.max(4, Math.min(100, Number(percent)||0))+'%';
+  if(txt && detail) txt.textContent = detail;
+}
+
+function finishSaveOverlay(success, title, detail){
+  const el = document.getElementById('saveOverlay');
+  const card = document.getElementById('saveOverlayCard');
+  saveOverlayPending = false;
+  clearTimeout(saveOverlayShowTimer);
+  clearTimeout(saveOverlayHideTimer);
+  if(!el || !card) return;
+
+  document.getElementById('saveOverlayTitle').textContent = title || (success?'저장 완료':'저장 오류');
+  document.getElementById('saveOverlayDetail').textContent = detail || (success?'변경사항을 반영했습니다.':'잠시 후 다시 시도해 주세요.');
+  document.getElementById('saveOverlayBar').style.width = success?'100%':'35%';
+  card.className = 'save-overlay-card '+(success?'done':'err');
+
+  if(!el.classList.contains('show')) return;
+  const minRemain = Math.max(0, 620 - (Date.now()-saveOverlayVisibleAt));
+  const resultHold = success ? 380 : 900;
+  saveOverlayHideTimer = setTimeout(()=>{
+    el.classList.remove('show');
+    el.setAttribute('aria-hidden','true');
+    card.className = 'save-overlay-card';
+  }, Math.max(minRemain, resultHold));
+}
+
 let toastT;
 function toast(msg,type){ const el=document.getElementById('toast'); el.textContent=msg; el.className='toast show'+(type?' '+type:''); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),2800); }
 
@@ -2294,6 +2597,8 @@ function updateLockUI(){
 ══════════════════════════════════════════ */
 let autoSaveTimer = null;
 let isSyncing = false;
+let saveQueued = false;
+const dirtySites = new Set();
 
 function setSyncMsg(msg, color){
   const el = document.getElementById('autoSyncMsg');
@@ -2302,37 +2607,72 @@ function setSyncMsg(msg, color){
   if(ind){ ind.textContent = msg; ind.style.color = color||'var(--gray400)'; }
 }
 
-// 데이터 변경 시 호출 → 2초 디바운스 후 자동 저장
-function triggerAutoSave(){
+// 데이터 변경 시 호출 → 2초 디바운스 후 변경된 사업장만 자동 저장
+function triggerAutoSave(site){
+  const target = String(site || curSite || '').trim();
+  if(target) dirtySites.add(target);
   clearTimeout(autoSaveTimer);
   setSyncMsg('● 변경사항 있음...', 'var(--orange500)');
+  if(isSyncing) saveQueued = true;
   autoSaveTimer = setTimeout(()=>{ autoSaveAll(); }, 2000);
 }
 
 function autoSaveAll(){
   if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
-  if(isSyncing) return;
+  if(isSyncing){ saveQueued = true; return; }
+
+  const targets = [...dirtySites].filter(s=>siteData[s] && !isDeprecatedSite(s));
+  if(!targets.length) return;
+  targets.forEach(s=>dirtySites.delete(s));
+
   isSyncing = true;
   setSyncMsg('↑ 저장 중...', 'var(--blue500)');
-  let pending = sites.length;
+  beginSaveOverlay('변경사항 저장 중...', targets.length>1 ? targets.length+'개 사업장을 순서대로 저장하고 있습니다.' : targets[0]+' 데이터를 서버에 반영하고 있습니다.');
+  let idx = 0;
   let hasError = false;
-  if(pending === 0){ onSaveDone(false); return; }
-  sites.forEach(s=>{
-    saveRowsForSite(s,res=>{
-      if(res?.result!=='success') hasError=true;
-      pending--;
-      if(pending===0) onSaveDone(hasError);
+  let lastError = '';
+
+  // GAS 요청을 동시에 몰아 보내지 않고 사업장별로 순차 저장합니다.
+  const saveNext = () => {
+    const siteIndex = idx;
+    const site = targets[idx++];
+    if(!site){ onSaveDone(hasError, lastError); return; }
+    saveRowsForSite(site,res=>{
+      if(res?.result!=='success'){
+        hasError = true;
+        lastError = res?.error || '저장 오류';
+        dirtySites.add(site); // 다음 수정 또는 수동 저장 시 다시 시도
+      }
+      saveNext();
+    }, (done,total,detail)=>{
+      const withinSite = total ? done/total : 0;
+      const overall = ((siteIndex + withinSite) / targets.length) * 100;
+      setSaveOverlayProgress(Math.round(overall), site+' · '+detail);
     });
-  });
+  };
+  saveNext();
 }
 
-function onSaveDone(hasError){
+function onSaveDone(hasError, lastError){
   isSyncing = false;
   if(hasError){
     setSyncMsg('● 저장 오류', 'var(--red500)');
+    finishSaveOverlay(false, '저장하지 못했습니다', lastError || '잠시 후 다시 시도해 주세요.');
+    toast('❌ 저장 오류: '+(lastError||'잠시 후 다시 시도해 주세요.'),'err');
   } else {
     setGasOk();
     setSyncMsg('✓ 저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
+  }
+
+  // 저장 중에 사용자가 추가로 수정한 경우에만 한 번 더 저장합니다.
+  // 서버 오류가 발생했을 때 무한 재시도하여 화면이 계속 대기 상태가 되는 현상을 방지합니다.
+  if(saveQueued || (!hasError && dirtySites.size)){
+    saveQueued = false;
+    setSaveOverlayProgress(98, '추가 변경사항을 확인하고 있습니다...');
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(()=>{ autoSaveAll(); }, 550);
+  } else if(!hasError){
+    finishSaveOverlay(true, '저장 완료', '변경사항을 안전하게 반영했습니다.');
   }
 }
 
