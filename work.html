@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>관리감독자 유해위험작업 현황</title>
+<title>관리감독자 유해위험작업 관리 현황</title>
 <style>
 :root {
   --blue50:#f0f4ff; --blue100:#d6e4ff; --blue500:#3182f6; --blue600:#1b6ef3;
@@ -133,15 +133,6 @@ body{font-family:'Malgun Gothic','맑은 고딕',-apple-system,sans-serif;font-s
 .site-add-card:hover{border-color:var(--blue500);color:var(--blue500);background:rgba(240,244,255,.8);transform:translateY(-4px)}
 .site-add-icon{font-size:32px;line-height:1}
 .site-add-txt{font-size:13px;font-weight:700}
-
-/* 접속 QR 카드 — PC 대시보드 우측 여유 공간에 표시 */
-.qr-access-card{background:rgba(255,255,255,.96);border:1px solid var(--gray200);border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100%;transition:all .18s}
-.qr-access-card:hover{box-shadow:0 8px 32px rgba(49,130,246,.13);transform:translateY(-4px);border-color:var(--blue100)}
-.qr-access-inner{width:100%;padding:22px 22px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.qr-access-title{font-size:18px;font-weight:800;color:var(--gray900);letter-spacing:-.35px;margin-bottom:13px}
-.qr-access-img-wrap{width:min(190px,78%);aspect-ratio:1/1;padding:10px;background:#fff;border:1px solid var(--gray200);border-radius:13px;box-shadow:0 2px 10px rgba(15,23,42,.07)}
-.qr-access-img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
-.qr-access-note{margin-top:12px;font-size:11px;color:var(--gray500);line-height:1.55;word-break:keep-all}
 
 /* ════ 현황 페이지 ════ */
 .work-header{padding:16px 24px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -365,8 +356,6 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   .machine-chip{font-size:10px;padding:2px 7px}
   .site-card-footer{padding:10px 17px}
   .site-goto{font-size:11px;padding:5px 12px}
-  /* QR은 PC 화면에서 모바일 접속을 돕기 위한 카드이므로 모바일에서는 숨김 */
-  .qr-access-card{display:none}
 
   /* 사업장 상세 헤더 */
   .work-header{padding:9px 8px;gap:6px;align-items:center}
@@ -467,7 +456,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 
   /* 숨김 */
   .topbar,.navbar,.work-toolbar,.td-del,.th-del,.tt,.toast,.modal-bg,
-  .work-header .btn, .sort-btn, .autoSaveIndicator, .row-order-handle, .qr-access-card { display:none!important; }
+  .work-header .btn, .sort-btn, .autoSaveIndicator, .row-order-handle { display:none!important; }
 
   /* 전체 폰트/배경 */
   body{ font-size:7.5pt!important; background:#fff!important; color:#000!important;
@@ -642,7 +631,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
       </svg>
     </div>
     <div class="ld-title">
-      <h1>유해위험작업 <span>대상 현황</span></h1>
+      <h1>유해위험작업 <span>관리 현황</span></h1>
       <p>관리감독자 지정 관리 시스템</p>
     </div>
     <div class="ld-progress-wrap">
@@ -683,7 +672,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 <div class="page active" id="page-home">
   <div class="dash-bg">
     <div class="dash-hero">
-      <div class="dash-hero-title">관리감독자<br><span>유해위험작업 대상 현황</span></div>
+      <div class="dash-hero-title">관리감독자<br><span>유해위험작업 대상 관리 현황</span></div>
       <div class="dash-hero-sub">담당 공정 내 유해위험작업 대상 여부를 관리감독자별로 파악합니다 &nbsp;·&nbsp; 산업안전보건법 제16조 / 안전보건규칙 별표3</div>
       <div class="dash-hero-actions">
         <span id="autoSyncMsg" style="font-size:12px;color:var(--gray400)">● 자동 동기화 대기 중...</span>
@@ -703,7 +692,6 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
       <button class="btn btn-primary btn-sm" id="addRowBtn" onclick="addRow()">+ 행 추가</button>
       <button class="btn btn-sm btn-primary" id="lockBtn" onclick="isUnlocked()?lockSite():requireAuth(()=>{})">🔒 편집</button>
       <button class="btn btn-sm" id="autoSaveIndicator" style="color:var(--gray400);cursor:default">● 자동저장</button>
-      <button class="btn btn-sm" onclick="exportExcel()">엑셀</button>
       <button class="btn btn-sm" onclick="printPDF()">PDF</button>
     </div>
   </div>
@@ -716,7 +704,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
     <button class="btn btn-sm" onclick="pingGAS()" title="GAS 서버 연결 확인">🔌 연결확인</button>
     <span class="hint">기계명 클릭→점검기준 &nbsp;|&nbsp; 편집 후 No. 영역의 ⠿ 드래그→행 순서 변경 &nbsp;|&nbsp; Tab·방향키 이동 &nbsp;|&nbsp; 스페이스바 체크</span>
   </div>
-  <div class="mobile-scroll-guide"><span>↔</span><span>모바일 카드에서 작업 대상을 바로 확인하고 선택할 수 있습니다. 상세 표는 PC 화면과 PDF·엑셀 출력에 유지됩니다.</span></div>
+  <div class="mobile-scroll-guide"><span>↔</span><span>모바일 카드에서 작업 대상을 바로 확인하고 선택할 수 있습니다. 상세 표는 PC 화면과 PDF 출력에 유지됩니다.</span></div>
   <div class="print-head" id="printHead"><h2 id="printTitle"></h2><p id="printSub"></p></div>
   <div class="mobile-card-list" id="mobileCardList"></div>
 
@@ -1059,15 +1047,7 @@ function renderDashboard(){
       </div>
     </div>`;
   }).join('') +
-  `<div class="qr-access-card" aria-label="모바일 접속 QR 코드">
-    <div class="qr-access-inner">
-      <div class="qr-access-title">접속 QR</div>
-      <div class="qr-access-img-wrap">
-        <img class="qr-access-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZoAAAGaAQAAAAAefbjOAAADGklEQVR4nO2cTW7cMAxGH2sBXtpADjBHkW/QI/VMuYF9lB4ggLUcwMbXhaT5SbpoMIU9iamFZwbwQyiAIMWPVEx8ek0/Ps+AQw455JBDDjn0PSErKwCsBilwfdiQ6gvDLuY5tD0UJUkz2JBamfXAdFpg6gFoJEm6h7Yzz6HtoFA+Uw/xFaA7G3RvJlJYLApEAoNm2dw8h/aHJmtFnBsRtaCRteaK//2XHPoSkEaAqV+NKR8rmo+KxRfbk0OfWTVrdAISQDcDqZXF+QWLry85V9z6xZPvyaH/AE1mZtaD/fodIM7vXltzqbGXeQ5tHSNuA0BXzo8iXR7cZ44n35NDj0M2AFWAMGPqVzM7LdiQw0PIYWQn8xzaqfqkW9DUX4pM1lBjhFefx4SSmf1SjQxZqzpJOXjEefUYcQCIokV2Cxo7CbqiXlYd87b6zMrl+OR7cugRqHpElR2qC7x7gKSleIl7xPeHsi4VJZn1q+XqM2rJuSKHjNLh2MM8hzaPETeRIc6gMbe2lvJthKxReNb4/tAla5CDQkkOc0kTxQU6XXod7hGHgKS5kcbUlrqCTippIpnZwGpX6eqL7MmhR/QIozubpp9nI76Cpv4tiBQwAJFaMZnrEUeAikIVXwMGrQBhECBqDYI1QHc273QdBArXr4LVqgu8BQMwulmQXlSixcbmObQb1C2YWSsbUkD63eZTZJ6ztNNCGa7ayTyHNodSK0lnY8r9Lbhq11IWsBufszwAVKrPeFNzXgZsaWqgoClCt+sRh4FSm1saZmZWFKoZNKaAxu5s5ZWdzHNoM+imr3Htal1lqhw8gNr48hhxDCi7AN2SXSDf1yjrkjqS3+A5AlQVqryaJQeJOK75J1P/FiDdj98++Z4cegS6nCxLu+va37ptc1wTi2eN7w5Vj5iBePEI1Ut/ZYoGKKM07hGHgyZrZWYBs5NkQ7La5EoBG/Y2z6EdoDoi8+7SRpRrlkeAPt7polksK9aphziuuQvKZK5ZHgH6i0i5lBPF2F1PlsvdAM2T78mhR6C7Lvc/Lv/PZA455JBDDjnkEMAfw9YR1n1dtlwAAAAASUVORK5CYII=" alt="https://maeil-esh.github.io/Portal/work.html 접속 QR 코드">
-      </div>
-      <div class="qr-access-note">휴대전화 카메라로 스캔하여<br>모바일 화면에 접속하세요.</div>
-    </div>
-  </div>`;
+``;  // 추가 카드 제거
 
   document.getElementById('totalBadge').textContent = `전체 ${totalAll}명`;
 }
@@ -1957,153 +1937,10 @@ function loadAllFromGAS(){
 }
 
 /* ══════════════════════════════════════════
-   엑셀 / PDF
+   PDF
 ══════════════════════════════════════════ */
-let xlsxStyleLoadStarted = false;
-function loadXlsxStyle(){
-  if(window.XLSX || xlsxStyleLoadStarted) return;
-  xlsxStyleLoadStarted = true;
-  const s = document.createElement('script');
-  s.src = 'https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';
-  s.onload = ()=>toast('엑셀 출력 모듈 준비 완료','ok');
-  s.onerror = ()=>{ xlsxStyleLoadStarted=false; toast('엑셀 출력 모듈을 불러오지 못했습니다','err'); };
-  document.head.appendChild(s);
-}
+function printPDF(){
 
-function excelCell(ws, r, c){
-  const addr = XLSX.utils.encode_cell({r,c});
-  if(!ws[addr]) ws[addr] = { t:'s', v:'' };
-  return ws[addr];
-}
-function excelStyleRange(ws, sr, sc, er, ec, style){
-  for(let r=sr;r<=er;r++) for(let c=sc;c<=ec;c++) excelCell(ws,r,c).s = style;
-}
-function excelMerge(ws, sr, sc, er, ec){
-  ws['!merges'] = ws['!merges'] || [];
-  ws['!merges'].push({s:{r:sr,c:sc},e:{r:er,c:ec}});
-}
-function excelBorder(color='C9CED6', style='thin'){
-  return {top:{style,color:{rgb:color}},bottom:{style,color:{rgb:color}},left:{style,color:{rgb:color}},right:{style,color:{rgb:color}}};
-}
-function excelCriteriaText(mid){
-  const m=MACHINES.find(x=>x.id===mid);
-  return m ? m.items.map(v=>'- '+v).join('\n') : '';
-}
-
-function exportExcel(){
-  const dept=document.getElementById('filterDept').value;
-  const q=document.getElementById('searchBox').value.trim().toLowerCase();
-  const rows=sd().rows.filter(r=>(!dept||r.team===dept)&&(!q||r.name.toLowerCase().includes(q)||r.empno.toLowerCase().includes(q)||r.team.toLowerCase().includes(q)||r.process.toLowerCase().includes(q)));
-  if(!rows.length){ toast('데이터가 없습니다','err'); return; }
-  if(typeof XLSX==='undefined'){
-    loadXlsxStyle();
-    toast('엑셀 출력 모듈 로딩 중입니다. 잠시 후 다시 눌러 주세요.','');
-    return;
-  }
-
-  const wb=XLSX.utils.book_new();
-  wb.Props={Title:curSite+' 관리감독자 유해위험작업 대상 현황',Subject:'관리감독자 지정 관리 시스템',Author:'유해위험작업 대상 현황',CreatedDate:new Date()};
-
-  const machineLabels=MACHINES.map(m=>m.label.replace('\n',' '));
-  const totalCols=19; // No. + 기본정보 5 + 계 + 기계 11 + 수정일
-  const lastCol=XLSX.utils.encode_col(totalCols-1);
-  const title=curSite+' 관리감독자 유해위험작업 대상 현황'+(dept?' ['+dept+']':'');
-  const sub='출력일: '+new Date().toLocaleDateString('ko-KR')+'  ·  사업장: '+curSite+'  ·  총 '+rows.length+'명';
-  const main=[];
-  main.push([title]);
-  main.push([sub]);
-  main.push([]);
-  main.push(['No.','팀','공정명','직책','사번','이름','유해위험작업 대상','','','','','','','','','','','','수정일']);
-  main.push(['','','','','','','계',...machineLabels,'']);
-  rows.forEach((r,idx)=>main.push([
-    idx+1,r.team,r.process,r.position,r.empno,r.name,
-    MACHINES.filter(m=>r.machines[m.id]).length,
-    ...MACHINES.map(m=>r.machines[m.id]?'✓':''),r.date
-  ]));
-  const totalRowIdx=main.length;
-  main.push(['합계','','','','','',
-    rows.reduce((sum,r)=>sum+MACHINES.filter(m=>r.machines[m.id]).length,0),
-    ...MACHINES.map(m=>rows.filter(r=>r.machines[m.id]).length),'']);
-
-  const ws=XLSX.utils.aoa_to_sheet(main);
-  excelMerge(ws,0,0,0,totalCols-1);
-  excelMerge(ws,1,0,1,totalCols-1);
-  for(let c=0;c<=5;c++) excelMerge(ws,3,c,4,c);
-  excelMerge(ws,3,6,3,17);
-  excelMerge(ws,3,18,4,18);
-  excelMerge(ws,totalRowIdx,0,totalRowIdx,5);
-
-  const thinBorder=excelBorder('C9CED6','thin');
-  const darkHeader={font:{name:'맑은 고딕',sz:10,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'333D4B'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:excelBorder('667085','thin')};
-  const midHeader={font:{name:'맑은 고딕',sz:9,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'4E5968'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:excelBorder('667085','thin')};
-  const blueGroupHeader={font:{name:'맑은 고딕',sz:10,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'2864A8'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:excelBorder('667085','thin')};
-  const bodyCenter={font:{name:'맑은 고딕',sz:9,color:{rgb:'333D4B'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:thinBorder};
-  const bodyLeft={font:{name:'맑은 고딕',sz:9,color:{rgb:'333D4B'}},alignment:{horizontal:'left',vertical:'center',wrapText:true},border:thinBorder};
-  const bodyAlt={font:{name:'맑은 고딕',sz:9,color:{rgb:'333D4B'}},fill:{patternType:'solid',fgColor:{rgb:'F7F7F7'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:thinBorder};
-  const bodyAltLeft={font:{name:'맑은 고딕',sz:9,color:{rgb:'333D4B'}},fill:{patternType:'solid',fgColor:{rgb:'F7F7F7'}},alignment:{horizontal:'left',vertical:'center',wrapText:true},border:thinBorder};
-  const countStyle={font:{name:'맑은 고딕',sz:9,bold:true,color:{rgb:'1B6EF3'}},fill:{patternType:'solid',fgColor:{rgb:'F0F4FF'}},alignment:{horizontal:'center',vertical:'center'},border:thinBorder};
-  const checkedStyle={font:{name:'맑은 고딕',sz:10,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'3182F6'}},alignment:{horizontal:'center',vertical:'center'},border:thinBorder};
-  const totalStyle={font:{name:'맑은 고딕',sz:9,bold:true,color:{rgb:'333D4B'}},fill:{patternType:'solid',fgColor:{rgb:'E5E8EB'}},alignment:{horizontal:'center',vertical:'center'},border:excelBorder('AEB4BC','thin')};
-
-  excelStyleRange(ws,3,0,3,18,darkHeader);
-  excelStyleRange(ws,4,0,4,18,midHeader);
-  // rowspan으로 보이는 헤더는 동일한 진한 배경 유지
-  [0,1,2,3,4,5,18].forEach(c=>excelStyleRange(ws,3,c,4,c,darkHeader));
-  // 상위 작업대상 그룹은 화면과 동일하게 파란색으로 강조
-  excelStyleRange(ws,3,6,3,17,blueGroupHeader);
-
-  for(let r=5;r<totalRowIdx;r++){
-    const alt=(r-5)%2===1;
-    for(let c=0;c<totalCols;c++){
-      excelCell(ws,r,c).s = (c===1||c===2) ? (alt?bodyAltLeft:bodyLeft) : (alt?bodyAlt:bodyCenter);
-    }
-    excelCell(ws,r,6).s=countStyle;
-    for(let c=7;c<=17;c++) if(excelCell(ws,r,c).v==='✓') excelCell(ws,r,c).s=checkedStyle;
-  }
-  excelStyleRange(ws,totalRowIdx,0,totalRowIdx,18,totalStyle);
-  excelCell(ws,0,0).s={font:{name:'맑은 고딕',sz:14,bold:true,color:{rgb:'191F28'}},alignment:{horizontal:'center',vertical:'center'}};
-  excelCell(ws,1,0).s={font:{name:'맑은 고딕',sz:9,color:{rgb:'6B7684'}},alignment:{horizontal:'center',vertical:'center'}};
-
-  ws['!cols']=[
-    {wch:5},{wch:13},{wch:15},{wch:9},{wch:11},{wch:10},{wch:6},
-    ...MACHINES.map(m=>({wch:(m.id==='compressor'||m.id==='radiation'?8:7)})),{wch:14}
-  ];
-  ws['!rows']=[{hpt:25},{hpt:17},{hpt:6},{hpt:22},{hpt:28},...rows.map(()=>({hpt:20})),{hpt:20}];
-  ws['!pageSetup']={orientation:'landscape',paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:0};
-  ws['!margins']={left:0.25,right:0.25,top:0.3,bottom:0.3,header:0.1,footer:0.1};
-  ws['!ref']='A1:'+lastCol+(totalRowIdx+1);
-  XLSX.utils.book_append_sheet(wb,ws,'유해위험작업현황');
-
-  // PDF의 4열 카드형 배치를 그대로 옮긴 작업별 점검기준 시트
-  const criteria=[
-    ['▶ 작업별 점검기준'],
-    [],
-    ['호이스트','컨베이어','산업용로봇','리프트'],
-    [excelCriteriaText('hoist'),excelCriteriaText('conveyor'),excelCriteriaText('robot'),excelCriteriaText('lift')],
-    ['프레스','공기압축기','지게차','용접/절단'],
-    [excelCriteriaText('press'),excelCriteriaText('compressor'),excelCriteriaText('forklift'),excelCriteriaText('welding')],
-    ['와이어로프 등 (체인, 벨트 포함)','중량물','방사선기기',''],
-    [excelCriteriaText('wire'),excelCriteriaText('heavy'),excelCriteriaText('radiation'),'※ 육안점검을 기준으로 함.\n필요 시 직접 작동 등을 통한 점검 실시.']
-  ];
-  const ws2=XLSX.utils.aoa_to_sheet(criteria);
-  excelMerge(ws2,0,0,0,3);
-  const criteriaHead={font:{name:'맑은 고딕',sz:10,bold:true,color:{rgb:'191F28'}},fill:{patternType:'solid',fgColor:{rgb:'E8E8E8'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:excelBorder('999999','thin')};
-  const criteriaBody={font:{name:'맑은 고딕',sz:9,color:{rgb:'333333'}},alignment:{horizontal:'left',vertical:'top',wrapText:true},border:excelBorder('999999','thin')};
-  const criteriaNote={font:{name:'맑은 고딕',sz:8,color:{rgb:'555555'}},alignment:{horizontal:'left',vertical:'bottom',wrapText:true},border:excelBorder('999999','thin')};
-  excelCell(ws2,0,0).s={font:{name:'맑은 고딕',sz:12,bold:true,color:{rgb:'191F28'}},alignment:{horizontal:'left',vertical:'center'},border:{top:{style:'medium',color:{rgb:'222222'}}}};
-  [2,4,6].forEach(r=>excelStyleRange(ws2,r,0,r,3,criteriaHead));
-  [3,5,7].forEach(r=>excelStyleRange(ws2,r,0,r,3,criteriaBody));
-  excelCell(ws2,7,3).s=criteriaNote;
-  ws2['!cols']=[{wch:34},{wch:34},{wch:34},{wch:34}];
-  ws2['!rows']=[{hpt:23},{hpt:6},{hpt:22},{hpt:88},{hpt:22},{hpt:178},{hpt:26},{hpt:128}];
-  ws2['!pageSetup']={orientation:'landscape',paperSize:9,fitToPage:true,fitToWidth:1,fitToHeight:1};
-  ws2['!margins']={left:0.25,right:0.25,top:0.3,bottom:0.3,header:0.1,footer:0.1};
-  ws2['!ref']='A1:D8';
-  XLSX.utils.book_append_sheet(wb,ws2,'작업별점검기준');
-
-  XLSX.writeFile(wb,curSite+'_유해위험작업현황_'+today()+'.xlsx',{bookType:'xlsx',cellStyles:true});
-  toast('엑셀 다운로드 완료','ok');
-}
 function printPDF(){
   const dept = document.getElementById('filterDept').value;
   document.getElementById('printTitle').textContent =
