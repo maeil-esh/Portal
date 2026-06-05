@@ -338,18 +338,19 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 .toast.ok{background:var(--green500)}.toast.err{background:var(--red500)}
 
 
-/* ════ 저장 진행 오버레이 ════ */
+/* ════ 저장 진행 알림 — 입력을 막지 않는 비차단 방식 ════ */
 .save-overlay{
   display:none;position:fixed;inset:0;z-index:99998;
-  align-items:center;justify-content:center;padding:20px;
-  background:rgba(25,31,40,.24);backdrop-filter:blur(2px);
+  align-items:flex-end;justify-content:flex-end;padding:18px;
+  background:transparent;backdrop-filter:none;
+  pointer-events:none; /* 자동저장 중에도 표 입력·체크 선택을 계속 허용 */
 }
 .save-overlay.show{display:flex}
 .save-overlay-card{
-  width:min(360px,calc(100vw - 34px));padding:23px 22px 20px;
-  border:1px solid rgba(229,232,235,.95);border-radius:15px;
-  background:rgba(255,255,255,.98);box-shadow:0 16px 48px rgba(15,23,42,.18);
-  text-align:center;
+  width:min(320px,calc(100vw - 26px));padding:17px 18px 15px;
+  border:1px solid rgba(229,232,235,.98);border-radius:13px;
+  background:rgba(255,255,255,.98);box-shadow:0 12px 34px rgba(15,23,42,.16);
+  text-align:center;pointer-events:none;
 }
 .save-overlay-spinner{
   width:38px;height:38px;margin:0 auto 14px;border-radius:50%;
@@ -543,9 +544,13 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   .modal h3{font-size:15px;margin-bottom:14px}
   .modal-btns .btn{min-height:37px;justify-content:center}
   .toast{max-width:calc(100vw - 22px);white-space:normal;text-align:center;font-size:12px;line-height:1.45;padding:9px 14px;bottom:14px}
-  .save-overlay-card{padding:20px 18px 17px;border-radius:13px}
-  .save-overlay-title{font-size:14px}
-  .save-overlay-detail{font-size:11px}
+  .save-overlay{align-items:flex-start;justify-content:center;padding:10px 8px}
+  .save-overlay-card{width:min(330px,calc(100vw - 16px));padding:14px 15px 13px;border-radius:11px}
+  .save-overlay-spinner{width:30px;height:30px;margin-bottom:10px;border-width:3px}
+  .save-overlay-title{font-size:13px}
+  .save-overlay-detail{font-size:11px;margin-top:5px}
+  .save-overlay-progress{margin-top:10px}
+  .save-overlay-note{display:none}
 }
 
 @media screen and (max-width:390px){
