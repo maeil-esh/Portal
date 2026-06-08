@@ -1186,6 +1186,12 @@ let unlockedMasterSites = new Set();  // 기준정보 편집 인증된 사업장
 let editPwCallback = null;
 let masterPwCallback = null;
 let gasSeq = 0;
+// 일시적인 GAS 콜드 스타트·네트워크 지연은 안전한 요청에 한해 자동 재시도합니다.
+const GAS_SAFE_RETRY_ACTIONS = new Set([
+  'ping','loadBootstrap','loadAllMaster','loadAll','load','loadMaster','loadSiteOrder',
+  'saveMaster','saveSiteOrder','save','clearSite','deleteSite'
+]);
+const GAS_READ_ACTIONS = new Set(['ping','loadBootstrap','loadAllMaster','loadAll','load','loadMaster','loadSiteOrder']);
 // JSONP는 GET URL 길이 제한을 받으므로 한 번에 보내는 URL을 안전 범위로 제한합니다.
 const MAX_JSONP_URL_LENGTH = 5200;
 const SAVE_CHUNK_ROW_CAP = 50;
@@ -1684,14 +1690,35 @@ function moveSiteIndex(from, to){
   saveSiteOrderToGAS(true);
   toast('사업장 순서가 변경됐습니다','ok');
 }
+let siteOrderSaveTimer = null;
+let siteOrderSaveRunning = false;
+let siteOrderSaveQueued = false;
+let siteOrderSaveSilent = true;
+
 function saveSiteOrderToGAS(silent){
   if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
-  gasCall('saveSiteOrder', {data: JSON.stringify({order: sites})}, res=>{
+  siteOrderSaveSilent = siteOrderSaveSilent && !!silent;
+  clearTimeout(siteOrderSaveTimer);
+  siteOrderSaveTimer = setTimeout(flushSiteOrderToGAS, 350);
+}
+
+function flushSiteOrderToGAS(){
+  if(siteOrderSaveRunning){ siteOrderSaveQueued = true; return; }
+  siteOrderSaveRunning = true;
+  const silent = siteOrderSaveSilent;
+  siteOrderSaveSilent = true;
+  const orderSnapshot = sites.slice();
+  gasCall('saveSiteOrder', {data: JSON.stringify({order: orderSnapshot})}, res=>{
+    siteOrderSaveRunning = false;
     if(res?.result==='success'){
       setGasOk();
       if(!silent) toast('사업장 순서 저장 완료','ok');
-    } else if(!silent){
+    } else {
       toast('❌ 사업장 순서 저장 실패: '+(res?.error||'오류'),'err');
+    }
+    if(siteOrderSaveQueued){
+      siteOrderSaveQueued = false;
+      setTimeout(flushSiteOrderToGAS, 120);
     }
   });
 }
@@ -1886,15 +1913,46 @@ function masterPayload(site){
   };
 }
 
+const masterSaveTimers = new Map();
+const masterSaveRunning = new Set();
+const masterSaveQueued = new Set();
+const masterSaveSilent = new Map();
+
+// 기준정보는 짧은 시간 안에 여러 번 수정될 수 있으므로 사업장별로 묶어서 순차 저장합니다.
+// 동시에 여러 saveMaster 요청이 기준정보 시트를 덮어쓰는 현상을 방지합니다.
 function saveMasterToGAS(site, silent){
   if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
   if(!site || !siteData[site]) return;
-  gasCall('saveMaster', {data: JSON.stringify(masterPayload(site))}, res=>{
+  masterSaveSilent.set(site, (masterSaveSilent.has(site) ? masterSaveSilent.get(site) : true) && !!silent);
+  clearTimeout(masterSaveTimers.get(site));
+  const delay = silent ? 420 : 0;
+  masterSaveTimers.set(site, setTimeout(()=>flushMasterToGAS(site), delay));
+}
+
+function flushMasterToGAS(site){
+  if(!site || !siteData[site]) return;
+  if(masterSaveRunning.has(site)){
+    masterSaveQueued.add(site);
+    return;
+  }
+  masterSaveRunning.add(site);
+  const silent = masterSaveSilent.has(site) ? masterSaveSilent.get(site) : true;
+  masterSaveSilent.set(site, true);
+  const payload = JSON.stringify(masterPayload(site));
+  setSyncMsg('↑ 기준정보 저장 중...', 'var(--blue500)');
+  gasCall('saveMaster', {data: payload}, res=>{
+    masterSaveRunning.delete(site);
     if(res?.result==='success'){
       setGasOk();
-      if(!silent) setSyncMsg('✓ 기준정보 저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
-    } else if(!silent){
+      setSyncMsg('✓ 기준정보 저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
+      if(!silent) toast('✅ '+site+' 기준정보 저장 완료','ok');
+    } else {
+      setSyncMsg('● 기준정보 저장 오류', 'var(--red500)');
       toast('❌ 기준정보 저장 실패: '+(res?.error||'오류'),'err');
+    }
+    if(masterSaveQueued.has(site)){
+      masterSaveQueued.delete(site);
+      setTimeout(()=>flushMasterToGAS(site), 120);
     }
   });
 }
@@ -1994,57 +2052,85 @@ document.addEventListener('click',e=>{
 /* ══════════════════════════════════════════
    GAS
 ══════════════════════════════════════════ */
-function gasCall(action, params, cb){
+function gasCall(action, params, cb, options){
   if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL'){ toast('GAS URL을 설정하세요','err'); return; }
+  options = options || {};
+  const maxAttempts = Number(options.maxAttempts || (GAS_SAFE_RETRY_ACTIONS.has(action) ? 3 : 1));
+  const timeoutMs = Number(options.timeoutMs || (GAS_READ_ACTIONS.has(action) ? 18000 : 15000));
+  let attempt = 0;
+  let finished = false;
 
-  const cbN = 'gcb_' + Date.now() + '_' + (++gasSeq) + '_' + Math.random().toString(36).slice(2);
-  let scriptEl = null;
-  let done = false;
-  const cleanup = () => {
-    if(scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
-    try{ delete window[cbN]; }catch(e){ window[cbN] = undefined; }
-  };
-  window[cbN] = res => {
-    if(done) return;
-    done = true;
-    cleanup();
-    if(typeof cb === 'function') cb(res || {});
+  const shouldRetryResult = res => {
+    if(!GAS_SAFE_RETRY_ACTIONS.has(action) || !res || res.result==='success') return false;
+    const msg = String(res.error || '');
+    if(/알 수 없는 action|data 파라미터 없음|site 필요|site 없음/i.test(msg)) return false;
+    return true;
   };
 
-  let qs = 'action=' + encodeURIComponent(action) + '&callback=' + encodeURIComponent(cbN);
-  if(params){
-    Object.entries(params).forEach(([k,v]) => {
-      qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(String(v));
-    });
-  }
+  const runAttempt = () => {
+    attempt += 1;
+    const cbN = 'gcb_' + Date.now() + '_' + (++gasSeq) + '_' + Math.random().toString(36).slice(2);
+    let scriptEl = null;
+    let requestDone = false;
+    let timeoutId = null;
 
-  const src = GAS_URL + '?' + qs;
-  if(src.length > 180000){
-    console.warn('[GAS] URL length is large:', src.length);
-  }
-  scriptEl = document.createElement('script');
-  scriptEl.src = src;
-  scriptEl.onerror = () => {
-    if(done) return;
-    done = true;
-    cleanup();
-    const err = {result:'error', error:'GAS 연결 오류 — 웹앱 배포 URL 또는 공개 권한을 확인하세요'};
-    setGasError('연결 오류');
-    toast('❌ '+err.error,'err');
-    console.error('[GAS] script load error:', action);
-    if(typeof cb === 'function') cb(err);
-  };
-  document.head.appendChild(scriptEl);
-  setTimeout(() => {
-    if(!done && window[cbN]){
-      done = true;
+    const cleanup = () => {
+      clearTimeout(timeoutId);
+      if(scriptEl && scriptEl.parentNode) scriptEl.parentNode.removeChild(scriptEl);
+      try{ delete window[cbN]; }catch(e){ window[cbN] = undefined; }
+    };
+    const finish = res => {
+      if(finished) return;
+      finished = true;
+      if(typeof cb === 'function') cb(res || {});
+    };
+    const retryOrFinish = err => {
+      if(requestDone || finished) return;
+      requestDone = true;
       cleanup();
-      const err = {result:'error', error:'서버 응답 없음 (12초 초과)'};
-      setGasError('응답 없음');
-      toast('❌ '+err.error,'err');
-      if(typeof cb === 'function') cb(err);
+      if(attempt < maxAttempts){
+        const wait = Math.min(1800, 450 * attempt);
+        console.warn('[GAS] retry', action, attempt + '/' + maxAttempts, err?.error || err);
+        setTimeout(runAttempt, wait);
+        return;
+      }
+      setGasError(err?.error?.includes('응답') ? '응답 없음' : '연결 오류');
+      toast('❌ '+(err?.error||'GAS 연결 오류'),'err');
+      finish(err || {result:'error',error:'GAS 연결 오류'});
+    };
+
+    window[cbN] = res => {
+      if(requestDone || finished) return;
+      requestDone = true;
+      cleanup();
+      if(shouldRetryResult(res) && attempt < maxAttempts){
+        const wait = Math.min(1800, 450 * attempt);
+        console.warn('[GAS] result retry', action, attempt + '/' + maxAttempts, res?.error || '오류');
+        setTimeout(runAttempt, wait);
+        return;
+      }
+      finish(res || {});
+    };
+
+    let qs = 'action=' + encodeURIComponent(action) + '&callback=' + encodeURIComponent(cbN);
+    qs += '&_ts=' + encodeURIComponent(Date.now() + '_' + attempt);
+    if(params){
+      Object.entries(params).forEach(([k,v]) => {
+        qs += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(String(v));
+      });
     }
-  }, 12000);
+
+    const src = GAS_URL + '?' + qs;
+    if(src.length > 180000) console.warn('[GAS] URL length is large:', src.length);
+    scriptEl = document.createElement('script');
+    scriptEl.src = src;
+    scriptEl.async = true;
+    scriptEl.onerror = () => retryOrFinish({result:'error', error:'GAS 연결 오류 — 웹앱 배포 URL 또는 공개 권한을 확인하세요'});
+    document.head.appendChild(scriptEl);
+    timeoutId = setTimeout(() => retryOrFinish({result:'error', error:'서버 응답 없음 ('+Math.round(timeoutMs/1000)+'초 초과)'}), timeoutMs);
+  };
+
+  runAttempt();
 }
 function setGasOk(){ document.getElementById('gasDot').className='gas-dot ok'; document.getElementById('gasMsg').textContent='연결됨'; }
 function setGasError(msg){ document.getElementById('gasDot').className='gas-dot err'; document.getElementById('gasMsg').textContent=msg||'연결 오류'; }
@@ -2250,30 +2336,7 @@ function appendLoadedRows(rows){
 }
 
 function loadAllFromGAS(){
-  toast('불러오는 중...','');
-  gasCall('loadAllMaster',{},mres=>{
-    if(mres?.result!=='success'){
-      const msg=mres?.error||'기준정보 불러오기 실패';
-      setGasError('불러오기 오류');
-      toast('❌ '+msg,'err');
-      return;
-    }
-    const loadedOrder = Array.isArray(mres.order) ? mres.order : [];
-    applyMasterMap(mres.data || {}); applyLoadedSiteOrder(loadedOrder);
-    gasCall('loadAll',{},res=>{
-      if(res?.result==='success'&&Array.isArray(res.data)){
-        resetAllRows();
-        appendLoadedRows(res.data);
-        applyLoadedSiteOrder(loadedOrder);
-        renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); setGasOk();
-        toast(res.data.filter(r=>!isDeprecatedSite(r.site)).length+'건 불러오기 완료','ok');
-      } else {
-        const msg=res?.error||'현황 데이터 불러오기 실패';
-        setGasError('불러오기 오류');
-        toast('❌ '+msg,'err');
-      }
-    });
-  });
+  reloadAllFromGAS({manual:true});
 }
 
 /* ══════════════════════════════════════════
@@ -2785,8 +2848,13 @@ const LD = {
       setTimeout(() => this._set(100, '완료!'), 350);
       setTimeout(() => this.hide(), 700);
     }
-    // 최대 10초 타임아웃 (GAS 응답 없어도 닫힘)
-    setTimeout(() => { if (!this._done) this.complete('연결 시간 초과 — 오프라인 모드'); }, 10000);
+    // GAS 콜드 스타트가 길어져도 오류로 단정하지 않습니다. 화면만 먼저 열고 백그라운드 로딩은 계속합니다.
+    setTimeout(() => {
+      if (!this._done) {
+        this._set(92, '서버 응답이 지연되어 화면을 먼저 표시합니다...');
+        setTimeout(() => this.hide(), 650);
+      }
+    }, 22000);
   },
 
   // 외부에서 호출: 단계별 진행률 업데이트
@@ -3004,42 +3072,85 @@ function onSaveDone(hasError, lastError){
 }
 
 // 페이지 로드 시 전체 불러오기
-function autoLoadAll(){
+let bootstrapLoading = false;
+let bootstrapReloadQueued = false;
+
+function requestBootstrapData(cb){
+  // v4.6 GAS에서는 기준정보와 현황을 한 번에 받아 초기 로딩 시간을 줄입니다.
+  // 이전 GAS가 배포되어 있어도 자동으로 기존 2단계 방식으로 폴백합니다.
+  gasCall('loadBootstrap',{},res=>{
+    if(res?.result==='success' && Array.isArray(res.data)){
+      cb(res);
+      return;
+    }
+    const err = String(res?.error || '');
+    if(!/알 수 없는 action\s*:\s*loadBootstrap/i.test(err)){
+      cb(res || {result:'error',error:'초기 데이터 불러오기 실패'});
+      return;
+    }
+    gasCall('loadAllMaster',{},mres=>{
+      const masterOk = mres?.result==='success';
+      const warning = masterOk ? '' : (mres?.error || '기준정보 불러오기 실패');
+      gasCall('loadAll',{},dres=>{
+        if(dres?.result==='success' && Array.isArray(dres.data)){
+          cb({
+            result:'success',
+            data:dres.data,
+            masters:masterOk ? (mres.data || {}) : {},
+            order:masterOk && Array.isArray(mres.order) ? mres.order : [],
+            warning:warning
+          });
+        } else {
+          cb(dres || {result:'error',error:'현황 데이터 불러오기 실패'});
+        }
+      });
+    });
+  });
+}
+
+function reloadAllFromGAS(options){
+  options = options || {};
   if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
+  if(bootstrapLoading){
+    bootstrapReloadQueued = true;
+    return;
+  }
+  bootstrapLoading = true;
+  if(options.manual) toast('불러오는 중...','');
   setSyncMsg('↓ 불러오는 중...', 'var(--blue500)');
-  LD.progress(60, '기준정보 불러오는 중...');
-  gasCall('loadAllMaster',{},mres=>{
-    if(mres?.result!=='success'){
-      const msg=mres?.error||'기준정보 불러오기 실패';
+  LD.progress(60, '기준정보와 현황을 불러오는 중...');
+
+  requestBootstrapData(res=>{
+    bootstrapLoading = false;
+    if(res?.result==='success' && Array.isArray(res.data)){
+      LD.progress(88, '데이터 처리 중...');
+      const loadedOrder = Array.isArray(res.order) ? res.order : [];
+      applyMasterMap(res.masters || res.master || {});
+      applyLoadedSiteOrder(loadedOrder);
+      resetAllRows();
+      appendLoadedRows(res.data);
+      applyLoadedSiteOrder(loadedOrder);
+      renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); setGasOk();
+      const visibleCount = res.data.filter(r=>!isDeprecatedSite(r.site)).length;
+      setSyncMsg('✓ 최신화됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
+      LD.complete('✓ 데이터 로딩 완료 — '+visibleCount+'건');
+      if(res.warning) toast('⚠️ 현황은 불러왔지만 기준정보 확인 필요: '+res.warning,'err');
+      else if(options.manual) toast(visibleCount+'건 불러오기 완료','ok');
+    } else {
+      const msg=res?.error||'현황 데이터 불러오기 실패';
       setGasError('불러오기 오류');
       setSyncMsg('● 불러오기 오류', 'var(--red500)');
       LD.complete('❌ '+msg);
       toast('❌ '+msg,'err');
-      return;
     }
-    const loadedOrder = Array.isArray(mres.order) ? mres.order : [];
-    applyMasterMap(mres.data || {}); applyLoadedSiteOrder(loadedOrder);
-    LD.progress(75, '사업장 현황 불러오는 중...');
-    gasCall('loadAll',{},res=>{
-      if(res?.result==='success'&&Array.isArray(res.data)){
-        LD.progress(88, '데이터 처리 중...');
-        resetAllRows();
-        appendLoadedRows(res.data);
-        applyLoadedSiteOrder(loadedOrder);
-        renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); setGasOk();
-        const visibleCount = res.data.filter(r=>!isDeprecatedSite(r.site)).length;
-        setSyncMsg('✓ 최신화됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
-        LD.complete('✓ 데이터 로딩 완료 — '+visibleCount+'건');
-      } else {
-        const msg=res?.error||'현황 데이터 불러오기 실패';
-        setGasError('불러오기 오류');
-        setSyncMsg('● 불러오기 오류', 'var(--red500)');
-        LD.complete('❌ '+msg);
-        toast('❌ '+msg,'err');
-      }
-    });
+    if(bootstrapReloadQueued){
+      bootstrapReloadQueued = false;
+      setTimeout(()=>reloadAllFromGAS({manual:false}), 500);
+    }
   });
 }
+
+function autoLoadAll(){ reloadAllFromGAS({manual:false}); }
 
 /* ══════════════════════════════════════════
    초기화
