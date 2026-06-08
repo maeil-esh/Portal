@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>관리감독자 및 유해위험작업 현황</title>
+<!-- v4.7: 기준정보 공정명 목록을 PC·모바일 현황 입력 드롭다운과 연동 -->
 <style>
 :root {
   --blue50:#f0f4ff; --blue100:#d6e4ff; --blue500:#3182f6; --blue600:#1b6ef3;
@@ -1049,7 +1050,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
     <h3>관리감독자 기본정보 수정</h3>
     <div class="mobile-edit-grid">
       <label class="mobile-edit-field"><span>팀</span><select class="mobile-edit-control" id="mobileEditTeam"></select></label>
-      <label class="mobile-edit-field"><span>공정명</span><input class="mobile-edit-control" id="mobileEditProcess" placeholder="공정명"></label>
+      <label class="mobile-edit-field"><span>공정명</span><select class="mobile-edit-control" id="mobileEditProcess"></select></label>
       <label class="mobile-edit-field"><span>직책</span><select class="mobile-edit-control" id="mobileEditPosition"></select></label>
       <label class="mobile-edit-field"><span>사번</span><input class="mobile-edit-control" id="mobileEditEmpno" placeholder="사번"></label>
       <label class="mobile-edit-field full"><span>이름</span><input class="mobile-edit-control" id="mobileEditName" placeholder="이름"></label>
@@ -1397,8 +1398,6 @@ function renderTable(){
   const mT={};
   MACHINES.forEach(m=>mT[m.id]=0);
   filtered.forEach(r=>MACHINES.forEach(m=>{ if(r.machines[m.id])mT[m.id]++; }));
-  const teamOpts = sd().master.team.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');
-  const posOpts  = sd().master.position.map(p=>`<option value="${esc(p)}">${esc(p)}</option>`).join('');
   tbody.innerHTML = filtered.map((r,i)=>{
     const total = MACHINES.filter(m=>r.machines[m.id]).length;
     const checks = MACHINES.map(m=>
@@ -1413,12 +1412,13 @@ function renderTable(){
       <td class="td-no"><div class="row-no-wrap">${isUnlocked()?`<span class="row-order-handle" draggable="true" title="드래그하여 행 순서 변경" ondragstart="onRowDragStart(event,${r.id})" ondragend="onRowDragEnd(event)">⠿</span>`:''}<span>${i+1}</span></div></td>
       <td class="td-text col-sticky" style="left:40px" data-col="team" tabindex="0" onkeydown="onCellKey(event,this)">
         <select class="cell-edit" onchange="setF(${r.id},'team',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
-          <option value=""></option>${teamOpts.replace(`"${esc(r.team)}"`,`"${esc(r.team)}" selected`)}</select></td>
+          ${buildMasterSelectOptions(sd().master.team,r.team,'팀 선택')}</select></td>
       <td class="td-process col-sticky" style="left:125px" data-col="process" tabindex="0" onkeydown="onCellKey(event,this)">
-        <input class="cell-edit" value="${esc(r.process)}" placeholder="공정명" onchange="setF(${r.id},'process',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
+        <select class="cell-edit" onchange="setF(${r.id},'process',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
+          ${buildMasterSelectOptions(sd().master.process,r.process,'공정 선택')}</select></td>
       <td class="td-text col-sticky" style="left:225px" data-col="position" tabindex="0" onkeydown="onCellKey(event,this)">
         <select class="cell-edit" onchange="setF(${r.id},'position',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
-          <option value=""></option>${posOpts.replace(`"${esc(r.position)}"`,`"${esc(r.position)}" selected`)}</select></td>
+          ${buildMasterSelectOptions(sd().master.position,r.position,'직책 선택')}</select></td>
       <td class="td-empno col-sticky" style="left:293px" data-col="empno" tabindex="0" onkeydown="onCellKey(event,this)">
         <input class="cell-edit" value="${esc(r.empno)}" placeholder="사번" onchange="setF(${r.id},'empno',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
       <td class="td-name col-sticky" style="left:373px" data-col="name" tabindex="0" onkeydown="onCellKey(event,this)">
@@ -1498,10 +1498,11 @@ function openMobileEdit(id){
     if(!r) return;
     mobileEditRowId = Number(id);
     const team = document.getElementById('mobileEditTeam');
+    const process = document.getElementById('mobileEditProcess');
     const pos  = document.getElementById('mobileEditPosition');
-    team.innerHTML = '<option value=""></option>' + sd().master.team.map(v=>`<option value="${esc(v)}"${v===r.team?' selected':''}>${esc(v)}</option>`).join('');
-    pos.innerHTML  = '<option value=""></option>' + sd().master.position.map(v=>`<option value="${esc(v)}"${v===r.position?' selected':''}>${esc(v)}</option>`).join('');
-    document.getElementById('mobileEditProcess').value = r.process || '';
+    team.innerHTML    = buildMasterSelectOptions(sd().master.team, r.team, '팀 선택');
+    process.innerHTML = buildMasterSelectOptions(sd().master.process, r.process, '공정 선택');
+    pos.innerHTML     = buildMasterSelectOptions(sd().master.position, r.position, '직책 선택');
     document.getElementById('mobileEditEmpno').value   = r.empno || '';
     document.getElementById('mobileEditName').value    = r.name || '';
     document.getElementById('mobileEditDesignationDate').value = normalizeDateInput(r.designationDate) || todayISO();
@@ -1533,7 +1534,20 @@ function saveMobileEdit(){
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
-function setF(id,f,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r[f]=v; r.date=today(); if(['name','empno','team'].includes(f))renderTable(); triggerAutoSave(); }
+
+// 기준정보 목록을 현황 입력 드롭다운과 연결합니다.
+// 과거에 입력된 값이 기준정보에서 삭제되었더라도 화면에서 사라지지 않도록 기존값을 임시 옵션으로 유지합니다.
+function buildMasterSelectOptions(list, current, placeholder){
+  const cur = String(current || '').trim();
+  const values = [...new Set((Array.isArray(list) ? list : []).map(v=>String(v||'').trim()).filter(Boolean))];
+  const legacy = !!cur && !values.includes(cur);
+  if(legacy) values.push(cur);
+  return `<option value="">${esc(placeholder || '선택')}</option>` + values.map(v=>
+    `<option value="${esc(v)}"${v===cur?' selected':''}>${esc(v)}${legacy && v===cur?' (기존값)':''}</option>`
+  ).join('');
+}
+
+function setF(id,f,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r[f]=v; r.date=today(); if(['name','empno','team','process'].includes(f))renderTable(); triggerAutoSave(); }
 function setDesignationDate(id,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r.designationDate=normalizeDateInput(v)||''; r.date=today(); renderTable(); triggerAutoSave(); }
 function toggleCheck(id,mid){ if(!isUnlocked()){ requireAuth(()=>{ const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }); return; } const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }
 
