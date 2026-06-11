@@ -1267,7 +1267,7 @@ function renderDashboard(){
       <div class="site-card-accent" style="background:${col.accent}"></div>
       <div class="site-card-inner">
         <span class="site-card-num">${numStr}</span>
-        <div class="site-card-icon" style="background:${col.icon}">🏭</div>
+        <div class="site-card-icon" style="background:${col.icon}">${s === 'MIC' ? '🏢' : '🏭'}</div>
         <div class="site-card-category" style="color:${col.cat}">SUPERVISOR &amp; HAZARDOUS WORK</div>
         <div class="site-card-name">${esc(s)}</div>
         <div class="site-card-desc">등록된 관리감독자 ${cnt}명 · ${new Set(d.rows.map(r=>r.team).filter(Boolean)).size}개 부서 · ${activeTypes}개 작업 유형</div>
