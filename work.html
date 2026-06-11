@@ -348,6 +348,57 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 .master-item-del:hover{color:var(--red500);background:var(--red50)}
 .master-add-row{display:flex;gap:8px;padding:10px 16px;border-top:1px solid var(--gray200)}
 
+
+/* ════ 엑셀 업로드 페이지 ════ */
+.import-wrap{padding:24px;max-width:1280px;margin:0 auto}
+.import-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:16px;padding:20px 22px;border:1px solid var(--gray200);border-radius:14px;background:linear-gradient(135deg,#fff 0%,#f6f9ff 100%);box-shadow:var(--sh1)}
+.import-hero h2{font-size:20px;font-weight:800;color:var(--gray900);letter-spacing:-.45px;margin-bottom:6px}
+.import-hero p{font-size:12px;color:var(--gray600);line-height:1.65;word-break:keep-all}
+.import-hero-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--green100);border-radius:20px;background:var(--green50);color:#008f76;font-size:11px;font-weight:800;white-space:nowrap}
+.import-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.9fr);gap:16px;align-items:start}
+.import-card{overflow:hidden;border:1px solid var(--gray200);border-radius:12px;background:#fff;box-shadow:var(--sh1)}
+.import-card-head{display:flex;align-items:center;gap:8px;padding:13px 15px;border-bottom:1px solid var(--gray200);background:var(--gray800);color:#fff;font-size:13px;font-weight:800}
+.import-card-body{padding:15px}
+.import-step{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--gray100)}
+.import-step:last-child{border-bottom:none}
+.import-step-num{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--blue50);color:var(--blue600);font-size:11px;font-weight:900;flex-shrink:0}
+.import-step strong{display:block;font-size:12px;color:var(--gray900);margin-bottom:3px}
+.import-step p{font-size:11px;color:var(--gray500);line-height:1.55;word-break:keep-all}
+.import-template-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:12px;padding:10px 12px;border:1px solid var(--blue100);border-radius:8px;background:var(--blue50);color:var(--blue600);font-size:12px;font-weight:800;text-decoration:none;transition:all .12s}
+.import-template-btn:hover{background:var(--blue500);border-color:var(--blue500);color:#fff}
+.import-field{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.import-field label{font-size:11px;font-weight:800;color:var(--gray600)}
+.import-control{width:100%;min-height:40px;border:1.5px solid var(--gray200);border-radius:7px;background:#fff;padding:8px 10px;font-family:inherit;font-size:12px;color:var(--gray800)}
+.import-control:focus{outline:none;border-color:var(--blue500)}
+.import-warning{margin:10px 0;padding:9px 10px;border:1px solid #ffe2a8;border-radius:7px;background:#fff8e8;color:#9b6400;font-size:11px;line-height:1.55;word-break:keep-all}
+.import-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.import-actions .btn{justify-content:center}
+.import-summary{margin-top:16px;padding:12px 13px;border:1px solid var(--gray200);border-radius:9px;background:var(--gray50);font-size:12px;color:var(--gray600);line-height:1.55}
+.import-summary.ok{border-color:var(--green100);background:var(--green50);color:#007b67}
+.import-summary.err{border-color:#ffd5d8;background:var(--red50);color:#bd3340}
+.import-summary strong{color:inherit}
+.import-error-list{display:none;margin-top:10px;max-height:180px;overflow:auto;padding:8px 10px;border:1px solid #ffd5d8;border-radius:8px;background:#fff8f8;color:#bd3340;font-size:11px;line-height:1.55}
+.import-error-list.show{display:block}
+.import-preview{margin-top:16px;overflow:auto;border:1px solid var(--gray200);border-radius:10px;background:#fff;box-shadow:var(--sh1)}
+.import-preview-title{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 13px;border-bottom:1px solid var(--gray200);background:var(--gray50);font-size:12px;font-weight:800;color:var(--gray800)}
+.import-preview table{width:100%;min-width:820px;font-size:11px;white-space:nowrap}
+.import-preview th{position:static;background:#445166;color:#fff;padding:8px 7px;text-align:center;border-right:1px solid rgba(255,255,255,.16)}
+.import-preview td{height:auto;padding:7px 7px;text-align:center;border-right:1px solid var(--gray200);border-bottom:1px solid var(--gray200)}
+.import-preview td.text-left{text-align:left}
+.import-empty{padding:24px 15px;text-align:center;color:var(--gray400);font-size:12px;line-height:1.65}
+@media screen and (max-width:768px){
+  .import-wrap{padding:9px}
+  .import-hero{display:block;padding:15px 14px;margin-bottom:10px;border-radius:11px}
+  .import-hero h2{font-size:17px}
+  .import-hero-badge{margin-top:10px;font-size:10px}
+  .import-grid{grid-template-columns:1fr;gap:9px}
+  .import-card-head{padding:11px 12px;font-size:12px}
+  .import-card-body{padding:12px}
+  .import-actions{display:grid;grid-template-columns:1fr 1fr}
+  .import-actions .btn{min-height:36px;padding:6px 4px;font-size:10px}
+  .import-preview{margin-top:10px}
+}
+
 /* ════ 툴팁 팝업 ════ */
 .tt{display:none;position:fixed;z-index:9999;background:var(--white);border:1px solid var(--gray200);border-radius:var(--r8);box-shadow:var(--sh2);min-width:272px;max-width:360px;overflow:hidden;animation:fadeUp .12s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -831,6 +882,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   <div id="siteTabs" style="display:flex;gap:0;align-items:flex-end"></div>
   <div class="nav-sep"></div>
   <button class="nav-tab" id="tab-master" onclick="checkMasterPw()">기준정보</button>
+  <button class="nav-tab" id="tab-import" onclick="openImportPage()">엑셀 업로드</button>
   <button type="button" class="nav-criteria-btn" onclick="openCriteriaGuide()" title="작업별 점검기준 보기">✓ 작업별 점검기준</button>
   <div class="navbar-space"></div>
   <button type="button" class="nav-download-btn" onclick="exportAllExcel()" title="전체 사업장 현황을 엑셀 파일로 다운로드">⬇ 전체 현황 다운로드</button>
@@ -862,6 +914,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
       <button class="btn btn-sm" id="autoSaveIndicator" style="color:var(--gray400);cursor:default">● 자동저장</button>
       <button class="btn btn-sm btn-dark" onclick="downloadDesignationBatch()" title="현재 사업장의 지정서를 ZIP 파일로 일괄 저장">지정서 일괄저장</button>
       <button class="btn btn-sm" onclick="exportExcel()">엑셀</button>
+      <button class="btn btn-sm" onclick="openImportPage(curSite)">업로드</button>
       <button class="btn btn-sm" onclick="printPDF()">PDF</button>
     </div>
   </div>
@@ -963,6 +1016,57 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
     </div>
     <!-- 기준정보 카드 -->
     <div class="master-cards" id="masterCards"></div>
+  </div>
+</div>
+
+
+<!-- ══ PAGE: 엑셀 업로드 ══ -->
+<div class="page" id="page-import">
+  <div class="import-wrap">
+    <div class="import-hero">
+      <div>
+        <h2>엑셀 표준서식 일괄 업로드</h2>
+        <p>표준서식을 내려받아 사업장별 현황을 작성한 뒤 업로드할 수 있습니다.<br>적용 전 서버에 기존 현황을 자동 백업하고, 선택한 사업장의 자료만 교체합니다.</p>
+      </div>
+      <span class="import-hero-badge">✓ 사업장별 자동 백업</span>
+    </div>
+    <div class="import-grid">
+      <section class="import-card">
+        <div class="import-card-head">📄 표준서식 작성 방법</div>
+        <div class="import-card-body">
+          <div class="import-step"><span class="import-step-num">1</span><div><strong>표준서식 다운로드</strong><p>아래 파일을 내려받아 PC에서 작성합니다. HTML 파일과 엑셀 서식을 같은 GitHub 폴더에 올리면 링크가 자동으로 연결됩니다.</p></div></div>
+          <div class="import-step"><span class="import-step-num">2</span><div><strong>사업장별로 한 파일씩 작성</strong><p>한 번에 한 사업장의 자료만 작성합니다. 작업 대상은 해당 열에 O를 입력하고, 해당하지 않으면 빈칸으로 둡니다.</p></div></div>
+          <div class="import-step"><span class="import-step-num">3</span><div><strong>파일 선택 후 검증</strong><p>업로드 전에 필수값, 사업장 불일치, 사번 중복, 작업 대상 입력값 오류를 먼저 확인합니다.</p></div></div>
+          <div class="import-step"><span class="import-step-num">4</span><div><strong>검증 완료 후 반영</strong><p>선택한 사업장의 기존 현황을 백업한 뒤 업로드 자료로 교체합니다. 다른 사업장 자료는 변경하지 않습니다.</p></div></div>
+          <a class="import-template-btn" id="standardExcelTemplateLink" href="./관리감독자_유해위험작업_업로드_표준서식.xlsx" download>⬇ 엑셀 업로드 표준서식 다운로드</a>
+        </div>
+      </section>
+      <section class="import-card">
+        <div class="import-card-head">⬆ 사업장 현황 업로드</div>
+        <div class="import-card-body">
+          <div class="import-field">
+            <label for="excelUploadSite">반영 대상 사업장</label>
+            <select class="import-control" id="excelUploadSite" onchange="changeExcelUploadSite()"></select>
+          </div>
+          <div class="import-field">
+            <label for="excelUploadFile">작성 완료한 엑셀 파일</label>
+            <input class="import-control" id="excelUploadFile" type="file" accept=".xlsx,.xls" onchange="handleExcelUploadFile(this.files&&this.files[0])">
+          </div>
+          <div class="import-warning">⚠ 업로드를 적용하면 선택한 사업장의 기존 현황이 교체됩니다. 적용 직전 자료는 서버에 자동 백업되며, 필요 시 아래 복원 버튼으로 되돌릴 수 있습니다.</div>
+          <div class="import-actions">
+            <button class="btn btn-primary" type="button" onclick="applyExcelUpload()">검증 완료 자료 반영</button>
+            <button class="btn" type="button" onclick="resetExcelUpload()">파일 초기화</button>
+            <button class="btn" type="button" onclick="restoreLatestExcelBackup()">최근 백업 복원</button>
+          </div>
+          <div class="import-summary" id="excelUploadSummary">표준서식 파일을 선택하면 업로드 전 검증 결과가 표시됩니다.</div>
+          <div class="import-error-list" id="excelUploadErrors"></div>
+        </div>
+      </section>
+    </div>
+    <section class="import-preview" id="excelUploadPreview">
+      <div class="import-preview-title"><span>업로드 미리보기</span><span id="excelUploadPreviewCount">0건</span></div>
+      <div class="import-empty">아직 선택한 파일이 없습니다.</div>
+    </section>
   </div>
 </div>
 
@@ -1115,6 +1219,8 @@ document.addEventListener('keydown',e=>{
    GAS URL
 ══════════════════════════════════════════ */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwS3l0GEBobEBS1GRGxHfziijuM7dH_HK5ElGrYV7PcI-oAQkNjFKM0nY7dcAj2tYzP/exec';
+// HTML 파일과 동일한 GitHub Pages 폴더에 표준서식 XLSX 파일을 올리면 상대경로로 자동 연결됩니다.
+const STANDARD_EXCEL_TEMPLATE_URL = './관리감독자_유해위험작업_업로드_표준서식.xlsx';
 
 /* ══════════════════════════════════════════
    점검기준 데이터 (이미지 원본 기준)
@@ -1185,6 +1291,7 @@ let sortState = { mid: null, dir: 0 }; // dir: 0=없음 1=내림차순(체크O�
 let unlockedSites = new Set();       // 현황 편집 인증된 사업장
 let unlockedMasterSites = new Set();  // 기준정보 편집 인증된 사업장
 let editPwCallback = null;
+let editPwTargetSite = '';
 let masterPwCallback = null;
 let gasSeq = 0;
 // 일시적인 GAS 콜드 스타트·네트워크 지연은 안전한 요청에 한해 자동 재시도합니다.
@@ -1212,11 +1319,13 @@ function goPage(page, site){
   document.getElementById('page-'+page).classList.add('active');
   if(page==='home')   document.getElementById('tab-home').classList.add('active');
   if(page==='master') document.getElementById('tab-master').classList.add('active');
+  if(page==='import') document.getElementById('tab-import').classList.add('active');
 
   renderNavTabs();
   if(page==='home')   renderDashboard();
   if(page==='work')   renderWorkPage();
   if(page==='master') renderMasterPage();
+  if(page==='import') renderImportPage();
 }
 
 /* ══════════════════════════════════════════
@@ -2399,6 +2508,272 @@ function excelCriteriaText(mid){
   return m ? m.items.map(v=>'- '+v).join('\n') : '';
 }
 
+/* ══════════════════════════════════════════
+   엑셀 표준서식 업로드
+══════════════════════════════════════════ */
+const EXCEL_UPLOAD_HEADERS = [
+  {key:'site',label:'사업장',aliases:['사업장']},
+  {key:'team',label:'팀',aliases:['팀','부서']},
+  {key:'process',label:'공정명',aliases:['공정명','공정']},
+  {key:'position',label:'직책',aliases:['직책','직급']},
+  {key:'empno',label:'사번',aliases:['사번','사원번호']},
+  {key:'name',label:'이름',aliases:['이름','성명']},
+  {key:'designationDate',label:'지정일',aliases:['지정일','관리감독자지정일']},
+  {key:'hoist',label:'호이스트',aliases:['호이스트']},
+  {key:'conveyor',label:'컨베이어',aliases:['컨베이어']},
+  {key:'robot',label:'산업용로봇',aliases:['산업용로봇','로봇']},
+  {key:'lift',label:'리프트',aliases:['리프트']},
+  {key:'press',label:'프레스',aliases:['프레스']},
+  {key:'compressor',label:'공기압축기',aliases:['공기압축기','압축기']},
+  {key:'forklift',label:'지게차',aliases:['지게차']},
+  {key:'welding',label:'용접·절단',aliases:['용접·절단','용접/절단','용접절단']},
+  {key:'wire',label:'와이어로프',aliases:['와이어로프','와이어로프등']},
+  {key:'heavy',label:'중량물',aliases:['중량물']},
+  {key:'radiation',label:'방사선기기',aliases:['방사선기기','방사선장비']},
+  {key:'total',label:'합계',aliases:['합계','계']},
+  {key:'bigo',label:'비고',aliases:['비고']}
+];
+let excelUploadRows = [];
+let excelUploadErrors = [];
+let excelUploadWarnings = [];
+let excelUploadFileName = '';
+
+function normalizeUploadHeader(v){
+  return String(v||'').trim().replace(/\s+/g,'').replace(/[ㆍ·\/\\\-_()]/g,'').toLowerCase();
+}
+function openImportPage(site){
+  if(site && sites.includes(site)) curSite = site;
+  goPage('import');
+}
+function renderImportPage(){
+  const sel=document.getElementById('excelUploadSite');
+  const link=document.getElementById('standardExcelTemplateLink');
+  if(link) link.href=STANDARD_EXCEL_TEMPLATE_URL;
+  if(!sel) return;
+  const target=sites.includes(curSite)?curSite:(sites[0]||'');
+  sel.innerHTML=sites.filter(s=>!isDeprecatedSite(s)).map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  sel.value=target;
+  if(sel.value) curSite=sel.value;
+  renderExcelUploadSummary();
+}
+function changeExcelUploadSite(){
+  const sel=document.getElementById('excelUploadSite');
+  if(sel && sel.value) curSite=sel.value;
+  resetExcelUpload();
+}
+function resetExcelUpload(){
+  excelUploadRows=[]; excelUploadErrors=[]; excelUploadWarnings=[]; excelUploadFileName='';
+  const inp=document.getElementById('excelUploadFile');
+  if(inp) inp.value='';
+  renderExcelUploadSummary();
+}
+function uploadTargetSite(){
+  const sel=document.getElementById('excelUploadSite');
+  return String((sel&&sel.value)||curSite||'').trim();
+}
+function excelUploadDateToISO(v){
+  if(v instanceof Date && !isNaN(v.getTime())){
+    return [v.getFullYear(),String(v.getMonth()+1).padStart(2,'0'),String(v.getDate()).padStart(2,'0')].join('-');
+  }
+  if(typeof v==='number' && window.XLSX && XLSX.SSF && typeof XLSX.SSF.parse_date_code==='function'){
+    const d=XLSX.SSF.parse_date_code(v);
+    if(d && d.y && d.m && d.d) return String(d.y).padStart(4,'0')+'-'+String(d.m).padStart(2,'0')+'-'+String(d.d).padStart(2,'0');
+  }
+  return normalizeDateInput(v);
+}
+function parseUploadFlag(v){
+  const raw=String(v??'').trim();
+  if(!raw) return {ok:true,value:false};
+  const t=raw.toUpperCase().replace(/\s+/g,'');
+  if(['O','○','◯','Y','YES','TRUE','1','V','✓','✔'].includes(t)) return {ok:true,value:true};
+  if(['X','N','NO','FALSE','0','-'].includes(t)) return {ok:true,value:false};
+  return {ok:false,value:false,raw};
+}
+function uploadHeaderMap(matrix){
+  const max=Math.min(12,matrix.length);
+  for(let r=0;r<max;r++){
+    const row=Array.isArray(matrix[r])?matrix[r]:[];
+    const normalized=row.map(normalizeUploadHeader);
+    const map={};
+    EXCEL_UPLOAD_HEADERS.forEach(spec=>{
+      const aliases=spec.aliases.map(normalizeUploadHeader);
+      const idx=normalized.findIndex(h=>aliases.includes(h));
+      if(idx>=0) map[spec.key]=idx;
+    });
+    if(['site','team','process','position','name','hoist','radiation'].every(k=>map[k]!==undefined)) return {rowIndex:r,map};
+  }
+  return null;
+}
+function parseExcelUploadMatrix(matrix,target){
+  const result={rows:[],errors:[],warnings:[]};
+  const hm=uploadHeaderMap(matrix);
+  if(!hm){ result.errors.push('업로드양식 헤더를 찾지 못했습니다. 제공된 표준서식의 시트명과 열 제목을 변경하지 마세요.'); return result; }
+  const get=(arr,key)=> hm.map[key]===undefined?'':arr[hm.map[key]];
+  const empSeen=new Map();
+  const nameSeen=new Map();
+  for(let i=hm.rowIndex+1;i<matrix.length;i++){
+    const row=Array.isArray(matrix[i])?matrix[i]:[];
+    const excelRow=i+1;
+    const meaningful=['site','team','process','position','empno','name','designationDate','hoist','conveyor','robot','lift','press','compressor','forklift','welding','wire','heavy','radiation','bigo']
+      .some(k=>String(get(row,k)??'').trim()!=='');
+    if(!meaningful) continue;
+    const site=String(get(row,'site')||target).trim();
+    const team=String(get(row,'team')||'').trim();
+    const process=String(get(row,'process')||'').trim();
+    const position=String(get(row,'position')||'').trim();
+    const empno=String(get(row,'empno')||'').trim();
+    const name=String(get(row,'name')||'').trim();
+    const designationRaw=get(row,'designationDate');
+    const designationDate=excelUploadDateToISO(designationRaw);
+    if(site && site!==target) result.errors.push(excelRow+'행: 사업장 "'+site+'"이(가) 선택한 대상 "'+target+'"과 다릅니다.');
+    if(!team) result.errors.push(excelRow+'행: 팀을 입력하세요.');
+    if(!process) result.errors.push(excelRow+'행: 공정명을 입력하세요.');
+    if(!position) result.errors.push(excelRow+'행: 직책을 입력하세요.');
+    if(!name) result.errors.push(excelRow+'행: 이름을 입력하세요.');
+    if(String(designationRaw||'').trim() && !designationDate) result.errors.push(excelRow+'행: 지정일은 YYYY-MM-DD 형식으로 입력하세요.');
+    if(empno){
+      if(empSeen.has(empno)) result.errors.push(excelRow+'행: 사번 '+empno+'이(가) '+empSeen.get(empno)+'행과 중복됩니다.');
+      else empSeen.set(empno,excelRow);
+    }
+    if(name){
+      if(nameSeen.has(name)) result.warnings.push(excelRow+'행: 이름 '+name+'이(가) '+nameSeen.get(name)+'행에도 있습니다. 동명이인 여부를 확인하세요.');
+      else nameSeen.set(name,excelRow);
+    }
+    const machines={};
+    MACHINES.forEach(m=>{
+      const parsed=parseUploadFlag(get(row,m.id));
+      machines[m.id]=parsed.value;
+      if(!parsed.ok) result.errors.push(excelRow+'행: '+m.label.replace('\n',' ')+' 값 "'+parsed.raw+'"은 사용할 수 없습니다. O 또는 빈칸으로 입력하세요.');
+    });
+    result.rows.push({team,process,position,empno,name,designationDate,bigo:String(get(row,'bigo')||'').trim(),machines});
+  }
+  if(!result.rows.length) result.errors.push('업로드할 데이터 행이 없습니다. 업로드양식 시트에 자료를 입력하세요.');
+  return result;
+}
+function handleExcelUploadFile(file){
+  excelUploadRows=[]; excelUploadErrors=[]; excelUploadWarnings=[]; excelUploadFileName=file?file.name:'';
+  if(!file){ renderExcelUploadSummary(); return; }
+  if(!/\.xlsx?$/i.test(file.name)){ excelUploadErrors=['엑셀 파일(.xlsx 또는 .xls)만 업로드할 수 있습니다.']; renderExcelUploadSummary(); return; }
+  const target=uploadTargetSite();
+  loadXlsxStyle(()=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const book=XLSX.read(e.target.result,{type:'array',cellDates:true});
+        const ws=book.Sheets['업로드양식'] || book.Sheets[book.SheetNames[0]];
+        if(!ws) throw new Error('읽을 수 있는 시트가 없습니다.');
+        const matrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true});
+        const parsed=parseExcelUploadMatrix(matrix,target);
+        excelUploadRows=parsed.rows; excelUploadErrors=parsed.errors; excelUploadWarnings=parsed.warnings;
+        renderExcelUploadSummary();
+      }catch(err){
+        console.error(err);
+        excelUploadErrors=['엑셀 파일을 읽지 못했습니다: '+(err.message||err)];
+        renderExcelUploadSummary();
+      }
+    };
+    reader.onerror=()=>{ excelUploadErrors=['엑셀 파일을 읽는 중 오류가 발생했습니다.']; renderExcelUploadSummary(); };
+    reader.readAsArrayBuffer(file);
+  });
+}
+function renderExcelUploadSummary(){
+  const summary=document.getElementById('excelUploadSummary');
+  const errorBox=document.getElementById('excelUploadErrors');
+  const preview=document.getElementById('excelUploadPreview');
+  const previewCount=document.getElementById('excelUploadPreviewCount');
+  if(!summary||!errorBox||!preview) return;
+  summary.className='import-summary';
+  if(!excelUploadFileName){
+    summary.innerHTML='표준서식 파일을 선택하면 업로드 전 검증 결과가 표시됩니다.';
+  }else if(excelUploadErrors.length){
+    summary.classList.add('err');
+    summary.innerHTML='<strong>검증 오류 '+excelUploadErrors.length+'건</strong> · 오류를 수정한 뒤 파일을 다시 선택하세요.';
+  }else{
+    summary.classList.add('ok');
+    summary.innerHTML='<strong>검증 완료</strong> · '+esc(excelUploadFileName)+' · '+excelUploadRows.length+'명'+(excelUploadWarnings.length?' · 확인 권장 '+excelUploadWarnings.length+'건':'');
+  }
+  const messages=[...excelUploadErrors.map(v=>'❌ '+v),...excelUploadWarnings.map(v=>'⚠ '+v)];
+  errorBox.className='import-error-list'+(messages.length?' show':'');
+  errorBox.innerHTML=messages.slice(0,60).map(v=>'<div>'+esc(v)+'</div>').join('')+(messages.length>60?'<div>… 외 '+(messages.length-60)+'건</div>':'');
+  if(previewCount) previewCount.textContent=excelUploadRows.length+'건';
+  if(!excelUploadRows.length){
+    preview.innerHTML='<div class="import-preview-title"><span>업로드 미리보기</span><span id="excelUploadPreviewCount">0건</span></div><div class="import-empty">'+(excelUploadFileName?'검증 가능한 데이터가 없습니다.':'아직 선택한 파일이 없습니다.')+'</div>';
+    return;
+  }
+  const rows=excelUploadRows.slice(0,15);
+  preview.innerHTML=`<div class="import-preview-title"><span>업로드 미리보기</span><span id="excelUploadPreviewCount">${excelUploadRows.length}건${excelUploadRows.length>15?' · 상위 15건 표시':''}</span></div>
+    <table><thead><tr><th>No.</th><th>팀</th><th>공정명</th><th>직책</th><th>사번</th><th>이름</th><th>지정일</th><th>작업 대상</th><th>비고</th></tr></thead><tbody>
+    ${rows.map((r,i)=>`<tr><td>${i+1}</td><td class="text-left">${esc(r.team)}</td><td class="text-left">${esc(r.process)}</td><td>${esc(r.position)}</td><td>${esc(r.empno)}</td><td>${esc(r.name)}</td><td>${esc(r.designationDate)}</td><td>${MACHINES.filter(m=>r.machines[m.id]).length}</td><td class="text-left">${esc(r.bigo)}</td></tr>`).join('')}
+    </tbody></table>`;
+}
+function replaceSiteRowsFromExcel(site,rows){
+  ensureSite(site);
+  const d=sd(site);
+  d.rows=(rows||[]).map((r,i)=>({
+    id:i+1, team:r.team||'', process:r.process||'', position:r.position||'', empno:r.empno||'', name:r.name||'',
+    designationDate:normalizeDateInput(r.designationDate)||'', bigo:r.bigo||'', date:today(),
+    machines:Object.fromEntries(MACHINES.map(m=>[m.id,!!(r.machines&&r.machines[m.id])]))
+  }));
+  d.nextId=d.rows.length+1;
+}
+function applyExcelUpload(){
+  const target=uploadTargetSite();
+  if(!target){ toast('사업장을 선택하세요','err'); return; }
+  if(excelUploadErrors.length || !excelUploadRows.length){ toast('검증 오류를 먼저 해결하세요','err'); return; }
+  requireAuth(()=>applyExcelUploadConfirmed(target),target);
+}
+function applyExcelUploadConfirmed(target){
+  if(!confirm(target+' 사업장의 기존 현황을 '+excelUploadRows.length+'명 자료로 교체하시겠습니까?\n\n적용 전 기존 자료는 서버에 자동 백업됩니다.')) return;
+  const previousRows=(sd(target).rows||[]).map(r=>JSON.parse(JSON.stringify(r)));
+  const previousNextId=sd(target).nextId;
+  beginSaveOverlay('엑셀 업로드 반영 중...', target+' 기존 자료를 백업하고 있습니다.');
+  setSaveOverlayProgress(8,'기존 현황 자동 백업 중...');
+  gasCall('backupSite',{site:target,reason:'excelUpload'},backup=>{
+    if(backup?.result!=='success'){
+      finishSaveOverlay(false,'백업하지 못했습니다',backup?.error||'GAS 최신 배포 여부를 확인하세요.');
+      toast('❌ 업로드 전 백업 실패: '+(backup?.error||'오류'),'err');
+      return;
+    }
+    replaceSiteRowsFromExcel(target,excelUploadRows);
+    setSaveOverlayProgress(24,'검증 완료 자료를 서버에 반영하고 있습니다...');
+    saveRowsForSite(target,res=>{
+      if(res?.result==='success'){
+        setGasOk();
+        setSaveOverlayProgress(100,'업로드 자료 반영 완료');
+        finishSaveOverlay(true,'엑셀 업로드 완료',target+' · '+res.count+'건을 반영했습니다.');
+        renderDashboard();
+        if(curPage==='work') renderWorkPage();
+        toast('✅ '+target+' 엑셀 업로드 완료 ('+res.count+'건)','ok');
+      }else{
+        sd(target).rows=previousRows; sd(target).nextId=previousNextId;
+        finishSaveOverlay(false,'업로드 반영 오류',(res?.error||'오류')+' · 서버에 업로드 직전 백업이 보관되어 있습니다.');
+        toast('❌ 업로드 실패: '+(res?.error||'오류'),'err');
+      }
+    },(done,total,detail)=>{
+      const pct=24+(total?Math.round(done/total*70):0);
+      setSaveOverlayProgress(pct,target+' · '+detail);
+    });
+  },{maxAttempts:1,timeoutMs:30000});
+}
+function restoreLatestExcelBackup(){
+  const target=uploadTargetSite();
+  if(!target){ toast('사업장을 선택하세요','err'); return; }
+  requireAuth(()=>{
+    if(!confirm(target+' 사업장의 가장 최근 업로드 전 백업으로 복원하시겠습니까?\n\n현재 자료도 복원 직전 백업으로 별도 보관됩니다.')) return;
+    beginSaveOverlay('최근 백업 복원 중...',target+' 백업 자료를 확인하고 있습니다.');
+    gasCall('restoreLatestBackup',{site:target},res=>{
+      if(res?.result==='success'){
+        finishSaveOverlay(true,'백업 복원 완료',target+' · '+(res.count||0)+'건을 복원했습니다.');
+        toast('✅ '+target+' 최근 백업 복원 완료','ok');
+        setTimeout(()=>reloadAllFromGAS({manual:false}),500);
+      }else{
+        finishSaveOverlay(false,'백업을 복원하지 못했습니다',res?.error||'복원 가능한 백업이 없습니다.');
+        toast('❌ 백업 복원 실패: '+(res?.error||'오류'),'err');
+      }
+    },{maxAttempts:1,timeoutMs:30000});
+  },target);
+}
+
 function exportAllExcel(){
   const allRows=[];
   sites.filter(s=>!isDeprecatedSite(s)).forEach(site=>{
@@ -2940,6 +3315,7 @@ function requireAuth(cb, site){
   const s = site||curSite;
   if(isUnlocked(s)){ cb(); return; }
   editPwCallback = cb;
+  editPwTargetSite = s;
   document.getElementById('editSiteLabel').textContent = s;
   document.getElementById('editPwInput').value='';
   document.getElementById('editPwInput').style.borderColor='';
@@ -2949,14 +3325,14 @@ function requireAuth(cb, site){
 }
 
 function confirmEditPw(){
-  const s = curSite;
+  const s = editPwTargetSite || curSite;
   const entered = document.getElementById('editPwInput').value;
   const correct = sd(s).master.editPw || '1234';
   if(entered === correct){
     unlockedSites.add(s);
     closeEditPwModal();
     updateLockUI();
-    if(editPwCallback){ editPwCallback(); editPwCallback=null; }
+    if(editPwCallback){ const fn=editPwCallback; editPwCallback=null; editPwTargetSite=''; fn(); }
     toast('✅ '+s+' 편집 잠금 해제됨','ok');
   } else {
     document.getElementById('editPwInput').value='';
@@ -2969,7 +3345,7 @@ function confirmEditPw(){
     toast('❌ 비밀번호 오류','err');
   }
 }
-function closeEditPwModal(){ document.getElementById('editPwModalBg').classList.remove('show'); editPwCallback=null; }
+function closeEditPwModal(){ document.getElementById('editPwModalBg').classList.remove('show'); editPwCallback=null; editPwTargetSite=''; }
 
 // 잠금 해제
 function lockSite(){
@@ -3144,7 +3520,7 @@ function reloadAllFromGAS(options){
       resetAllRows();
       appendLoadedRows(res.data);
       applyLoadedSiteOrder(loadedOrder);
-      renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); setGasOk();
+      renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); if(curPage==='import') renderImportPage(); setGasOk();
       const visibleCount = res.data.filter(r=>!isDeprecatedSite(r.site)).length;
       setSyncMsg('✓ 최신화됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
       LD.complete('✓ 데이터 로딩 완료 — '+visibleCount+'건');
