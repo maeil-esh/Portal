@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>관리감독자 및 유해위험작업 현황</title>
-<!-- v4.8: 사번 선행 0 보존(화면·GAS·엑셀 업로드) + 기준정보 공정명 연동 -->
+<!-- v4.9: 현황 엑셀 다운로드와 업로드양식 연동 + 사번 선행 0 보존 + 기준정보 공정명 연동 -->
 <style>
 :root {
   --blue50:#f0f4ff; --blue100:#d6e4ff; --blue500:#3182f6; --blue600:#1b6ef3;
@@ -1077,20 +1077,20 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   <div class="import-wrap">
     <div class="import-hero">
       <div>
-        <h2>엑셀 표준서식 일괄 업로드</h2>
-        <p>표준서식을 내려받아 사업장별 현황을 작성한 뒤 업로드할 수 있습니다.<br>적용 전 서버에 기존 현황을 자동 백업하고, 선택한 사업장의 자료만 교체합니다.</p>
+        <h2>현황 엑셀 다운로드 · 일괄 업로드</h2>
+        <p>선택한 사업장의 현재 현황을 엑셀로 내려받아 수정한 뒤 그대로 업로드할 수 있습니다.<br>적용 전 서버에 기존 현황을 자동 백업하고, 선택한 사업장의 자료만 교체합니다.</p>
       </div>
       <span class="import-hero-badge">✓ 사업장별 자동 백업</span>
     </div>
     <div class="import-grid">
       <section class="import-card">
-        <div class="import-card-head">📄 표준서식 작성 방법</div>
+        <div class="import-card-head">📄 현황 엑셀 수정 방법</div>
         <div class="import-card-body">
-          <div class="import-step"><span class="import-step-num">1</span><div><strong>표준서식 다운로드</strong><p>아래 파일을 내려받아 PC에서 작성합니다. HTML 파일과 엑셀 서식을 같은 GitHub 폴더에 올리면 링크가 자동으로 연결됩니다.</p></div></div>
-          <div class="import-step"><span class="import-step-num">2</span><div><strong>사업장별로 한 파일씩 작성</strong><p>한 번에 한 사업장의 자료만 작성합니다. 작업 대상은 해당 열에 O를 입력하고, 해당하지 않으면 빈칸으로 둡니다.</p></div></div>
-          <div class="import-step"><span class="import-step-num">3</span><div><strong>파일 선택 후 검증</strong><p>업로드 전에 필수값, 사업장 불일치, 사번 중복, 작업 대상 입력값 오류를 먼저 확인합니다.</p></div></div>
+          <div class="import-step"><span class="import-step-num">1</span><div><strong>선택 사업장 현황 엑셀 다운로드</strong><p>아래 버튼을 누르면 선택한 사업장의 현재 자료가 포함된 엑셀 파일을 내려받습니다. 현황 화면의 엑셀 버튼과 동일한 형식입니다.</p></div></div>
+          <div class="import-step"><span class="import-step-num">2</span><div><strong>업로드양식 시트 수정</strong><p>다운로드한 파일의 <b>업로드양식</b> 탭에서 내용을 수정합니다. 작업 대상은 해당 열에 O를 입력하고, 해당하지 않으면 빈칸으로 둡니다.</p></div></div>
+          <div class="import-step"><span class="import-step-num">3</span><div><strong>수정한 파일 선택 후 검증</strong><p>같은 엑셀 파일을 선택하면 필수값, 사업장 불일치, 사번 중복, 작업 대상 입력값 오류를 먼저 확인합니다.</p></div></div>
           <div class="import-step"><span class="import-step-num">4</span><div><strong>검증 완료 후 반영</strong><p>선택한 사업장의 기존 현황을 백업한 뒤 업로드 자료로 교체합니다. 다른 사업장 자료는 변경하지 않습니다.</p></div></div>
-          <a class="import-template-btn" id="standardExcelTemplateLink" href="./관리감독자_유해위험작업_업로드_표준서식.xlsx" download>⬇ 엑셀 업로드 표준서식 다운로드</a>
+          <button class="import-template-btn" id="linkedSiteExcelDownloadBtn" type="button" onclick="exportSelectedSiteExcelForUpload()">⬇ 선택 사업장 현황 엑셀 다운로드</button>
         </div>
       </section>
       <section class="import-card">
@@ -1101,7 +1101,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
             <select class="import-control" id="excelUploadSite" onchange="changeExcelUploadSite()"></select>
           </div>
           <div class="import-field">
-            <label for="excelUploadFile">작성 완료한 엑셀 파일</label>
+            <label for="excelUploadFile">수정 완료한 현황 엑셀 파일</label>
             <input class="import-control" id="excelUploadFile" type="file" accept=".xlsx,.xls" onchange="handleExcelUploadFile(this.files&&this.files[0])">
           </div>
           <div class="import-warning">⚠ 업로드를 적용하면 선택한 사업장의 기존 현황이 교체됩니다. 적용 직전 자료는 서버에 자동 백업되며, 필요 시 아래 복원 버튼으로 되돌릴 수 있습니다.</div>
@@ -1110,7 +1110,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
             <button class="btn" type="button" onclick="resetExcelUpload()">파일 초기화</button>
             <button class="btn" type="button" onclick="restoreLatestExcelBackup()">최근 백업 복원</button>
           </div>
-          <div class="import-summary" id="excelUploadSummary">표준서식 파일을 선택하면 업로드 전 검증 결과가 표시됩니다.</div>
+          <div class="import-summary" id="excelUploadSummary">다운로드한 현황 엑셀 파일을 선택하면 업로드 전 검증 결과가 표시됩니다.</div>
           <div class="import-error-list" id="excelUploadErrors"></div>
         </div>
       </section>
@@ -1271,8 +1271,7 @@ document.addEventListener('keydown',e=>{
    GAS URL
 ══════════════════════════════════════════ */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwS3l0GEBobEBS1GRGxHfziijuM7dH_HK5ElGrYV7PcI-oAQkNjFKM0nY7dcAj2tYzP/exec';
-// HTML 파일과 동일한 GitHub Pages 폴더에 표준서식 XLSX 파일을 올리면 상대경로로 자동 연결됩니다.
-const STANDARD_EXCEL_TEMPLATE_URL = './관리감독자_유해위험작업_업로드_표준서식.xlsx';
+// v4.9: 업로드용 엑셀은 별도 정적 파일 없이 화면의 현재 사업장 데이터를 기준으로 동적 생성합니다.
 
 /* ══════════════════════════════════════════
    점검기준 데이터 (이미지 원본 기준)
@@ -2601,8 +2600,6 @@ function openImportPage(site){
 }
 function renderImportPage(){
   const sel=document.getElementById('excelUploadSite');
-  const link=document.getElementById('standardExcelTemplateLink');
-  if(link) link.href=STANDARD_EXCEL_TEMPLATE_URL;
   if(!sel) return;
   const target=sites.includes(curSite)?curSite:(sites[0]||'');
   sel.innerHTML=sites.filter(s=>!isDeprecatedSite(s)).map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
@@ -2661,7 +2658,7 @@ function uploadHeaderMap(matrix){
 function parseExcelUploadMatrix(matrix,target,displayMatrix){
   const result={rows:[],errors:[],warnings:[]};
   const hm=uploadHeaderMap(matrix);
-  if(!hm){ result.errors.push('업로드양식 헤더를 찾지 못했습니다. 제공된 표준서식의 시트명과 열 제목을 변경하지 마세요.'); return result; }
+  if(!hm){ result.errors.push('업로드양식 헤더를 찾지 못했습니다. 다운로드한 엑셀 파일의 업로드양식 시트명과 열 제목을 변경하지 마세요.'); return result; }
   const get=(arr,key)=> hm.map[key]===undefined?'':arr[hm.map[key]];
   const empSeen=new Map();
   const nameSeen=new Map();
@@ -2740,7 +2737,7 @@ function renderExcelUploadSummary(){
   if(!summary||!errorBox||!preview) return;
   summary.className='import-summary';
   if(!excelUploadFileName){
-    summary.innerHTML='표준서식 파일을 선택하면 업로드 전 검증 결과가 표시됩니다.';
+    summary.innerHTML='다운로드한 현황 엑셀 파일을 선택하면 업로드 전 검증 결과가 표시됩니다.';
   }else if(excelUploadErrors.length){
     summary.classList.add('err');
     summary.innerHTML='<strong>검증 오류 '+excelUploadErrors.length+'건</strong> · 오류를 수정한 뒤 파일을 다시 선택하세요.';
@@ -2828,6 +2825,51 @@ function restoreLatestExcelBackup(){
       }
     },{maxAttempts:1,timeoutMs:30000});
   },target);
+}
+
+/* ══════════════════════════════════════════
+   사업장 현황 엑셀 ↔ 업로드양식 연동
+   - 현황 화면의 엑셀 파일 안에 업로드양식 시트를 함께 포함합니다.
+   - 엑셀 업로드 페이지에서도 동일한 파일을 동적으로 내려받습니다.
+══════════════════════════════════════════ */
+function appendUploadFormSheet(wb,site,rows){
+  const machineLabels=MACHINES.map(m=>m.label.replace('\n',' '));
+  const headers=['사업장','팀','공정명','직책','사번','이름','지정일',...machineLabels,'합계','비고','수정일'];
+  const matrix=[headers];
+  (rows||[]).forEach(r=>matrix.push([
+    site,r.team||'',r.process||'',r.position||'',empnoText(r.empno),r.name||'',normalizeDateInput(r.designationDate)||'',
+    ...MACHINES.map(m=>r.machines&&r.machines[m.id]?'O':''),
+    MACHINES.filter(m=>r.machines&&r.machines[m.id]).length,r.bigo||'',normalizeDateInput(r.date)||r.date||''
+  ]));
+  const ws=XLSX.utils.aoa_to_sheet(matrix);
+  const thin=excelBorder('D1D6DB','thin');
+  const head={font:{name:'맑은 고딕',sz:9,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'344155'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:thin};
+  const body={font:{name:'맑은 고딕',sz:9,color:{rgb:'333D4B'}},alignment:{horizontal:'center',vertical:'center'},border:thin};
+  const editable={font:{name:'맑은 고딕',sz:9,color:{rgb:'333D4B'}},fill:{patternType:'solid',fgColor:{rgb:'FFFBEA'}},alignment:{horizontal:'center',vertical:'center'},border:thin};
+  const flag={font:{name:'맑은 고딕',sz:9,bold:true,color:{rgb:'1B6EF3'}},fill:{patternType:'solid',fgColor:{rgb:'F0F4FF'}},alignment:{horizontal:'center',vertical:'center'},border:thin};
+  excelStyleRange(ws,0,0,0,headers.length-1,head);
+  for(let r=1;r<matrix.length;r++){
+    for(let c=0;c<headers.length;c++) excelCell(ws,r,c).s=body;
+    // 사용자가 수정하는 구간을 연한 배경으로 표시합니다.
+    for(let c=1;c<=18;c++) excelCell(ws,r,c).s=editable;
+    for(let c=7;c<=17;c++) if(excelCell(ws,r,c).v==='O') excelCell(ws,r,c).s=flag;
+    // 사번은 반드시 텍스트 형식으로 저장하여 012345와 같은 선행 0을 보존합니다.
+    const empCell=excelCell(ws,r,4);
+    empCell.t='s'; empCell.v=empnoText(empCell.v); empCell.z='@';
+  }
+  ws['!cols']=[
+    {wch:18},{wch:14},{wch:16},{wch:10},{wch:13},{wch:12},{wch:13},
+    ...MACHINES.map(m=>({wch:(m.id==='compressor'||m.id==='radiation'?11:9)})),
+    {wch:7},{wch:18},{wch:13}
+  ];
+  ws['!rows']=[{hpt:27},...(rows||[]).map(()=>({hpt:20}))];
+  ws['!autofilter']={ref:'A1:'+XLSX.utils.encode_col(headers.length-1)+Math.max(matrix.length,1)};
+  XLSX.utils.book_append_sheet(wb,ws,'업로드양식');
+}
+function exportSelectedSiteExcelForUpload(){
+  const site=uploadTargetSite();
+  if(!site){ toast('사업장을 선택하세요','err'); return; }
+  exportExcel({site,useWorkFilters:false,allowEmpty:true,downloadPurpose:'upload'});
 }
 
 function exportAllExcel(){
@@ -2931,25 +2973,32 @@ function exportAllExcel(){
   toast('전체 현황 엑셀 다운로드 완료','ok');
 }
 
-function exportExcel(){
-  const dept=document.getElementById('filterDept').value;
-  const q=document.getElementById('searchBox').value.trim().toLowerCase();
-  const rows=sd().rows.filter(r=>(!dept||r.team===dept)&&(!q||r.name.toLowerCase().includes(q)||r.empno.toLowerCase().includes(q)||r.team.toLowerCase().includes(q)||r.process.toLowerCase().includes(q)));
-  if(!rows.length){ toast('데이터가 없습니다','err'); return; }
+function exportExcel(options){
+  options=options||{};
+  const site=String(options.site||curSite||'').trim();
+  if(!site){ toast('사업장을 선택하세요','err'); return; }
+  const dept=options.useWorkFilters===false?'':document.getElementById('filterDept').value;
+  const q=options.useWorkFilters===false?'':document.getElementById('searchBox').value.trim().toLowerCase();
+  const siteRows=(sd(site).rows||[]);
+  const rows=siteRows.filter(r=>(!dept||r.team===dept)&&(!q||String(r.name||'').toLowerCase().includes(q)||empnoText(r.empno).toLowerCase().includes(q)||String(r.team||'').toLowerCase().includes(q)||String(r.process||'').toLowerCase().includes(q)));
+  if(!rows.length && !options.allowEmpty){ toast('데이터가 없습니다','err'); return; }
   if(typeof XLSX==='undefined'){
-    loadXlsxStyle(exportExcel);
+    loadXlsxStyle(()=>exportExcel(options));
     toast('엑셀 출력 모듈 로딩 중입니다. 준비되면 자동으로 다운로드합니다.','');
     return;
   }
 
   const wb=XLSX.utils.book_new();
-  wb.Props={Title:curSite+' 관리감독자 및 유해위험작업 현황',Subject:'관리감독자 및 유해위험작업 통합 관리',Author:'관리감독자 및 유해위험작업 현황',CreatedDate:new Date()};
+  wb.Props={Title:site+' 관리감독자 및 유해위험작업 현황',Subject:'관리감독자 및 유해위험작업 통합 관리',Author:'관리감독자 및 유해위험작업 현황',CreatedDate:new Date()};
+
+  // 첫 번째 탭은 업로드에 그대로 다시 사용할 수 있는 사업장 전체 자료입니다.
+  appendUploadFormSheet(wb,site,siteRows);
 
   const machineLabels=MACHINES.map(m=>m.label.replace('\n',' '));
   const totalCols=20; // No. + 기본정보 5 + 지정일 + 계 + 기계 11 + 수정일
   const lastCol=XLSX.utils.encode_col(totalCols-1);
-  const title=curSite+' 관리감독자 및 유해위험작업 현황'+(dept?' ['+dept+']':'');
-  const sub='출력일: '+todayISO()+'  ·  사업장: '+curSite+'  ·  총 '+rows.length+'명';
+  const title=site+' 관리감독자 및 유해위험작업 현황'+(dept?' ['+dept+']':'');
+  const sub='출력일: '+todayISO()+'  ·  사업장: '+site+'  ·  총 '+rows.length+'명';
   const main=[];
   main.push([title]);
   main.push([sub]);
@@ -3042,8 +3091,8 @@ function exportExcel(){
   ws2['!ref']='A1:D8';
   XLSX.utils.book_append_sheet(wb,ws2,'작업별점검기준');
 
-  XLSX.writeFile(wb,curSite+'_관리감독자및유해위험작업현황_'+todayISO()+'.xlsx',{bookType:'xlsx',cellStyles:true});
-  toast('엑셀 다운로드 완료','ok');
+  XLSX.writeFile(wb,site+'_관리감독자및유해위험작업현황_'+todayISO()+'.xlsx',{bookType:'xlsx',cellStyles:true});
+  toast(options.downloadPurpose==='upload'?'선택 사업장 현황 엑셀 다운로드 완료':'엑셀 다운로드 완료','ok');
 }
 function printPDF(){
   const dept = document.getElementById('filterDept').value;
