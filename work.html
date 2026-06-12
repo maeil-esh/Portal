@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -6,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>관리감독자 및 유해위험작업 현황</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- v4.9: 현황 엑셀 다운로드와 업로드양식 연동 + 사번 선행 0 보존 + 기준정보 공정명 연동 -->
+<!-- v5.3.1: 미사용 코드 정리(사업장 추가 모달, 레거시 저장/불러오기 래퍼, 지정서·점검기준 버튼·추가카드 잔여 CSS) -->
 <style>
 :root {
   --blue50:#f0f4ff; --blue100:#d6e4ff; --blue500:#3182f6; --blue600:#1b6ef3;
@@ -100,8 +99,6 @@
 .btn-sm{padding:5px 10px;font-size:11px}
 .btn-primary{background:var(--blue500);color:var(--white);border-color:var(--blue500)}
 .btn-primary:hover{background:var(--blue600);border-color:var(--blue600)}
-.btn-success{background:var(--green500);color:var(--white);border-color:var(--green500)}
-.btn-success:hover{background:#009e82}
 .btn-red{background:var(--red500);color:var(--white);border-color:var(--red500)}
 .btn-red:hover{background:#d93a47}
 .btn-dark{background:#344155;color:var(--white);border-color:#344155}
@@ -168,11 +165,6 @@
 .site-goto:hover{background:var(--blue500);color:var(--white)}
 .machine-chips{display:flex;gap:5px;flex-wrap:wrap;padding:0 22px 14px}
 .machine-chip{font-size:10px;font-weight:600;color:var(--blue500);background:var(--blue50);border:1px solid var(--blue100);border-radius:10px;padding:2px 8px}
-/* 추가 카드 */
-.site-add-card{background:rgba(255,255,255,.7);border:2px dashed var(--gray300);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:260px;cursor:pointer;transition:all .18s;color:var(--gray400)}
-.site-add-card:hover{border-color:var(--blue500);color:var(--blue500);background:rgba(240,244,255,.8);transform:translateY(-4px)}
-.site-add-icon{font-size:32px;line-height:1}
-.site-add-txt{font-size:13px;font-weight:700}
 
 /* 접속 QR 카드 — PC 대시보드 우측 여유 공간에 표시 */
 .qr-access-card{background:rgba(255,255,255,.96);border:1px solid var(--gray200);border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100%;transition:all .18s}
@@ -182,21 +174,6 @@
 .qr-access-img-wrap{width:min(190px,78%);aspect-ratio:1/1;padding:10px;background:#fff;border:1px solid var(--gray200);border-radius:13px;box-shadow:0 2px 10px rgba(15,23,42,.07)}
 .qr-access-img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
 .qr-access-note{margin-top:12px;font-size:11px;color:var(--gray500);line-height:1.55;word-break:keep-all}
-
-/* 대시보드 상단: 작업별 점검기준 바로가기 */
-.criteria-guide-btn{
-  position:absolute;left:calc(50% + 370px);right:auto;top:50%;transform:translateY(-48%);
-  display:flex;align-items:center;gap:10px;min-width:190px;padding:13px 15px;
-  border:1px solid var(--blue100);border-radius:14px;background:rgba(255,255,255,.93);
-  box-shadow:0 4px 18px rgba(49,130,246,.10);cursor:pointer;text-align:left;
-  font-family:inherit;transition:all .16s;backdrop-filter:blur(5px)
-}
-.criteria-guide-btn:hover{transform:translateY(-52%);border-color:var(--blue500);box-shadow:0 9px 28px rgba(49,130,246,.18);background:#fff}
-.criteria-guide-icon{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:var(--blue50);color:var(--blue500);font-size:17px;font-weight:900;flex-shrink:0}
-.criteria-guide-text{display:flex;flex-direction:column;gap:3px;min-width:0}
-.criteria-guide-text strong{font-size:13px;color:var(--gray900);letter-spacing:-.25px;white-space:nowrap}
-.criteria-guide-text small{font-size:10px;color:var(--gray500);letter-spacing:-.1px}
-.criteria-guide-arrow{margin-left:auto;color:var(--blue500);font-size:15px;font-weight:800}
 
 /* 작업별 점검기준 팝업 */
 .criteria-modal-bg{padding:22px}
@@ -317,25 +294,6 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 .mobile-designation-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--gray200)}
 .mobile-designation-row span{color:var(--gray500);font-size:10px}
 .mobile-designation-pdf-btn{display:inline-flex;align-items:center;justify-content:center;min-height:27px;padding:4px 8px;border:1px solid var(--blue100);border-radius:6px;background:var(--blue50);color:var(--blue600);font-family:inherit;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap}
-
-/* 지정서 PDF는 첨부된 원본 PDF 서식에 입력값을 투명 레이어로 합성합니다. */
-#designationRenderStage{position:fixed;left:-12000px;top:0;width:794px;pointer-events:none;z-index:-10;background:#fff}
-.designation-certificate{width:794px;height:1123px;padding:64px 52px;background:#fff;color:#111;font-family:'Malgun Gothic','맑은 고딕',sans-serif;letter-spacing:-.25px}
-.designation-cert-frame{width:100%;height:100%;border:2px solid #111;padding:38px 40px 25px;display:flex;flex-direction:column;background:#fff}
-.designation-cert-title{text-align:center;font-size:36px;font-weight:900;letter-spacing:1px;margin-top:0;margin-bottom:26px}
-.designation-cert-info{font-size:20px;line-height:1.72;margin-left:8px;margin-bottom:21px}
-.designation-cert-info-row{display:flex;align-items:flex-start;min-height:35px}
-.designation-cert-label{width:86px;letter-spacing:10px;white-space:nowrap}
-.designation-cert-colon{width:26px}
-.designation-cert-value{flex:1;font-weight:500;letter-spacing:-.45px;word-break:keep-all}
-.designation-cert-intro{font-size:16px;line-height:1.75;margin:0 0 22px 8px;word-break:keep-all}
-.designation-cert-subtitle{font-size:21px;font-weight:700;margin:0 0 8px 0}
-.designation-cert-list{margin:0;padding-left:30px;font-size:15px;line-height:1.66;word-break:keep-all}
-.designation-cert-list li{padding-left:3px;margin-bottom:1px}
-.designation-cert-bottom{margin-top:auto;text-align:center;padding-top:6px}
-.designation-cert-date{font-size:18px;letter-spacing:13px;margin-bottom:25px;padding-left:13px}
-.designation-cert-sign{display:flex;align-items:center;justify-content:center;gap:9px;font-size:21px;letter-spacing:2px}
-.designation-cert-stamp{display:inline-grid;place-items:center;width:43px;height:52px;border:1px solid #777;font-size:12px;line-height:1.45;letter-spacing:2px;text-align:center;padding-left:2px}
 
 /* ════ 기준정보 페이지 ════ */
 .master-wrap{padding:24px}
@@ -516,8 +474,6 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 .mobile-edit-control:focus{outline:none;border-color:var(--blue500)}
 
 @media screen and (max-width:1180px){
-  .criteria-guide-btn{position:static;transform:none;margin:15px auto 0;min-width:190px}
-  .criteria-guide-btn:hover{transform:translateY(-2px)}
 }
 
 @media screen and (max-width:768px){
@@ -567,9 +523,6 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   .dash-hero-title{font-size:26px;letter-spacing:-.65px;margin-bottom:8px}
   .dash-hero-sub{font-size:12px;line-height:1.65;margin-bottom:14px;word-break:keep-all}
   .dash-hero-actions{font-size:11px}
-  .criteria-guide-btn{margin-top:13px;min-width:0;width:min(230px,100%);padding:11px 13px;border-radius:12px}
-  .criteria-guide-icon{width:30px;height:30px;font-size:15px}
-  .criteria-guide-text strong{font-size:12px}
   .criteria-modal-bg{padding:8px}
   .modal.criteria-modal{width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;max-height:calc(100dvh - 16px);border-radius:12px!important}
   .criteria-modal-head{padding:12px 13px;gap:8px}
@@ -705,7 +658,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   /* 숨김 */
   .topbar,.navbar,.work-toolbar,.td-del,.th-del,.tt,.toast,.modal-bg,.save-overlay,
   .work-header .btn, .sort-btn, .autoSaveIndicator, .row-order-handle, .qr-access-card,
-  .td-design-pdf,.th-design-pdf,#designationRenderStage { display:none!important; }
+  .td-design-pdf,.th-design-pdf { display:none!important; }
 
   /* 전체 폰트/배경 */
   body{ font-size:7.5pt!important; background:#fff!important; color:#000!important;
@@ -1348,18 +1301,6 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   </div>
 </div>
 
-<!-- 사업장 추가 모달 -->
-<div class="modal-bg" id="modalBg">
-  <div class="modal">
-    <h3>사업장 추가</h3>
-    <input id="modalSiteInp" placeholder="사업장명 입력 (예: 평택공장)" onkeydown="if(event.key==='Enter')confirmModal()">
-    <div class="modal-btns">
-      <button class="btn" onclick="closeModal()">취소</button>
-      <button class="btn btn-primary" onclick="confirmModal()">추가</button>
-    </div>
-  </div>
-</div>
-
 <!-- 비밀번호 모달 -->
 <div class="modal-bg" id="pwModalBg">
   <div class="modal" style="max-width:340px">
@@ -1393,7 +1334,6 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 </div>
 
 <!-- 지정서 PDF 생성용 숨김 영역 (원본 PDF 서식 기반 출력) -->
-<div id="designationRenderStage" aria-hidden="true"></div>
 
 <!-- 툴팁 -->
 <div class="tt" id="ttPop">
@@ -2312,8 +2252,6 @@ function flushMasterToGAS(site){
 /* ══════════════════════════════════════════
    사업장 추가/삭제
 ══════════════════════════════════════════ */
-function openAddSiteModal(){ document.getElementById('modalSiteInp').value=''; document.getElementById('modalBg').classList.add('show'); setTimeout(()=>document.getElementById('modalSiteInp').focus(),100); }
-function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
 function createSiteLocal(v){
   v = String(v||'').trim();
   if(!v || isDeprecatedSite(v)) return;
@@ -2323,17 +2261,6 @@ function createSiteLocal(v){
   } else if(!sites.includes(v)) {
     sites.push(v);
   }
-}
-function confirmModal(){
-  const v = document.getElementById('modalSiteInp').value.trim();
-  if(!v){ toast('사업장명을 입력하세요','err'); return; }
-  if(sites.includes(v)){ toast('이미 존재합니다','err'); return; }
-  createSiteLocal(v);
-  closeModal();
-  saveMasterToGAS(v, true);
-  saveRowsForSite(v, ()=>{});
-  saveSiteOrderToGAS(true);
-  goPage('work',v); toast(v+' 추가됨','ok');
 }
 function addSite(){
   const v = document.getElementById('newSiteInput').value.trim();
@@ -2619,22 +2546,6 @@ function saveRowsForSite(site, cb, onProgress){
   });
 }
 
-function saveToGAS(){
-  beginSaveOverlay('변경사항 저장 중...', curSite+' 데이터를 서버에 반영하고 있습니다.');
-  toast('저장 중...','');
-  saveRowsForSite(curSite, res=>{
-    if(res?.result==='success'){
-      finishSaveOverlay(true, '저장 완료', res.count+'건을 안전하게 반영했습니다.');
-      toast('✅ 저장 완료 ('+res.count+'건)','ok'); setGasOk(); renderDashboard();
-    } else {
-      finishSaveOverlay(false, '저장하지 못했습니다', res?.error||'오류');
-      toast('❌ 저장 실패: '+(res?.error||'오류'),'err');
-    }
-  }, (done,total,detail)=>{
-    setSaveOverlayProgress(total ? Math.round(done/total*100) : 0, curSite+' · '+detail);
-  });
-}
-function saveAllToGAS(){ autoSaveAll(); }
 
 function ensureSite(site){
   site = String(site||'').trim();
@@ -2687,9 +2598,6 @@ function appendLoadedRows(rows){
   });
 }
 
-function loadAllFromGAS(){
-  reloadAllFromGAS({manual:true});
-}
 
 /* ══════════════════════════════════════════
    엑셀 / PDF
@@ -3943,7 +3851,6 @@ function readOrgLocal(site){try{const raw=localStorage.getItem(orgLocalKey(site)
 function writeOrgLocal(site,data){try{localStorage.setItem(orgLocalKey(site),JSON.stringify(normalizeOrgChart(data)));}catch(e){}}
 function readOrgHistoryLocal(site){try{const raw=localStorage.getItem(orgHistoryLocalKey(site));const arr=raw?JSON.parse(raw):[];return Array.isArray(arr)?arr:[];}catch(e){return [];}}
 function writeOrgHistoryLocal(site,arr){try{localStorage.setItem(orgHistoryLocalKey(site),JSON.stringify((arr||[]).slice(0,ORG_HISTORY_LIMIT)));}catch(e){}}
-function stableJson(v){return JSON.stringify(v,Object.keys(v||{}).sort());}
 function orgHistorySignature(entry){return JSON.stringify({data:normalizeOrgChart(entry.data||{}),snapshot:normalizeOrgSnapshot(entry.snapshot||{})});}
 function addOrgHistoryLocal(site,data,snapshot,serverEntry){
   const arr=readOrgHistoryLocal(site); const now=new Date(); const entry=serverEntry||{versionId:'local_'+now.getTime(),site,savedAt:now.toISOString(),summary:'조직도 변경내용 저장',data:normalizeOrgChart(data),snapshot:normalizeOrgSnapshot(snapshot)};
