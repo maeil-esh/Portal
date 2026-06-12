@@ -6,7 +6,7 @@
 <title>관리감독자 및 유해위험작업 현황</title>
 <link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- v5.3.4: 조직도 저장 타임아웃 보완(콜백 지연응답 가드, 저장 45초 대기, 중복 저장 방지) + 이력 모달 접근성/파비콘 정리 / v5.3.3: 이력 한 줄 목록·삭제 / v5.3.2: 수급사 추가·삭제, 위원회 삭제·복원 -->
+<!-- v5.3.5: 저장 이력 임시+서버 병합 표시(목록 교체 깜빡임 제거) + 서버 저장 성공 시 임시 이력을 서버 이력으로 승격 / v5.3.4: 저장 타임아웃 보완 / v5.3.3: 이력 한 줄 목록·삭제 / v5.3.2: 수급사·위원회 옵션 -->
 <style>
 :root {
   --blue50:#f0f4ff; --blue100:#d6e4ff; --blue500:#3182f6; --blue600:#1b6ef3;
@@ -3871,7 +3871,12 @@ function addOrgHistoryLocal(site,data,snapshot,serverEntry){
   const arr=readOrgHistoryLocal(site); const now=new Date(); const entry=serverEntry||{versionId:'local_'+now.getTime(),site,savedAt:now.toISOString(),summary:'조직도 변경내용 저장',data:normalizeOrgChart(data),snapshot:normalizeOrgSnapshot(snapshot)};
   entry.data=normalizeOrgChart(entry.data||data); entry.snapshot=normalizeOrgSnapshot(entry.snapshot||snapshot);
   const sig=orgHistorySignature(entry); const first=arr[0];
-  if(first&&orgHistorySignature(first)===sig) return first;
+  if(first&&orgHistorySignature(first)===sig){
+    // 같은 내용의 임시 이력이 이미 맨 앞에 있을 때: 서버 저장 결과가 오면
+    // 임시(local_*)를 서버 versionId로 승격해 "임시" 표시가 누적되지 않게 한다.
+    if(serverEntry&&String(first.versionId||'').indexOf('local_')===0){arr[0]=entry;writeOrgHistoryLocal(site,arr);return entry;}
+    return first;
+  }
   arr.unshift(entry); writeOrgHistoryLocal(site,arr); return entry;
 }
 function setOrgStatus(msg,tone){const el=document.getElementById('orgStatus');if(!el)return;el.textContent=msg;el.className='org-status'+(tone?' '+tone:'');}
@@ -3949,7 +3954,21 @@ function formatOrgSavedAt(v){try{return new Date(v).toLocaleString('ko-KR',{year
 function returnToCurrentOrgChart(){orgHistoryPreview=null;setOrgHistoryPreviewUi(false);const data=orgChartCache[curOrgSite]||readOrgLocal(curOrgSite)||defaultOrgChart();applyOrgChartForm(data);refreshOrgBottom(false);bindOrgInputs();setOrgStatus('✓ 현재 조직도로 복귀','ok');}
 function openOrgHistoryModal(){const bg=document.getElementById('orgHistoryModalBg');if(bg){bg.classList.add('show');bg.setAttribute('aria-hidden','false');}document.getElementById('orgHistorySiteLabel').textContent=curOrgSite;loadOrgHistoryList();}
 function closeOrgHistoryModal(){const bg=document.getElementById('orgHistoryModalBg');if(bg){if(document.activeElement&&bg.contains(document.activeElement))document.activeElement.blur();bg.classList.remove('show');bg.setAttribute('aria-hidden','true');}}
-function loadOrgHistoryList(){const local=readOrgHistoryLocal(curOrgSite);renderOrgHistoryList(local,true);gasCall('listOrgChartHistory',{site:curOrgSite,limit:40},res=>{if(res?.result==='success'&&Array.isArray(res.entries)){orgHistoryEntries=res.entries;renderOrgHistoryList(res.entries,false);}else if(!local.length){renderOrgHistoryList([],false);}}, {maxAttempts:1});}
+function orgHistorySrcOf(e){return e&&e.src?e.src:(String(e?.versionId||'').indexOf('local_')===0?'local':'server');}
+function loadOrgHistoryList(){
+  const localAll=readOrgHistoryLocal(curOrgSite).map(e=>Object.assign({},e,{src:orgHistorySrcOf(e)}));
+  renderOrgHistoryList(localAll,null); // 서버 응답 전까지 캐시를 먼저 표시
+  gasCall('listOrgChartHistory',{site:curOrgSite,limit:40},res=>{
+    if(res?.result==='success'&&Array.isArray(res.entries)){
+      const server=res.entries.map(e=>Object.assign({},e,{src:'server'}));
+      const serverIds=new Set(server.map(e=>String(e.versionId)));
+      // 서버에 없는 브라우저 임시(local_*) 이력만 덧붙여 병합 — 목록이 통째로 바뀌며 줄어드는 현상 방지
+      const extras=localAll.filter(e=>e.src==='local'&&!serverIds.has(String(e.versionId)));
+      const merged=server.concat(extras).sort((a,b)=>new Date(b.savedAt)-new Date(a.savedAt));
+      renderOrgHistoryList(merged,null);
+    } else if(!localAll.length){renderOrgHistoryList([],null);}
+  }, {maxAttempts:1});
+}
 function deleteOrgHistoryVersion(versionId,isLocal){
   versionId=String(versionId||'');if(!versionId)return;
   if(!confirm('이 저장 이력을 삭제할까요?\n삭제한 이력은 복구할 수 없습니다.'))return;
@@ -3963,7 +3982,7 @@ function deleteOrgHistoryVersion(versionId,isLocal){
 }
 function renderOrgHistoryList(entries,isLocal){
   const box=document.getElementById('orgHistoryList');if(!box)return;orgHistoryEntries=Array.isArray(entries)?entries:[];if(!orgHistoryEntries.length){box.innerHTML='<div class="org-history-empty">아직 저장 이력이 없습니다.<br>조직도 내용을 입력한 뒤 저장하면 첫 이력이 생성됩니다.</div>';return;}
-  box.innerHTML=orgHistoryEntries.map((e,i)=>'<div class="org-history-item"><strong>'+esc(formatOrgSavedAt(e.savedAt))+'</strong><span class="org-history-src">'+(isLocal?'임시':'서버')+'</span><span class="org-history-sum" title="'+esc(e.summary||'조직도 변경내용 저장')+'">'+esc(e.summary||'조직도 변경내용 저장')+'</span><span class="org-history-cnt">'+Number(e.snapshot?.total||e.total||0)+'명</span><div class="org-history-actions"><button class="btn btn-sm" onclick="viewOrgHistoryVersion(\''+esc(e.versionId||'')+'\')">보기</button><button class="btn btn-sm btn-primary" onclick="restoreOrgHistoryVersion(\''+esc(e.versionId||'')+'\')">복원</button><button class="btn btn-sm org-history-del" title="이 이력 삭제" onclick="deleteOrgHistoryVersion(\''+esc(e.versionId||'')+'\','+(isLocal?'true':'false')+')">🗑</button></div></div>').join('');
+  box.innerHTML=orgHistoryEntries.map((e,i)=>{const src=e.src?e.src:(isLocal?'local':orgHistorySrcOf(e));return '<div class="org-history-item"><strong>'+esc(formatOrgSavedAt(e.savedAt))+'</strong><span class="org-history-src">'+(src==='local'?'임시':'서버')+'</span><span class="org-history-sum" title="'+esc(e.summary||'조직도 변경내용 저장')+'">'+esc(e.summary||'조직도 변경내용 저장')+'</span><span class="org-history-cnt">'+Number(e.snapshot?.total||e.total||0)+'명</span><div class="org-history-actions"><button class="btn btn-sm" onclick="viewOrgHistoryVersion(\''+esc(e.versionId||'')+'\')">보기</button><button class="btn btn-sm btn-primary" onclick="restoreOrgHistoryVersion(\''+esc(e.versionId||'')+'\')">복원</button><button class="btn btn-sm org-history-del" title="이 이력 삭제" onclick="deleteOrgHistoryVersion(\''+esc(e.versionId||'')+'\','+(src==='local'?'true':'false')+')">🗑</button></div></div>';}).join('');
 }
 function findOrgHistoryLocal(versionId){return readOrgHistoryLocal(curOrgSite).find(e=>String(e.versionId)===String(versionId));}
 function fetchOrgHistoryVersion(versionId,cb){const local=findOrgHistoryLocal(versionId);gasCall('loadOrgChartHistory',{site:curOrgSite,versionId},res=>{if(res?.result==='success'&&res.entry)cb(res.entry);else if(local)cb(local);else toast('해당 저장 이력을 불러오지 못했습니다.','err');}, {maxAttempts:1});}
