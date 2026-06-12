@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>관리감독자 및 유해위험작업 현황</title>
-<!-- v4.7: 기준정보 공정명 목록을 PC·모바일 현황 입력 드롭다운과 연동 -->
+<!-- v4.8: 사번 선행 0 보존(화면·GAS·엑셀 업로드) + 기준정보 공정명 연동 -->
 <style>
 :root {
   --blue50:#f0f4ff; --blue100:#d6e4ff; --blue500:#3182f6; --blue600:#1b6ef3;
@@ -1664,7 +1664,7 @@ function openMobileEdit(id){
     team.innerHTML    = buildMasterSelectOptions(sd().master.team, r.team, '팀 선택');
     process.innerHTML = buildMasterSelectOptions(sd().master.process, r.process, '공정 선택');
     pos.innerHTML     = buildMasterSelectOptions(sd().master.position, r.position, '직책 선택');
-    document.getElementById('mobileEditEmpno').value   = r.empno || '';
+    document.getElementById('mobileEditEmpno').value   = empnoText(r.empno);
     document.getElementById('mobileEditName').value    = r.name || '';
     document.getElementById('mobileEditDesignationDate').value = normalizeDateInput(r.designationDate) || todayISO();
     document.getElementById('mobileEditModalBg').classList.add('show');
@@ -1684,7 +1684,7 @@ function saveMobileEdit(){
   r.team     = document.getElementById('mobileEditTeam').value;
   r.process  = document.getElementById('mobileEditProcess').value.trim();
   r.position = document.getElementById('mobileEditPosition').value;
-  r.empno    = document.getElementById('mobileEditEmpno').value.trim();
+  r.empno    = empnoText(document.getElementById('mobileEditEmpno').value);
   r.name     = document.getElementById('mobileEditName').value.trim();
   r.designationDate = normalizeDateInput(document.getElementById('mobileEditDesignationDate').value) || '';
   r.date     = today();
@@ -1694,7 +1694,9 @@ function saveMobileEdit(){
   toast('✅ 기본정보를 저장했습니다','ok');
 }
 
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function textValue(v){ return v===undefined||v===null?'':String(v); }
+function empnoText(v){ return textValue(v).trim(); }
+function esc(s){ return textValue(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
 // 기준정보 목록을 현황 입력 드롭다운과 연결합니다.
 // 과거에 입력된 값이 기준정보에서 삭제되었더라도 화면에서 사라지지 않도록 기존값을 임시 옵션으로 유지합니다.
@@ -1708,7 +1710,7 @@ function buildMasterSelectOptions(list, current, placeholder){
   ).join('');
 }
 
-function setF(id,f,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r[f]=v; r.date=today(); if(['name','empno','team','process'].includes(f))renderTable(); triggerAutoSave(); }
+function setF(id,f,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r[f]=f==='empno'?empnoText(v):v; r.date=today(); if(['name','empno','team','process'].includes(f))renderTable(); triggerAutoSave(); }
 function setDesignationDate(id,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r.designationDate=normalizeDateInput(v)||''; r.date=today(); renderTable(); triggerAutoSave(); }
 function toggleCheck(id,mid){ if(!isUnlocked()){ requireAuth(()=>{ const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }); return; } const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }
 
@@ -2503,7 +2505,7 @@ function appendLoadedRows(rows){
     const d=siteData[row.site];
     if(!d) return;
     d.rows.push({ id:d.nextId++, team:row.team||'', process:row.process||'', position:row.position||'',
-      empno:row.empno||'', name:row.name||'', bigo:row.bigo||'',
+      empno:empnoText(row.empno), name:row.name||'', bigo:row.bigo||'',
       // 구버전 테스트 데이터가 비고에 날짜를 넣었던 경우에만 1회 호환합니다.
       designationDate:normalizeDateInput(row.designationDate)||normalizeDateInput(row.bigo)||'', date:normalizeDateInput(row.date)||'',
       machines:Object.fromEntries(MACHINES.map(m=>[m.id,row[m.id]==='O'])) });
@@ -2656,7 +2658,7 @@ function uploadHeaderMap(matrix){
   }
   return null;
 }
-function parseExcelUploadMatrix(matrix,target){
+function parseExcelUploadMatrix(matrix,target,displayMatrix){
   const result={rows:[],errors:[],warnings:[]};
   const hm=uploadHeaderMap(matrix);
   if(!hm){ result.errors.push('업로드양식 헤더를 찾지 못했습니다. 제공된 표준서식의 시트명과 열 제목을 변경하지 마세요.'); return result; }
@@ -2665,6 +2667,7 @@ function parseExcelUploadMatrix(matrix,target){
   const nameSeen=new Map();
   for(let i=hm.rowIndex+1;i<matrix.length;i++){
     const row=Array.isArray(matrix[i])?matrix[i]:[];
+    const displayRow=Array.isArray(displayMatrix&&displayMatrix[i])?displayMatrix[i]:row;
     const excelRow=i+1;
     const meaningful=['site','team','process','position','empno','name','designationDate','hoist','conveyor','robot','lift','press','compressor','forklift','welding','wire','heavy','radiation','bigo']
       .some(k=>String(get(row,k)??'').trim()!=='');
@@ -2673,7 +2676,7 @@ function parseExcelUploadMatrix(matrix,target){
     const team=String(get(row,'team')||'').trim();
     const process=String(get(row,'process')||'').trim();
     const position=String(get(row,'position')||'').trim();
-    const empno=String(get(row,'empno')||'').trim();
+    const empno=empnoText(get(displayRow,'empno')); // 엑셀 표시 문자열을 우선 사용하여 012345 같은 선행 0을 보존
     const name=String(get(row,'name')||'').trim();
     const designationRaw=get(row,'designationDate');
     const designationDate=excelUploadDateToISO(designationRaw);
@@ -2715,7 +2718,8 @@ function handleExcelUploadFile(file){
         const ws=book.Sheets['업로드양식'] || book.Sheets[book.SheetNames[0]];
         if(!ws) throw new Error('읽을 수 있는 시트가 없습니다.');
         const matrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true});
-        const parsed=parseExcelUploadMatrix(matrix,target);
+        const displayMatrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false});
+        const parsed=parseExcelUploadMatrix(matrix,target,displayMatrix);
         excelUploadRows=parsed.rows; excelUploadErrors=parsed.errors; excelUploadWarnings=parsed.warnings;
         renderExcelUploadSummary();
       }catch(err){
@@ -2762,7 +2766,7 @@ function replaceSiteRowsFromExcel(site,rows){
   ensureSite(site);
   const d=sd(site);
   d.rows=(rows||[]).map((r,i)=>({
-    id:i+1, team:r.team||'', process:r.process||'', position:r.position||'', empno:r.empno||'', name:r.name||'',
+    id:i+1, team:r.team||'', process:r.process||'', position:r.position||'', empno:empnoText(r.empno), name:r.name||'',
     designationDate:normalizeDateInput(r.designationDate)||'', bigo:r.bigo||'', date:today(),
     machines:Object.fromEntries(MACHINES.map(m=>[m.id,!!(r.machines&&r.machines[m.id])]))
   }));
@@ -3281,7 +3285,7 @@ const LD = {
   _msgIndex: 0,
   _messages: [
     '서버 연결 상태를 확인하고 있습니다...',
-    '처음 접속은 잠시 지연될 수 있습니다...',
+    '처음 접속은 서버가 깨어나는 동안 잠시 지연될 수 있습니다...',
     '데이터를 불러오는 중입니다. 화면을 닫지 말고 잠시만 기다려 주세요...',
     '응답을 기다리는 동안 화면 구성을 준비하고 있습니다...'
   ],
