@@ -22,46 +22,76 @@
   --sh2:0 4px 16px rgba(0,0,0,.10);
 }
 
-/* ════ 로딩 스크린 ════ */
+/* ════ 로딩 스크린 — 첫 접속 대기 체감 개선 ════ */
 #loading-screen{
   position:fixed;inset:0;z-index:99999;
-  background:linear-gradient(145deg,#f0f4ff 0%,#f9fafb 50%,#eaf9f4 100%);
+  background:linear-gradient(145deg,#f0f4ff 0%,#f9fafb 48%,#eaf9f4 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:0;transition:opacity .5s ease,visibility .5s ease;
+  padding:24px;overflow:hidden;
+  transition:opacity .45s ease,visibility .45s ease;
 }
 #loading-screen.hidden{opacity:0;visibility:hidden;pointer-events:none;}
 
-/* 배경 블롭 */
 .ld-blob{position:absolute;inset:0;pointer-events:none;overflow:hidden}
-.ld-blob::before{content:'';position:absolute;width:600px;height:600px;top:-150px;left:-100px;border-radius:50%;background:radial-gradient(circle,rgba(49,130,246,.08) 0%,transparent 70%)}
-.ld-blob::after{content:'';position:absolute;width:500px;height:500px;bottom:-100px;right:-80px;border-radius:50%;background:radial-gradient(circle,rgba(0,180,147,.07) 0%,transparent 70%)}
-.ld-dots-bg{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(15,23,42,.05) 1px,transparent 1px);background-size:28px 28px}
+.ld-blob::before{content:'';position:absolute;width:620px;height:620px;top:-180px;left:-130px;border-radius:50%;background:radial-gradient(circle,rgba(49,130,246,.10) 0%,transparent 70%);animation:ldFloatA 8s ease-in-out infinite}
+.ld-blob::after{content:'';position:absolute;width:520px;height:520px;bottom:-140px;right:-100px;border-radius:50%;background:radial-gradient(circle,rgba(0,180,147,.09) 0%,transparent 70%);animation:ldFloatB 9s ease-in-out infinite}
+.ld-dots-bg{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,rgba(15,23,42,.055) 1px,transparent 1px);background-size:28px 28px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.8),rgba(0,0,0,.25))}
 
-/* 로고 영역 */
-.ld-logo-wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:28px;animation:ldFadeDown .7s cubic-bezier(.22,1,.36,1) both}
-.ld-icon{width:56px;height:56px;background:var(--blue500);border-radius:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(49,130,246,.25);animation:ldPulse 2s ease-in-out infinite}
-.ld-title{text-align:center}
-.ld-title h1{font-size:clamp(22px,4vw,34px);font-weight:800;color:var(--gray900);letter-spacing:-.5px;line-height:1.2;margin-bottom:8px}
+.ld-panel{
+  position:relative;z-index:1;width:min(420px,calc(100vw - 40px));
+  display:flex;flex-direction:column;align-items:center;
+  padding:30px 28px 24px;border:1px solid rgba(209,214,219,.9);border-radius:22px;
+  background:rgba(255,255,255,.92);box-shadow:0 18px 55px rgba(25,31,40,.10);
+  animation:ldFadeDown .55s cubic-bezier(.22,1,.36,1) both;
+}
+.ld-logo-wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:18px;width:100%}
+.ld-icon-wrap{position:relative;width:76px;height:76px;display:flex;align-items:center;justify-content:center;margin-bottom:2px}
+.ld-ring{position:absolute;inset:0;border-radius:50%;border:3px solid rgba(49,130,246,.14);border-top-color:var(--blue500);animation:ldSpin 1.1s linear infinite}
+.ld-ring::after{content:'';position:absolute;inset:8px;border-radius:50%;border:2px dashed rgba(0,180,147,.34);animation:ldSpinReverse 2.6s linear infinite}
+.ld-icon{position:relative;width:54px;height:54px;background:var(--blue500);border-radius:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(49,130,246,.25);animation:ldPulse 2s ease-in-out infinite}
+.ld-title{text-align:center;width:100%}
+.ld-title h1{font-size:clamp(22px,4vw,31px);font-weight:800;color:var(--gray900);letter-spacing:-.55px;line-height:1.24;margin-bottom:8px}
 .ld-title h1 span{color:var(--blue500)}
-.ld-title p{font-size:13px;color:var(--gray500);letter-spacing:-.1px}
+.ld-title p{font-size:13px;color:var(--gray600);letter-spacing:-.15px;line-height:1.5}
+.ld-wait-note{margin-top:8px;font-size:12px;color:var(--gray500);line-height:1.45;text-align:center}
 
-/* 프로그레스 바 */
-.ld-progress-wrap{position:relative;z-index:1;width:220px;margin-top:8px}
-.ld-progress-track{height:3px;background:var(--gray200);border-radius:2px;overflow:hidden}
-.ld-progress-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--blue500),var(--green500));width:0%;transition:width .3s ease}
-.ld-status{font-size:11px;color:var(--gray400);text-align:center;margin-top:8px;letter-spacing:-.1px;min-height:16px}
+.ld-progress-wrap{position:relative;z-index:1;width:100%;margin-top:22px}
+.ld-progress-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--gray500);font-weight:700;letter-spacing:-.1px}
+.ld-progress-track{position:relative;height:8px;background:var(--gray200);border-radius:999px;overflow:hidden}
+.ld-progress-bar{position:relative;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--blue500),var(--green500));width:0%;min-width:34px;transition:width .35s ease}
+.ld-progress-bar::after{content:'';position:absolute;top:0;bottom:0;left:-40%;width:40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:ldShimmer 1.15s linear infinite}
+.ld-status{font-size:12px;color:var(--gray700);font-weight:700;text-align:center;margin-top:12px;letter-spacing:-.15px;min-height:18px}
+.ld-elapsed{font-size:11px;color:var(--gray500);text-align:center;margin-top:5px;min-height:16px}
 
-/* 하단 뱃지 */
-.ld-badge{position:relative;z-index:1;margin-top:32px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.8);border:1px solid var(--gray200);border-radius:20px;padding:5px 14px 5px 10px;backdrop-filter:blur(4px)}
+.ld-steps{width:100%;display:grid;grid-template-columns:1fr;gap:7px;margin-top:18px}
+.ld-step{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid var(--gray200);border-radius:10px;background:#fff;font-size:12px;color:var(--gray600)}
+.ld-step-dot{width:8px;height:8px;border-radius:50%;background:var(--gray300);flex:0 0 8px}
+.ld-step.active{border-color:rgba(49,130,246,.35);background:#f7faff;color:var(--gray900);font-weight:700}
+.ld-step.active .ld-step-dot{background:var(--blue500);box-shadow:0 0 0 4px rgba(49,130,246,.12);animation:ldBlink 1.4s ease-in-out infinite}
+.ld-step.done{color:var(--gray500)}
+.ld-step.done .ld-step-dot{background:var(--green500)}
+
+.ld-badge{position:relative;z-index:1;margin-top:14px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.84);border:1px solid var(--gray200);border-radius:20px;padding:6px 14px 6px 10px;backdrop-filter:blur(4px)}
 .ld-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--green500);animation:ldBlink 2s ease-in-out infinite}
-.ld-badge span{font-size:11px;font-weight:600;color:var(--gray600);letter-spacing:.02em}
+.ld-badge span{font-size:11px;font-weight:700;color:var(--gray600);letter-spacing:.02em}
 
-@keyframes ldFadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes ldPulse{0%,100%{box-shadow:0 8px 32px rgba(49,130,246,.25)}50%{box-shadow:0 8px 40px rgba(49,130,246,.45)}}
-@keyframes ldBlink{0%,100%{opacity:1}50%{opacity:.3}}
+@media(max-width:480px){
+  #loading-screen{padding:18px}
+  .ld-panel{width:100%;padding:26px 20px 20px;border-radius:18px}
+  .ld-title h1{font-size:22px}
+  .ld-title p,.ld-wait-note{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .ld-ring,.ld-ring::after,.ld-progress-bar::after,.ld-blob::before,.ld-blob::after,.ld-icon,.ld-step.active .ld-step-dot,.ld-badge-dot{animation:none!important}
+}
+@keyframes ldFadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ldPulse{0%,100%{box-shadow:0 8px 28px rgba(49,130,246,.25)}50%{box-shadow:0 8px 36px rgba(49,130,246,.42)}}
+@keyframes ldBlink{0%,100%{opacity:1}50%{opacity:.38}}
 @keyframes ldSpin{to{transform:rotate(360deg)}}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Malgun Gothic','맑은 고딕',-apple-system,sans-serif;font-size:13px;background:var(--gray100);color:var(--gray900);-webkit-font-smoothing:antialiased}
+@keyframes ldSpinReverse{to{transform:rotate(-360deg)}}
+@keyframes ldShimmer{to{left:115%}}
+@keyframes ldFloatA{0%,100%{transform:translate(0,0)}50%{transform:translate(26px,22px)}}
+@keyframes ldFloatB{0%,100%{transform:translate(0,0)}50%{transform:translate(-22px,-18px)}}
 
 /* ════ 글로벌 컴포넌트 ════ */
 .btn{padding:7px 14px;border:1.5px solid var(--gray200);border-radius:var(--r6);font-size:12px;font-family:inherit;font-weight:600;cursor:pointer;background:var(--white);color:var(--gray700);display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:all .12s;letter-spacing:-.2px}
@@ -836,27 +866,49 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 <body>
 
 <!-- ════ 로딩 스크린 ════ -->
-<div id="loading-screen">
+<div id="loading-screen" role="status" aria-live="polite" aria-label="초기 데이터 로딩 중">
   <div class="ld-blob"></div>
   <div class="ld-dots-bg"></div>
-  <div class="ld-logo-wrap">
-    <div class="ld-icon">
-      <svg viewBox="0 0 28 28" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26">
-        <path d="M14 3L22 7.5V17.5L14 22L6 17.5V7.5L14 3Z"/>
-        <path d="M14 3V22M6 7.5L22 17.5M22 7.5L6 17.5"/>
-      </svg>
-    </div>
-    <div class="ld-title">
-      <h1>관리감독자 및 <span>유해위험작업 현황</span></h1>
-      <p>지정·점검 대상 통합 관리 시스템</p>
-    </div>
-    <div class="ld-progress-wrap">
-      <div class="ld-progress-track">
-        <div class="ld-progress-bar" id="ldBar"></div>
+
+  <div class="ld-panel">
+    <div class="ld-logo-wrap">
+      <div class="ld-icon-wrap" aria-hidden="true">
+        <div class="ld-ring"></div>
+        <div class="ld-icon">
+          <svg viewBox="0 0 28 28" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26">
+            <path d="M14 3L22 7.5V17.5L14 22L6 17.5V7.5L14 3Z"/>
+            <path d="M14 3V22M6 7.5L22 17.5M22 7.5L6 17.5"/>
+          </svg>
+        </div>
       </div>
-      <div class="ld-status" id="ldStatus">시스템 초기화 중...</div>
+
+      <div class="ld-title">
+        <h1>관리감독자 및 <span>유해위험작업 현황</span></h1>
+        <p>지정·점검 대상 데이터를 불러오고 있습니다.</p>
+        <div class="ld-wait-note">첫 접속 또는 서버 절전 해제 시 10~30초 정도 소요될 수 있습니다.</div>
+      </div>
+
+      <div class="ld-progress-wrap">
+        <div class="ld-progress-meta">
+          <span>초기화 진행률</span>
+          <span id="ldPct">0%</span>
+        </div>
+        <div class="ld-progress-track" aria-hidden="true">
+          <div class="ld-progress-bar" id="ldBar"></div>
+        </div>
+        <div class="ld-status" id="ldStatus">시스템 초기화 중...</div>
+        <div class="ld-elapsed" id="ldElapsed">대기 시간 0초</div>
+      </div>
+
+      <div class="ld-steps" aria-hidden="true">
+        <div class="ld-step active" id="ldStep1"><span class="ld-step-dot"></span><span>화면 구성 준비</span></div>
+        <div class="ld-step" id="ldStep2"><span class="ld-step-dot"></span><span>서버 연결 확인</span></div>
+        <div class="ld-step" id="ldStep3"><span class="ld-step-dot"></span><span>기준정보 및 현황 데이터 로딩</span></div>
+        <div class="ld-step" id="ldStep4"><span class="ld-step-dot"></span><span>표와 모바일 카드 렌더링</span></div>
+      </div>
     </div>
   </div>
+
   <div class="ld-badge">
     <span class="ld-badge-dot"></span>
     <span>산업안전보건법 제16조 / 안전보건규칙 별표3</span>
@@ -3213,63 +3265,142 @@ function toast(msg,type){ const el=document.getElementById('toast'); el.textCont
 
 /* ════ 로딩 스크린 제어 ════ */
 const LD = {
-  bar: null, status: null, screen: null,
-  _pct: 0,          // 현재 진행률
-  _done: false,      // 실제 데이터 로드 완료 여부
-  _domReady: false,  // DOM 준비 여부
+  bar: null,
+  status: null,
+  screen: null,
+  pctText: null,
+  elapsed: null,
+  steps: [],
+  _pct: 0,
+  _done: false,
+  _domReady: false,
+  _startedAt: 0,
+  _tickTimer: null,
+  _messageTimer: null,
+  _autoTimer: null,
+  _msgIndex: 0,
+  _messages: [
+    '서버 연결 상태를 확인하고 있습니다...',
+    '처음 접속은 잠시 지연될 수 있습니다...',
+    '데이터를 불러오는 중입니다. 화면을 닫지 말고 잠시만 기다려 주세요...',
+    '응답을 기다리는 동안 화면 구성을 준비하고 있습니다...'
+  ],
 
   init() {
-    this.bar    = document.getElementById('ldBar');
+    this.bar = document.getElementById('ldBar');
     this.status = document.getElementById('ldStatus');
     this.screen = document.getElementById('loading-screen');
+    this.pctText = document.getElementById('ldPct');
+    this.elapsed = document.getElementById('ldElapsed');
+    this.steps = [
+      document.getElementById('ldStep1'),
+      document.getElementById('ldStep2'),
+      document.getElementById('ldStep3'),
+      document.getElementById('ldStep4')
+    ];
     this._domReady = true;
-    // DOM 준비 즉시 15%
-    this._set(15, '시스템 초기화 중...');
-    // GAS URL 있으면 순차 진행, 없으면 3단계 후 완료
+    this._startedAt = Date.now();
+
+    this._set(12, '화면 구성 준비 중...');
+    this._startElapsedTimer();
+    this._startMessageRotation();
+    this._startSoftProgress();
+
     if (GAS_URL && GAS_URL !== 'YOUR_GAS_DEPLOYMENT_URL') {
-      // GAS 연결 있음 → 30%까지 빠르게, 이후 실제 로딩 대기
-      setTimeout(() => this._set(30, '서버 연결 중...'), 200);
-      setTimeout(() => this._set(50, '사업장 데이터 로딩 중...'), 500);
-      // 이후 progress()로 외부에서 제어
+      setTimeout(() => this._set(28, '서버 연결 중...'), 200);
+      setTimeout(() => this._set(44, '사업장 데이터 요청 중...'), 650);
     } else {
-      // GAS 없음 → 빠르게 완료
-      setTimeout(() => this._set(60, '화면 구성 중...'), 150);
-      setTimeout(() => this._set(100, '완료!'), 350);
-      setTimeout(() => this.hide(), 700);
+      setTimeout(() => this._set(62, '화면 구성 중...'), 180);
+      setTimeout(() => this._set(100, '완료!'), 430);
+      setTimeout(() => this.hide(), 780);
     }
-    // GAS 콜드 스타트가 길어져도 오류로 단정하지 않습니다. 화면만 먼저 열고 백그라운드 로딩은 계속합니다.
+
+    // GAS 콜드 스타트가 길어져도 멈춘 화면처럼 보이지 않도록 안내 후 화면을 먼저 표시합니다.
     setTimeout(() => {
       if (!this._done) {
-        this._set(92, '서버 응답이 지연되어 화면을 먼저 표시합니다...');
-        setTimeout(() => this.hide(), 650);
+        this._set(94, '서버 응답이 지연되어 화면을 먼저 표시합니다. 데이터는 계속 동기화됩니다...');
+        setTimeout(() => this.hide(), 900);
       }
     }, 22000);
   },
 
-  // 외부에서 호출: 단계별 진행률 업데이트
   progress(pct, msg) {
     if (this._done) return;
     this._set(Math.max(this._pct, pct), msg);
   },
 
-  // 로딩 완료 (외부에서 호출)
   complete(msg) {
     if (this._done) return;
     this._done = true;
     this._set(100, msg || '완료!');
-    setTimeout(() => this.hide(), 400);
+    this._stopTimers();
+    setTimeout(() => this.hide(), 500);
   },
 
   _set(pct, msg) {
-    this._pct = pct;
-    if (this.bar)    this.bar.style.width = pct + '%';
-    if (this.status) this.status.textContent = msg;
+    const safePct = Math.max(0, Math.min(100, Math.round(pct)));
+    this._pct = safePct;
+    if (this.bar) this.bar.style.width = safePct + '%';
+    if (this.pctText) this.pctText.textContent = safePct + '%';
+    if (this.status && msg) this.status.textContent = msg;
+    this._updateSteps(safePct);
+  },
+
+  _updateSteps(pct) {
+    const activeIndex = pct >= 88 ? 3 : pct >= 58 ? 2 : pct >= 28 ? 1 : 0;
+    this.steps.forEach((el, idx) => {
+      if (!el) return;
+      el.classList.toggle('done', idx < activeIndex);
+      el.classList.toggle('active', idx === activeIndex);
+    });
+  },
+
+  _startElapsedTimer() {
+    this._tickTimer = setInterval(() => {
+      if (!this.elapsed) return;
+      const sec = Math.max(0, Math.floor((Date.now() - this._startedAt) / 1000));
+      const suffix = sec >= 10 ? ' · 첫 접속은 조금 더 걸릴 수 있습니다.' : '';
+      this.elapsed.textContent = '대기 시간 ' + sec + '초' + suffix;
+    }, 1000);
+  },
+
+  _startMessageRotation() {
+    this._messageTimer = setInterval(() => {
+      if (this._done || this._pct >= 96 || !this.status) return;
+      if (this._pct >= 44) {
+        this._msgIndex = (this._msgIndex + 1) % this._messages.length;
+        this.status.textContent = this._messages[this._msgIndex];
+      }
+    }, 3200);
+  },
+
+  _startSoftProgress() {
+    this._autoTimer = setInterval(() => {
+      if (this._done) return;
+      // 실제 완료 전에는 90%까지만 천천히 올려서 정지된 느낌을 줄입니다.
+      if (this._pct < 90) {
+        const next = this._pct + (this._pct < 55 ? 2 : 1);
+        this._set(Math.min(next, 90), null);
+      }
+    }, 1200);
+  },
+
+  _stopTimers() {
+    if (this._tickTimer) clearInterval(this._tickTimer);
+    if (this._messageTimer) clearInterval(this._messageTimer);
+    if (this._autoTimer) clearInterval(this._autoTimer);
+    this._tickTimer = null;
+    this._messageTimer = null;
+    this._autoTimer = null;
   },
 
   hide() {
+    this._stopTimers();
     if (this.screen) {
       this.screen.classList.add('hidden');
-      setTimeout(() => { if (this.screen) this.screen.style.display = 'none'; }, 520);
+      setTimeout(() => {
+        if (this.screen) this.screen.style.display = 'none';
+      }, 520);
     }
   }
 };
