@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>관리감독자 및 유해위험작업 현황</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- v5.3.1: 미사용 코드 정리(사업장 추가 모달, 레거시 저장/불러오기 래퍼, 지정서·점검기준 버튼·추가카드 잔여 CSS) -->
+<!-- v5.3.2: 사내 수급사 추가/삭제 버튼 보강 + 산업안전보건위원회 삭제·복원 옵션(committeeHidden 저장 연동, GAS v5.3.2 필요) -->
 <style>
 :root {
   --blue50:#f0f4ff; --blue100:#d6e4ff; --blue500:#3182f6; --blue600:#1b6ef3;
@@ -874,9 +874,15 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 #orgExactRoot .subcon-names input{font-family:'Noto Sans KR',sans-serif;font-size:10.5px;text-align:center;border:none;outline:none;background:transparent;padding:2px 5px;width:100%;color:#111;cursor:text;border-bottom:1px solid #eee}
 #orgExactRoot .subcon-names input:last-child{border-bottom:none}
 #orgExactRoot .subcon-names input::placeholder{color:#ccc}
-#orgExactRoot .hon-box{border:var(--lw) solid var(--lc);display:inline-flex;flex-direction:column;min-width:120px}
+#orgExactRoot .hon-box{position:relative;border:var(--lw) solid var(--lc);display:inline-flex;flex-direction:column;min-width:120px}
 #orgExactRoot .hon-box .bh{font-size:10px;padding:4px 8px}
 #orgExactRoot .hon-box .bn input{font-size:10.5px;padding:4px 8px}
+#orgExactRoot .org-committee-x{position:absolute;top:-8px;right:-8px;width:17px;height:17px;line-height:1;border-radius:50%;border:1px solid #d93a47;background:#fff;color:#d93a47;font-size:10px;font-weight:700;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;z-index:2}
+#orgExactRoot .hon-box:hover .org-committee-x{display:flex}
+#orgExactRoot .org-committee-restore{display:none;width:130px;border:1px dashed #bbb;border-radius:6px;padding:5px 0!important;margin-top:2px}
+#orgExactRoot.committee-hidden .hon-box{display:none!important}
+#orgExactRoot.committee-hidden .org-committee-restore{display:inline-block}
+#orgExactRoot.preview .org-committee-restore,#orgExactRoot.history-preview .org-committee-x,#orgExactRoot.history-preview .org-committee-restore{display:none!important}
 #orgExactRoot .doc-header,#orgExactRoot .doc-footer{width:100%;display:flex;align-items:center;border:1px solid #aaa;font-size:9px;font-weight:500;color:#222;background:white;flex-shrink:0}
 #orgExactRoot .doc-header{border-bottom:1.5px solid #555;padding:4px 8px;margin-bottom:6px}
 #orgExactRoot .doc-footer{border-top:1.5px solid #555;padding:4px 8px;margin-top:6px}
@@ -1203,7 +1209,8 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
             <div class="vl" style="height:24px;"></div>
             <div style="display:flex; align-items:flex-start; width:100%;">
               <div id="orgLeftCol" style="flex-shrink:0; width:155px; display:flex; flex-direction:column; align-items:center;">
-                <div class="hon-box"><div class="bh" contenteditable="true" spellcheck="false" data-org-text="committeeLabel">산업안전보건위원회</div></div>
+                <div class="hon-box" id="orgCommitteeBox"><button type="button" class="org-committee-x no-print" onclick="toggleOrgCommittee(false)" title="산업안전보건위원회 삭제">✕</button><div class="bh" contenteditable="true" spellcheck="false" data-org-text="committeeLabel">산업안전보건위원회</div></div>
+                <button type="button" class="btn-util no-print org-committee-restore" onclick="toggleOrgCommittee(true)">＋ 산업안전보건위원회</button>
               </div>
               <div style="flex:1; display:flex; flex-direction:column; align-items:center; min-width:0;">
                 <div class="box top-box">
@@ -1220,7 +1227,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
               </div>
               <div style="flex-shrink:0; width:155px; padding-left:12px; display:flex; flex-direction:column; align-items:flex-start;">
                 <div class="subcon-box"><div class="bh" id="orgSubconHeader" style="cursor:default;">사내 수급사 (0社)</div><div class="subcon-names" id="orgSubconNames"></div></div>
-                <button class="btn-util no-print" style="width:130px; text-align:center; margin-top:3px;" onclick="addOrgSubconRow()">＋ 추가</button>
+                <div class="no-print" style="display:flex;width:130px;margin-top:3px;"><button class="btn-util" style="flex:1; text-align:center;" onclick="addOrgSubconRow()">＋ 추가</button><button class="btn-util del" style="flex:1; text-align:center;" onclick="removeOrgSubconRow()">－ 삭제</button></div>
               </div>
             </div>
             <div style="display:flex; justify-content:center; margin-top:24px; width:100%;">
@@ -3834,11 +3841,11 @@ function orgTodayDot(){
 function defaultOrgTexts(){
   return {headerLeft:'MESH서식-11-02-01 안전보건관리 조직구성표',headerCenter:'2025-01-01',headerRight:'매일유업(주)',footerLeft:'MESH-11-02 안전보건운영관리절차서',footerCenter:'1/1',footerRight:'Ver 0.0',ceoLabel:'대표이사',committeeLabel:'산업안전보건위원회',responsibleLabel:'안전보건관리책임자',safetyLabel:'안전관리자',healthLabel:'보건관리자',fireLabel:'소방안전관리자',honoraryLabel:'명예산업안전감독관'};
 }
-function defaultOrgChart(){return {date:orgTodayDot(),ceo:'',responsible:'',safety:'',health:'',fire:'',honorary:'',subcontractors:[],texts:defaultOrgTexts()};}
+function defaultOrgChart(){return {date:orgTodayDot(),ceo:'',responsible:'',safety:'',health:'',fire:'',honorary:'',committeeHidden:false,subcontractors:[],texts:defaultOrgTexts()};}
 function normalizeOrgChart(data){
   const d=defaultOrgChart(); data=data||{};
   const rawTexts=(data.texts&&typeof data.texts==='object')?data.texts:{};
-  return {date:String(data.date||d.date),ceo:String(data.ceo||''),responsible:String(data.responsible||''),safety:String(data.safety||''),health:String(data.health||''),fire:String(data.fire||''),honorary:String(data.honorary||''),subcontractors:Array.isArray(data.subcontractors)?data.subcontractors.map(v=>String(v||'')).filter(v=>v.trim()):[],texts:Object.assign({},d.texts,Object.fromEntries(Object.entries(rawTexts).map(([k,v])=>[k,String(v??'')])))};
+  return {date:String(data.date||d.date),ceo:String(data.ceo||''),responsible:String(data.responsible||''),safety:String(data.safety||''),health:String(data.health||''),fire:String(data.fire||''),honorary:String(data.honorary||''),committeeHidden:!!data.committeeHidden,subcontractors:Array.isArray(data.subcontractors)?data.subcontractors.map(v=>String(v||'')).filter(v=>v.trim()):[],texts:Object.assign({},d.texts,Object.fromEntries(Object.entries(rawTexts).map(([k,v])=>[k,String(v??'')])))};
 }
 function normalizeOrgSnapshot(snapshot){
   snapshot=snapshot||{};
@@ -3876,10 +3883,11 @@ function applyOrgChartForm(data){
   Object.entries(map).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.value=data[key]||'';});
   Object.entries(data.texts||{}).forEach(([key,val])=>{const el=document.querySelector('#orgExactRoot [data-org-text="'+key+'"]');if(el)el.textContent=val;});
   renderOrgSubcontractors(data.subcontractors||[]);
+  setOrgCommitteeHidden(!!data.committeeHidden);
 }
 function collectOrgChartForm(){
   const v=id=>String(document.getElementById(id)?.value||'').trim();const texts={};document.querySelectorAll('#orgExactRoot [data-org-text]').forEach(el=>texts[el.dataset.orgText]=String(el.textContent||'').trim());
-  return normalizeOrgChart({date:v('orgDate')||orgTodayDot(),ceo:v('orgCeo'),responsible:v('orgResponsible'),safety:v('orgSafety'),health:v('orgHealth'),fire:v('orgFire'),honorary:v('orgHonorary'),subcontractors:[...document.querySelectorAll('#orgSubconNames input')].map(i=>i.value.trim()).filter(Boolean),texts});
+  return normalizeOrgChart({date:v('orgDate')||orgTodayDot(),ceo:v('orgCeo'),responsible:v('orgResponsible'),safety:v('orgSafety'),health:v('orgHealth'),fire:v('orgFire'),honorary:v('orgHonorary'),committeeHidden:isOrgCommitteeHidden(),subcontractors:[...document.querySelectorAll('#orgSubconNames input')].map(i=>i.value.trim()).filter(Boolean),texts});
 }
 function markOrgChartDirty(){if(!curOrgSite||orgHistoryPreview)return;orgChartDirty=true;cacheCurrentOrgForm();updateOrgSubconCount();setOrgStatus('입력 변경 · 저장 필요','warn');}
 function bindOrgInputs(){
@@ -3891,6 +3899,10 @@ function renderOrgSubcontractors(list){
   box.innerHTML='';rows.forEach(v=>{const inp=document.createElement('input');inp.placeholder='회사명';inp.value=String(v||'');inp.oninput=markOrgChartDirty;box.appendChild(inp);});updateOrgSubconCount();
 }
 function addOrgSubconRow(){if(orgHistoryPreview)return;const box=document.getElementById('orgSubconNames');if(!box)return;const inp=document.createElement('input');inp.placeholder='회사명';inp.oninput=markOrgChartDirty;box.appendChild(inp);updateOrgSubconCount();inp.focus();markOrgChartDirty();}
+function removeOrgSubconRow(){if(orgHistoryPreview)return;const box=document.getElementById('orgSubconNames');if(!box)return;const inputs=box.querySelectorAll('input');if(!inputs.length)return;if(inputs.length===1){inputs[0].value='';updateOrgSubconCount();markOrgChartDirty();return;}box.removeChild(inputs[inputs.length-1]);updateOrgSubconCount();markOrgChartDirty();}
+function isOrgCommitteeHidden(){const r=document.getElementById('orgExactRoot');return !!(r&&r.classList.contains('committee-hidden'));}
+function setOrgCommitteeHidden(hidden){const r=document.getElementById('orgExactRoot');if(r)r.classList.toggle('committee-hidden',!!hidden);}
+function toggleOrgCommittee(show){if(orgHistoryPreview){toast('과거 저장본 보기 상태에서는 수정할 수 없습니다.','err');return;}setOrgCommitteeHidden(!show);markOrgChartDirty();setOrgStatus(show?'산업안전보건위원회 표시됨 · 저장 필요':'산업안전보건위원회 삭제됨 · 저장 필요','warn');}
 function updateOrgSubconCount(){const n=[...document.querySelectorAll('#orgSubconNames input')].filter(i=>i.value.trim()).length;const h=document.getElementById('orgSubconHeader');if(h)h.textContent='사내 수급사 ('+n+'社)';}
 function getOrgDeptGroups(site){
   const d=sd(site)||{rows:[],master:defMaster()};const map=new Map();(d.rows||[]).forEach(r=>{const name=String(r.name||'').trim();if(!name)return;const team=String(r.team||'').trim()||'미지정';if(!map.has(team))map.set(team,[]);const arr=map.get(team);if(!arr.includes(name))arr.push(name);});
@@ -3953,7 +3965,7 @@ async function downloadOrgPpt(){
     function connectLine(container,sel){const kids=[...container.querySelectorAll(':scope > '+sel)];if(kids.length<2)return;const f=kids[0].getBoundingClientRect(),l=kids[kids.length-1].getBoundingClientRect();hline(((f.left+f.width/2)-pr.left)*sx,((l.left+l.width/2)-pr.left)*sx,(f.top-pr.top)*sy);}
     addRect({x:0,y:0,w:PW,h:PH},{color:WHITE},WHITE,0);const dhEl=pageEl.querySelector('.doc-header');if(dhEl){addRect(pp(dhEl,.1,.01),{color:WHITE},'AAAAAA',.5);dhEl.querySelectorAll('span').forEach((sp,i)=>addTxt(sp.innerText.trim(),pp(sp,.05,.01),{color:'222222',fontSize:8,bold:false,align:['left','center','right'][i],valign:'middle'}));}const dfEl=pageEl.querySelector('.doc-footer');if(dfEl){addRect(pp(dfEl,.1,.01),{color:WHITE},'AAAAAA',.5);dfEl.querySelectorAll('span').forEach((sp,i)=>addTxt(sp.innerText.trim(),pp(sp,.05,.01),{color:'222222',fontSize:8,bold:false,align:['left','center','right'][i],valign:'middle'}));}
     const titleEl=pageEl.querySelector('.page-title');if(titleEl)addTxt('안전보건관리 조직구성표',pp(titleEl),{color:'111111',fontSize:fpt(17),bold:true,align:'center',valign:'middle',underline:{type:'sng'}});const dw=pageEl.querySelector('.date-wrap');if(dw)addTxt('기준일:  '+document.getElementById('orgDate').value,pp(dw),{color:'111111',fontSize:fpt(10.5),bold:true,align:'right',valign:'middle'});
-    pageEl.querySelectorAll('.vl').forEach(vl=>{const r=vl.getBoundingClientRect();if(r.height<1)return;const x=(r.left-pr.left)*sx,y=(r.top-pr.top)*sy,w=Math.max(.015,r.width*sx),h=Math.max(.01,r.height*sy);try{slide.addShape('rect',{x:+Math.max(0,x).toFixed(4),y:+Math.max(0,y).toFixed(4),w:+w.toFixed(4),h:+h.toFixed(4),fill:{color:NAVY},line:{color:NAVY,pt:0}});}catch(e){}});pageEl.querySelectorAll('.branch-wrap').forEach(bw=>connectLine(bw,'.branch-item'));const dr=document.getElementById('orgDeptRow');if(dr)connectLine(dr,'.dept-col');pageEl.querySelectorAll('.box,.hon-box,.subcon-box').forEach(el=>addRect(pp(el,.1,.05)));pageEl.querySelectorAll('.dept-title-box,.dept-names-box').forEach(el=>addRect(pp(el,.05,.02)));const sb=pageEl.querySelector('.sup-bar');if(sb){const p=pp(sb,.1,.02);addRect(p,{color:NAVY},NAVY,0);addTxt(sb.innerText.trim(),p,{color:WHITE,fontSize:10,bold:true,align:'center',valign:'middle'});}pageEl.querySelectorAll('.bh').forEach(bh=>{if(bh.closest('.sup-bar'))return;const p=pp(bh,.05,.01);addRect(p,{color:NAVY},NAVY,0);addTxt(bh.innerText.trim(),p,{color:WHITE,fontSize:10,bold:true,align:'center',valign:'middle'});});pageEl.querySelectorAll('.bn input,.name-inp,.subcon-names input').forEach(inp=>{const val=inp.value.trim();if(!val)return;addTxt(val,pp(inp,.05,.01),{color:'111111',fontSize:10,align:'center',valign:'middle',margin:1});});pageEl.querySelectorAll('.dept-names-box').forEach(nb=>{[...nb.querySelectorAll('input')].slice(0,-1).forEach(inp=>{const r=inp.getBoundingClientRect();hline((r.left-pr.left)*sx,(r.right-pr.left)*sx,(r.bottom-pr.top)*sy,.008,'DDDDDD');});});await pptx.writeFile({fileName:orgSafeFilename()+'.pptx'});setOrgStatus('✓ PPT 저장 완료','ok');
+    pageEl.querySelectorAll('.vl').forEach(vl=>{const r=vl.getBoundingClientRect();if(r.height<1)return;const x=(r.left-pr.left)*sx,y=(r.top-pr.top)*sy,w=Math.max(.015,r.width*sx),h=Math.max(.01,r.height*sy);try{slide.addShape('rect',{x:+Math.max(0,x).toFixed(4),y:+Math.max(0,y).toFixed(4),w:+w.toFixed(4),h:+h.toFixed(4),fill:{color:NAVY},line:{color:NAVY,pt:0}});}catch(e){}});pageEl.querySelectorAll('.branch-wrap').forEach(bw=>connectLine(bw,'.branch-item'));const dr=document.getElementById('orgDeptRow');if(dr)connectLine(dr,'.dept-col');pageEl.querySelectorAll('.box,.hon-box,.subcon-box').forEach(el=>{if(!el.offsetWidth)return;addRect(pp(el,.1,.05));});pageEl.querySelectorAll('.dept-title-box,.dept-names-box').forEach(el=>addRect(pp(el,.05,.02)));const sb=pageEl.querySelector('.sup-bar');if(sb){const p=pp(sb,.1,.02);addRect(p,{color:NAVY},NAVY,0);addTxt(sb.innerText.trim(),p,{color:WHITE,fontSize:10,bold:true,align:'center',valign:'middle'});}pageEl.querySelectorAll('.bh').forEach(bh=>{if(bh.closest('.sup-bar'))return;if(!bh.offsetWidth)return;const p=pp(bh,.05,.01);addRect(p,{color:NAVY},NAVY,0);addTxt(bh.innerText.trim(),p,{color:WHITE,fontSize:10,bold:true,align:'center',valign:'middle'});});pageEl.querySelectorAll('.bn input,.name-inp,.subcon-names input').forEach(inp=>{const val=inp.value.trim();if(!val)return;addTxt(val,pp(inp,.05,.01),{color:'111111',fontSize:10,align:'center',valign:'middle',margin:1});});pageEl.querySelectorAll('.dept-names-box').forEach(nb=>{[...nb.querySelectorAll('input')].slice(0,-1).forEach(inp=>{const r=inp.getBoundingClientRect();hline((r.left-pr.left)*sx,(r.right-pr.left)*sx,(r.bottom-pr.top)*sy,.008,'DDDDDD');});});await pptx.writeFile({fileName:orgSafeFilename()+'.pptx'});setOrgStatus('✓ PPT 저장 완료','ok');
   }catch(err){console.error(err);toast('PPT 생성 오류: '+err.message,'err');setOrgStatus('PPT 저장 오류','err');}finally{wrapper.scrollTop=originalScroll;if(!wasPreview)toggleOrgPreview(false);btn.textContent='📊 PPT 저장';btn.disabled=false;}}
 
 // 조직도 입력 이벤트 연결
