@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>관리감독자 및 유해위험작업 현황</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
 <!-- v4.9: 현황 엑셀 다운로드와 업로드양식 연동 + 사번 선행 0 보존 + 기준정보 공정명 연동 -->
 <style>
 :root {
@@ -861,6 +862,88 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   #page-work .work-header{ display:none!important; }
 }
 .print-head{display:none}
+
+
+/* ════ 안전보건관리 조직도 페이지 (v5.1: 원본 서식 그대로 이식 + 저장 이력) ════ */
+.org-wrap{padding:16px 18px 30px;background:linear-gradient(145deg,#eef3fb 0%,#f8fafc 55%,#eef8f5 100%);min-height:calc(100vh - 110px)}
+.org-toolbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;max-width:1280px;margin:0 auto 12px;padding:10px 12px;border:1px solid var(--gray200);border-radius:11px;background:#fff;box-shadow:var(--sh1)}
+.org-toolbar-title{font-size:13px;font-weight:900;color:var(--gray900);margin-right:4px;letter-spacing:-.25px}
+.org-toolbar select{min-width:158px;border:1px solid var(--gray200);border-radius:6px;background:#fff;padding:6px 9px;font-family:inherit;font-size:12px;color:var(--gray800)}
+.org-toolbar-spacer{flex:1}.org-status{font-size:11px;font-weight:700;color:var(--gray500);white-space:nowrap}.org-status.ok{color:#008f76}.org-status.warn{color:#b77900}.org-status.err{color:var(--red500)}
+.org-help{max-width:1280px;margin:0 auto 10px;padding:9px 11px;border:1px solid #cfe1ff;border-radius:8px;background:#f5f9ff;color:#486581;font-size:11px;line-height:1.55;word-break:keep-all}
+.org-exact-stage{height:calc(100vh - 210px);min-height:590px;max-width:1280px;margin:0 auto;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:20px 16px 40px;background:#d0d0d0;border:1px solid var(--gray200);border-radius:12px;box-shadow:var(--sh1)}
+
+/* 아래는 사용자가 제공한 두 번째 HTML의 조직도 서식을 값만 스코프 처리하여 그대로 이식한 영역입니다. */
+#orgExactRoot{--navy:#1E3A5F;--lc:#1E3A5F;--lw:1.5px;--top-box-w:200px;--branch-w:148px;--dept-w:118px;font-family:'Noto Sans KR',sans-serif;color:#111;flex-shrink:0}
+#orgExactRoot *{box-sizing:border-box}
+#orgExactRoot .org-exact-page{width:1024px;min-height:768px;padding:0 22px 20px;background:white;position:relative;display:flex;flex-direction:column;flex-shrink:0;border:1px dashed rgba(0,0,0,.12)}
+#orgExactRoot .page-title{text-align:center;font-size:17px;font-weight:800;letter-spacing:-.3px;text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:1.5px}
+#orgExactRoot .date-wrap{font-size:10.5px;font-weight:700;display:flex;align-items:center;gap:3px;white-space:nowrap}
+#orgExactRoot .date-wrap input{font-family:'Noto Sans KR',sans-serif;font-size:10.5px;font-weight:700;border:none;border-bottom:1px solid #ccc;outline:none;width:80px;text-align:center;background:transparent;color:#111}
+#orgExactRoot .box{display:inline-flex;flex-direction:column;border:var(--lw) solid var(--lc);background:white}
+#orgExactRoot .bh{background:var(--navy);color:white;font-size:11px;font-weight:700;padding:5px 10px;text-align:center;white-space:nowrap;outline:none;cursor:text}
+#orgExactRoot .bh[contenteditable="true"]:focus{background:#254a75}
+#orgExactRoot .bn input{font-family:'Noto Sans KR',sans-serif;font-size:11px;text-align:center;border:none;outline:none;background:transparent;padding:5px 10px;width:100%;color:#111;cursor:text;line-height:1.6;overflow:visible;min-height:28px}
+#orgExactRoot .bn input::placeholder{color:#ccc}
+#orgExactRoot .top-box{width:var(--top-box-w);min-width:var(--top-box-w)}
+#orgExactRoot .vl{width:var(--lw);background:var(--lc);flex-shrink:0}
+#orgExactRoot .branch-wrap{display:flex;align-items:flex-start;justify-content:center;position:relative}
+#orgExactRoot .branch-item{display:flex;flex-direction:column;align-items:center;padding:0 8px;position:relative}
+#orgExactRoot .branch-item::before{content:'';position:absolute;top:0;left:0;right:0;height:var(--lw);background:var(--lc)}
+#orgExactRoot .branch-item:first-child::before{left:50%}
+#orgExactRoot .branch-item:last-child::before{right:50%}
+#orgExactRoot .branch-item:only-child::before{display:none}
+#orgExactRoot .sup-inner{display:inline-flex;flex-direction:column}
+#orgExactRoot .sup-bar{background:var(--navy);color:white;font-size:11.5px;font-weight:700;padding:5px 16px;text-align:center;border:var(--lw) solid var(--lc);white-space:nowrap;align-self:stretch}
+#orgExactRoot .dept-outer{display:flex;align-items:flex-start}
+#orgExactRoot .dept-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:0}
+#orgExactRoot .dept-col{display:flex;flex-direction:column;align-items:center;width:var(--dept-w);min-width:var(--dept-w);max-width:var(--dept-w);flex:none;position:relative}
+#orgExactRoot .dept-col::before{content:'';position:absolute;top:0;left:0;right:0;height:var(--lw);background:var(--lc)}
+#orgExactRoot .dept-col:first-child::before{left:50%}
+#orgExactRoot .dept-col:last-child::before{right:50%}
+#orgExactRoot .dept-col:only-child::before{display:none}
+#orgExactRoot .dept-title-box{border:var(--lw) solid var(--lc);background:var(--navy);width:calc(var(--dept-w) - 6px)}
+#orgExactRoot .dept-title-box .bh{font-size:10.5px;padding:4px 6px;display:block;width:100%}
+#orgExactRoot .dept-names-box{border:var(--lw) solid var(--lc);border-top:none;width:calc(var(--dept-w) - 6px);min-height:72px;padding:3px 1px;columns:1;column-gap:0}
+#orgExactRoot .dept-names-box.two-col{columns:2}
+#orgExactRoot .dept-names-box input{font-family:'Noto Sans KR',sans-serif;font-size:10.5px;text-align:center;border:none;outline:none;background:transparent;padding:2px 3px;width:100%;color:#111;cursor:default;border-bottom:1px solid #f0f0f0;display:block;break-inside:avoid;line-height:1.5;overflow:visible}
+#orgExactRoot .dept-names-box input:last-child{border-bottom:none}
+#orgExactRoot .dept-names-box input::placeholder{color:#ccc}
+#orgExactRoot .btn-util{font-family:'Noto Sans KR',sans-serif;font-size:9px;color:#bbb;background:transparent;border:none;cursor:pointer;padding:1px 0;text-align:center;transition:color .15s}
+#orgExactRoot .btn-util:hover{color:var(--navy)}
+#orgExactRoot .btn-util.del:hover{color:#c00}
+#orgExactRoot .subcon-box{border:var(--lw) solid var(--lc);width:130px;display:flex;flex-direction:column}
+#orgExactRoot .subcon-box .bh{font-size:10px;padding:4px 7px;cursor:default;white-space:nowrap}
+#orgExactRoot .subcon-names{display:flex;flex-direction:column;padding:3px 1px;min-height:22px}
+#orgExactRoot .subcon-names input{font-family:'Noto Sans KR',sans-serif;font-size:10.5px;text-align:center;border:none;outline:none;background:transparent;padding:2px 5px;width:100%;color:#111;cursor:text;border-bottom:1px solid #eee}
+#orgExactRoot .subcon-names input:last-child{border-bottom:none}
+#orgExactRoot .subcon-names input::placeholder{color:#ccc}
+#orgExactRoot .hon-box{border:var(--lw) solid var(--lc);display:inline-flex;flex-direction:column;min-width:120px}
+#orgExactRoot .hon-box .bh{font-size:10px;padding:4px 8px}
+#orgExactRoot .hon-box .bn input{font-size:10.5px;padding:4px 8px}
+#orgExactRoot .doc-header,#orgExactRoot .doc-footer{width:100%;display:flex;align-items:center;border:1px solid #aaa;font-size:9px;font-weight:500;color:#222;background:white;flex-shrink:0}
+#orgExactRoot .doc-header{border-bottom:1.5px solid #555;padding:4px 8px;margin-bottom:6px}
+#orgExactRoot .doc-footer{border-top:1.5px solid #555;padding:4px 8px;margin-top:6px}
+#orgExactRoot .doc-header span,#orgExactRoot .doc-footer span{flex:1;outline:none;white-space:nowrap;overflow:hidden}
+#orgExactRoot .doc-header span:nth-child(2),#orgExactRoot .doc-footer span:nth-child(2){text-align:center}
+#orgExactRoot .doc-header span:nth-child(3),#orgExactRoot .doc-footer span:nth-child(3){text-align:right}
+#orgExactRoot.preview .no-print{display:none!important}
+#orgExactRoot.preview .org-exact-page{border:none!important}
+#orgExactRoot.preview input{border-color:transparent!important}
+#orgExactRoot.preview input::placeholder{color:transparent!important}
+#orgExactRoot.preview [contenteditable]{cursor:default}
+#orgExactRoot.preview .dept-names-box{min-height:unset}
+#orgExactRoot.history-preview .bn input,#orgExactRoot.history-preview .subcon-names input,#orgExactRoot.history-preview .date-wrap input{background:#fffdf4}
+#orgExactRoot .org-export-text{font-family:'Noto Sans KR',sans-serif;text-align:center;color:#111;width:100%;white-space:pre-wrap}
+
+.org-history-wrap{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;margin-top:9px}
+.org-history-item{padding:10px 11px;border:1px solid var(--gray200);border-radius:8px;background:#fff}
+.org-history-item-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.org-history-item-head strong{font-size:12px;color:var(--gray900)}.org-history-item-head span{font-size:10px;color:var(--gray500)}
+.org-history-item-summary{margin-top:5px;font-size:11px;line-height:1.5;color:var(--gray600);word-break:keep-all}
+.org-history-item-actions{display:flex;gap:5px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+.org-history-empty{padding:28px 12px;text-align:center;color:var(--gray400);font-size:12px}
+.org-history-banner{display:none;max-width:1280px;margin:0 auto 10px;padding:9px 11px;border:1px solid #ffe2a8;border-radius:8px;background:#fff8e8;color:#9b6400;font-size:11px;line-height:1.55}.org-history-banner.show{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
+@media(max-width:768px){.org-wrap{padding:9px}.org-toolbar{padding:9px;gap:5px;margin-bottom:8px}.org-toolbar-title{width:100%}.org-toolbar select{min-width:128px;flex:1}.org-toolbar-spacer{display:none}.org-status{width:100%;margin-top:2px}.org-help{margin-bottom:7px;font-size:10px}.org-exact-stage{height:calc(100vh - 250px);padding:8px;border-radius:8px;justify-content:flex-start}}
 </style>
 </head>
 <body>
@@ -935,6 +1018,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   <div class="nav-sep"></div>
   <button class="nav-tab" id="tab-master" onclick="checkMasterPw()">기준정보</button>
   <button class="nav-tab" id="tab-import" onclick="openImportPage()">엑셀 업로드</button>
+  <button class="nav-tab" id="tab-org" onclick="openOrgPage()">안전보건 조직도</button>
   <button type="button" class="nav-criteria-btn" onclick="openCriteriaGuide()" title="작업별 점검기준 보기">✓ 작업별 점검기준</button>
   <div class="navbar-space"></div>
   <button type="button" class="nav-download-btn" onclick="exportAllExcel()" title="전체 사업장 현황을 엑셀 파일로 다운로드">⬇ 전체 현황 다운로드</button>
@@ -1119,6 +1203,91 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
       <div class="import-preview-title"><span>업로드 미리보기</span><span id="excelUploadPreviewCount">0건</span></div>
       <div class="import-empty">아직 선택한 파일이 없습니다.</div>
     </section>
+  </div>
+</div>
+
+
+
+<!-- ══ PAGE: 안전보건관리 조직도 ══ -->
+<div class="page" id="page-org">
+  <div class="org-wrap">
+    <div class="org-toolbar">
+      <span class="org-toolbar-title">안전보건관리 조직구성표</span>
+      <select id="orgSiteSelect" onchange="changeOrgSite(this.value)" aria-label="조직도 사업장 선택"></select>
+      <button type="button" class="btn btn-sm" onclick="refreshOrgBottom(true)">↻ 하단 현황 새로고침</button>
+      <button type="button" class="btn btn-sm btn-primary" onclick="saveOrgChart()">💾 변경내용 저장</button>
+      <button type="button" class="btn btn-sm" onclick="reloadOrgChart()">↓ 저장정보 불러오기</button>
+      <button type="button" class="btn btn-sm" onclick="openOrgHistoryModal()">🕘 저장 이력</button>
+      <span class="org-toolbar-spacer"></span>
+      <button type="button" class="btn btn-sm" id="orgPreviewBtn" onclick="toggleOrgPreview()">👁 미리보기 전환</button>
+      <button type="button" class="btn btn-sm" id="orgCaptureBtn" onclick="downloadOrgPng()">📷 PNG 저장</button>
+      <button type="button" class="btn btn-sm btn-dark" id="orgPptBtn" onclick="downloadOrgPpt()">📊 PPT 저장</button>
+      <span class="org-status" id="orgStatus">불러오기 대기</span>
+    </div>
+    <div class="org-help">두 번째로 제공한 조직도 HTML 서식을 그대로 이식했습니다. 하단 <b>관리감독자 부서·이름</b>만 현황 페이지에서 자동으로 채우며, 상단 입력값과 저장 시점의 하단 구성은 사업장별 이력으로 보관합니다.</div>
+    <div class="org-history-banner" id="orgHistoryBanner"><span id="orgHistoryBannerText">과거 저장본을 보고 있습니다.</span><button type="button" class="btn btn-sm" onclick="returnToCurrentOrgChart()">현재 조직도로 돌아가기</button></div>
+    <div class="org-exact-stage" id="orgPageWrapper">
+      <div id="orgExactRoot">
+        <div class="org-exact-page" id="orgChartCanvas">
+          <div class="doc-header">
+            <span contenteditable="true" spellcheck="false" data-org-text="headerLeft">MESH서식-11-02-01 안전보건관리 조직구성표</span>
+            <span contenteditable="true" spellcheck="false" data-org-text="headerCenter">2025-01-01</span>
+            <span contenteditable="true" spellcheck="false" data-org-text="headerRight">매일유업(주)</span>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; width:100%; flex:1; justify-content:center; padding: 24px 0;">
+            <div style="position:relative; width:100%; text-align:center; margin-bottom:0;">
+              <div class="page-title">안전보건관리 조직구성표</div>
+              <div class="date-wrap" style="position:absolute; right:0; top:50%; transform:translateY(-50%);">기준일: <input id="orgDate" data-org-field="date" /></div>
+            </div>
+            <div class="box top-box" style="margin-top:24px;">
+              <div class="bh" contenteditable="true" spellcheck="false" data-org-text="ceoLabel">대표이사</div>
+              <div class="bn"><input id="orgCeo" data-org-field="ceo" placeholder="성 명" /></div>
+            </div>
+            <div class="vl" style="height:24px;"></div>
+            <div style="display:flex; align-items:flex-start; width:100%;">
+              <div id="orgLeftCol" style="flex-shrink:0; width:155px; display:flex; flex-direction:column; align-items:center;">
+                <div class="hon-box"><div class="bh" contenteditable="true" spellcheck="false" data-org-text="committeeLabel">산업안전보건위원회</div></div>
+              </div>
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; min-width:0;">
+                <div class="box top-box">
+                  <div class="bh" contenteditable="true" spellcheck="false" data-org-text="responsibleLabel">안전보건관리책임자</div>
+                  <div class="bn"><input id="orgResponsible" data-org-field="responsible" placeholder="성 명" /></div>
+                </div>
+                <div class="vl" style="height:24px;"></div>
+                <div class="branch-wrap">
+                  <div class="branch-item"><div class="vl" style="height:24px;"></div><div class="box" style="width:var(--branch-w);"><div class="bh" contenteditable="true" spellcheck="false" data-org-text="safetyLabel">안전관리자</div><div class="bn"><input id="orgSafety" data-org-field="safety" placeholder="성명 또는 위탁기관" /></div></div></div>
+                  <div class="branch-item"><div class="vl" style="height:24px;"></div><div class="box" style="width:var(--branch-w);"><div class="bh" contenteditable="true" spellcheck="false" data-org-text="healthLabel">보건관리자</div><div class="bn"><input id="orgHealth" data-org-field="health" placeholder="성명 또는 위탁기관" /></div></div></div>
+                  <div class="branch-item"><div class="vl" style="height:24px;"></div><div class="box" style="width:var(--branch-w);"><div class="bh" contenteditable="true" spellcheck="false" data-org-text="fireLabel">소방안전관리자</div><div class="bn"><input id="orgFire" data-org-field="fire" placeholder="성 명" /></div></div></div>
+                  <div class="branch-item"><div class="vl" style="height:24px;"></div><div class="box" style="width:var(--branch-w);"><div class="bh" contenteditable="true" spellcheck="false" data-org-text="honoraryLabel">명예산업안전감독관</div><div class="bn"><input id="orgHonorary" data-org-field="honorary" placeholder="성 명" /></div></div></div>
+                </div>
+              </div>
+              <div style="flex-shrink:0; width:155px; padding-left:12px; display:flex; flex-direction:column; align-items:flex-start;">
+                <div class="subcon-box"><div class="bh" id="orgSubconHeader" style="cursor:default;">사내 수급사 (0社)</div><div class="subcon-names" id="orgSubconNames"></div></div>
+                <button class="btn-util no-print" style="width:130px; text-align:center; margin-top:3px;" onclick="addOrgSubconRow()">＋ 추가</button>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:center; margin-top:24px; width:100%;">
+              <div class="sup-inner"><div class="sup-bar">관리감독자 (<span id="orgSupCountLabel">0</span>명)</div><div class="dept-outer"><div class="dept-row" id="orgDeptRow"></div></div></div>
+            </div>
+          </div>
+          <div class="doc-footer">
+            <span contenteditable="true" spellcheck="false" data-org-text="footerLeft">MESH-11-02 안전보건운영관리절차서</span>
+            <span contenteditable="true" spellcheck="false" data-org-text="footerCenter">1/1</span>
+            <span contenteditable="true" spellcheck="false" data-org-text="footerRight">Ver 0.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 조직도 저장 이력 팝업 -->
+<div class="modal-bg" id="orgHistoryModalBg" onclick="if(event.target===this)closeOrgHistoryModal()" aria-hidden="true">
+  <div class="modal" style="max-width:680px" role="dialog" aria-modal="true" aria-labelledby="orgHistoryModalTitle">
+    <h3 id="orgHistoryModalTitle">안전보건관리 조직도 저장 이력</h3>
+    <p style="font-size:12px;color:var(--gray500);margin-bottom:8px;margin-top:-8px"><strong id="orgHistorySiteLabel"></strong> 사업장의 변경 저장본입니다. 과거 저장본을 확인하거나 상단 입력값을 복원할 수 있습니다.</p>
+    <div class="org-history-wrap" id="orgHistoryList"><div class="org-history-empty">저장 이력을 불러오는 중입니다.</div></div>
+    <div class="modal-btns"><button class="btn" onclick="closeOrgHistoryModal()">닫기</button></div>
   </div>
 </div>
 
@@ -1338,6 +1507,7 @@ let siteData = Object.fromEntries(DEFAULT_SITES.map(s=>[s,newSiteData()]));
 let curSite  = sites[0];   // 현황 페이지 기준 사업장
 let curMasterSite = sites[0]; // 기준정보 선택 사업장
 let curPage  = 'home';
+let curOrgSite = sites[0]; // 조직도 페이지 기준 사업장
 let sortState = { mid: null, dir: 0 }; // dir: 0=없음 1=내림차순(체크O먼저) -1=오름차순
 let unlockedSites = new Set();       // 현황 편집 인증된 사업장
 let unlockedMasterSites = new Set();  // 기준정보 편집 인증된 사업장
@@ -1347,10 +1517,10 @@ let masterPwCallback = null;
 let gasSeq = 0;
 // 일시적인 GAS 콜드 스타트·네트워크 지연은 안전한 요청에 한해 자동 재시도합니다.
 const GAS_SAFE_RETRY_ACTIONS = new Set([
-  'ping','loadBootstrap','loadAllMaster','loadAll','load','loadMaster','loadSiteOrder',
-  'saveMaster','saveSiteOrder','save','clearSite','deleteSite'
+  'ping','loadBootstrap','loadAllMaster','loadAll','load','loadMaster','loadSiteOrder','loadOrgChart','listOrgChartHistory','loadOrgChartHistory',
+  'saveMaster','saveSiteOrder','saveOrgChart','save','clearSite','deleteSite'
 ]);
-const GAS_READ_ACTIONS = new Set(['ping','loadBootstrap','loadAllMaster','loadAll','load','loadMaster','loadSiteOrder']);
+const GAS_READ_ACTIONS = new Set(['ping','loadBootstrap','loadAllMaster','loadAll','load','loadMaster','loadSiteOrder','loadOrgChart','listOrgChartHistory','loadOrgChartHistory']);
 // JSONP는 GET URL 길이 제한을 받으므로 한 번에 보내는 URL을 안전 범위로 제한합니다.
 const MAX_JSONP_URL_LENGTH = 5200;
 const SAVE_CHUNK_ROW_CAP = 50;
@@ -1371,12 +1541,14 @@ function goPage(page, site){
   if(page==='home')   document.getElementById('tab-home').classList.add('active');
   if(page==='master') document.getElementById('tab-master').classList.add('active');
   if(page==='import') document.getElementById('tab-import').classList.add('active');
+  if(page==='org')    document.getElementById('tab-org').classList.add('active');
 
   renderNavTabs();
   if(page==='home')   renderDashboard();
   if(page==='work')   renderWorkPage();
   if(page==='master') renderMasterPage();
   if(page==='import') renderImportPage();
+  if(page==='org')    renderOrgPage();
 }
 
 /* ══════════════════════════════════════════
@@ -3704,7 +3876,7 @@ function reloadAllFromGAS(options){
       resetAllRows();
       appendLoadedRows(res.data);
       applyLoadedSiteOrder(loadedOrder);
-      renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); if(curPage==='import') renderImportPage(); setGasOk();
+      renderNavTabs(); renderDashboard(); if(curPage==='work') renderWorkPage(); if(curPage==='master') renderMasterPage(); if(curPage==='import') renderImportPage(); if(curPage==='org') refreshOrgBottom(); setGasOk();
       const visibleCount = res.data.filter(r=>!isDeprecatedSite(r.site)).length;
       setSyncMsg('✓ 최신화됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
       LD.complete('✓ 데이터 로딩 완료 — '+visibleCount+'건');
@@ -3725,6 +3897,154 @@ function reloadAllFromGAS(options){
 }
 
 function autoLoadAll(){ reloadAllFromGAS({manual:false}); }
+
+
+
+/* ══════════════════════════════════════════
+   안전보건관리 조직도 — 원본 서식 완전 이식 + 하단 자동 반영 + 저장 이력
+   - 조직도 출력 DOM/CSS/PPT 변환 로직은 제공받은 두 번째 HTML을 그대로 기반으로 구성
+   - 하단 팀·이름은 현황 데이터에서 자동 생성
+   - 저장 시 상단 정보와 하단 스냅샷을 함께 기록하여 과거 저장본 조회 가능
+══════════════════════════════════════════ */
+const ORG_LOCAL_PREFIX = 'mesh_org_chart_v2_';
+const ORG_HISTORY_LOCAL_PREFIX = 'mesh_org_chart_history_v2_';
+const ORG_HISTORY_LIMIT = 60;
+const orgChartCache = {};
+let orgChartDirty = false;
+let orgPreview = false;
+let orgHistoryPreview = null;
+let orgHistoryEntries = [];
+
+function orgTodayDot(){
+  const t=new Date();
+  return String(t.getFullYear()).slice(2)+'.'+String(t.getMonth()+1).padStart(2,'0')+'.'+String(t.getDate()).padStart(2,'0')+'.';
+}
+function defaultOrgTexts(){
+  return {headerLeft:'MESH서식-11-02-01 안전보건관리 조직구성표',headerCenter:'2025-01-01',headerRight:'매일유업(주)',footerLeft:'MESH-11-02 안전보건운영관리절차서',footerCenter:'1/1',footerRight:'Ver 0.0',ceoLabel:'대표이사',committeeLabel:'산업안전보건위원회',responsibleLabel:'안전보건관리책임자',safetyLabel:'안전관리자',healthLabel:'보건관리자',fireLabel:'소방안전관리자',honoraryLabel:'명예산업안전감독관'};
+}
+function defaultOrgChart(){return {date:orgTodayDot(),ceo:'',responsible:'',safety:'',health:'',fire:'',honorary:'',subcontractors:[],texts:defaultOrgTexts()};}
+function normalizeOrgChart(data){
+  const d=defaultOrgChart(); data=data||{};
+  const rawTexts=(data.texts&&typeof data.texts==='object')?data.texts:{};
+  return {date:String(data.date||d.date),ceo:String(data.ceo||''),responsible:String(data.responsible||''),safety:String(data.safety||''),health:String(data.health||''),fire:String(data.fire||''),honorary:String(data.honorary||''),subcontractors:Array.isArray(data.subcontractors)?data.subcontractors.map(v=>String(v||'')).filter(v=>v.trim()):[],texts:Object.assign({},d.texts,Object.fromEntries(Object.entries(rawTexts).map(([k,v])=>[k,String(v??'')])))};
+}
+function normalizeOrgSnapshot(snapshot){
+  snapshot=snapshot||{};
+  const departments=Array.isArray(snapshot.departments)?snapshot.departments.map(g=>({team:String(g.team||'').trim()||'미지정',names:Array.isArray(g.names)?g.names.map(v=>String(v||'').trim()).filter(Boolean):[]})).filter(g=>g.names.length||g.team):[];
+  return {departments,total:Number(snapshot.total)||departments.reduce((n,g)=>n+g.names.length,0)};
+}
+function orgLocalKey(site){return ORG_LOCAL_PREFIX+String(site||'');}
+function orgHistoryLocalKey(site){return ORG_HISTORY_LOCAL_PREFIX+String(site||'');}
+function readOrgLocal(site){try{const raw=localStorage.getItem(orgLocalKey(site));return raw?normalizeOrgChart(JSON.parse(raw)):null;}catch(e){return null;}}
+function writeOrgLocal(site,data){try{localStorage.setItem(orgLocalKey(site),JSON.stringify(normalizeOrgChart(data)));}catch(e){}}
+function readOrgHistoryLocal(site){try{const raw=localStorage.getItem(orgHistoryLocalKey(site));const arr=raw?JSON.parse(raw):[];return Array.isArray(arr)?arr:[];}catch(e){return [];}}
+function writeOrgHistoryLocal(site,arr){try{localStorage.setItem(orgHistoryLocalKey(site),JSON.stringify((arr||[]).slice(0,ORG_HISTORY_LIMIT)));}catch(e){}}
+function stableJson(v){return JSON.stringify(v,Object.keys(v||{}).sort());}
+function orgHistorySignature(entry){return JSON.stringify({data:normalizeOrgChart(entry.data||{}),snapshot:normalizeOrgSnapshot(entry.snapshot||{})});}
+function addOrgHistoryLocal(site,data,snapshot,serverEntry){
+  const arr=readOrgHistoryLocal(site); const now=new Date(); const entry=serverEntry||{versionId:'local_'+now.getTime(),site,savedAt:now.toISOString(),summary:'조직도 변경내용 저장',data:normalizeOrgChart(data),snapshot:normalizeOrgSnapshot(snapshot)};
+  entry.data=normalizeOrgChart(entry.data||data); entry.snapshot=normalizeOrgSnapshot(entry.snapshot||snapshot);
+  const sig=orgHistorySignature(entry); const first=arr[0];
+  if(first&&orgHistorySignature(first)===sig) return first;
+  arr.unshift(entry); writeOrgHistoryLocal(site,arr); return entry;
+}
+function setOrgStatus(msg,tone){const el=document.getElementById('orgStatus');if(!el)return;el.textContent=msg;el.className='org-status'+(tone?' '+tone:'');}
+function openOrgPage(site){curOrgSite=String(site||curSite||sites[0]||'').trim()||sites[0];goPage('org');}
+function renderOrgPage(){
+  if(!sites.includes(curOrgSite))curOrgSite=curSite&&sites.includes(curSite)?curSite:sites[0];
+  const sel=document.getElementById('orgSiteSelect');if(sel)sel.innerHTML=sites.map(s=>'<option value="'+esc(s)+'"'+(s===curOrgSite?' selected':'')+'>'+esc(s)+'</option>').join('');
+  orgHistoryPreview=null; setOrgHistoryPreviewUi(false);
+  const data=orgChartCache[curOrgSite]||readOrgLocal(curOrgSite)||defaultOrgChart();orgChartCache[curOrgSite]=normalizeOrgChart(data);applyOrgChartForm(orgChartCache[curOrgSite]);refreshOrgBottom(false);
+  orgChartDirty=false;setOrgStatus('저장정보 확인 중...','');loadOrgChartFromServer(curOrgSite,{silent:true});
+  setTimeout(alignOrgHonorary,50);
+}
+function changeOrgSite(site){cacheCurrentOrgForm();curOrgSite=String(site||'').trim();renderOrgPage();}
+function cacheCurrentOrgForm(){if(!curOrgSite||!document.getElementById('orgDate')||orgHistoryPreview)return;const data=collectOrgChartForm();orgChartCache[curOrgSite]=data;writeOrgLocal(curOrgSite,data);}
+function applyOrgChartForm(data){
+  data=normalizeOrgChart(data);const map={orgDate:'date',orgCeo:'ceo',orgResponsible:'responsible',orgSafety:'safety',orgHealth:'health',orgFire:'fire',orgHonorary:'honorary'};
+  Object.entries(map).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.value=data[key]||'';});
+  Object.entries(data.texts||{}).forEach(([key,val])=>{const el=document.querySelector('#orgExactRoot [data-org-text="'+key+'"]');if(el)el.textContent=val;});
+  renderOrgSubcontractors(data.subcontractors||[]);
+}
+function collectOrgChartForm(){
+  const v=id=>String(document.getElementById(id)?.value||'').trim();const texts={};document.querySelectorAll('#orgExactRoot [data-org-text]').forEach(el=>texts[el.dataset.orgText]=String(el.textContent||'').trim());
+  return normalizeOrgChart({date:v('orgDate')||orgTodayDot(),ceo:v('orgCeo'),responsible:v('orgResponsible'),safety:v('orgSafety'),health:v('orgHealth'),fire:v('orgFire'),honorary:v('orgHonorary'),subcontractors:[...document.querySelectorAll('#orgSubconNames input')].map(i=>i.value.trim()).filter(Boolean),texts});
+}
+function markOrgChartDirty(){if(!curOrgSite||orgHistoryPreview)return;orgChartDirty=true;cacheCurrentOrgForm();updateOrgSubconCount();setOrgStatus('입력 변경 · 저장 필요','warn');}
+function bindOrgInputs(){
+  document.querySelectorAll('#orgExactRoot input[data-org-field]').forEach(el=>{el.oninput=markOrgChartDirty;});
+  document.querySelectorAll('#orgExactRoot [data-org-text]').forEach(el=>{el.oninput=markOrgChartDirty;});
+}
+function renderOrgSubcontractors(list){
+  const box=document.getElementById('orgSubconNames');if(!box)return;const rows=(Array.isArray(list)?list.slice():[]);if(!rows.length)rows.push('');
+  box.innerHTML='';rows.forEach(v=>{const inp=document.createElement('input');inp.placeholder='회사명';inp.value=String(v||'');inp.oninput=markOrgChartDirty;box.appendChild(inp);});updateOrgSubconCount();
+}
+function addOrgSubconRow(){if(orgHistoryPreview)return;const box=document.getElementById('orgSubconNames');if(!box)return;const inp=document.createElement('input');inp.placeholder='회사명';inp.oninput=markOrgChartDirty;box.appendChild(inp);updateOrgSubconCount();inp.focus();markOrgChartDirty();}
+function updateOrgSubconCount(){const n=[...document.querySelectorAll('#orgSubconNames input')].filter(i=>i.value.trim()).length;const h=document.getElementById('orgSubconHeader');if(h)h.textContent='사내 수급사 ('+n+'社)';}
+function getOrgDeptGroups(site){
+  const d=sd(site)||{rows:[],master:defMaster()};const map=new Map();(d.rows||[]).forEach(r=>{const name=String(r.name||'').trim();if(!name)return;const team=String(r.team||'').trim()||'미지정';if(!map.has(team))map.set(team,[]);const arr=map.get(team);if(!arr.includes(name))arr.push(name);});
+  const ordered=[];((d.master&&d.master.team)||[]).forEach(team=>{if(map.has(team)){ordered.push({team,names:map.get(team)});map.delete(team);}});map.forEach((names,team)=>ordered.push({team,names}));return ordered;
+}
+function makeOrgSnapshot(groups){const departments=(groups||[]).map(g=>({team:String(g.team||'').trim()||'미지정',names:(g.names||[]).map(v=>String(v||'').trim()).filter(Boolean)}));return normalizeOrgSnapshot({departments,total:departments.reduce((n,g)=>n+g.names.length,0)});}
+function updateOrgDeptWidths(){const root=document.getElementById('orgExactRoot');const n=document.querySelectorAll('#orgDeptRow .dept-col').length;if(!root||!n)return;const maxArea=900,maxW=118,minW=60,w=Math.max(minW,Math.min(maxW,Math.floor(maxArea/n)));root.style.setProperty('--dept-w',w+'px');}
+function renderOrgBottomSnapshot(snapshot){
+  snapshot=normalizeOrgSnapshot(snapshot);const row=document.getElementById('orgDeptRow');if(!row)return;const groups=snapshot.departments||[];document.getElementById('orgSupCountLabel').textContent=String(snapshot.total||0);
+  if(!groups.length){row.innerHTML='<div class="dept-col"><div class="vl" style="height:24px;"></div><div class="dept-title-box"><div class="bh">등록된 부서 없음(0명)</div></div><div class="dept-names-box"><input class="name-inp" readonly placeholder="이름"><input class="name-inp" readonly placeholder="이름"><input class="name-inp" readonly placeholder="이름"><input class="name-inp" readonly placeholder="이름"><input class="name-inp" readonly placeholder="이름"></div></div>';updateOrgDeptWidths();setTimeout(alignOrgHonorary,30);return;}
+  row.innerHTML='';groups.forEach(g=>{const col=document.createElement('div');col.className='dept-col';const title=esc(g.team)+'('+g.names.length+'명)';const names=(g.names||[]).slice();while(names.length<5)names.push('');col.innerHTML='<div class="vl" style="height:24px;"></div><div class="dept-title-box"><div class="bh">'+title+'</div></div><div class="dept-names-box'+(g.names.length>10?' two-col':'')+'">'+names.map(n=>'<input class="name-inp" readonly value="'+esc(n)+'" placeholder="이름">').join('')+'</div>';row.appendChild(col);});updateOrgDeptWidths();setTimeout(alignOrgHonorary,30);
+}
+function refreshOrgBottom(exitHistory){if(exitHistory&&orgHistoryPreview)returnToCurrentOrgChart();const groups=getOrgDeptGroups(curOrgSite);renderOrgBottomSnapshot(makeOrgSnapshot(groups));if(exitHistory)setOrgStatus('✓ 하단 현황 최신화','ok');}
+function collectRenderedOrgSnapshot(){const groups=[];document.querySelectorAll('#orgDeptRow .dept-col').forEach(col=>{const title=String(col.querySelector('.dept-title-box .bh')?.textContent||'').replace(/\(\d+명\)\s*$/,'').trim();if(!title||title==='등록된 부서 없음')return;const names=[...col.querySelectorAll('.name-inp')].map(i=>i.value.trim()).filter(Boolean);groups.push({team:title,names});});return makeOrgSnapshot(groups);}
+function alignOrgHonorary(){const leftCol=document.getElementById('orgLeftCol');const firstBox=document.querySelector('#orgExactRoot .branch-item .box');if(!firstBox||!leftCol)return;leftCol.style.paddingTop='0';const off=firstBox.getBoundingClientRect().top-leftCol.getBoundingClientRect().top;if(off>0)leftCol.style.paddingTop=off+'px';}
+function saveOrgChart(){
+  if(orgHistoryPreview){toast('과거 저장본 보기 상태입니다. 먼저 현재 조직도로 돌아가 주세요.','err');return;}
+  requireAuth(()=>{const data=collectOrgChartForm();const snapshot=collectRenderedOrgSnapshot();orgChartCache[curOrgSite]=data;writeOrgLocal(curOrgSite,data);const localEntry=addOrgHistoryLocal(curOrgSite,data,snapshot);setOrgStatus('서버 저장 중...','');
+    gasCall('saveOrgChart',{data:JSON.stringify({site:curOrgSite,data,snapshot})},res=>{if(res?.result==='success'){orgChartDirty=false;if(res.historyEntry)addOrgHistoryLocal(curOrgSite,data,snapshot,res.historyEntry);setOrgStatus(res.changed===false?'✓ 변경 없음 · 기존 저장본 유지':'✓ 저장 완료 · 이력 생성','ok');toast(res.changed===false?'변경된 내용이 없어 새 이력을 만들지 않았습니다.':'✅ '+curOrgSite+' 조직도 저장 및 이력 생성 완료','ok');setGasOk();}else if(/알 수 없는 action\s*:\s*saveOrgChart/i.test(String(res?.error||''))){setOrgStatus('브라우저 저장됨 · GAS v5.1 패치 필요','warn');toast('브라우저에는 저장했습니다. 공용 이력 관리를 위해 GAS v5.1 패치를 적용해 주세요.','err');}else{setOrgStatus('브라우저 저장됨 · 서버 오류','err');toast('❌ 조직도 서버 저장 실패: '+(res?.error||'오류'),'err');}}, {maxAttempts:1});
+  },curOrgSite);
+}
+function reloadOrgChart(){if(orgChartDirty&&!confirm('현재 입력 내용은 브라우저에 임시 저장되어 있습니다. 서버 저장정보를 다시 불러올까요?'))return;orgHistoryPreview=null;setOrgHistoryPreviewUi(false);setOrgStatus('저장정보 불러오는 중...','');loadOrgChartFromServer(curOrgSite,{silent:false,force:true});}
+function loadOrgChartFromServer(site,options){
+  options=options||{};const local=readOrgLocal(site);if(local&&options.force!==true){orgChartCache[site]=local;applyOrgChartForm(local);}
+  gasCall('loadOrgChart',{site},res=>{if(res?.result==='success'){const data=normalizeOrgChart(res.data||local||defaultOrgChart());orgChartCache[site]=data;writeOrgLocal(site,data);if(site===curOrgSite&&!orgHistoryPreview){applyOrgChartForm(data);refreshOrgBottom(false);orgChartDirty=false;setOrgStatus('✓ 저장정보 불러옴','ok');bindOrgInputs();}if(!options.silent)toast(site+' 조직도 정보 불러오기 완료','ok');}else if(/알 수 없는 action\s*:\s*loadOrgChart/i.test(String(res?.error||''))){const data=local||defaultOrgChart();orgChartCache[site]=data;if(site===curOrgSite){applyOrgChartForm(data);refreshOrgBottom(false);bindOrgInputs();}setOrgStatus(local?'브라우저 저장정보 불러옴 · GAS 패치 필요':'신규 입력 · GAS 패치 필요','warn');if(!options.silent)toast('GAS 조직도 패치 적용 전이므로 현재 브라우저 저장정보를 불러왔습니다.','err');}else{const data=local||defaultOrgChart();orgChartCache[site]=data;if(site===curOrgSite){applyOrgChartForm(data);refreshOrgBottom(false);bindOrgInputs();}setOrgStatus(local?'브라우저 저장정보 불러옴':'신규 입력','warn');if(!options.silent)toast('서버 불러오기 실패: '+(res?.error||'오류'),'err');}}, {maxAttempts:1});
+}
+function setOrgHistoryPreviewUi(on,entry){
+  const root=document.getElementById('orgExactRoot'),banner=document.getElementById('orgHistoryBanner');if(root)root.classList.toggle('history-preview',!!on);if(banner)banner.classList.toggle('show',!!on);
+  document.querySelectorAll('#orgExactRoot input:not(.name-inp)').forEach(i=>i.readOnly=!!on);document.querySelectorAll('#orgExactRoot [data-org-text]').forEach(el=>el.setAttribute('contenteditable',on?'false':'true'));
+  const txt=document.getElementById('orgHistoryBannerText');if(txt&&on)txt.textContent='과거 저장본을 보고 있습니다. 저장일: '+formatOrgSavedAt(entry?.savedAt)+' · 현재 화면의 PNG/PPT 출력도 이 저장본 기준입니다.';
+}
+function formatOrgSavedAt(v){try{return new Date(v).toLocaleString('ko-KR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});}catch(e){return String(v||'');}}
+function returnToCurrentOrgChart(){orgHistoryPreview=null;setOrgHistoryPreviewUi(false);const data=orgChartCache[curOrgSite]||readOrgLocal(curOrgSite)||defaultOrgChart();applyOrgChartForm(data);refreshOrgBottom(false);bindOrgInputs();setOrgStatus('✓ 현재 조직도로 복귀','ok');}
+function openOrgHistoryModal(){const bg=document.getElementById('orgHistoryModalBg');if(bg){bg.classList.add('show');bg.setAttribute('aria-hidden','false');}document.getElementById('orgHistorySiteLabel').textContent=curOrgSite;loadOrgHistoryList();}
+function closeOrgHistoryModal(){const bg=document.getElementById('orgHistoryModalBg');if(bg){bg.classList.remove('show');bg.setAttribute('aria-hidden','true');}}
+function loadOrgHistoryList(){const local=readOrgHistoryLocal(curOrgSite);renderOrgHistoryList(local,true);gasCall('listOrgChartHistory',{site:curOrgSite,limit:40},res=>{if(res?.result==='success'&&Array.isArray(res.entries)){orgHistoryEntries=res.entries;renderOrgHistoryList(res.entries,false);}else if(!local.length){renderOrgHistoryList([],false);}}, {maxAttempts:1});}
+function renderOrgHistoryList(entries,isLocal){
+  const box=document.getElementById('orgHistoryList');if(!box)return;orgHistoryEntries=Array.isArray(entries)?entries:[];if(!orgHistoryEntries.length){box.innerHTML='<div class="org-history-empty">아직 저장 이력이 없습니다.<br>조직도 내용을 입력한 뒤 저장하면 첫 이력이 생성됩니다.</div>';return;}
+  box.innerHTML=orgHistoryEntries.map((e,i)=>'<div class="org-history-item"><div class="org-history-item-head"><strong>'+esc(formatOrgSavedAt(e.savedAt))+'</strong><span>'+(isLocal?'브라우저 임시 이력':'서버 저장 이력')+'</span><span>관리감독자 '+Number(e.snapshot?.total||e.total||0)+'명</span></div><div class="org-history-item-summary">'+esc(e.summary||'조직도 변경내용 저장')+'</div><div class="org-history-item-actions"><button class="btn btn-sm" onclick="viewOrgHistoryVersion(\''+esc(e.versionId||'')+'\')">이력 보기</button><button class="btn btn-sm btn-primary" onclick="restoreOrgHistoryVersion(\''+esc(e.versionId||'')+'\')">상단값 복원</button></div></div>').join('');
+}
+function findOrgHistoryLocal(versionId){return readOrgHistoryLocal(curOrgSite).find(e=>String(e.versionId)===String(versionId));}
+function fetchOrgHistoryVersion(versionId,cb){const local=findOrgHistoryLocal(versionId);gasCall('loadOrgChartHistory',{site:curOrgSite,versionId},res=>{if(res?.result==='success'&&res.entry)cb(res.entry);else if(local)cb(local);else toast('해당 저장 이력을 불러오지 못했습니다.','err');}, {maxAttempts:1});}
+function viewOrgHistoryVersion(versionId){fetchOrgHistoryVersion(versionId,entry=>{orgHistoryPreview=entry;applyOrgChartForm(entry.data||defaultOrgChart());renderOrgBottomSnapshot(entry.snapshot||{});setOrgHistoryPreviewUi(true,entry);bindOrgInputs();closeOrgHistoryModal();setOrgStatus('과거 저장본 보기 · '+formatOrgSavedAt(entry.savedAt),'warn');});}
+function restoreOrgHistoryVersion(versionId){fetchOrgHistoryVersion(versionId,entry=>{orgHistoryPreview=null;setOrgHistoryPreviewUi(false);applyOrgChartForm(entry.data||defaultOrgChart());refreshOrgBottom(false);bindOrgInputs();orgChartDirty=true;cacheCurrentOrgForm();closeOrgHistoryModal();setOrgStatus('과거 상단값 복원됨 · 저장 필요','warn');toast('과거 상단 입력값을 복원했습니다. 현재 하단 인원은 최신 현황으로 유지됩니다. 저장 버튼을 눌러 반영해 주세요.','ok');});}
+function toggleOrgPreview(force){orgPreview=typeof force==='boolean'?force:!orgPreview;const root=document.getElementById('orgExactRoot'),btn=document.getElementById('orgPreviewBtn');if(root)root.classList.toggle('preview',orgPreview);if(btn)btn.textContent=orgPreview?'✏️ 편집 모드로 돌아가기':'👁 미리보기 전환';document.querySelectorAll('#orgExactRoot [contenteditable]').forEach(el=>{if(orgPreview){if(el.getAttribute('contenteditable')==='true'){el.setAttribute('contenteditable','false');el._orgEd=true;}}else if(el._orgEd&&!orgHistoryPreview){el.setAttribute('contenteditable','true');el._orgEd=false;}});if(!orgPreview)setTimeout(alignOrgHonorary,50);}
+function orgSafeFilename(){return String(curOrgSite||'사업장').replace(/[\\/:*?"<>|]/g,'_')+'_안전보건관리_조직도_'+String(document.getElementById('orgDate')?.value||'최신').replace(/[^0-9]/g,'');}
+function materializeOrgInputs(page){const reps=[];(page||document.getElementById('orgChartCanvas')).querySelectorAll('input').forEach(inp=>{const div=document.createElement('div'),style=getComputedStyle(inp);div.className='org-export-text';div.style.fontFamily="'Noto Sans KR', sans-serif";div.style.fontSize=style.fontSize;div.style.textAlign='center';div.style.padding=style.padding;div.style.color='#111';div.style.width='100%';div.style.minHeight=style.height;div.style.lineHeight=style.lineHeight||'1.5';div.style.borderBottom=style.borderBottom;div.innerText=inp.value.trim()||'\u00A0';inp.parentNode.insertBefore(div,inp);inp.style.display='none';reps.push({inp,div});});return()=>reps.forEach(({inp,div})=>{div.remove();inp.style.display='';});}
+async function downloadOrgPng(){
+  const btn=document.getElementById('orgCaptureBtn');btn.textContent='⏳ 캡처 중...';btn.disabled=true;const page=document.getElementById('orgChartCanvas'),wrapper=document.getElementById('orgPageWrapper'),originalScroll=wrapper.scrollTop;wrapper.scrollTop=0;const wasPreview=orgPreview;if(!wasPreview)toggleOrgPreview(true);const restore=materializeOrgInputs(page);
+  try{await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',()=>typeof window.html2canvas==='function');if(document.fonts&&document.fonts.ready)await document.fonts.ready;await new Promise(r=>setTimeout(r,150));const canvas=await window.html2canvas(page,{scale:window.devicePixelRatio||2,useCORS:true,backgroundColor:'#ffffff',scrollY:0,windowY:0});const a=document.createElement('a');a.download=orgSafeFilename()+'.png';a.href=canvas.toDataURL('image/png');a.click();setOrgStatus('✓ PNG 저장 완료','ok');}catch(err){toast('PNG 저장 실패: '+err.message,'err');setOrgStatus('PNG 저장 오류','err');}finally{restore();wrapper.scrollTop=originalScroll;if(!wasPreview)toggleOrgPreview(false);btn.textContent='📷 PNG 저장';btn.disabled=false;}}
+async function downloadOrgPpt(){
+  const btn=document.getElementById('orgPptBtn');btn.textContent='⏳ PPT 변환 중...';btn.disabled=true;const wrapper=document.getElementById('orgPageWrapper'),originalScroll=wrapper.scrollTop;wrapper.scrollTop=0;const root=document.getElementById('orgExactRoot'),wasPreview=orgPreview;if(!wasPreview)toggleOrgPreview(true);
+  try{await loadScriptOnce('https://cdn.jsdelivr.net/gh/gitbrent/PptxGenJS@3.12.0/dist/pptxgen.bundle.js',()=>typeof window.PptxGenJS==='function');if(document.fonts&&document.fonts.ready)await document.fonts.ready;await new Promise(r=>setTimeout(r,180));const pptx=new window.PptxGenJS();pptx.layout='LAYOUT_WIDE';const slide=pptx.addSlide();const pageEl=document.getElementById('orgChartCanvas'),pr=pageEl.getBoundingClientRect(),PW=13.33,PH=7.5,sx=PW/pr.width,sy=PH/pr.height,NAVY='1E3A5F',WHITE='FFFFFF',fscale=PW*72/pr.width*1.15;const fpt=px=>Math.max(7,Math.round(px*fscale*10)/10);
+    function pp(el,minW,minH){const r=el.getBoundingClientRect(),x=(r.left-pr.left)*sx,y=(r.top-pr.top)*sy,w=r.width*sx,h=r.height*sy;if(w<(minW||.005)||h<(minH||.005))return null;return{x:+Math.max(0,x).toFixed(4),y:+Math.max(0,y).toFixed(4),w:+Math.max(minW||.005,w).toFixed(4),h:+Math.max(minH||.005,h).toFixed(4)};}
+    function addRect(p,fill,lc,lpt){if(!p)return;try{slide.addShape('rect',{...p,fill:fill||{color:WHITE},line:{color:lc||NAVY,pt:lpt||.75}});}catch(e){}}
+    function addTxt(str,p,opts){if(!p||!str)return;try{slide.addText(str,{...p,fontFace:'Malgun Gothic',wrap:true,margin:1.5,...opts});}catch(e){}}
+    function hline(x1,x2,y,lw,color){if(x2-x1<.01||y<0)return;const h=lw||.015;try{slide.addShape('rect',{x:+x1.toFixed(4),y:+Math.max(0,y-h/2).toFixed(4),w:+(x2-x1).toFixed(4),h,fill:{color:color||NAVY},line:{color:color||NAVY,pt:0}});}catch(e){}}
+    function connectLine(container,sel){const kids=[...container.querySelectorAll(':scope > '+sel)];if(kids.length<2)return;const f=kids[0].getBoundingClientRect(),l=kids[kids.length-1].getBoundingClientRect();hline(((f.left+f.width/2)-pr.left)*sx,((l.left+l.width/2)-pr.left)*sx,(f.top-pr.top)*sy);}
+    addRect({x:0,y:0,w:PW,h:PH},{color:WHITE},WHITE,0);const dhEl=pageEl.querySelector('.doc-header');if(dhEl){addRect(pp(dhEl,.1,.01),{color:WHITE},'AAAAAA',.5);dhEl.querySelectorAll('span').forEach((sp,i)=>addTxt(sp.innerText.trim(),pp(sp,.05,.01),{color:'222222',fontSize:8,bold:false,align:['left','center','right'][i],valign:'middle'}));}const dfEl=pageEl.querySelector('.doc-footer');if(dfEl){addRect(pp(dfEl,.1,.01),{color:WHITE},'AAAAAA',.5);dfEl.querySelectorAll('span').forEach((sp,i)=>addTxt(sp.innerText.trim(),pp(sp,.05,.01),{color:'222222',fontSize:8,bold:false,align:['left','center','right'][i],valign:'middle'}));}
+    const titleEl=pageEl.querySelector('.page-title');if(titleEl)addTxt('안전보건관리 조직구성표',pp(titleEl),{color:'111111',fontSize:fpt(17),bold:true,align:'center',valign:'middle',underline:{type:'sng'}});const dw=pageEl.querySelector('.date-wrap');if(dw)addTxt('기준일:  '+document.getElementById('orgDate').value,pp(dw),{color:'111111',fontSize:fpt(10.5),bold:true,align:'right',valign:'middle'});
+    pageEl.querySelectorAll('.vl').forEach(vl=>{const r=vl.getBoundingClientRect();if(r.height<1)return;const x=(r.left-pr.left)*sx,y=(r.top-pr.top)*sy,w=Math.max(.015,r.width*sx),h=Math.max(.01,r.height*sy);try{slide.addShape('rect',{x:+Math.max(0,x).toFixed(4),y:+Math.max(0,y).toFixed(4),w:+w.toFixed(4),h:+h.toFixed(4),fill:{color:NAVY},line:{color:NAVY,pt:0}});}catch(e){}});pageEl.querySelectorAll('.branch-wrap').forEach(bw=>connectLine(bw,'.branch-item'));const dr=document.getElementById('orgDeptRow');if(dr)connectLine(dr,'.dept-col');pageEl.querySelectorAll('.box,.hon-box,.subcon-box').forEach(el=>addRect(pp(el,.1,.05)));pageEl.querySelectorAll('.dept-title-box,.dept-names-box').forEach(el=>addRect(pp(el,.05,.02)));const sb=pageEl.querySelector('.sup-bar');if(sb){const p=pp(sb,.1,.02);addRect(p,{color:NAVY},NAVY,0);addTxt(sb.innerText.trim(),p,{color:WHITE,fontSize:10,bold:true,align:'center',valign:'middle'});}pageEl.querySelectorAll('.bh').forEach(bh=>{if(bh.closest('.sup-bar'))return;const p=pp(bh,.05,.01);addRect(p,{color:NAVY},NAVY,0);addTxt(bh.innerText.trim(),p,{color:WHITE,fontSize:10,bold:true,align:'center',valign:'middle'});});pageEl.querySelectorAll('.bn input,.name-inp,.subcon-names input').forEach(inp=>{const val=inp.value.trim();if(!val)return;addTxt(val,pp(inp,.05,.01),{color:'111111',fontSize:10,align:'center',valign:'middle',margin:1});});pageEl.querySelectorAll('.dept-names-box').forEach(nb=>{[...nb.querySelectorAll('input')].slice(0,-1).forEach(inp=>{const r=inp.getBoundingClientRect();hline((r.left-pr.left)*sx,(r.right-pr.left)*sx,(r.bottom-pr.top)*sy,.008,'DDDDDD');});});await pptx.writeFile({fileName:orgSafeFilename()+'.pptx'});setOrgStatus('✓ PPT 저장 완료','ok');
+  }catch(err){console.error(err);toast('PPT 생성 오류: '+err.message,'err');setOrgStatus('PPT 저장 오류','err');}finally{wrapper.scrollTop=originalScroll;if(!wasPreview)toggleOrgPreview(false);btn.textContent='📊 PPT 저장';btn.disabled=false;}}
+
+// 조직도 입력 이벤트 연결
+setTimeout(bindOrgInputs,0);
 
 /* ══════════════════════════════════════════
    초기화
