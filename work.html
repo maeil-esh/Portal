@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>관리감독자 및 유해위험작업 현황</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- v5.3.2: 사내 수급사 추가/삭제 버튼 보강 + 산업안전보건위원회 삭제·복원 옵션(committeeHidden 저장 연동, GAS v5.3.2 필요) -->
+<!-- v5.3.3: 조직도 저장 이력 한 줄 목록 + 이력 삭제 기능(GAS v5.3.3 deleteOrgChartHistory 필요) / v5.3.2: 수급사 추가·삭제, 위원회 삭제·복원 -->
 <style>
 :root {
   --blue50:#f0f4ff; --blue100:#d6e4ff; --blue500:#3182f6; --blue600:#1b6ef3;
@@ -899,10 +899,14 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 #orgExactRoot .org-export-text{font-family:'Noto Sans KR',sans-serif;text-align:center;color:#111;width:100%;white-space:pre-wrap}
 
 .org-history-wrap{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;margin-top:9px}
-.org-history-item{padding:10px 11px;border:1px solid var(--gray200);border-radius:8px;background:#fff}
-.org-history-item-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.org-history-item-head strong{font-size:12px;color:var(--gray900)}.org-history-item-head span{font-size:10px;color:var(--gray500)}
-.org-history-item-summary{margin-top:5px;font-size:11px;line-height:1.5;color:var(--gray600);word-break:keep-all}
-.org-history-item-actions{display:flex;gap:5px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
+.org-history-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--gray200);border-radius:8px;background:#fff;min-width:0}
+.org-history-item strong{font-size:11.5px;color:var(--gray900);white-space:nowrap;flex-shrink:0}
+.org-history-src{font-size:9.5px;color:var(--gray400);white-space:nowrap;flex-shrink:0;border:1px solid var(--gray200);border-radius:8px;padding:1px 6px}
+.org-history-sum{flex:1;min-width:0;font-size:11px;color:var(--gray600);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.org-history-cnt{font-size:10px;color:var(--gray500);white-space:nowrap;flex-shrink:0}
+.org-history-actions{display:flex;gap:4px;flex-shrink:0}
+.org-history-actions .btn{padding:3px 8px;font-size:10.5px}
+.org-history-del:hover{color:#fff!important;background:var(--red500)!important;border-color:var(--red500)!important}
 .org-history-empty{padding:28px 12px;text-align:center;color:var(--gray400);font-size:12px}
 .org-history-banner{display:none;max-width:1280px;margin:0 auto 10px;padding:9px 11px;border:1px solid #ffe2a8;border-radius:8px;background:#fff8e8;color:#9b6400;font-size:11px;line-height:1.55}.org-history-banner.show{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
 @media(max-width:768px){.org-wrap{padding:9px}.org-toolbar{padding:9px;gap:5px;margin-bottom:8px}.org-toolbar-title{width:100%}.org-toolbar select{min-width:128px;flex:1}.org-toolbar-spacer{display:none}.org-status{width:100%;margin-top:2px}.org-help{margin-bottom:7px;font-size:10px}.org-exact-stage{height:calc(100vh - 250px);padding:8px;border-radius:8px;justify-content:flex-start}}
@@ -3941,9 +3945,20 @@ function returnToCurrentOrgChart(){orgHistoryPreview=null;setOrgHistoryPreviewUi
 function openOrgHistoryModal(){const bg=document.getElementById('orgHistoryModalBg');if(bg){bg.classList.add('show');bg.setAttribute('aria-hidden','false');}document.getElementById('orgHistorySiteLabel').textContent=curOrgSite;loadOrgHistoryList();}
 function closeOrgHistoryModal(){const bg=document.getElementById('orgHistoryModalBg');if(bg){bg.classList.remove('show');bg.setAttribute('aria-hidden','true');}}
 function loadOrgHistoryList(){const local=readOrgHistoryLocal(curOrgSite);renderOrgHistoryList(local,true);gasCall('listOrgChartHistory',{site:curOrgSite,limit:40},res=>{if(res?.result==='success'&&Array.isArray(res.entries)){orgHistoryEntries=res.entries;renderOrgHistoryList(res.entries,false);}else if(!local.length){renderOrgHistoryList([],false);}}, {maxAttempts:1});}
+function deleteOrgHistoryVersion(versionId,isLocal){
+  versionId=String(versionId||'');if(!versionId)return;
+  if(!confirm('이 저장 이력을 삭제할까요?\n삭제한 이력은 복구할 수 없습니다.'))return;
+  const purgeLocal=()=>writeOrgHistoryLocal(curOrgSite,readOrgHistoryLocal(curOrgSite).filter(e=>String(e.versionId)!==versionId));
+  if(isLocal===true||versionId.indexOf('local_')===0){purgeLocal();toast('브라우저 임시 이력을 삭제했습니다.','ok');loadOrgHistoryList();return;}
+  gasCall('deleteOrgChartHistory',{site:curOrgSite,versionId},res=>{
+    if(res?.result==='success'){purgeLocal();toast('저장 이력을 삭제했습니다.','ok');loadOrgHistoryList();}
+    else if(/알 수 없는 action/i.test(String(res?.error||''))){toast('이력 삭제는 GAS v5.3.3 이상이 필요합니다. 풀코드를 재배포해 주세요.','err');}
+    else{toast('이력 삭제 실패: '+(res?.error||'오류'),'err');}
+  },{maxAttempts:1});
+}
 function renderOrgHistoryList(entries,isLocal){
   const box=document.getElementById('orgHistoryList');if(!box)return;orgHistoryEntries=Array.isArray(entries)?entries:[];if(!orgHistoryEntries.length){box.innerHTML='<div class="org-history-empty">아직 저장 이력이 없습니다.<br>조직도 내용을 입력한 뒤 저장하면 첫 이력이 생성됩니다.</div>';return;}
-  box.innerHTML=orgHistoryEntries.map((e,i)=>'<div class="org-history-item"><div class="org-history-item-head"><strong>'+esc(formatOrgSavedAt(e.savedAt))+'</strong><span>'+(isLocal?'브라우저 임시 이력':'서버 저장 이력')+'</span><span>관리감독자 '+Number(e.snapshot?.total||e.total||0)+'명</span></div><div class="org-history-item-summary">'+esc(e.summary||'조직도 변경내용 저장')+'</div><div class="org-history-item-actions"><button class="btn btn-sm" onclick="viewOrgHistoryVersion(\''+esc(e.versionId||'')+'\')">이력 보기</button><button class="btn btn-sm btn-primary" onclick="restoreOrgHistoryVersion(\''+esc(e.versionId||'')+'\')">상단값 복원</button></div></div>').join('');
+  box.innerHTML=orgHistoryEntries.map((e,i)=>'<div class="org-history-item"><strong>'+esc(formatOrgSavedAt(e.savedAt))+'</strong><span class="org-history-src">'+(isLocal?'임시':'서버')+'</span><span class="org-history-sum" title="'+esc(e.summary||'조직도 변경내용 저장')+'">'+esc(e.summary||'조직도 변경내용 저장')+'</span><span class="org-history-cnt">'+Number(e.snapshot?.total||e.total||0)+'명</span><div class="org-history-actions"><button class="btn btn-sm" onclick="viewOrgHistoryVersion(\''+esc(e.versionId||'')+'\')">보기</button><button class="btn btn-sm btn-primary" onclick="restoreOrgHistoryVersion(\''+esc(e.versionId||'')+'\')">복원</button><button class="btn btn-sm org-history-del" title="이 이력 삭제" onclick="deleteOrgHistoryVersion(\''+esc(e.versionId||'')+'\','+(isLocal?'true':'false')+')">🗑</button></div></div>').join('');
 }
 function findOrgHistoryLocal(versionId){return readOrgHistoryLocal(curOrgSite).find(e=>String(e.versionId)===String(versionId));}
 function fetchOrgHistoryVersion(versionId,cb){const local=findOrgHistoryLocal(versionId);gasCall('loadOrgChartHistory',{site:curOrgSite,versionId},res=>{if(res?.result==='success'&&res.entry)cb(res.entry);else if(local)cb(local);else toast('해당 저장 이력을 불러오지 못했습니다.','err');}, {maxAttempts:1});}
