@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리감독자 안전보건 이행평가</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+:root{
+  --teal:#1f5460; --teal-d:#163d46; --teal-l:#2e7d8a;
+  --bg:#eef2f3; --card:#ffffff; --ink:#1b2a2e; --mut:#5b6e73;
+  --line:#d7e0e2; --line-s:#c2cdd0;
+  --good:#1f7a3d; --mid:#9a6a00; --warn:#b23b32;
+  --good-bg:#e6f3eb; --mid-bg:#fbf2dd; --warn-bg:#f8e7e5;
+  --prov:#8a5a00; --prov-bg:#fdf3e0;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:'Pretendard',-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 64px}
+header.top{background:linear-gradient(135deg,var(--teal),var(--teal-d));color:#fff;
+  padding:22px 0 20px;margin-bottom:22px;border-bottom:3px solid var(--teal-l)}
+header.top .wrap{padding-top:0;padding-bottom:0}
+.brand{font-size:12.5px;letter-spacing:.14em;font-weight:600;color:#bfe0e4;text-transform:uppercase}
+header.top h1{margin:6px 0 4px;font-size:21px;font-weight:700;letter-spacing:-.01em}
+header.top p{margin:0;font-size:13px;color:#cfe2e5}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:20px 20px 22px;margin-bottom:18px;box-shadow:0 1px 2px rgba(20,50,56,.04)}
+.sec-eyebrow{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;
+  letter-spacing:.04em;color:var(--teal);margin:0 0 14px}
+.sec-eyebrow .num{display:inline-flex;align-items:center;justify-content:center;
+  width:21px;height:21px;border-radius:6px;background:var(--teal);color:#fff;font-size:12px}
+.notice{background:#f4f8f9;border:1px solid var(--line);border-left:3px solid var(--teal-l);
+  border-radius:8px;padding:11px 13px;font-size:13px;color:var(--mut);margin-bottom:18px;line-height:1.55}
+label.fld{display:block;font-size:13.5px;font-weight:600;margin:0 0 6px;color:var(--ink)}
+.row{margin-bottom:16px}
+select,input[type=text],input[type=number]{width:100%;padding:11px 12px;font-size:15px;
+  border:1px solid var(--line-s);border-radius:8px;background:#fff;color:var(--ink);
+  font-family:inherit;-webkit-appearance:none}
+select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;border-color:var(--teal-l)}
+.id-line{display:flex;gap:8px}
+.id-line input{flex:1}
+.btn{padding:11px 16px;font-size:14.5px;font-weight:600;border-radius:8px;border:1px solid transparent;
+  cursor:pointer;font-family:inherit;white-space:nowrap;transition:filter .12s}
+.btn:hover{filter:brightness(.95)}
+.btn:active{filter:brightness(.9)}
+.btn-ghost{background:#fff;border-color:var(--teal);color:var(--teal)}
+.btn-fill{background:var(--teal);color:#fff}
+.btn-soft{background:#e7eef0;color:var(--teal-d);border-color:var(--line-s)}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+.lookup-out{margin-top:9px;font-size:14px;min-height:20px}
+.lookup-out .name{font-weight:700;font-size:17px;color:var(--teal-d)}
+.lookup-out .meta{color:var(--mut);font-size:13px;margin-left:8px}
+.lookup-out.err{color:var(--warn);font-weight:600}
+.sub{font-size:12.5px;color:var(--mut);margin:-2px 0 12px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pair .cell label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+.pair .cell .tgt{font-size:11.5px;color:var(--mut);font-weight:500}
+.actions{display:flex;gap:9px;margin-top:6px}
+.actions .btn{flex:1}
+.hidden{display:none}
+/* result */
+.diag{width:100%;border-collapse:collapse;font-size:13.5px;margin-bottom:6px}
+.diag th,.diag td{border:1px solid var(--line-s);padding:9px 10px;text-align:center;vertical-align:middle}
+.diag thead th{background:var(--teal);color:#fff;font-weight:600;font-size:13px}
+.diag td.lead{text-align:left;background:#f6f9fa;font-weight:600;color:var(--ink);line-height:1.4}
+.diag td.lead small{display:block;font-weight:500;color:var(--mut);font-size:12px;margin-top:1px}
+.note-opts{font-size:11.5px;color:var(--mut);white-space:nowrap}
+.opt{position:relative;display:inline-block;padding:1px 3px}
+.opt.on{font-weight:700}
+.opt.on.g15{color:var(--good)} .opt.on.g12{color:var(--mid)} .opt.on.g9{color:var(--warn)}
+.opt.on::after{content:"";position:absolute;inset:-3px -7px;border:2px solid currentColor;
+  border-radius:48% 52% 50% 50%/52% 50% 50% 48%;transform:rotate(-4deg);opacity:.9}
+.sep{color:var(--line-s)}
+.score-pill{display:inline-block;min-width:48px;padding:3px 9px;border-radius:999px;font-weight:700;font-size:13.5px}
+.s15{background:var(--good-bg);color:var(--good)} .s12{background:var(--mid-bg);color:var(--mid)} .s9{background:var(--warn-bg);color:var(--warn)}
+.grade{font-size:11px;font-weight:700;letter-spacing:.02em}
+.detail{width:100%;border-collapse:collapse;font-size:13.5px;margin:4px 0 8px}
+.detail th,.detail td{border:1px solid var(--line-s);padding:8px 6px;text-align:center}
+.detail thead th{background:var(--teal-d);color:#fff;font-weight:600;font-size:12.5px}
+.detail tbody th{background:#eef3f4;font-weight:700;color:var(--teal-d);width:64px}
+.detail td.tot{background:#f6f9fa;font-weight:700}
+.detail td.miss{color:var(--warn);font-weight:700;background:var(--warn-bg)}
+.detail td.prov{color:var(--prov)}
+.foot{font-size:12px;color:var(--mut);margin:2px 0 16px;line-height:1.55}
+.foot b{color:var(--ink)}
+.prov-badge{display:inline-block;background:var(--prov-bg);color:var(--prov);border:1px solid #eccf93;
+  font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:6px;margin-left:6px;vertical-align:middle}
+.result-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px}
+.result-head h2{margin:0;font-size:18px;color:var(--teal-d)}
+.result-head .who{font-size:14px;color:var(--mut)}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+  background:var(--teal-d);color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;
+  opacity:0;pointer-events:none;transition:.25s;box-shadow:0 6px 20px rgba(20,50,56,.3);z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.backbar{display:flex;gap:9px;margin-top:4px}
+@media(max-width:560px){.pair{grid-template-columns:1fr}.id-line{flex-direction:column}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="brand"></div>
+  <h1>관리감독자 안전보건업무 이행평가</h1>
+  <p>'26년 상반기 · 전산화시스템 이전(1~2월) 활동 입력 및 평가 조회</p>
+</div></header>
+
+<div class="wrap">
+
+<!-- ================= 입력 화면 ================= -->
+<section id="viewInput">
+  <div class="notice">
+    <b>'26년 이전 지정된 관리감독자만 대상입니다.</b><br>
+    전산화시스템 도입 이전(1~2월) 종이 체크리스트 활동 건수를 입력해 주세요.
+    3~5월 전산 데이터는 시스템에서 자동으로 불러옵니다.
+  </div>
+
+  <div class="card">
+    <div class="sec-eyebrow"><span class="num">1</span> 대상자 조회</div>
+    <div class="row">
+      <label class="fld" for="site">사업장 선택</label>
+      <select id="site"><option value="">— 사업장을 선택하세요 —</option></select>
+    </div>
+    <div class="row">
+      <label class="fld" for="sabun">사번</label>
+      <div class="id-line">
+        <input type="text" id="sabun" placeholder="사번 입력 (예: 0503126)" autocomplete="off">
+        <button class="btn btn-ghost" id="btnLookup">조회</button>
+      </div>
+      <div class="lookup-out" id="lookupOut">조회 결과: —</div>
+    </div>
+  </div>
+
+  <div class="card" id="inputCard" style="opacity:.5;pointer-events:none">
+    <div class="sec-eyebrow"><span class="num">2</span> 1~2월 종이 체크리스트 작성 건수</div>
+    <div class="sub">대상: 월 4건 기준</div>
+    <div class="pair">
+      <div class="cell"><label>1월 <span class="tgt">(대상 4건)</span></label>
+        <input type="number" min="0" max="31" id="janW" placeholder="0"></div>
+      <div class="cell"><label>2월 <span class="tgt">(대상 4건)</span></label>
+        <input type="number" min="0" max="31" id="febW" placeholder="0"></div>
+    </div>
+
+    <div class="sec-eyebrow" style="margin-top:20px"><span class="num">3</span> 1~2월 체크리스트 내 안전보건 활동 작성 건수</div>
+    <div class="pair">
+      <div class="cell"><label>1월</label>
+        <input type="number" min="0" max="31" id="janA" placeholder="0"></div>
+      <div class="cell"><label>2월</label>
+        <input type="number" min="0" max="31" id="febA" placeholder="0"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-fill" id="btnSave">저장</button>
+      <button class="btn btn-soft" id="btnUpdate">수정</button>
+      <button class="btn btn-ghost" id="btnView">평가 결과 조회</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 결과 화면 ================= -->
+<section id="viewResult" class="hidden">
+  <div class="card">
+    <div class="result-head">
+      <h2>평가 결과</h2>
+      <div class="who" id="resWho"></div>
+    </div>
+    <div class="sec-eyebrow" style="margin-top:14px"><span class="num">1</span> 평가표 기입 사항</div>
+    <table class="diag">
+      <thead><tr><th style="width:48%">진단내용</th><th>실적</th><th>평가결과</th><th>비고(배점)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="lead">1) 관리감독자 체크리스트 작성 건수<small>(실행 / 대상)</small></td>
+          <td id="d1act">–</td>
+          <td id="d1score">–</td>
+          <td id="d1note" class="note-opts">–</td>
+        </tr>
+        <tr>
+          <td class="lead">2) 관리감독자 체크리스트 내<br>안전보건 활동 이력</td>
+          <td id="d2act">–</td>
+          <td id="d2score">–</td>
+          <td id="d2note" class="note-opts">–</td>
+        </tr>
+        <tr>
+          <td class="lead">5) MESH 내부심사 부적합<small>(10점에서 건당 -1점)</small></td>
+          <td id="d5act">–</td>
+          <td id="d5score">–</td>
+          <td id="d5note" class="note-opts">10 ~ 0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="sec-eyebrow"><span class="num">2</span> 평가 세부내역</div>
+
+    <div style="font-weight:700;font-size:14px;margin:2px 0 8px;color:var(--teal-d)">
+      관리감독자 체크리스트 작성 결과 <span id="provBadge1"></span></div>
+    <table class="detail">
+      <thead><tr><th>구분</th><th>1월</th><th>2월</th><th>3월</th><th>4월</th><th>5월</th><th>계</th></tr></thead>
+      <tbody>
+        <tr><th>대상</th><td>4</td><td>4</td><td>7</td><td>21</td><td>18</td><td class="tot">54</td></tr>
+        <tr id="rowWritten"><th>작성</th></tr>
+      </tbody>
+    </table>
+    <div class="foot">※ 일지 작성 100% 준수 → <b>우수 15점</b> / 누락 → <b>보완 9점</b></div>
+
+    <div style="font-weight:700;font-size:14px;margin:14px 0 8px;color:var(--teal-d)">
+      관리감독자 체크리스트 안전보건 활동 작성 <span id="provBadge2"></span></div>
+    <table class="detail">
+      <thead><tr><th>구분</th><th>1월</th><th>2월</th><th>3월</th><th>4월</th><th>5월</th><th>계</th></tr></thead>
+      <tbody><tr id="rowAct"><th>작성</th></tr></tbody>
+    </table>
+    <div class="foot">※ 매월 2회 이상 → <b>우수 15점</b> / 기간 내 활동 → <b>보통 12점</b> / 활동 없음 → <b>보완 9점</b></div>
+
+    <div class="backbar">
+      <button class="btn btn-ghost" id="btnBack">← 입력으로</button>
+      <button class="btn btn-soft" id="btnPrint">인쇄 / PDF</button>
+    </div>
+  </div>
+</section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 데이터 계층 — GAS + Google Sheets (JSONP) ===== */
+const API = 'https://script.google.com/macros/s/AKfycbxOntW73_0V-3bSUXIiXt_cmp4XI8v713eqJCTemzyZ4LkFukIRL5m94vgnxwDBP8F1/exec';
+
+function jsonp(action, params){
+  return new Promise((resolve, reject)=>{
+    const cb = 'cb_' + Date.now() + '_' + Math.floor(Math.random()*1e6);
+    const timer = setTimeout(()=>{ cleanup(); reject(new Error('시간 초과')); }, 15000);
+    let s;
+    function cleanup(){ clearTimeout(timer); try{ delete window[cb]; }catch(e){} if(s && s.parentNode) s.parentNode.removeChild(s); }
+    window[cb] = (res)=>{ cleanup(); resolve(res); };
+    const qs = Object.entries(params||{}).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
+    s = document.createElement('script');
+    s.src = API + '?action=' + encodeURIComponent(action) + '&callback=' + cb + (qs ? '&'+qs : '');
+    s.onerror = ()=>{ cleanup(); reject(new Error('네트워크 오류')); };
+    document.body.appendChild(s);
+  });
+}
+
+const TARGET=[4,4,7,21,18];
+let current=null; // {site,sabun,name,dept,rank,verified,w35,a35}
+
+const $=id=>document.getElementById(id);
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1900);}
+
+/* 사업장 드롭다운 — GAS에서 로드 (실패 시 기본 8개) */
+const siteSel=document.getElementById('site');
+const SITES_FALLBACK=['중부권역-평택','중부권역-아산','동부권역-경산','동부권역-영동','청양공장','상하공장','광주공장','MIC'];
+function fillSites(list){ list.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;siteSel.appendChild(o);}); }
+(async()=>{
+  try{ const r=await jsonp('getSites'); fillSites(r&&r.ok&&r.sites&&r.sites.length? r.sites : SITES_FALLBACK); }
+  catch(e){ fillSites(SITES_FALLBACK); }
+})();
+
+async function doLookup(){
+  const site=siteSel.value, sabun=$('sabun').value.trim();
+  const out=$('lookupOut'); const card=$('inputCard');
+  if(!site){toast('사업장을 선택하세요');return;}
+  if(!sabun){toast('사번을 입력하세요');return;}
+  out.className='lookup-out'; out.textContent='조회 중…';
+  let res;
+  try{ res=await jsonp('getByToken',{sabun}); }
+  catch(e){ out.className='lookup-out err'; out.textContent='조회 실패: '+e.message; return; }
+  if(!res||!res.ok){
+    out.className='lookup-out err'; out.textContent='조회 결과: '+((res&&res.msg)||'사번을 찾을 수 없습니다.');
+    card.style.opacity=.5; card.style.pointerEvents='none'; current=null; return;
+  }
+  const p=res.person;
+  current={site:p.site,sabun:p.sabun,name:p.name,dept:p.dept,rank:p.rank,w35:p.w35,a35:p.a35,verified:p.verified,audit:res.audit||{count:0,score:10,max:10,min:0}};
+  if(site!==p.site){ siteSel.value=p.site; }   // 선택 사업장 자동 보정
+  out.className='lookup-out';
+  out.innerHTML='조회 결과: <span class="name">'+p.name+'</span><span class="meta">'+p.site+' · '+p.dept+' · '+p.rank+'</span>';
+  card.style.opacity=1; card.style.pointerEvents='auto';
+  const sv=res.saved;
+  $('janW').value = sv? sv.janW : '';
+  $('febW').value = sv? sv.febW : '';
+  $('janA').value = sv? sv.janA : '';
+  $('febA').value = sv? sv.febA : '';
+  if(sv) toast('저장된 입력값을 불러왔습니다');
+}
+
+function collectInput(){
+  const n=id=>{const v=parseInt($(id).value,10);return isNaN(v)?0:Math.max(0,v);};
+  return {janW:n('janW'),febW:n('febW'),janA:n('janA'),febA:n('febA')};
+}
+
+async function doSave(update){
+  if(!current){toast('먼저 대상자를 조회하세요');return;}
+  const inp=collectInput();
+  const payload={sabun:current.sabun,site:current.site,name:current.name,dept:current.dept,rank:current.rank,janW:inp.janW,febW:inp.febW,janA:inp.janA,febA:inp.febA};
+  let res;
+  try{ res=await jsonp('submitEval',{data:JSON.stringify(payload)}); }
+  catch(e){ toast('저장 실패: '+e.message); return; }
+  if(!(res&&res.ok)){ toast('저장 실패: '+((res&&res.msg)||'')); return; }
+  const word = res.mode==='update' ? '수정' : '저장';
+  if(confirm(word+'되었습니다.\n평가결과를 조회하시겠습니까?')) doView();
+  else toast(word+'되었습니다');
+}
+
+/* 점수 계산 */
+function scoreWritten(months){ // months=[1,2,3,4,5월 작성]
+  const miss=months.some((w,i)=>w<TARGET[i]);
+  return miss?9:15;
+}
+function scoreActivity(months){
+  if(months.every(a=>a>=2)) return 15;
+  if(months.some(a=>a>=1)) return 12;
+  return 9;
+}
+const pill=s=>'<span class="score-pill s'+s+'">'+s+'점</span>';
+const grade=s=>s==15?'우수':s==12?'보통':'보완';
+
+async function doView(){
+  if(!current){toast('먼저 대상자를 조회하세요');return;}
+  const inp=collectInput();
+  const W=[inp.janW,inp.febW,...current.w35];
+  const A=[inp.janA,inp.febA,...current.a35];
+  const sumW=W.reduce((a,b)=>a+b,0), sumA=A.reduce((a,b)=>a+b,0), sumT=TARGET.reduce((a,b)=>a+b,0);
+  const sW=scoreWritten(W), sA=scoreActivity(A);
+
+  $('resWho').textContent=current.site+' · '+current.name+' ('+current.rank+')';
+  $('d1act').innerHTML=sumW+' / '+sumT+' 건';
+  $('d1score').innerHTML=pill(sW)+'<br><span class="grade" style="color:var(--'+(sW==15?'good':'warn')+')">'+grade(sW)+'</span>';
+  $('d2act').innerHTML=sumA+' 건';
+  const acol=sA==15?'good':sA==12?'mid':'warn';
+  $('d2score').innerHTML=pill(sA)+'<br><span class="grade" style="color:var(--'+acol+')">'+grade(sA)+'</span>';
+
+  // 비고(배점): 받은 등급에 동그라미
+  const opt=(label,pts,on)=>'<span class="opt'+(on?' on g'+pts:'')+'">'+label+' '+pts+'</span>';
+  $('d1note').innerHTML = opt('우수',15,sW==15)+'<span class="sep"> / </span>'+opt('보완',9,sW==9);
+  $('d2note').innerHTML = opt('우수',15,sA==15)+'<span class="sep"> / </span>'+opt('보통',12,sA==12)+'<span class="sep"> / </span>'+opt('보완',9,sA==9);
+
+  // 5번 항목 — MESH 내부심사
+  const au=current.audit||{count:0,score:10,max:10,min:0};
+  $('d5act').innerHTML='( '+au.count+' )건';
+  const audCol = au.score>=8 ? 'good' : au.score>=5 ? 'mid' : 'warn';
+  $('d5score').innerHTML='<span class="score-pill s'+(au.score>=8?15:au.score>=5?12:9)+'">'+au.score+'점</span><br><span class="grade" style="color:var(--'+audCol+')">'+au.max+' ~ '+au.min+'</span>';
+  $('d5note').innerHTML='반기 부적합 건수 / -1점/건';
+
+  // 상세표 작성
+  const rW=$('rowWritten'); rW.innerHTML='<th>작성</th>';
+  W.forEach((w,i)=>{const td=document.createElement('td');td.textContent=w;
+    if(w<TARGET[i])td.className='miss'; if(i>=2&&!current.verified)td.classList.add('prov');rW.appendChild(td);});
+  const tdW=document.createElement('td');tdW.className='tot';tdW.textContent=sumW;rW.appendChild(tdW);
+
+  const rA=$('rowAct'); rA.innerHTML='<th>작성</th>';
+  A.forEach((a,i)=>{const td=document.createElement('td');td.textContent=a;
+    if(i>=2&&!current.verified)td.classList.add('prov');rA.appendChild(td);});
+  const tdA=document.createElement('td');tdA.className='tot';tdA.textContent=sumA;rA.appendChild(tdA);
+
+  const badge=current.verified?'':'<span class="prov-badge">3~5월 잠정 · 달력 검증 전</span>';
+  $('provBadge1').innerHTML=badge; $('provBadge2').innerHTML=badge;
+
+  $('viewInput').classList.add('hidden'); $('viewResult').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+$('btnLookup').onclick=doLookup;
+$('sabun').addEventListener('keydown',e=>{if(e.key==='Enter')doLookup();});
+$('btnSave').onclick=()=>doSave(false);
+$('btnUpdate').onclick=()=>doSave(true);
+$('btnView').onclick=doView;
+$('btnBack').onclick=()=>{$('viewResult').classList.add('hidden');$('viewInput').classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});};
+$('btnPrint').onclick=()=>window.print();
+</script>
+</body>
+</html>
