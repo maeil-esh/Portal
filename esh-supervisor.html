@@ -111,6 +111,19 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
 .lookup-out.loading{color:var(--teal-d,#0A2540)}
 .lookup-out.loading::before{content:'';display:inline-block;width:12px;height:12px;margin-right:6px;vertical-align:-2px;
   border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+/* 부적합 내역 */
+.audit-detail{margin-top:14px;padding:14px 16px;background:#FFF8F1;border:1px solid #FCD9B6;border-radius:10px}
+.audit-detail.hidden{display:none}
+.audit-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.audit-title{font-weight:700;font-size:13px;color:#9A3412}
+.audit-toggle{font-size:12px;background:transparent;border:1px solid #FCD9B6;color:#9A3412;padding:3px 10px;border-radius:6px;cursor:pointer}
+.audit-toggle:hover{background:#FED7AA}
+.audit-list{display:flex;flex-direction:column;gap:8px}
+.audit-list.collapsed{display:none}
+.audit-item{display:flex;gap:10px;font-size:12.5px;line-height:1.55;padding:8px 10px;background:#fff;border:1px solid #FED7AA;border-radius:8px}
+.audit-no{flex:0 0 auto;display:inline-flex;align-items:flex-start;font-weight:700;color:#9A3412;min-width:24px}
+.audit-content{flex:1;color:#1F2937;white-space:pre-wrap;word-break:break-word}
+.audit-empty{font-size:12.5px;color:#16A34A;text-align:center;padding:8px}
 .backbar{display:flex;gap:9px;margin-top:4px}
 @media(max-width:560px){.pair{grid-template-columns:1fr}.id-line{flex-direction:column}}
 </style>
@@ -141,7 +154,7 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
     <div class="row">
       <label class="fld" for="sabun">사번</label>
       <div class="id-line">
-        <input type="text" id="sabun" placeholder="사번 입력 (예: 050000)" autocomplete="off">
+        <input type="text" id="sabun" placeholder="사번 입력 (예: 0503126)" autocomplete="off">
         <button class="btn btn-ghost" id="btnLookup">조회</button>
       </div>
       <div class="lookup-out" id="lookupOut">조회 결과: —</div>
@@ -202,7 +215,7 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
   </div>
 
   <div class="card">
-    <div class="sec-eyebrow"><span class="num">5</span> MESH 내부심사 평가</div>
+    <div class="sec-eyebrow"><span class="num">2</span> MESH 내부심사 평가</div>
     <table class="diag">
       <thead><tr><th style="width:48%">진단내용</th><th>실적</th><th>평가결과</th><th>비고(배점)</th></tr></thead>
       <tbody>
@@ -214,6 +227,13 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
         </tr>
       </tbody>
     </table>
+    <div id="auditDetail" class="audit-detail hidden">
+      <div class="audit-head">
+        <span class="audit-title">부적합 내역</span>
+        <button type="button" class="audit-toggle" id="auditToggleBtn">접기</button>
+      </div>
+      <div id="auditList" class="audit-list"></div>
+    </div>
   </div>
 
   <div class="card">
@@ -305,7 +325,7 @@ async function doLookup(){
     card.style.opacity=.5; card.style.pointerEvents='none'; current=null; return;
   }
   const p=res.person;
-  current={site:p.site,sabun:p.sabun,name:p.name,dept:p.dept,rank:p.rank,w35:p.w35,a35:p.a35,verified:p.verified,audit:res.audit||{count:0,score:10,max:10,min:0}};
+  current={site:p.site,sabun:p.sabun,name:p.name,dept:p.dept,rank:p.rank,w35:p.w35,a35:p.a35,verified:p.verified,audit:res.audit||{count:0,score:10,max:10,min:0,items:[]}};
   if(site!==p.site){ siteSel.value=p.site; }   // 선택 사업장 자동 보정
   out.className='lookup-out';
   out.innerHTML='조회 결과: <span class="name">'+p.name+'</span><span class="meta">'+p.site+' · '+p.dept+' · '+p.rank+'</span>';
@@ -375,11 +395,31 @@ async function doView(){
   $('d2note').innerHTML = opt('우수',15,sA==15)+'<span class="sep"> / </span>'+opt('보통',12,sA==12)+'<span class="sep"> / </span>'+opt('보완',9,sA==9);
 
   // 5번 항목 — MESH 내부심사
-  const au=current.audit||{count:0,score:10,max:10,min:0};
+  const au=current.audit||{count:0,score:10,max:10,min:0,items:[]};
   $('d5act').innerHTML='( '+au.count+' )건';
   const audCol = au.score>=8 ? 'good' : au.score>=5 ? 'mid' : 'warn';
   $('d5score').innerHTML='<span class="score-pill s'+(au.score>=8?15:au.score>=5?12:9)+'">'+au.score+'점</span><br><span class="grade" style="color:var(--'+audCol+')">'+au.max+' ~ '+au.min+'</span>';
   $('d5note').innerHTML='반기 부적합 건수 / -1점/건';
+
+  // 부적합 내역 영역
+  const det=$('auditDetail'), list=$('auditList');
+  const items=Array.isArray(au.items)?au.items:[];
+  if(items.length===0){
+    det.classList.remove('hidden');
+    list.classList.remove('collapsed');
+    list.innerHTML='<div class="audit-empty">✓ 부적합 사항이 없습니다 (10점 만점)</div>';
+    $('auditToggleBtn').style.display='none';
+  } else {
+    det.classList.remove('hidden');
+    list.classList.remove('collapsed');
+    $('auditToggleBtn').style.display='';
+    $('auditToggleBtn').textContent='접기';
+    list.innerHTML=items.map((it,i)=>{
+      const no=it.no||(i+1);
+      const content=(it.content||'').replace(/</g,'&lt;');
+      return '<div class="audit-item"><span class="audit-no">'+no+'.</span><div class="audit-content">'+content+'</div></div>';
+    }).join('');
+  }
 
   // 상세표 작성
   const rW=$('rowWritten'); rW.innerHTML='<th>작성</th>';
@@ -395,6 +435,13 @@ async function doView(){
   $('provBadge1').innerHTML=''; $('provBadge2').innerHTML='';
 
   $('viewInput').classList.add('hidden'); $('viewResult').classList.remove('hidden');
+  // 부적합 내역 토글
+  const tb=$('auditToggleBtn');
+  if(tb){ tb.onclick=()=>{
+    const l=$('auditList');
+    const collapsed=l.classList.toggle('collapsed');
+    tb.textContent=collapsed?'펼치기':'접기';
+  };}
   window.scrollTo({top:0,behavior:'smooth'});
   progDone();
 }
