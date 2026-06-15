@@ -124,15 +124,64 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
 .audit-no{flex:0 0 auto;display:inline-flex;align-items:flex-start;font-weight:700;color:#9A3412;min-width:24px}
 .audit-content{flex:1;color:#1F2937;white-space:pre-wrap;word-break:break-word}
 .audit-empty{font-size:12.5px;color:#16A34A;text-align:center;padding:8px}
+/* 헤더 접속 QR */
+.top .wrap{position:relative}
+.qr-box{position:absolute;top:14px;right:18px;background:#fff;border-radius:10px;padding:8px 8px 6px;
+  box-shadow:0 4px 14px rgba(0,0,0,.18);cursor:pointer;transition:transform .15s;text-align:center;line-height:0}
+.qr-box:hover{transform:translateY(-1px) scale(1.02)}
+.qr-canvas{width:84px;height:84px;display:flex;align-items:center;justify-content:center}
+.qr-canvas img,.qr-canvas canvas,.qr-canvas svg{width:84px;height:84px;display:block}
+.qr-cap{font-size:10.5px;line-height:1.4;color:#0A2540;font-weight:700;margin-top:4px;letter-spacing:-.2px}
+@media (max-width: 640px){ .qr-box{display:none} }
 .backbar{display:flex;gap:9px;margin-top:4px}
 @media(max-width:560px){.pair{grid-template-columns:1fr}.id-line{flex-direction:column}}
+
+/* === 모바일 최적화 (≤640px) === */
+@media (max-width: 640px){
+  .wrap{padding:0 12px 64px}
+  header.top h1{font-size:18px;line-height:1.25}
+  header.top p{font-size:11.5px;line-height:1.4}
+  .sec-eyebrow{font-size:12px}
+  /* 진단 표 — 좁은 화면 대응 */
+  .diag{font-size:12px;table-layout:fixed}
+  .diag th,.diag td{padding:7px 5px;word-break:keep-all}
+  .diag td.lead{font-size:12.5px;padding:8px 7px}
+  .diag td.lead small{font-size:10.5px}
+  .score-pill{min-width:40px;padding:2px 6px;font-size:12px}
+  /* 세부내역 표 — 7열 좁을 때 옆 스크롤 */
+  .detail-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .detail{min-width:560px;font-size:12.5px}
+  .detail th,.detail td{padding:6px 4px}
+  /* 결과 헤더 한 줄 위→줄바꿈 */
+  .result-head{flex-direction:column;align-items:flex-start;gap:2px}
+  /* 버튼 — 줄바꿈 허용 + 그래도 보기 좋게 */
+  .actions{flex-wrap:wrap;gap:8px}
+  .actions .btn{flex:1 1 calc(50% - 4px);min-width:0;font-size:13.5px;padding:11px 8px}
+  .backbar{flex-wrap:wrap}
+  /* 부적합 내역 */
+  .audit-item{font-size:12px;padding:7px 9px}
+  .audit-title{font-size:12.5px}
+  /* 카드 패딩 살짝 줄임 */
+  .card{padding:14px 14px 16px}
+  /* 점수 보조 영역 줄바꿈 자연스럽게 */
+  .note-opts{font-size:11.5px}
+}
+@media (max-width: 380px){
+  header.top h1{font-size:17px}
+  .actions .btn{flex:1 1 100%}
+}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
 <body>
 <header class="top"><div class="wrap">
   <div class="brand"></div>
   <h1>관리감독자 안전보건업무 이행평가</h1>
   <p>'26년 상반기 · <b>1번 관리감독자 체크리스트</b> · <b>5번 MESH 내부심사</b> 항목 평가 지원</p>
+  <div class="qr-box" id="qrBox" title="이 페이지 접속 QR" onclick="window.open(location.href,'_blank')">
+    <div id="qrCanvas" class="qr-canvas"></div>
+    <div class="qr-cap">접속 QR</div>
+  </div>
 </div></header>
 
 <div class="wrap">
@@ -241,21 +290,21 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
 
     <div style="font-weight:700;font-size:14px;margin:2px 0 8px;color:var(--teal-d)">
       관리감독자 체크리스트 작성 결과 <span id="provBadge1"></span></div>
-    <table class="detail">
+    <div class="detail-wrap"><table class="detail">
       <thead><tr><th>구분</th><th>1월</th><th>2월</th><th>3월<small style="display:block;font-weight:400;font-size:10px;color:#94a3b8">3/23~31</small></th><th>4월</th><th>5월</th><th>계</th></tr></thead>
       <tbody>
         <tr><th>대상</th><td>4</td><td>4</td><td>7</td><td>21</td><td>18</td><td class="tot">54</td></tr>
         <tr id="rowWritten"><th>작성</th></tr>
       </tbody>
-    </table>
+    </table></div>
     <div class="foot">※ 일지 작성 100% 준수 → <b>우수 15점</b> / 누락 → <b>보완 9점</b></div>
 
     <div style="font-weight:700;font-size:14px;margin:14px 0 8px;color:var(--teal-d)">
       관리감독자 체크리스트 안전보건 활동 작성 <span id="provBadge2"></span></div>
-    <table class="detail">
+    <div class="detail-wrap"><table class="detail">
       <thead><tr><th>구분</th><th>1월</th><th>2월</th><th>3월<small style="display:block;font-weight:400;font-size:10px;color:#94a3b8">3/23~31</small></th><th>4월</th><th>5월</th><th>계</th></tr></thead>
       <tbody><tr id="rowAct"><th>작성</th></tr></tbody>
-    </table>
+    </table></div>
     <div class="foot">※ 매월 2회 이상 → <b>우수 15점</b> / 기간 내 활동 → <b>보통 12점</b> / 활동 없음 → <b>보완 9점</b></div>
 
     <div class="backbar">
@@ -307,6 +356,20 @@ function fillSites(list){ list.forEach(s=>{const o=document.createElement('optio
 (async()=>{
   try{ const r=await jsonp('getSites'); fillSites(r&&r.ok&&r.sites&&r.sites.length? r.sites : SITES_FALLBACK); }
   catch(e){ fillSites(SITES_FALLBACK); }
+})();
+
+/* 접속 QR 그리기 */
+(function renderQR(){
+  try{
+    if(typeof qrcode!=='function') return;
+    const url = (location.origin + location.pathname).replace(/\/+$/,'') || location.href;
+    const qr = qrcode(0, 'M');
+    qr.addData(url);
+    qr.make();
+    // 4픽셀 셀, 흰 여백 8px
+    const el = document.getElementById('qrCanvas');
+    if(el) el.innerHTML = qr.createImgTag(4, 8);
+  }catch(e){ /* 라이브러리 미로딩 시 무시 */ }
 })();
 
 async function doLookup(){
