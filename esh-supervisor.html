@@ -141,7 +141,7 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
     <div class="row">
       <label class="fld" for="sabun">사번</label>
       <div class="id-line">
-        <input type="text" id="sabun" placeholder="사번 입력 (예: 0503126)" autocomplete="off">
+        <input type="text" id="sabun" placeholder="사번 입력 (예: 050000)" autocomplete="off">
         <button class="btn btn-ghost" id="btnLookup">조회</button>
       </div>
       <div class="lookup-out" id="lookupOut">조회 결과: —</div>
@@ -207,7 +207,7 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
       <thead><tr><th style="width:48%">진단내용</th><th>실적</th><th>평가결과</th><th>비고(배점)</th></tr></thead>
       <tbody>
         <tr>
-          <td class="lead">MESH 내부심사 부적합<small>(10점에서 건당 -1점)</small></td>
+          <td class="lead">5) MESH 내부심사 부적합<small>(10점에서 건당 -1점)</small></td>
           <td id="d5act">–</td>
           <td id="d5score">–</td>
           <td id="d5note" class="note-opts">10 ~ 0</td>
@@ -384,16 +384,15 @@ async function doView(){
   // 상세표 작성
   const rW=$('rowWritten'); rW.innerHTML='<th>작성</th>';
   W.forEach((w,i)=>{const td=document.createElement('td');td.textContent=w;
-    if(w<TARGET[i])td.className='miss'; if(i>=2&&!current.verified)td.classList.add('prov');rW.appendChild(td);});
+    if(w<TARGET[i])td.className='miss';rW.appendChild(td);});
   const tdW=document.createElement('td');tdW.className='tot';tdW.textContent=sumW;rW.appendChild(tdW);
 
   const rA=$('rowAct'); rA.innerHTML='<th>작성</th>';
   A.forEach((a,i)=>{const td=document.createElement('td');td.textContent=a;
-    if(i>=2&&!current.verified)td.classList.add('prov');rA.appendChild(td);});
+    rA.appendChild(td);});
   const tdA=document.createElement('td');tdA.className='tot';tdA.textContent=sumA;rA.appendChild(tdA);
 
-  const badge=current.verified?'':'<span class="prov-badge">3~5월 잠정 · 달력 검증 전</span>';
-  $('provBadge1').innerHTML=badge; $('provBadge2').innerHTML=badge;
+  $('provBadge1').innerHTML=''; $('provBadge2').innerHTML='';
 
   $('viewInput').classList.add('hidden'); $('viewResult').classList.remove('hidden');
   window.scrollTo({top:0,behavior:'smooth'});
