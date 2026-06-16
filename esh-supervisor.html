@@ -172,16 +172,22 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
 }
 
 
-/* =========================================================
-   모바일 진단표 열 폭 보정
-   - 카드형 전환 없이 기존 표 구조 유지
-   - 좁은 화면에서 평가결과/비고(배점) 텍스트와 점수 배지 밀림 완화
-   ========================================================= */
+/* ============================================================
+   모바일 표 폭 최적화 — 2026-06 보정
+   - 카드형 전환 없음
+   - 가로 스크롤 최소화
+   - .diag, .detail 표를 모바일 화면 폭 안에 맞춤
+   ============================================================ */
 @media (max-width: 640px) {
+  .card {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
   .diag {
     width: 100%;
     table-layout: fixed;
-    font-size: 11.6px;
+    font-size: 11.4px;
   }
 
   .diag th,
@@ -194,19 +200,19 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
   }
 
   .diag th {
-    font-size: 11.2px;
+    font-size: 11px;
     line-height: 1.2;
-    word-break: normal;
+    white-space: nowrap;
   }
 
   .diag th:nth-child(1),
   .diag td:nth-child(1) {
-    width: 43%;
+    width: 42%;
   }
 
   .diag th:nth-child(2),
   .diag td:nth-child(2) {
-    width: 15%;
+    width: 14%;
   }
 
   .diag th:nth-child(3),
@@ -216,17 +222,20 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
 
   .diag th:nth-child(4),
   .diag td:nth-child(4) {
-    width: 24%;
+    width: 26%;
   }
 
   .diag td.lead {
-    font-size: 11.8px;
-    padding: 7px 5px;
+    font-size: 11.5px;
+    padding: 7px 4px;
+    text-align: left;
   }
 
   .diag td.lead small {
-    font-size: 10px;
-    line-height: 1.25;
+    display: block;
+    font-size: 9.8px;
+    line-height: 1.22;
+    margin-top: 2px;
   }
 
   .diag td:nth-child(2),
@@ -237,24 +246,67 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
   }
 
   .diag td:nth-child(4) {
-    font-size: 10.8px;
-    text-align: left;
+    font-size: 10.5px;
+    text-align: center;
     word-break: keep-all;
+    overflow-wrap: normal;
   }
 
   .score-pill {
     box-sizing: border-box;
-    min-width: 34px;
-    padding: 2px 4px;
-    font-size: 11.2px;
-    line-height: 1.2;
+    min-width: 31px;
+    padding: 2px 3px;
+    font-size: 10.8px;
+    line-height: 1.18;
     white-space: nowrap;
+  }
+
+  .detail-wrap {
+    overflow-x: visible;
+    -webkit-overflow-scrolling: auto;
+  }
+
+  .detail {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    font-size: 11.3px;
+  }
+
+  .detail th,
+  .detail td {
+    padding: 7px 3px;
+    line-height: 1.3;
+    word-break: keep-all;
+    overflow-wrap: normal;
+  }
+
+  .detail th:first-child,
+  .detail td:first-child {
+    width: 18%;
+  }
+
+  .detail th:not(:first-child),
+  .detail td:not(:first-child) {
+    width: 16.4%;
+  }
+
+  .detail th .sub,
+  .detail small,
+  .sub {
+    font-size: 9.5px;
+    line-height: 1.15;
   }
 }
 
 @media (max-width: 380px) {
+  .card {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
   .diag {
-    font-size: 11px;
+    font-size: 10.9px;
   }
 
   .diag th,
@@ -263,13 +315,52 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
   }
 
   .diag td.lead {
-    font-size: 11.3px;
+    font-size: 11px;
+  }
+
+  .diag td.lead small {
+    font-size: 9.4px;
+  }
+
+  .diag th:nth-child(1),
+  .diag td:nth-child(1) {
+    width: 41%;
+  }
+
+  .diag th:nth-child(2),
+  .diag td:nth-child(2) {
+    width: 14%;
+  }
+
+  .diag th:nth-child(3),
+  .diag td:nth-child(3) {
+    width: 18%;
+  }
+
+  .diag th:nth-child(4),
+  .diag td:nth-child(4) {
+    width: 27%;
   }
 
   .score-pill {
-    min-width: 32px;
-    padding: 2px 3px;
+    min-width: 29px;
+    padding: 2px 2px;
+    font-size: 10.4px;
+  }
+
+  .detail {
     font-size: 10.8px;
+  }
+
+  .detail th,
+  .detail td {
+    padding: 6px 2px;
+  }
+
+  .detail th .sub,
+  .detail small,
+  .sub {
+    font-size: 9px;
   }
 }
 
@@ -521,7 +612,9 @@ async function doSave(update){
   catch(e){ progDone(); btnBusy(bid,false,blabel); toast('저장 실패: '+e.message); return; }
   progDone(); btnBusy(bid,false,blabel);
   if(!(res&&res.ok)){ toast('저장 실패: '+((res&&res.msg)||'')); return; }
-  const word = res.mode==='update' ? '수정' : '저장';
+  
+      if(res.audit){ current.audit = res.audit; }
+      const word = res.mode==='update' ? '수정' : '저장';
   if(confirm(word+'되었습니다.\n평가결과를 조회하시겠습니까?')) doView();
   else toast(word+'되었습니다');
 }
