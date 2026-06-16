@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- mobile-2line-audit-fixed v1.2 -->
+<!-- mobile-no-audit-responsive v1.3 -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -112,19 +112,6 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
 .lookup-out.loading{color:var(--teal-d,#0A2540)}
 .lookup-out.loading::before{content:'';display:inline-block;width:12px;height:12px;margin-right:6px;vertical-align:-2px;
   border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
-/* 부적합 내역 */
-.audit-detail{margin-top:14px;padding:14px 16px;background:#FFF8F1;border:1px solid #FCD9B6;border-radius:10px}
-.audit-detail.hidden{display:none}
-.audit-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.audit-title{font-weight:700;font-size:13px;color:#9A3412}
-.audit-toggle{font-size:12px;background:transparent;border:1px solid #FCD9B6;color:#9A3412;padding:3px 10px;border-radius:6px;cursor:pointer}
-.audit-toggle:hover{background:#FED7AA}
-.audit-list{display:flex;flex-direction:column;gap:8px}
-.audit-list.collapsed{display:none}
-.audit-item{display:flex;gap:10px;font-size:12.5px;line-height:1.55;padding:8px 10px;background:#fff;border:1px solid #FED7AA;border-radius:8px}
-.audit-no{flex:0 0 auto;display:inline-flex;align-items:flex-start;font-weight:700;color:#9A3412;min-width:24px}
-.audit-content{flex:1;color:#1F2937;white-space:pre-wrap;word-break:break-word}
-.audit-empty{font-size:12.5px;color:#16A34A;text-align:center;padding:8px}
 /* 헤더 접속 QR */
 .top .wrap{position:relative}
 .qr-box{position:absolute;top:14px;right:18px;background:#fff;border-radius:10px;padding:8px 8px 6px;
@@ -159,9 +146,6 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
   .actions{flex-wrap:wrap;gap:8px}
   .actions .btn{flex:1 1 calc(50% - 4px);min-width:0;font-size:13.5px;padding:11px 8px}
   .backbar{flex-wrap:wrap}
-  /* 부적합 내역 */
-  .audit-item{font-size:12px;padding:7px 9px}
-  .audit-title{font-size:12.5px}
   /* 카드 패딩 살짝 줄임 */
   .card{padding:14px 14px 16px}
   /* 점수 보조 영역 줄바꿈 자연스럽게 */
@@ -182,7 +166,6 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
 .note-opts{white-space:normal;line-height:1.45}
 .note-line{display:block;white-space:nowrap}
 .score-pill{white-space:nowrap}
-.audit-empty.warn{color:var(--warn);background:#fff7ed;border-color:#fed7aa}
 
 @media (max-width:640px){
   .diag{width:100%;font-size:11.6px;table-layout:fixed}
@@ -207,9 +190,6 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
   .detail thead th small{font-size:9px!important;line-height:1.1}
   .detail tbody th{width:54px;font-size:11.1px}
   .foot{font-size:11.4px;line-height:1.5}
-  .audit-detail{padding:10px 10px 12px}
-  .audit-empty{font-size:12px;line-height:1.45;padding:12px 8px}
-  .audit-item{grid-template-columns:26px 1fr;gap:6px;font-size:11.8px;line-height:1.45}
 }
 
 @media (max-width:380px){
@@ -222,6 +202,64 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
   .opt.on::after{inset:-2px -3px}
   .detail{font-size:10.8px}
   .detail th,.detail td{padding:5px 1px}
+}
+
+
+/* === 최종 모바일 표 보정: iPhone 기준 한 화면 표시 v1.3 === */
+html,body{max-width:100%;overflow-x:hidden}
+.card{overflow:hidden}
+.diag,.detail{width:100%;table-layout:fixed}
+.diag th:nth-child(1),.diag td:nth-child(1){width:42%}
+.diag th:nth-child(2),.diag td:nth-child(2){width:14%}
+.diag th:nth-child(3),.diag td:nth-child(3){width:18%}
+.diag th:nth-child(4),.diag td:nth-child(4){width:26%}
+.note-opts{white-space:normal;line-height:1.45}
+.note-line{display:block;white-space:nowrap}
+.score-pill,.grade,.opt{white-space:nowrap}
+
+@media (max-width:640px){
+  .wrap{padding-left:10px;padding-right:10px}
+  .card{padding:13px 12px 15px;border-radius:11px}
+  .sec-eyebrow{font-size:12px;margin-bottom:12px;gap:8px}
+  .diag{font-size:11.4px;margin-bottom:0}
+  .diag th,.diag td{padding:6px 3px;line-height:1.3;vertical-align:middle;word-break:keep-all;overflow-wrap:break-word}
+  .diag thead th{font-size:11.1px;padding:7px 3px;letter-spacing:-.2px}
+  .diag td.lead{font-size:11.3px;padding:7px 4px;line-height:1.32;letter-spacing:-.35px}
+  .diag td.lead small{font-size:9.6px;line-height:1.22;margin-top:2px}
+  .diag td:nth-child(2),.diag td:nth-child(3){font-size:11px;letter-spacing:-.25px;word-break:keep-all;overflow-wrap:normal}
+  .diag td:nth-child(4){font-size:10.4px;letter-spacing:-.3px;text-align:center;word-break:keep-all;overflow-wrap:normal}
+  .score-pill{min-width:32px;padding:2px 4px;font-size:10.9px;line-height:1.15}
+  .grade{font-size:10px;line-height:1.15}
+  .note-opts{line-height:1.55}
+  .note-line{min-height:16px}
+  .opt{padding:1px 1px}
+  .opt.on::after{inset:-2px -3px;border-width:2px}
+  .detail-wrap{width:100%;overflow-x:hidden;-webkit-overflow-scrolling:auto}
+  .detail{min-width:0;font-size:11.1px;margin:4px 0 8px}
+  .detail th,.detail td{padding:6px 1px;line-height:1.22;word-break:keep-all;overflow-wrap:normal}
+  .detail thead th{font-size:10.8px;padding:7px 1px;letter-spacing:-.2px}
+  .detail thead th small{font-size:8.8px!important;line-height:1.05}
+  .detail tbody th{width:48px;font-size:10.9px}
+  .foot{font-size:11.2px;line-height:1.45;letter-spacing:-.15px}
+}
+@media (max-width:380px){
+  .wrap{padding-left:8px;padding-right:8px}
+  .card{padding:12px 10px 14px}
+  .diag{font-size:10.9px}
+  .diag th,.diag td{padding:5px 2px;line-height:1.25}
+  .diag thead th{font-size:10.6px}
+  .diag td.lead{font-size:10.7px;padding:6px 3px;letter-spacing:-.45px}
+  .diag td.lead small{font-size:9.1px}
+  .diag td:nth-child(2),.diag td:nth-child(3){font-size:10.5px}
+  .diag td:nth-child(4){font-size:9.9px;letter-spacing:-.45px}
+  .score-pill{min-width:29px;padding:2px 3px;font-size:10.3px}
+  .grade{font-size:9.6px}
+  .opt.on::after{inset:-2px -2px}
+  .detail{font-size:10.5px}
+  .detail th,.detail td{padding:5px 1px}
+  .detail thead th{font-size:10.2px}
+  .detail tbody th{width:44px;font-size:10.3px}
+  .foot{font-size:10.8px}
 }
 
 </style>
@@ -330,13 +368,6 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
         </tr>
       </tbody>
     </table>
-    <div id="auditDetail" class="audit-detail hidden">
-      <div class="audit-head">
-        <span class="audit-title">부적합 내역</span>
-        <button type="button" class="audit-toggle" id="auditToggleBtn">접기</button>
-      </div>
-      <div id="auditList" class="audit-list"></div>
-    </div>
   </div>
 
   <div class="card">
@@ -551,28 +582,6 @@ async function doView(){
   $('d5score').innerHTML='<span class="score-pill s'+(au.score>=8?15:au.score>=5?12:9)+'">'+au.score+'점</span><br><span class="grade" style="color:var(--'+audCol+')">'+au.max+' ~ '+au.min+'</span>';
   $('d5note').innerHTML='<span class="note-line">반기 부적합 건수</span><span class="note-line">-1점/건</span>';
 
-  // 부적합 내역 영역
-  const det=$('auditDetail'), list=$('auditList');
-  const items=Array.isArray(au.items)?au.items:[];
-  const auditCount=Number(au.count||0);
-  det.classList.remove('hidden');
-  list.classList.remove('collapsed');
-  if(items.length===0){
-    $('auditToggleBtn').style.display='none';
-    if(auditCount>0){
-      list.innerHTML='<div class="audit-empty warn">부적합 '+auditCount+'건이 집계되었지만 상세 내역이 응답에 포함되지 않았습니다.<br>Apps Script 새 배포와 내부심사 시트의 반영대상/팀/사업장 값을 확인하세요.</div>';
-    }else{
-      list.innerHTML='<div class="audit-empty">✓ 부적합 사항이 없습니다 (10점 만점)</div>';
-    }
-  } else {
-    $('auditToggleBtn').style.display='';
-    $('auditToggleBtn').textContent='접기';
-    list.innerHTML=items.map((it,i)=>{
-      const no=escapeHtml(it.no||(i+1));
-      const content=escapeHtml(it.content||'');
-      return '<div class="audit-item"><span class="audit-no">'+no+'.</span><div class="audit-content">'+content+'</div></div>';
-    }).join('');
-  }
 
   // 상세표 작성
   const rW=$('rowWritten'); rW.innerHTML='<th>작성</th>';
@@ -588,13 +597,6 @@ async function doView(){
   $('provBadge1').innerHTML=''; $('provBadge2').innerHTML='';
 
   $('viewInput').classList.add('hidden'); $('viewResult').classList.remove('hidden');
-  // 부적합 내역 토글
-  const tb=$('auditToggleBtn');
-  if(tb){ tb.onclick=()=>{
-    const l=$('auditList');
-    const collapsed=l.classList.toggle('collapsed');
-    tb.textContent=collapsed?'펼치기':'접기';
-  };}
   window.scrollTo({top:0,behavior:'smooth'});
   progDone();
 }
