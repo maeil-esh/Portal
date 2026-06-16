@@ -170,6 +170,109 @@ select:focus,input:focus{outline:2px solid var(--teal-l);outline-offset:-1px;bor
   header.top h1{font-size:17px}
   .actions .btn{flex:1 1 100%}
 }
+
+
+/* =========================================================
+   모바일 진단표 열 폭 보정
+   - 카드형 전환 없이 기존 표 구조 유지
+   - 좁은 화면에서 평가결과/비고(배점) 텍스트와 점수 배지 밀림 완화
+   ========================================================= */
+@media (max-width: 640px) {
+  .diag {
+    width: 100%;
+    table-layout: fixed;
+    font-size: 11.6px;
+  }
+
+  .diag th,
+  .diag td {
+    padding: 6px 3px;
+    line-height: 1.32;
+    vertical-align: middle;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  .diag th {
+    font-size: 11.2px;
+    line-height: 1.2;
+    word-break: normal;
+  }
+
+  .diag th:nth-child(1),
+  .diag td:nth-child(1) {
+    width: 43%;
+  }
+
+  .diag th:nth-child(2),
+  .diag td:nth-child(2) {
+    width: 15%;
+  }
+
+  .diag th:nth-child(3),
+  .diag td:nth-child(3) {
+    width: 18%;
+  }
+
+  .diag th:nth-child(4),
+  .diag td:nth-child(4) {
+    width: 24%;
+  }
+
+  .diag td.lead {
+    font-size: 11.8px;
+    padding: 7px 5px;
+  }
+
+  .diag td.lead small {
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .diag td:nth-child(2),
+  .diag td:nth-child(3) {
+    text-align: center;
+    word-break: keep-all;
+    overflow-wrap: normal;
+  }
+
+  .diag td:nth-child(4) {
+    font-size: 10.8px;
+    text-align: left;
+    word-break: keep-all;
+  }
+
+  .score-pill {
+    box-sizing: border-box;
+    min-width: 34px;
+    padding: 2px 4px;
+    font-size: 11.2px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 380px) {
+  .diag {
+    font-size: 11px;
+  }
+
+  .diag th,
+  .diag td {
+    padding: 5px 2px;
+  }
+
+  .diag td.lead {
+    font-size: 11.3px;
+  }
+
+  .score-pill {
+    min-width: 32px;
+    padding: 2px 3px;
+    font-size: 10.8px;
+  }
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 </head>
