@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- mobile-no-audit-responsive v1.3 -->
+<!-- mobile-no-audit-responsive v1.4 (내부심사 하드코딩) -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -425,6 +425,35 @@ function jsonp(action, params){
 const TARGET=[4,4,7,21,18];
 let current=null; // {site,sabun,name,dept,rank,verified,w35,a35}
 
+/* ===== 5번 MESH 내부심사 부적합 — 코드 하드코딩(반기 확정 데이터) =====
+   명단에 없는 사번은 자동 0건 / 10점. 결과 갱신 시 아래 AUDIT_COUNT만 수정. */
+const AUDIT_COUNT = {
+  '2002201': 4, '0503126': 2, '0506701': 2, '0007803': 2, '0307209': 1,
+  '0606201': 1, '0103201': 1, '0605201': 1, '1101209': 1, '0408204': 1,
+  '1305052': 1, '9310209': 1, '0601115': 1, '1907128': 1, '1812104': 1,
+  '0111204': 1, '1607101': 1, '0601205': 3, '0802130': 3, '1310001': 3,
+  '0510205': 2, '0510206': 2, '0511202': 2, '2304138': 1, '9602208': 4,
+  '0003405': 3, '0109401': 3, '9902401': 3, '1305051': 3, '9006401': 2,
+  '9702412': 2, '0501401': 1, '2204403': 1, '0008401': 1, '1107034': 1,
+  '9407401': 1, '0002409': 1, '0005402': 1, '9906403': 1, '0909928': 4,
+  '0106801': 2, '0208802': 2, '0303801': 2, '0607801': 2, '1203801': 1,
+  '0509805': 1, '0511801': 1, '0609802': 1, '0709801': 1, '1101802': 1,
+  '0002402': 1, '0503122': 1, '0207908': 3, '1107038': 3, '0503123': 3,
+  '0312901': 1, '0409902': 1, '0703902': 1, '0209902': 1, '0212908': 1,
+  '0505901': 1, '0712901': 1, '0104703': 5, '0608701': 5, '0711701': 4,
+  '0911701': 4, '1707110': 4, '0106702': 3, '1801137': 3, '0601705': 2,
+  '1201323': 2, '9402701': 2, '0308709': 1, '0309705': 1, '0906901': 1,
+  '0906905': 1, '9403701': 1, '0106703': 1, '0804704': 1, '0712702': 1,
+  '0405301': 3, '0306303': 3, '1010020': 3, '0810701': 3, '9610308': 2,
+  '1306406': 1, '1403310': 1, '9908301': 1, '0201302': 1, '0201304': 1,
+  '0306304': 1, '9211301': 1, '1207406': 2, '2605118': 1, '1205411': 1,
+};
+function z7(v){ var s=String(v==null?'':v).trim(); var d=s.replace(/[^0-9]/g,''); return d?('0000000'+d).slice(-7):s; }
+function localAudit(sabun){
+  var c = AUDIT_COUNT[z7(sabun)] || 0;
+  return { count:c, score:Math.max(0, 10 - c), max:10, min:0, items:[] };
+}
+
 const $=id=>document.getElementById(id);
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1900);}
 
@@ -473,7 +502,7 @@ async function doLookup(){
     card.style.opacity=.5; card.style.pointerEvents='none'; current=null; return;
   }
   const p=res.person;
-  current={site:p.site,sabun:p.sabun,name:p.name,dept:p.dept,rank:p.rank,w35:p.w35,a35:p.a35,verified:p.verified,audit:res.audit||{count:0,score:10,max:10,min:0,items:[]}};
+  current={site:p.site,sabun:p.sabun,name:p.name,dept:p.dept,rank:p.rank,w35:p.w35,a35:p.a35,verified:p.verified,audit:localAudit(p.sabun)};
   if(site!==p.site){ siteSel.value=p.site; }   // 선택 사업장 자동 보정
   out.className='lookup-out';
   out.innerHTML='조회 결과: <span class="name">'+p.name+'</span><span class="meta">'+p.site+' · '+p.dept+' · '+p.rank+'</span>';
@@ -503,7 +532,7 @@ async function doSave(update){
   catch(e){ progDone(); btnBusy(bid,false,blabel); toast('저장 실패: '+e.message); return; }
   progDone(); btnBusy(bid,false,blabel);
   if(!(res&&res.ok)){ toast('저장 실패: '+((res&&res.msg)||'')); return; }
-  if(res.audit){ current.audit=res.audit; }
+  current.audit=localAudit(current.sabun);
   const word = res.mode==='update' ? '수정' : '저장';
   if(confirm(word+'되었습니다.\n평가결과를 조회하시겠습니까?')){
     await refreshCurrentFromServer();
@@ -547,7 +576,7 @@ async function refreshCurrentFromServer(){
       current.w35=p.w35;
       current.a35=p.a35;
       current.verified=p.verified;
-      current.audit=res.audit||current.audit||{count:0,score:10,max:10,min:0,items:[]};
+      current.audit=localAudit(current.sabun);
     }
   }catch(e){
     /* 재조회 실패 시 기존 current 값으로 결과 표시 */
