@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<!-- v5.3.7 안정화: GAS 호출 타임아웃/저장 중 중복 실행 방지 권장 버전 -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>관리감독자 및 유해위험작업 현황</title>
@@ -912,6 +913,15 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 .org-history-banner{display:none;max-width:1280px;margin:0 auto 10px;padding:9px 11px;border:1px solid #ffe2a8;border-radius:8px;background:#fff8e8;color:#9b6400;font-size:11px;line-height:1.55}.org-history-banner.show{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
 @media(max-width:768px){.org-wrap{padding:9px}.org-toolbar{padding:9px;gap:5px;margin-bottom:8px}.org-toolbar-title{width:100%}.org-toolbar select{min-width:128px;flex:1}.org-toolbar-spacer{display:none}.org-status{width:100%;margin-top:2px}.org-help{margin-bottom:7px;font-size:10px}.org-exact-stage{height:calc(100vh - 250px);padding:8px;border-radius:8px;justify-content:flex-start}}
 </style>
+
+<script>
+// v5.3.7 저장 중복 실행 방지용 전역 잠금입니다.
+// 기존 저장 함수에서 직접 사용하지 않더라도, 커스텀 패치/디버깅 시 공통 상태로 활용할 수 있습니다.
+window.__meshSavingLock = false;
+window.__meshGasTimeoutMs = 45000;
+window.__meshGasSaveTimeoutMs = 60000;
+</script>
+
 </head>
 <body>
 
