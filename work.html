@@ -1,13 +1,13 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>관리감독자 및 유해위험작업 현황</title>
-<!-- v5.3.8: 조직도/저장이력 호출 잔상 방지, 요청 순서 토큰, 저장 안정화 연동 -->
 <link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- v5.3.8: 조직도 호출 잔상 방지 / v5.3.5: 저장 이력 임시+서버 병합 표시(목록 교체 깜빡임 제거) + 서버 저장 성공 시 임시 이력을 서버 이력으로 승격 / v5.3.4: 저장 타임아웃 보완 / v5.3.3: 이력 한 줄 목록·삭제 / v5.3.2: 수급사·위원회 옵션 -->
+<!-- v5.3.5: 저장 이력 임시+서버 병합 표시(목록 교체 깜빡임 제거) + 서버 저장 성공 시 임시 이력을 서버 이력으로 승격 / v5.3.4: 저장 타임아웃 보완 / v5.3.3: 이력 한 줄 목록·삭제 / v5.3.2: 수급사·위원회 옵션 -->
 <style>
 :root {
   --blue50:#f0f4ff; --blue100:#d6e4ff; --blue500:#3182f6; --blue600:#1b6ef3;
@@ -165,8 +165,11 @@
 .status-dot.hold{background:var(--orange500)}
 .site-goto{font-size:12px;font-weight:700;color:var(--blue500);background:var(--blue50);border:1.5px solid var(--blue100);border-radius:20px;padding:5px 14px;cursor:pointer;transition:all .12s;font-family:inherit}
 .site-goto:hover{background:var(--blue500);color:var(--white)}
-.machine-chips{display:flex;gap:5px;flex-wrap:wrap;padding:0 22px 14px}
-.machine-chip{font-size:10px;font-weight:600;color:var(--blue500);background:var(--blue50);border:1px solid var(--blue100);border-radius:10px;padding:2px 8px}
+.recent-modified{padding:0 22px 14px;font-size:11px;color:var(--gray600);line-height:1.45;min-height:30px;display:flex;align-items:flex-start}
+.recent-modified-box{width:100%;background:var(--gray50);border:1px solid var(--gray200);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.recent-modified-label{font-weight:700;color:var(--gray600)}
+.recent-modified-date{font-weight:800;color:var(--blue500);white-space:nowrap}
+.recent-modified.empty .recent-modified-date{color:var(--gray400)}
 
 /* 접속 QR 카드 — PC 대시보드 우측 여유 공간에 표시 */
 .qr-access-card{background:rgba(255,255,255,.96);border:1px solid var(--gray200);border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:100%;transition:all .18s}
@@ -912,31 +915,6 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 .org-history-empty{padding:28px 12px;text-align:center;color:var(--gray400);font-size:12px}
 .org-history-banner{display:none;max-width:1280px;margin:0 auto 10px;padding:9px 11px;border:1px solid #ffe2a8;border-radius:8px;background:#fff8e8;color:#9b6400;font-size:11px;line-height:1.55}.org-history-banner.show{display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap}
 @media(max-width:768px){.org-wrap{padding:9px}.org-toolbar{padding:9px;gap:5px;margin-bottom:8px}.org-toolbar-title{width:100%}.org-toolbar select{min-width:128px;flex:1}.org-toolbar-spacer{display:none}.org-status{width:100%;margin-top:2px}.org-help{margin-bottom:7px;font-size:10px}.org-exact-stage{height:calc(100vh - 250px);padding:8px;border-radius:8px;justify-content:flex-start}}
-
-
-/* v5.3.8: 조직도/저장이력 호출 중 과거 데이터 잔상 방지 */
-.org-loading-wrap{position:relative!important;}
-.org-loading-mask{
-  position:absolute!important;
-  inset:0!important;
-  background:rgba(255,255,255,.86)!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  z-index:999!important;
-  font-weight:800!important;
-  color:#334155!important;
-  border:1px solid #dbe3ef!important;
-  pointer-events:auto!important;
-}
-.org-history-loading-row,
-.org-history-loading-empty{
-  padding:14px 12px!important;
-  color:#64748b!important;
-  font-weight:700!important;
-  text-align:left!important;
-}
-
 </style>
 </head>
 <body>
@@ -1394,109 +1372,6 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 <div class="toast" id="toast"></div>
 
 <script>
-
-/* ============================================================
- * v5.3.8 안정화 패치
- * - 조직도/저장이력 호출 전에 과거 화면 잔상을 가립니다.
- * - 사업장 빠른 전환 시 늦게 도착한 이전 응답이 현재 화면을 덮지 않도록
- *   요청 순서 토큰을 제공합니다.
- * - 기존 함수명을 최대한 보존하기 위해 안전한 래퍼 방식으로 동작합니다.
- * ============================================================ */
-(function(){
-  window.__meshSavingLock = false;
-  window.__meshGasTimeoutMs = 45000;
-  window.__meshGasSaveTimeoutMs = 60000;
-  window.__orgChartLoadSeq = 0;
-  window.__orgChartHistorySeq = 0;
-
-  window.__meshNextOrgChartLoadSeq = function(){
-    window.__orgChartLoadSeq = (Number(window.__orgChartLoadSeq) || 0) + 1;
-    return window.__orgChartLoadSeq;
-  };
-  window.__meshIsCurrentOrgChartLoadSeq = function(seq){
-    return seq === window.__orgChartLoadSeq;
-  };
-  window.__meshNextOrgChartHistorySeq = function(){
-    window.__orgChartHistorySeq = (Number(window.__orgChartHistorySeq) || 0) + 1;
-    return window.__orgChartHistorySeq;
-  };
-  window.__meshIsCurrentOrgChartHistorySeq = function(seq){
-    return seq === window.__orgChartHistorySeq;
-  };
-
-  window.showOrgLoadingMask = function(target, message){
-    if (!target) return;
-    try {
-      target.classList.add('org-loading-wrap');
-      var mask = target.querySelector(':scope > .org-loading-mask');
-      if (!mask) {
-        mask = document.createElement('div');
-        mask.className = 'org-loading-mask';
-        target.appendChild(mask);
-      }
-      mask.textContent = message || '조직도 정보를 불러오는 중입니다.';
-    } catch(e) {}
-  };
-
-  window.hideOrgLoadingMask = function(target){
-    if (!target) return;
-    try {
-      var mask = target.querySelector(':scope > .org-loading-mask');
-      if (mask) mask.remove();
-    } catch(e) {}
-  };
-
-  window.resetOrgChartViewBeforeLoad = function(site){
-    try {
-      var ids = [
-        'orgChartPaper','orgChartPrintArea','orgChartPreview','orgChartCanvas',
-        'orgChartBody','orgChart','org-chart','orgPaper','orgPreview'
-      ];
-      var masked = false;
-      ids.forEach(function(id){
-        var el = document.getElementById(id);
-        if (!el) return;
-        el.setAttribute('data-loading','1');
-        if (!masked) {
-          window.showOrgLoadingMask(el, '조직도 정보를 불러오는 중입니다.');
-          masked = true;
-        }
-      });
-      document.querySelectorAll('[data-org-site-label]').forEach(function(el){
-        el.textContent = site || '';
-      });
-    } catch(e) {}
-  };
-
-  window.finishOrgChartLoad = function(){
-    try {
-      ['orgChartPaper','orgChartPrintArea','orgChartPreview','orgChartCanvas','orgChartBody','orgChart','org-chart','orgPaper','orgPreview'].forEach(function(id){
-        var el = document.getElementById(id);
-        if (!el) return;
-        el.removeAttribute('data-loading');
-        window.hideOrgLoadingMask(el);
-      });
-    } catch(e) {}
-  };
-
-  window.resetOrgChartHistoryBeforeLoad = function(){
-    try {
-      var html = '<div class="org-history-loading-empty">저장 이력을 불러오는 중입니다.</div>';
-      ['orgHistoryList','orgChartHistoryList','historyList'].forEach(function(id){
-        var el = document.getElementById(id);
-        if (el) el.innerHTML = html;
-      });
-      document.querySelectorAll('.org-history-list,.history-list').forEach(function(el){
-        el.innerHTML = html;
-      });
-      ['orgHistoryBody','orgChartHistoryBody','historyBody'].forEach(function(id){
-        var el = document.getElementById(id);
-        if (el) el.innerHTML = '<tr><td colspan="7" class="org-history-loading-row">저장 이력을 불러오는 중입니다.</td></tr>';
-      });
-    } catch(e) {}
-  };
-})();
-
 /* ══════════════════════════════════════════
    대시보드 작업별 점검기준 팝업
 ══════════════════════════════════════════ */
@@ -1664,6 +1539,22 @@ const CARD_COLORS = [
   {accent:'#0ea5e9',cat:'#0ea5e9',icon:'#e0f2fe',bg:'#0ea5e9'},
 ];
 
+
+function getSiteRecentModifiedDate(rows){
+  let latest = '';
+  (rows || []).forEach(function(r){
+    const v = normalizeDateInput(r && r.date);
+    if (v && (!latest || v > latest)) latest = v;
+  });
+  return latest;
+}
+function formatShortDate(value){
+  const v = normalizeDateInput(value);
+  if (!v) return '미기록';
+  const a = v.split('-');
+  return Number(a[1]) + '.' + Number(a[2]) + '.';
+}
+
 function renderDashboard(){
   const grid = document.getElementById('siteGrid');
   let totalAll = 0;
@@ -1678,6 +1569,7 @@ function renderDashboard(){
       .sort((a,b)=>machineCounts[b.id]-machineCounts[a.id]).slice(0,4);
     const totalWork = Object.values(machineCounts).reduce((a,b)=>a+b,0);
     const activeTypes = MACHINES.filter(m=>machineCounts[m.id]>0).length;
+    const recentModified = getSiteRecentModifiedDate(d.rows);
     totalAll += cnt;
     const numStr = String(idx+1).padStart(2,'0');
     return `<div class="site-card" onclick="goPage('work','${esc(s)}')">
@@ -1694,7 +1586,12 @@ function renderDashboard(){
           <div class="site-stat"><div class="site-stat-num">${activeTypes}</div><div class="site-stat-label">유형 수</div></div>
         </div>
       </div>
-      ${topMachines.length ? `<div class="machine-chips">${topMachines.map(m=>`<span class="machine-chip">${m.label.replace('\n',' ')} ${machineCounts[m.id]}명</span>`).join('')}</div>` : '<div style="height:14px"></div>'}
+      <div class="recent-modified ${recentModified ? '' : 'empty'}">
+        <div class="recent-modified-box">
+          <span class="recent-modified-label">최근 수정</span>
+          <span class="recent-modified-date">${recentModified ? esc(formatShortDate(recentModified)) : '미기록'}</span>
+        </div>
+      </div>
       <div class="site-card-footer">
         <div class="site-status">
           <span class="status-dot"></span>
@@ -4149,21 +4046,5 @@ setTimeout(()=>{ autoLoadAll(); }, 200);
 // 5분마다 자동 최신화
 setInterval(()=>{ autoLoadAll(); }, 5 * 60 * 1000);
 </script>
-
-<script>
-/* v5.3.8: 로딩 마스크가 예외 경로에서 남지 않도록 최장 12초 후 자동 해제 */
-(function(){
-  var oldReset = window.resetOrgChartViewBeforeLoad;
-  if (typeof oldReset === 'function') {
-    window.resetOrgChartViewBeforeLoad = function(site){
-      oldReset(site);
-      setTimeout(function(){
-        if (window.finishOrgChartLoad) window.finishOrgChartLoad();
-      }, 12000);
-    };
-  }
-})();
-</script>
-
 </body>
 </html>
