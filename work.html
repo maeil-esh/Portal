@@ -7,7 +7,7 @@
 <title>관리감독자 및 유해위험작업 현황</title>
 <link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- v5.4.0: 정기교육 이수율/이수상태 토글 + 전체 헤더 정렬 + 기본정보 구간 간격 축소·가운데 정렬 / v5.3.5: 저장 이력 임시+서버 병합 표시(목록 교체 깜빡임 제거) + 서버 저장 성공 시 임시 이력을 서버 이력으로 승격 / v5.3.4: 저장 타임아웃 보완 / v5.3.3: 이력 한 줄 목록·삭제 / v5.3.2: 수급사·위원회 옵션 -->
+<!-- v5.4.1: 정기교육 이수율 표시 크기 축소·상단 헤더 높이 안정화 / v5.4.0: 정기교육 이수율/이수상태 토글 + 전체 헤더 정렬 + 기본정보 구간 간격 축소·가운데 정렬 / v5.3.5: 저장 이력 임시+서버 병합 표시(목록 교체 깜빡임 제거) + 서버 저장 성공 시 임시 이력을 서버 이력으로 승격 / v5.3.4: 저장 타임아웃 보완 / v5.3.3: 이력 한 줄 목록·삭제 / v5.3.2: 수급사·위원회 옵션 -->
 <style>
 :root {
   --blue50:#f0f4ff; --blue100:#d6e4ff; --blue500:#3182f6; --blue600:#1b6ef3;
@@ -206,8 +206,8 @@
 .work-header{padding:16px 24px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .work-org-btn{margin-left:8px;padding:7px 13px;border-color:var(--blue100);background:var(--blue50);color:var(--blue600);font-weight:800}
 .work-org-btn:hover{background:var(--blue500);border-color:var(--blue500);color:#fff;box-shadow:0 3px 10px rgba(49,130,246,.18)}
-.work-training-rate{display:inline-flex;align-items:center;justify-content:center;margin-left:12px;padding:4px 10px;border-radius:8px;background:#fff;color:var(--gray900);font-size:22px;font-weight:800;letter-spacing:-.6px;line-height:1.25;white-space:nowrap}
-.work-training-rate strong{color:var(--blue600);font-weight:900}
+.work-training-rate{display:inline-flex;align-items:center;justify-content:center;margin-left:8px;padding:2px 4px;border-radius:6px;background:transparent;color:var(--gray700);font-size:12px;font-weight:700;letter-spacing:-.15px;line-height:1.35;white-space:nowrap}
+.work-training-rate strong{color:var(--blue600);font-size:12px;font-weight:800;letter-spacing:-.1px}
 .work-training-rate.good strong{color:var(--green500)}
 .work-site-label{font-size:14px;font-weight:700;color:var(--gray900)}
 .work-site-badge{font-size:11px;color:var(--gray500);background:var(--gray100);padding:2px 8px;border-radius:10px}
@@ -572,7 +572,8 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   .work-header>.btn:first-child{padding:6px 8px}
   .work-site-label{font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .work-site-badge{font-size:10px;padding:2px 7px}
-  .work-training-rate{order:5;width:100%;margin-left:0;justify-content:flex-start;font-size:16px;padding:3px 2px;background:transparent}
+  .work-training-rate{order:5;width:100%;margin-left:0;justify-content:flex-start;font-size:11px;padding:2px 1px;background:transparent}
+  .work-training-rate strong{font-size:11px}
   .work-actions{
     width:100%;margin-left:0!important;display:grid!important;
     grid-template-columns:repeat(3,minmax(0,1fr));gap:5px!important;
