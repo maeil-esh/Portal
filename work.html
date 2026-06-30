@@ -7,7 +7,7 @@
 <title>관리감독자 및 유해위험작업 현황</title>
 <link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- v5.3.5: 저장 이력 임시+서버 병합 표시(목록 교체 깜빡임 제거) + 서버 저장 성공 시 임시 이력을 서버 이력으로 승격 / v5.3.4: 저장 타임아웃 보완 / v5.3.3: 이력 한 줄 목록·삭제 / v5.3.2: 수급사·위원회 옵션 -->
+<!-- v5.4.0: 정기교육 이수율/이수상태 토글 + 전체 헤더 정렬 + 기본정보 구간 간격 축소·가운데 정렬 / v5.3.5: 저장 이력 임시+서버 병합 표시(목록 교체 깜빡임 제거) + 서버 저장 성공 시 임시 이력을 서버 이력으로 승격 / v5.3.4: 저장 타임아웃 보완 / v5.3.3: 이력 한 줄 목록·삭제 / v5.3.2: 수급사·위원회 옵션 -->
 <style>
 :root {
   --blue50:#f0f4ff; --blue100:#d6e4ff; --blue500:#3182f6; --blue600:#1b6ef3;
@@ -206,6 +206,9 @@
 .work-header{padding:16px 24px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .work-org-btn{margin-left:8px;padding:7px 13px;border-color:var(--blue100);background:var(--blue50);color:var(--blue600);font-weight:800}
 .work-org-btn:hover{background:var(--blue500);border-color:var(--blue500);color:#fff;box-shadow:0 3px 10px rgba(49,130,246,.18)}
+.work-training-rate{display:inline-flex;align-items:center;justify-content:center;margin-left:12px;padding:4px 10px;border-radius:8px;background:#fff;color:var(--gray900);font-size:22px;font-weight:800;letter-spacing:-.6px;line-height:1.25;white-space:nowrap}
+.work-training-rate strong{color:var(--blue600);font-weight:900}
+.work-training-rate.good strong{color:var(--green500)}
 .work-site-label{font-size:14px;font-weight:700;color:var(--gray900)}
 .work-site-badge{font-size:11px;color:var(--gray500);background:var(--gray100);padding:2px 8px;border-radius:10px}
 .work-toolbar{padding:8px 24px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -254,14 +257,19 @@ tbody tr:hover td.col-sticky{background:#eaf2ff!important}
 .sort-btn:hover{background:rgba(255,255,255,.38);color:#fff}
 .sort-btn.asc{background:var(--blue500);color:#fff}
 .sort-btn.desc{background:var(--green500);color:#fff}
-.cell-edit{border:none;outline:none;background:transparent;font-family:inherit;font-size:12px;color:var(--gray800);width:100%;height:100%;padding:0 7px;text-align:center;cursor:text}
+.sortable-th{cursor:pointer!important;user-select:none}
+.sortable-th:hover{background:#40516a!important}
+.sortable-th .th-inner{gap:4px}
+.sortable-th .sort-btn{opacity:.78}
+.sortable-th:hover .sort-btn{opacity:1}
+.cell-edit{border:none;outline:none;background:transparent;font-family:inherit;font-size:11px;color:var(--gray800);width:100%;height:100%;padding:0 4px;text-align:center;text-align-last:center;cursor:text}
 .cell-edit:focus{background:var(--white);outline:2px solid var(--blue500);outline-offset:-2px;border-radius:2px}
 select.cell-edit{cursor:pointer}
 td.cell-focused{outline:2px solid var(--blue500);outline-offset:-2px;position:relative;z-index:3}
-td.td-text{min-width:88px;text-align:left}
-td.td-name{min-width:78px;font-weight:700;color:var(--gray900)}
-td.td-empno{min-width:80px}
-td.td-process{min-width:100px;text-align:left}
+td.td-text{min-width:76px;text-align:center}
+td.td-name{min-width:64px;font-weight:700;color:var(--gray900);text-align:center}
+td.td-empno{min-width:72px}
+td.td-process{min-width:90px;text-align:center}
 td.td-date{min-width:100px;width:100px;font-size:11px;color:#536273;white-space:nowrap}
 .modified-date-value{display:inline-block;min-width:78px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.15px}
 .modified-date-value.empty{color:var(--gray400);font-weight:500}
@@ -289,13 +297,17 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
 
 
 /* ════ 관리감독자 지정일 · 지정서 PDF ════ */
-.td-design-date{min-width:116px;width:116px;padding:0 5px}
-.designation-date-input{width:104px;height:29px;border:1px solid #cbd4df;border-radius:5px;background:#fff;padding:0 5px;font-family:inherit;font-size:11px;color:var(--gray700);cursor:pointer}
+.td-design-date{min-width:94px;width:94px;padding:0 2px}
+.designation-date-input{width:88px;height:29px;border:1px solid #cbd4df;border-radius:5px;background:#fff;padding:0 5px;font-family:inherit;font-size:11px;color:var(--gray700);cursor:pointer}
 .designation-date-input:focus{outline:2px solid var(--blue500);outline-offset:0;border-color:var(--blue500)}
 .designation-date-input:disabled{background:transparent;color:var(--gray600);opacity:1;cursor:default;border-color:transparent}
-.td-design-pdf{min-width:62px;width:62px}
-.designation-pdf-btn{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:25px;border:1px solid #c7d0dc;border-radius:5px;background:#fff;color:#344155;font-family:inherit;font-size:9px;font-weight:900;cursor:pointer;letter-spacing:-.2px;box-shadow:0 1px 2px rgba(15,23,42,.06);transition:all .12s}
+.td-design-pdf{min-width:48px;width:48px}
+.designation-pdf-btn{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:25px;border:1px solid #c7d0dc;border-radius:5px;background:#fff;color:#344155;font-family:inherit;font-size:9px;font-weight:900;cursor:pointer;letter-spacing:-.2px;box-shadow:0 1px 2px rgba(15,23,42,.06);transition:all .12s}
 .designation-pdf-btn:hover{border-color:var(--blue500);background:var(--blue50);color:var(--blue600);transform:translateY(-1px)}
+.th-training,.td-training{min-width:58px;width:58px;text-align:center}
+.training-btn{display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:24px;border:1px solid #ffd5d8;border-radius:6px;background:var(--red50);color:var(--red500);font-family:inherit;font-size:10px;font-weight:900;cursor:pointer;letter-spacing:-.2px;transition:all .12s}
+.training-btn.done{border-color:var(--green100);background:var(--green50);color:#008f76}
+.training-btn:hover{transform:translateY(-1px);box-shadow:0 2px 7px rgba(15,23,42,.10)}
 .mobile-designation-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--gray200)}
 .mobile-designation-row span{color:var(--gray500);font-size:10px}
 .mobile-designation-pdf-btn{display:inline-flex;align-items:center;justify-content:center;min-height:27px;padding:4px 8px;border:1px solid var(--blue100);border-radius:6px;background:var(--blue50);color:var(--blue600);font-family:inherit;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap}
@@ -560,6 +572,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   .work-header>.btn:first-child{padding:6px 8px}
   .work-site-label{font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .work-site-badge{font-size:10px;padding:2px 7px}
+  .work-training-rate{order:5;width:100%;margin-left:0;justify-content:flex-start;font-size:16px;padding:3px 2px;background:transparent}
   .work-actions{
     width:100%;margin-left:0!important;display:grid!important;
     grid-template-columns:repeat(3,minmax(0,1fr));gap:5px!important;
@@ -585,10 +598,13 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
   .mobile-empty{padding:34px 15px;text-align:center;color:var(--gray500);background:var(--white);border:1px solid var(--gray200);border-radius:10px;line-height:1.7}
   .mobile-person-card{background:var(--white);border:1px solid #dce2ea;border-radius:11px;box-shadow:var(--sh1);overflow:hidden;margin-bottom:8px}
   .mobile-person-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 12px 8px}
+  .mobile-head-badges{display:flex;align-items:center;gap:5px;flex-shrink:0}
   .mobile-person-title{display:flex;align-items:center;min-width:0;gap:8px}
   .mobile-row-no{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--gray100);color:var(--gray600);font-size:10px;font-weight:800;flex-shrink:0}
   .mobile-person-title strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px;color:var(--gray900)}
   .mobile-total{display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:23px;padding:0 8px;border-radius:12px;background:var(--blue50);border:1px solid var(--blue100);color:var(--blue600);font-size:11px;font-weight:800;flex-shrink:0}
+  .mobile-training{display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:23px;padding:0 8px;border-radius:12px;border:1px solid #ffd5d8;background:var(--red50);color:var(--red500);font-family:inherit;font-size:10px;font-weight:900;cursor:pointer;white-space:nowrap}
+  .mobile-training.done{border-color:var(--green100);background:var(--green50);color:#008f76}
   .mobile-person-meta{padding:0 12px 9px;color:var(--gray600);font-size:11px;line-height:1.55;word-break:keep-all}
   .mobile-person-date{display:block;margin-top:2px;color:var(--gray400);font-size:10px}
   .mobile-machine-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:9px 10px 10px;border-top:1px solid var(--gray100);background:#fbfcfe}
@@ -728,7 +744,8 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
     line-height:1.25!important; text-align:center!important;
     word-break:keep-all!important; overflow:hidden!important;
   }
-  td.td-text, td.td-process, td.td-name{ text-align:left!important; }
+  td.td-text, td.td-process, td.td-name{ text-align:center!important; }
+  .training-btn{height:14px!important;min-width:26px!important;padding:0 3px!important;font-size:6.2pt!important;border-radius:4px!important;box-shadow:none!important}
 
   /* 체크박스 */
   .chk{
@@ -1015,6 +1032,7 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
     <span class="work-site-label" id="workSiteLabel"></span>
     <span class="work-site-badge" id="workSiteBadge"></span>
     <button type="button" class="btn btn-sm work-org-btn" onclick="openOrgPage(curSite)" title="현재 사업장의 안전보건관리 조직구성표를 열어 저장·출력합니다">📊 안전보건 조직도</button>
+    <span class="work-training-rate" id="workTrainingRate">정기교육 이수율 <strong>0%(0/0)</strong></span>
     <div class="work-actions" style="margin-left:auto;display:flex;gap:6px">
       <button class="btn btn-primary btn-sm" id="addRowBtn" onclick="addRow()">+ 행 추가</button>
       <button class="btn btn-sm btn-primary" id="lockBtn" onclick="isUnlocked()?lockSite():requireAuth(()=>{})">🔒 편집</button>
@@ -1042,16 +1060,17 @@ tfoot td.td-no{position:sticky;left:0;background:#e4e9f0;z-index:5;border-right:
     <table id="mainTable">
       <thead>
         <tr>
-          <th class="th-no" rowspan="2"><div class="th-inner">No.</div></th>
-          <th class="col-sticky" style="min-width:85px;left:40px" rowspan="2"><div class="th-inner">팀</div></th>
-          <th class="col-sticky" style="min-width:100px;left:125px" rowspan="2"><div class="th-inner">공정명</div></th>
-          <th class="col-sticky" style="min-width:68px;left:225px" rowspan="2"><div class="th-inner">직책</div></th>
-          <th class="col-sticky" style="min-width:80px;left:293px" rowspan="2"><div class="th-inner">사번</div></th>
-          <th class="col-sticky sticky-end" style="min-width:74px;left:373px" rowspan="2"><div class="th-inner">이름</div></th>
-          <th class="th-design-date" style="min-width:116px" rowspan="2"><div class="th-inner">지정일</div></th>
-          <th class="th-design-pdf" style="min-width:62px" rowspan="2"><div class="th-inner">지정서</div></th>
+          <th class="th-no sortable-th" rowspan="2" onclick="toggleSort('no')"><div class="th-inner">No.<button class="sort-btn" id="sortBtn_no" onclick="event.stopPropagation();toggleSort('no')" title="No. 정렬">↕</button></div></th>
+          <th class="col-sticky sortable-th" style="min-width:80px;left:40px" rowspan="2" onclick="toggleSort('team')"><div class="th-inner">팀<button class="sort-btn" id="sortBtn_team" onclick="event.stopPropagation();toggleSort('team')" title="팀 정렬">↕</button></div></th>
+          <th class="col-sticky sortable-th" style="min-width:90px;left:120px" rowspan="2" onclick="toggleSort('process')"><div class="th-inner">공정명<button class="sort-btn" id="sortBtn_process" onclick="event.stopPropagation();toggleSort('process')" title="공정명 정렬">↕</button></div></th>
+          <th class="col-sticky sortable-th" style="min-width:60px;left:210px" rowspan="2" onclick="toggleSort('position')"><div class="th-inner">직책<button class="sort-btn" id="sortBtn_position" onclick="event.stopPropagation();toggleSort('position')" title="직책 정렬">↕</button></div></th>
+          <th class="col-sticky sortable-th" style="min-width:72px;left:270px" rowspan="2" onclick="toggleSort('empno')"><div class="th-inner">사번<button class="sort-btn" id="sortBtn_empno" onclick="event.stopPropagation();toggleSort('empno')" title="사번 정렬">↕</button></div></th>
+          <th class="col-sticky sticky-end sortable-th" style="min-width:64px;left:342px" rowspan="2" onclick="toggleSort('name')"><div class="th-inner">이름<button class="sort-btn" id="sortBtn_name" onclick="event.stopPropagation();toggleSort('name')" title="이름 정렬">↕</button></div></th>
+          <th class="th-design-date sortable-th" style="min-width:94px" rowspan="2" onclick="toggleSort('designationDate')"><div class="th-inner">지정일<button class="sort-btn" id="sortBtn_designationDate" onclick="event.stopPropagation();toggleSort('designationDate')" title="지정일 정렬">↕</button></div></th>
+          <th class="th-design-pdf" style="min-width:48px" rowspan="2"><div class="th-inner">지정서</div></th>
+          <th class="th-training sortable-th" rowspan="2" onclick="toggleSort('regularTraining')"><div class="th-inner">정기<br>교육<button class="sort-btn" id="sortBtn_regularTraining" onclick="event.stopPropagation();toggleSort('regularTraining')" title="정기교육 정렬">↕</button></div></th>
           <th colspan="12" class="th-group"><div class="th-inner" style="font-size:11px">유해위험작업 대상 &nbsp;(기계명 클릭 → 점검기준)</div></th>
-          <th class="date-head" style="min-width:100px;width:100px" rowspan="2"><div class="th-inner">수정일</div></th>
+          <th class="date-head sortable-th" style="min-width:100px;width:100px" rowspan="2" onclick="toggleSort('date')"><div class="th-inner">수정일<button class="sort-btn" id="sortBtn_date" onclick="event.stopPropagation();toggleSort('date')" title="수정일 정렬">↕</button></div></th>
           <th class="th-del" rowspan="2"><div class="th-inner"></div></th>
         </tr>
         <tr id="machineHeaderRow"></tr>
@@ -1468,7 +1487,7 @@ let curSite  = sites[0];   // 현황 페이지 기준 사업장
 let curMasterSite = sites[0]; // 기준정보 선택 사업장
 let curPage  = 'home';
 let curOrgSite = sites[0]; // 조직도 페이지 기준 사업장
-let sortState = { mid: null, dir: 0 }; // dir: 0=없음 1=내림차순(체크O먼저) -1=오름차순
+let sortState = { key: null, dir: 0 }; // dir: 0=없음, 1=오름차순, -1=내림차순
 let unlockedSites = new Set();       // 현황 편집 인증된 사업장
 let unlockedMasterSites = new Set();  // 기준정보 편집 인증된 사업장
 let editPwCallback = null;
@@ -1632,18 +1651,21 @@ function buildMachineHeaders(){
   tr.innerHTML = '';
   const thT = document.createElement('th');
   thT.style.minWidth='46px';
-  thT.innerHTML='<div class="th-inner" style="font-size:11px">계</div>';
+  thT.className='sortable-th';
+  thT.onclick = () => toggleSort('total');
+  thT.innerHTML='<div class="th-inner" style="font-size:11px">계<button class="sort-btn" id="sortBtn_total" onclick="event.stopPropagation();toggleSort(\'total\')" title="합계 정렬">↕</button></div>';
   tr.appendChild(thT);
   MACHINES.forEach(m=>{
     const th = document.createElement('th');
-    th.className='th-machine'; th.style.minWidth='52px';
+    th.className='th-machine sortable-th'; th.style.minWidth='52px';
     th.innerHTML=`<div class="th-inner" style="font-size:11px;line-height:1.25;text-align:center;gap:2px">
       <span>${m.label.replace('\n','<br>')}</span>
-      <button class="sort-btn" id="sortBtn_${m.id}" onclick="event.stopPropagation();toggleSort('${m.id}')" title="${m.label.replace('\n',' ')} 정렬">↕</button>
+      <button class="sort-btn" id="sortBtn_machine_${m.id}" onclick="event.stopPropagation();toggleSort('machine:${m.id}')" title="${m.label.replace('\n',' ')} 정렬">↕</button>
     </div>`;
     th.addEventListener('click', e=>{ if(!e.target.classList.contains('sort-btn')) showMachineTT(m.id, e); });
     tr.appendChild(th);
   });
+  updateSortIndicators();
 }
 
 function updateFilterDept(){
@@ -1653,11 +1675,45 @@ function updateFilterDept(){
     sd().master.team.map(t=>`<option value="${esc(t)}"${t===cur?' selected':''}>${esc(t)}</option>`).join('');
 }
 
+function isTrainingCompleted(value){
+  if(value === true) return true;
+  const s = String(value ?? '').trim().replace(/\s+/g,'').toUpperCase();
+  return ['이수','완료','O','○','◯','Y','YES','TRUE','1','V','✓','✔'].includes(s);
+}
+function trainingStatusText(value){ return isTrainingCompleted(value) ? '이수' : '미이수'; }
+function updateTrainingRate(rows){
+  const el=document.getElementById('workTrainingRate');
+  if(!el) return;
+  const list=Array.isArray(rows)?rows:[];
+  const total=list.length;
+  const done=list.filter(r=>isTrainingCompleted(r.regularTraining)).length;
+  const pct=total?Math.round(done/total*100):0;
+  el.classList.toggle('good', total>0 && done===total);
+  el.innerHTML=`정기교육 이수율 <strong>${pct}%(${done}/${total})</strong>`;
+}
+function setTrainingStatus(id,done){
+  const r=sd().rows.find(r=>r.id===Number(id));
+  if(!r) return;
+  r.regularTraining=!!done;
+  r.date=today();
+  renderTable();
+  triggerAutoSave();
+}
+function toggleTraining(id){
+  if(!isUnlocked()){
+    requireAuth(()=>{ const r=sd().rows.find(r=>r.id===Number(id)); if(r) setTrainingStatus(id,!isTrainingCompleted(r.regularTraining)); });
+    return;
+  }
+  const r=sd().rows.find(r=>r.id===Number(id));
+  if(!r) return;
+  setTrainingStatus(id,!isTrainingCompleted(r.regularTraining));
+}
+
 function addRow(){
   requireAuth(()=>{
     const d = sd();
     const row = { id:d.nextId++, team:'', process:'', position:'', empno:'', name:'',
-      machines:Object.fromEntries(MACHINES.map(m=>[m.id,false])), designationDate:'', bigo:'', date:today() };
+      machines:Object.fromEntries(MACHINES.map(m=>[m.id,false])), designationDate:'', regularTraining:false, bigo:'', date:today() };
     d.rows.push(row);
     renderTable();
     document.getElementById('workSiteBadge').textContent = `총 ${d.rows.length}명`;
@@ -1695,18 +1751,13 @@ function renderTable(){
   let filtered = rows.filter(r=>
     (!dept||r.team===dept)&&(!q||r.name.toLowerCase().includes(q)||r.empno.toLowerCase().includes(q)||r.team.toLowerCase().includes(q)||r.process.toLowerCase().includes(q))
   );
-  if(sortState.mid && sortState.dir!==0){
-    filtered = [...filtered].sort((a,b)=>{
-      const av = a.machines[sortState.mid] ? 1 : 0;
-      const bv = b.machines[sortState.mid] ? 1 : 0;
-      return sortState.dir===1 ? bv-av : av-bv;
-    });
-  }
+  filtered = sortRowsByState(filtered);
+  updateTrainingRate(filtered);
   renderMobileCards(filtered);
   const tbody = document.getElementById('tableBody');
   const tfoot = document.getElementById('tableFoot');
   if(!filtered.length){
-    tbody.innerHTML=`<tr class="empty-row"><td colspan="${10+MACHINES.length+1}">데이터가 없습니다. [행 추가]를 클릭하세요.</td></tr>`;
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="${11+MACHINES.length+1}">데이터가 없습니다. [행 추가]를 클릭하세요.</td></tr>`;
     tfoot.innerHTML=''; return;
   }
   const mT={};
@@ -1727,19 +1778,20 @@ function renderTable(){
       <td class="td-text col-sticky" style="left:40px" data-col="team" tabindex="0" onkeydown="onCellKey(event,this)">
         <select class="cell-edit" onchange="setF(${r.id},'team',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
           ${buildMasterSelectOptions(sd().master.team,r.team,'팀 선택')}</select></td>
-      <td class="td-process col-sticky" style="left:125px" data-col="process" tabindex="0" onkeydown="onCellKey(event,this)">
+      <td class="td-process col-sticky" style="left:120px" data-col="process" tabindex="0" onkeydown="onCellKey(event,this)">
         <select class="cell-edit" onchange="setF(${r.id},'process',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
           ${buildMasterSelectOptions(sd().master.process,r.process,'공정 선택')}</select></td>
-      <td class="td-text col-sticky" style="left:225px" data-col="position" tabindex="0" onkeydown="onCellKey(event,this)">
+      <td class="td-text col-sticky" style="left:210px" data-col="position" tabindex="0" onkeydown="onCellKey(event,this)">
         <select class="cell-edit" onchange="setF(${r.id},'position',this.value)" ${isUnlocked()?'':"disabled"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')">
           ${buildMasterSelectOptions(sd().master.position,r.position,'직책 선택')}</select></td>
-      <td class="td-empno col-sticky" style="left:293px" data-col="empno" tabindex="0" onkeydown="onCellKey(event,this)">
+      <td class="td-empno col-sticky" style="left:270px" data-col="empno" tabindex="0" onkeydown="onCellKey(event,this)">
         <input class="cell-edit" value="${esc(r.empno)}" placeholder="사번" onchange="setF(${r.id},'empno',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
-      <td class="td-name col-sticky" style="left:373px" data-col="name" tabindex="0" onkeydown="onCellKey(event,this)">
+      <td class="td-name col-sticky" style="left:342px" data-col="name" tabindex="0" onkeydown="onCellKey(event,this)">
         <input class="cell-edit" value="${esc(r.name)}" placeholder="이름" onchange="setF(${r.id},'name',this.value)" ${isUnlocked()?'':"readonly"} onfocus="this.parentElement.classList.add('cell-focused')" onblur="this.parentElement.classList.remove('cell-focused')"></td>
       <td class="td-design-date" data-col="designationDate">
         <input type="date" class="designation-date-input" value="${esc(normalizeDateInput(r.designationDate))}" onchange="setDesignationDate(${r.id},this.value)" ${isUnlocked()?'':"disabled"} title="관리감독자 지정일"></td>
       <td class="td-design-pdf"><button type="button" class="designation-pdf-btn" onclick="downloadDesignationPdf(${r.id})" title="관리감독자 지정서 PDF 저장">PDF</button></td>
+      <td class="td-training" data-col="regularTraining" tabindex="0" onkeydown="onCellKey(event,this)"><button type="button" class="training-btn${isTrainingCompleted(r.regularTraining)?' done':''}" onclick="toggleTraining(${r.id})" title="정기교육 이수 여부 전환">${trainingStatusText(r.regularTraining)}</button></td>
       <td class="td-total" data-col="total" tabindex="0" onkeydown="onCellKey(event,this)" onclick="showTotalTT(${r.id},event)">
         <span class="total-badge${total===0?' zero':''}">${total}</span></td>
       ${checks}
@@ -1755,7 +1807,7 @@ function renderTable(){
   const totalAll = filtered.reduce((s,r)=>s+MACHINES.filter(m=>r.machines[m.id]).length,0);
   tfoot.innerHTML=`<tr><td class="td-no">합계</td>
     <td colspan="5" style="font-size:11px;color:var(--gray500)">${filtered.length}명</td>
-    <td></td><td></td>
+    <td></td><td></td><td></td>
     <td>${totalAll}</td>
     ${MACHINES.map(m=>`<td>${mT[m.id]||''}</td>`).join('')}
     <td></td></tr>`;
@@ -1795,7 +1847,7 @@ function renderMobileCards(filtered){
     return `<article class="mobile-person-card">
       <div class="mobile-person-head">
         <div class="mobile-person-title"><span class="mobile-row-no">${i+1}</span><strong>${title}</strong></div>
-        <span class="mobile-total">${total}개 대상</span>
+        <div class="mobile-head-badges"><span class="mobile-total">${total}개 대상</span><button type="button" class="mobile-training${isTrainingCompleted(r.regularTraining)?' done':''}" onclick="toggleTraining(${r.id})">${trainingStatusText(r.regularTraining)}</button></div>
       </div>
       <div class="mobile-person-meta">${info}<span class="mobile-person-date">수정일 ${esc(formatDisplayDate(r.date)||'미기록')}</span>
         <div class="mobile-designation-row"><span>지정일 ${esc(formatKoreanDate(r.designationDate)||'-')}</span><button type="button" class="mobile-designation-pdf-btn" onclick="downloadDesignationPdf(${r.id})">지정서 PDF</button></div>
@@ -1925,31 +1977,66 @@ function moveRowOrder(sourceId,targetId,insertAfter){
   if(to<0){ rows.splice(from,0,moved); return; }
   if(insertAfter) to += 1;
   rows.splice(to,0,moved);
-  sortState = { mid:null, dir:0 };
-  document.querySelectorAll('.sort-btn').forEach(b=>{ b.classList.remove('asc','desc'); b.textContent='↕'; });
+  sortState = { key:null, dir:0 };
+  updateSortIndicators();
   renderTable();
   triggerAutoSave();
   toast('✅ 행 순서를 변경했습니다','ok');
 }
 
 /* ════ 키보드 ════ */
-function toggleSort(mid){
-  if(sortState.mid === mid){
-    sortState.dir = sortState.dir === 1 ? -1 : sortState.dir === -1 ? 0 : 1;
-  } else {
-    sortState.mid = mid; sortState.dir = 1;
+function sortInitialDir(key){
+  return (key==='total' || key==='regularTraining' || String(key).startsWith('machine:')) ? -1 : 1;
+}
+function getSortValue(r,key,idx){
+  if(key==='no') return idx;
+  if(key==='team') return String(r.team||'');
+  if(key==='process') return String(r.process||'');
+  if(key==='position') return String(r.position||'');
+  if(key==='empno') return empnoText(r.empno);
+  if(key==='name') return String(r.name||'');
+  if(key==='designationDate') return normalizeDateInput(r.designationDate)||'';
+  if(key==='regularTraining') return isTrainingCompleted(r.regularTraining) ? 1 : 0;
+  if(key==='total') return MACHINES.filter(m=>r.machines&&r.machines[m.id]).length;
+  if(key==='date') return normalizeDateInput(r.date)||'';
+  if(String(key).startsWith('machine:')){
+    const mid=String(key).slice(8);
+    return r.machines&&r.machines[mid] ? 1 : 0;
   }
-  // 버튼 UI 업데이트
-  document.querySelectorAll('.sort-btn').forEach(b=>{
-    b.classList.remove('asc','desc'); b.textContent='↕';
-  });
-  if(sortState.dir !== 0){
-    const btn = document.getElementById('sortBtn_'+sortState.mid);
-    if(btn){
-      btn.classList.add(sortState.dir===1?'desc':'asc');
-      btn.textContent = sortState.dir===1?'↓':'↑';
-    }
+  return '';
+}
+function compareSortValues(a,b){
+  const na = typeof a === 'number' ? a : (a!=='' && !isNaN(Number(a)) ? Number(a) : null);
+  const nb = typeof b === 'number' ? b : (b!=='' && !isNaN(Number(b)) ? Number(b) : null);
+  if(na!==null && nb!==null) return na-nb;
+  return String(a||'').localeCompare(String(b||''),'ko',{numeric:true,sensitivity:'base'});
+}
+function sortRowsByState(rows){
+  if(!sortState.key || !sortState.dir) return rows;
+  return [...rows].map((r,idx)=>({r,idx})).sort((a,b)=>{
+    const cmp=compareSortValues(getSortValue(a.r,sortState.key,a.idx),getSortValue(b.r,sortState.key,b.idx));
+    return (sortState.dir===1?cmp:-cmp) || (a.idx-b.idx);
+  }).map(x=>x.r);
+}
+function sortButtonId(key){ return String(key).startsWith('machine:') ? 'sortBtn_machine_'+String(key).slice(8) : 'sortBtn_'+key; }
+function updateSortIndicators(){
+  document.querySelectorAll('.sort-btn').forEach(b=>{ b.classList.remove('asc','desc'); b.textContent='↕'; });
+  if(!sortState.key || !sortState.dir) return;
+  const btn=document.getElementById(sortButtonId(sortState.key));
+  if(btn){
+    btn.classList.add(sortState.dir===1?'asc':'desc');
+    btn.textContent=sortState.dir===1?'↑':'↓';
   }
+}
+function toggleSort(key){
+  if(sortState.key===key){
+    sortState.dir = sortState.dir===1 ? -1 : sortState.dir===-1 ? 0 : sortInitialDir(key);
+    if(sortState.dir===0) sortState.key=null;
+  }else{
+    sortState.key=key;
+    sortState.dir=sortInitialDir(key);
+  }
+  updateSortIndicators();
   renderTable();
 }
 
@@ -1963,7 +2050,7 @@ function onCellKey(e,td){
   if(e.key==='ArrowLeft'){e.preventDefault();const n=cells[idx-1];if(n)focusCell(n);return;}
   if(e.key==='ArrowDown'){e.preventDefault();const n=cells[idx+cols];if(n)focusCell(n);return;}
   if(e.key==='ArrowUp'){e.preventDefault();const n=cells[idx-cols];if(n)focusCell(n);return;}
-  if(e.key===' '&&(td.dataset.col==='check'||td.dataset.col==='total')){e.preventDefault();td.click();}
+  if(e.key===' '&&(td.dataset.col==='check'||td.dataset.col==='total'||td.dataset.col==='regularTraining')){e.preventDefault();td.click();}
 }
 
 /* ══════════════════════════════════════════
@@ -2483,6 +2570,7 @@ function rowPayloadForSite(site){
     MACHINES.forEach(m=>{ if(r.machines[m.id]) out[m.id] = 'O'; });
     const total = MACHINES.filter(m=>r.machines[m.id]).length;
     if(total) out.total = total;
+    out.regularTraining = trainingStatusText(r.regularTraining);
     // 지정일(designationDate)과 수정일(date)은 완전히 별도 필드로 저장합니다.
     // 비고(bigo)는 지정일 저장소로 재활용하지 않습니다.
     compactValue(out, 'designationDate', r.designationDate);
@@ -2631,7 +2719,7 @@ function appendLoadedRows(rows){
     const d=siteData[row.site];
     if(!d) return;
     d.rows.push({ id:d.nextId++, team:row.team||'', process:row.process||'', position:row.position||'',
-      empno:empnoText(row.empno), name:row.name||'', bigo:row.bigo||'',
+      empno:empnoText(row.empno), name:row.name||'', regularTraining:isTrainingCompleted(row.regularTraining), bigo:row.bigo||'',
       // 구버전 테스트 데이터가 비고에 날짜를 넣었던 경우에만 1회 호환합니다.
       designationDate:normalizeDateInput(row.designationDate)||normalizeDateInput(row.bigo)||'', date:normalizeDateInput(row.date)||'',
       machines:Object.fromEntries(MACHINES.map(m=>[m.id,row[m.id]==='O'])) });
@@ -2696,6 +2784,7 @@ const EXCEL_UPLOAD_HEADERS = [
   {key:'empno',label:'사번',aliases:['사번','사원번호']},
   {key:'name',label:'이름',aliases:['이름','성명']},
   {key:'designationDate',label:'지정일',aliases:['지정일','관리감독자지정일']},
+  {key:'regularTraining',label:'정기교육',aliases:['정기교육','정기교육이수','교육이수','이수여부']},
   {key:'hoist',label:'호이스트',aliases:['호이스트']},
   {key:'conveyor',label:'컨베이어',aliases:['컨베이어']},
   {key:'robot',label:'산업용로봇',aliases:['산업용로봇','로봇']},
@@ -2764,6 +2853,14 @@ function parseUploadFlag(v){
   if(['X','N','NO','FALSE','0','-'].includes(t)) return {ok:true,value:false};
   return {ok:false,value:false,raw};
 }
+function parseTrainingFlag(v){
+  const raw=String(v??'').trim();
+  if(!raw) return {ok:true,value:false};
+  const t=raw.toUpperCase().replace(/\s+/g,'');
+  if(['이수','완료','O','○','◯','Y','YES','TRUE','1','V','✓','✔'].includes(t)) return {ok:true,value:true};
+  if(['미이수','X','N','NO','FALSE','0','-'].includes(t)) return {ok:true,value:false};
+  return {ok:false,value:false,raw};
+}
 function uploadHeaderMap(matrix){
   const max=Math.min(12,matrix.length);
   for(let r=0;r<max;r++){
@@ -2790,7 +2887,7 @@ function parseExcelUploadMatrix(matrix,target,displayMatrix){
     const row=Array.isArray(matrix[i])?matrix[i]:[];
     const displayRow=Array.isArray(displayMatrix&&displayMatrix[i])?displayMatrix[i]:row;
     const excelRow=i+1;
-    const meaningful=['site','team','process','position','empno','name','designationDate','hoist','conveyor','robot','lift','press','compressor','forklift','welding','wire','heavy','radiation','bigo']
+    const meaningful=['site','team','process','position','empno','name','designationDate','regularTraining','hoist','conveyor','robot','lift','press','compressor','forklift','welding','wire','heavy','radiation','bigo']
       .some(k=>String(get(row,k)??'').trim()!=='');
     if(!meaningful) continue;
     const site=String(get(row,'site')||target).trim();
@@ -2801,6 +2898,8 @@ function parseExcelUploadMatrix(matrix,target,displayMatrix){
     const name=String(get(row,'name')||'').trim();
     const designationRaw=get(row,'designationDate');
     const designationDate=excelUploadDateToISO(designationRaw);
+    const trainingParsed=parseTrainingFlag(get(row,'regularTraining'));
+    if(!trainingParsed.ok) result.errors.push(excelRow+'행: 정기교육 값 "'+trainingParsed.raw+'"은 이수 또는 미이수로 입력하세요.');
     if(site && site!==target) result.errors.push(excelRow+'행: 사업장 "'+site+'"이(가) 선택한 대상 "'+target+'"과 다릅니다.');
     if(!team) result.errors.push(excelRow+'행: 팀을 입력하세요.');
     if(!process) result.errors.push(excelRow+'행: 공정명을 입력하세요.');
@@ -2821,7 +2920,7 @@ function parseExcelUploadMatrix(matrix,target,displayMatrix){
       machines[m.id]=parsed.value;
       if(!parsed.ok) result.errors.push(excelRow+'행: '+m.label.replace('\n',' ')+' 값 "'+parsed.raw+'"은 사용할 수 없습니다. O 또는 빈칸으로 입력하세요.');
     });
-    result.rows.push({team,process,position,empno,name,designationDate,bigo:String(get(row,'bigo')||'').trim(),machines});
+    result.rows.push({team,process,position,empno,name,designationDate,regularTraining:trainingParsed.value,bigo:String(get(row,'bigo')||'').trim(),machines});
   }
   if(!result.rows.length) result.errors.push('업로드할 데이터 행이 없습니다. 업로드양식 시트에 자료를 입력하세요.');
   return result;
@@ -2879,8 +2978,8 @@ function renderExcelUploadSummary(){
   }
   const rows=excelUploadRows.slice(0,15);
   preview.innerHTML=`<div class="import-preview-title"><span>업로드 미리보기</span><span id="excelUploadPreviewCount">${excelUploadRows.length}건${excelUploadRows.length>15?' · 상위 15건 표시':''}</span></div>
-    <table><thead><tr><th>No.</th><th>팀</th><th>공정명</th><th>직책</th><th>사번</th><th>이름</th><th>지정일</th><th>작업 대상</th><th>비고</th></tr></thead><tbody>
-    ${rows.map((r,i)=>`<tr><td>${i+1}</td><td class="text-left">${esc(r.team)}</td><td class="text-left">${esc(r.process)}</td><td>${esc(r.position)}</td><td>${esc(r.empno)}</td><td>${esc(r.name)}</td><td>${esc(r.designationDate)}</td><td>${MACHINES.filter(m=>r.machines[m.id]).length}</td><td class="text-left">${esc(r.bigo)}</td></tr>`).join('')}
+    <table><thead><tr><th>No.</th><th>팀</th><th>공정명</th><th>직책</th><th>사번</th><th>이름</th><th>지정일</th><th>정기교육</th><th>작업 대상</th><th>비고</th></tr></thead><tbody>
+    ${rows.map((r,i)=>`<tr><td>${i+1}</td><td class="text-left">${esc(r.team)}</td><td class="text-left">${esc(r.process)}</td><td>${esc(r.position)}</td><td>${esc(r.empno)}</td><td>${esc(r.name)}</td><td>${esc(r.designationDate)}</td><td>${trainingStatusText(r.regularTraining)}</td><td>${MACHINES.filter(m=>r.machines[m.id]).length}</td><td class="text-left">${esc(r.bigo)}</td></tr>`).join('')}
     </tbody></table>`;
 }
 function replaceSiteRowsFromExcel(site,rows){
@@ -2888,7 +2987,7 @@ function replaceSiteRowsFromExcel(site,rows){
   const d=sd(site);
   d.rows=(rows||[]).map((r,i)=>({
     id:i+1, team:r.team||'', process:r.process||'', position:r.position||'', empno:empnoText(r.empno), name:r.name||'',
-    designationDate:normalizeDateInput(r.designationDate)||'', bigo:r.bigo||'', date:today(),
+    designationDate:normalizeDateInput(r.designationDate)||'', regularTraining:isTrainingCompleted(r.regularTraining), bigo:r.bigo||'', date:today(),
     machines:Object.fromEntries(MACHINES.map(m=>[m.id,!!(r.machines&&r.machines[m.id])]))
   }));
   d.nextId=d.rows.length+1;
@@ -2958,10 +3057,10 @@ function restoreLatestExcelBackup(){
 ══════════════════════════════════════════ */
 function appendUploadFormSheet(wb,site,rows){
   const machineLabels=MACHINES.map(m=>m.label.replace('\n',' '));
-  const headers=['사업장','팀','공정명','직책','사번','이름','지정일',...machineLabels,'합계','비고','수정일'];
+  const headers=['사업장','팀','공정명','직책','사번','이름','지정일','정기교육',...machineLabels,'합계','비고','수정일'];
   const matrix=[headers];
   (rows||[]).forEach(r=>matrix.push([
-    site,r.team||'',r.process||'',r.position||'',empnoText(r.empno),r.name||'',normalizeDateInput(r.designationDate)||'',
+    site,r.team||'',r.process||'',r.position||'',empnoText(r.empno),r.name||'',normalizeDateInput(r.designationDate)||'',trainingStatusText(r.regularTraining),
     ...MACHINES.map(m=>r.machines&&r.machines[m.id]?'O':''),
     MACHINES.filter(m=>r.machines&&r.machines[m.id]).length,r.bigo||'',normalizeDateInput(r.date)||r.date||''
   ]));
@@ -2975,14 +3074,15 @@ function appendUploadFormSheet(wb,site,rows){
   for(let r=1;r<matrix.length;r++){
     for(let c=0;c<headers.length;c++) excelCell(ws,r,c).s=body;
     // 사용자가 수정하는 구간을 연한 배경으로 표시합니다.
-    for(let c=1;c<=18;c++) excelCell(ws,r,c).s=editable;
-    for(let c=7;c<=17;c++) if(excelCell(ws,r,c).v==='O') excelCell(ws,r,c).s=flag;
+    for(let c=1;c<=20;c++) excelCell(ws,r,c).s=editable;
+    excelCell(ws,r,7).s=isTrainingCompleted(excelCell(ws,r,7).v)?flag:editable;
+    for(let c=8;c<=18;c++) if(excelCell(ws,r,c).v==='O') excelCell(ws,r,c).s=flag;
     // 사번은 반드시 텍스트 형식으로 저장하여 012345와 같은 선행 0을 보존합니다.
     const empCell=excelCell(ws,r,4);
     empCell.t='s'; empCell.v=empnoText(empCell.v); empCell.z='@';
   }
   ws['!cols']=[
-    {wch:18},{wch:14},{wch:16},{wch:10},{wch:13},{wch:12},{wch:13},
+    {wch:18},{wch:14},{wch:16},{wch:10},{wch:13},{wch:12},{wch:13},{wch:9},
     ...MACHINES.map(m=>({wch:(m.id==='compressor'||m.id==='radiation'?11:9)})),
     {wch:7},{wch:18},{wch:13}
   ];
@@ -3012,30 +3112,30 @@ function exportAllExcel(){
   const wb=XLSX.utils.book_new();
   wb.Props={Title:'관리감독자 및 유해위험작업 전체 현황',Subject:'전체 사업장 통합 현황',Author:'관리감독자 및 유해위험작업 현황',CreatedDate:new Date()};
   const machineLabels=MACHINES.map(m=>m.label.replace('\n',' '));
-  const totalCols=21; // No. + 사업장 + 기본정보 5 + 지정일 + 계 + 기계 11 + 수정일
+  const totalCols=22; // No. + 사업장 + 기본정보 5 + 지정일 + 정기교육 + 계 + 기계 11 + 수정일
   const main=[];
   main.push(['관리감독자 및 유해위험작업 전체 현황']);
   main.push(['출력일: '+todayISO()+'  ·  사업장: '+sites.filter(s=>!isDeprecatedSite(s)).length+'개  ·  총 '+allRows.length+'명']);
   main.push([]);
-  main.push(['No.','사업장','팀','공정명','직책','사번','이름','지정일','유해위험작업 대상','','','','','','','','','','','','수정일']);
-  main.push(['','','','','','','','','계',...machineLabels,'']);
+  main.push(['No.','사업장','팀','공정명','직책','사번','이름','지정일','정기교육','유해위험작업 대상','','','','','','','','','','','','수정일']);
+  main.push(['','','','','','','','','','계',...machineLabels,'']);
   allRows.forEach(({site,r},idx)=>main.push([
-    idx+1,site,r.team,r.process,r.position,r.empno,r.name,formatDisplayDate(r.designationDate),
+    idx+1,site,r.team,r.process,r.position,r.empno,r.name,formatDisplayDate(r.designationDate),trainingStatusText(r.regularTraining),
     MACHINES.filter(m=>r.machines[m.id]).length,
     ...MACHINES.map(m=>r.machines[m.id]?'✓':''),formatDisplayDate(r.date)
   ]));
   const totalRowIdx=main.length;
-  main.push(['합계','','','','','','','',
+  main.push(['합계','','','','','','','','',
     allRows.reduce((sum,x)=>sum+MACHINES.filter(m=>x.r.machines[m.id]).length,0),
     ...MACHINES.map(m=>allRows.filter(x=>x.r.machines[m.id]).length),'']);
 
   const ws=XLSX.utils.aoa_to_sheet(main);
   excelMerge(ws,0,0,0,totalCols-1);
   excelMerge(ws,1,0,1,totalCols-1);
-  for(let c=0;c<=7;c++) excelMerge(ws,3,c,4,c);
-  excelMerge(ws,3,8,3,19);
-  excelMerge(ws,3,20,4,20);
-  excelMerge(ws,totalRowIdx,0,totalRowIdx,7);
+  for(let c=0;c<=8;c++) excelMerge(ws,3,c,4,c);
+  excelMerge(ws,3,9,3,20);
+  excelMerge(ws,3,21,4,21);
+  excelMerge(ws,totalRowIdx,0,totalRowIdx,8);
 
   const thinBorder=excelBorder('C9CED6','thin');
   const darkHeader={font:{name:'맑은 고딕',sz:10,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'333D4B'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:excelBorder('667085','thin')};
@@ -3049,23 +3149,24 @@ function exportAllExcel(){
   const checkedStyle={font:{name:'맑은 고딕',sz:10,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'3182F6'}},alignment:{horizontal:'center',vertical:'center'},border:thinBorder};
   const totalStyle={font:{name:'맑은 고딕',sz:9,bold:true,color:{rgb:'333D4B'}},fill:{patternType:'solid',fgColor:{rgb:'E5E8EB'}},alignment:{horizontal:'center',vertical:'center'},border:excelBorder('AEB4BC','thin')};
 
-  excelStyleRange(ws,3,0,3,20,darkHeader);
-  excelStyleRange(ws,4,0,4,20,midHeader);
-  [0,1,2,3,4,5,6,7,20].forEach(c=>excelStyleRange(ws,3,c,4,c,darkHeader));
-  excelStyleRange(ws,3,8,3,19,blueGroupHeader);
+  excelStyleRange(ws,3,0,3,21,darkHeader);
+  excelStyleRange(ws,4,0,4,21,midHeader);
+  [0,1,2,3,4,5,6,7,8,21].forEach(c=>excelStyleRange(ws,3,c,4,c,darkHeader));
+  excelStyleRange(ws,3,9,3,20,blueGroupHeader);
   for(let rr=5;rr<totalRowIdx;rr++){
     const alt=(rr-5)%2===1;
     for(let c=0;c<totalCols;c++){
       excelCell(ws,rr,c).s=(c===1||c===2||c===3)?(alt?bodyAltLeft:bodyLeft):(alt?bodyAlt:bodyCenter);
     }
-    excelCell(ws,rr,8).s=countStyle;
-    for(let c=9;c<=19;c++) if(excelCell(ws,rr,c).v==='✓') excelCell(ws,rr,c).s=checkedStyle;
+    excelCell(ws,rr,8).s=isTrainingCompleted(excelCell(ws,rr,8).v)?checkedStyle:bodyCenter;
+    excelCell(ws,rr,9).s=countStyle;
+    for(let c=10;c<=20;c++) if(excelCell(ws,rr,c).v==='✓') excelCell(ws,rr,c).s=checkedStyle;
   }
-  excelStyleRange(ws,totalRowIdx,0,totalRowIdx,20,totalStyle);
+  excelStyleRange(ws,totalRowIdx,0,totalRowIdx,21,totalStyle);
   excelCell(ws,0,0).s={font:{name:'맑은 고딕',sz:14,bold:true,color:{rgb:'191F28'}},alignment:{horizontal:'center',vertical:'center'}};
   excelCell(ws,1,0).s={font:{name:'맑은 고딕',sz:9,color:{rgb:'6B7684'}},alignment:{horizontal:'center',vertical:'center'}};
   ws['!cols']=[
-    {wch:5},{wch:18},{wch:13},{wch:15},{wch:9},{wch:11},{wch:10},{wch:13},{wch:6},
+    {wch:5},{wch:18},{wch:13},{wch:15},{wch:9},{wch:11},{wch:10},{wch:13},{wch:9},{wch:6},
     ...MACHINES.map(m=>({wch:(m.id==='compressor'||m.id==='radiation'?8:7)})),{wch:13}
   ];
   ws['!rows']=[{hpt:25},{hpt:17},{hpt:6},{hpt:22},{hpt:28},...allRows.map(()=>({hpt:20})),{hpt:20}];
@@ -3073,23 +3174,25 @@ function exportAllExcel(){
   ws['!margins']={left:0.25,right:0.25,top:0.3,bottom:0.3,header:0.1,footer:0.1};
   XLSX.utils.book_append_sheet(wb,ws,'전체현황');
 
-  const summary=[['사업장별 요약'],['출력일: '+todayISO()],[],['No.','사업장','관리감독자 수','부서 수','유해위험작업 지정 건수','작업 유형 수','지정일 입력 완료','지정일 미입력']];
+  const summary=[['사업장별 요약'],['출력일: '+todayISO()],[],['No.','사업장','관리감독자 수','부서 수','유해위험작업 지정 건수','작업 유형 수','지정일 입력 완료','지정일 미입력','정기교육 이수','정기교육 미이수','이수율']];
   sites.filter(s=>!isDeprecatedSite(s)).forEach((site,idx)=>{
     const rows=sd(site).rows||[];
     const machineCounts={}; MACHINES.forEach(m=>machineCounts[m.id]=rows.filter(r=>r.machines[m.id]).length);
     const designated=rows.filter(r=>normalizeDateInput(r.designationDate)).length;
-    summary.push([idx+1,site,rows.length,new Set(rows.map(r=>r.team).filter(Boolean)).size,Object.values(machineCounts).reduce((a,b)=>a+b,0),Object.values(machineCounts).filter(v=>v>0).length,designated,rows.length-designated]);
+    const trained=rows.filter(r=>isTrainingCompleted(r.regularTraining)).length;
+    summary.push([idx+1,site,rows.length,new Set(rows.map(r=>r.team).filter(Boolean)).size,Object.values(machineCounts).reduce((a,b)=>a+b,0),Object.values(machineCounts).filter(v=>v>0).length,designated,rows.length-designated,trained,rows.length-trained,rows.length?Math.round(trained/rows.length*100)+'%':'0%']);
   });
   const sumRow=summary.length;
-  summary.push(['합계','',allRows.length,'',allRows.reduce((sum,x)=>sum+MACHINES.filter(m=>x.r.machines[m.id]).length,0),'',allRows.filter(x=>normalizeDateInput(x.r.designationDate)).length,allRows.filter(x=>!normalizeDateInput(x.r.designationDate)).length]);
+  const trainedAll=allRows.filter(x=>isTrainingCompleted(x.r.regularTraining)).length;
+  summary.push(['합계','',allRows.length,'',allRows.reduce((sum,x)=>sum+MACHINES.filter(m=>x.r.machines[m.id]).length,0),'',allRows.filter(x=>normalizeDateInput(x.r.designationDate)).length,allRows.filter(x=>!normalizeDateInput(x.r.designationDate)).length,trainedAll,allRows.length-trainedAll,allRows.length?Math.round(trainedAll/allRows.length*100)+'%':'0%']);
   const ws2=XLSX.utils.aoa_to_sheet(summary);
-  excelMerge(ws2,0,0,0,7); excelMerge(ws2,1,0,1,7);
-  excelStyleRange(ws2,3,0,3,7,darkHeader);
-  for(let rr=4;rr<sumRow;rr++) for(let c=0;c<8;c++) excelCell(ws2,rr,c).s=((rr-4)%2?bodyAlt:bodyCenter);
-  excelStyleRange(ws2,sumRow,0,sumRow,7,totalStyle);
+  excelMerge(ws2,0,0,0,10); excelMerge(ws2,1,0,1,10);
+  excelStyleRange(ws2,3,0,3,10,darkHeader);
+  for(let rr=4;rr<sumRow;rr++) for(let c=0;c<11;c++) excelCell(ws2,rr,c).s=((rr-4)%2?bodyAlt:bodyCenter);
+  excelStyleRange(ws2,sumRow,0,sumRow,10,totalStyle);
   excelCell(ws2,0,0).s={font:{name:'맑은 고딕',sz:14,bold:true,color:{rgb:'191F28'}},alignment:{horizontal:'center',vertical:'center'}};
   excelCell(ws2,1,0).s={font:{name:'맑은 고딕',sz:9,color:{rgb:'6B7684'}},alignment:{horizontal:'center',vertical:'center'}};
-  ws2['!cols']=[{wch:5},{wch:22},{wch:14},{wch:10},{wch:20},{wch:12},{wch:15},{wch:13}];
+  ws2['!cols']=[{wch:5},{wch:22},{wch:14},{wch:10},{wch:20},{wch:12},{wch:15},{wch:13},{wch:13},{wch:13},{wch:9}];
   ws2['!rows']=[{hpt:25},{hpt:17},{hpt:6},{hpt:24},...sites.filter(s=>!isDeprecatedSite(s)).map(()=>({hpt:20})),{hpt:20}];
   XLSX.utils.book_append_sheet(wb,ws2,'사업장요약');
 
@@ -3119,7 +3222,7 @@ function exportExcel(options){
   appendUploadFormSheet(wb,site,siteRows);
 
   const machineLabels=MACHINES.map(m=>m.label.replace('\n',' '));
-  const totalCols=20; // No. + 기본정보 5 + 지정일 + 계 + 기계 11 + 수정일
+  const totalCols=21; // No. + 기본정보 5 + 지정일 + 정기교육 + 계 + 기계 11 + 수정일
   const lastCol=XLSX.utils.encode_col(totalCols-1);
   const title=site+' 관리감독자 및 유해위험작업 현황'+(dept?' ['+dept+']':'');
   const sub='출력일: '+todayISO()+'  ·  사업장: '+site+'  ·  총 '+rows.length+'명';
@@ -3127,25 +3230,25 @@ function exportExcel(options){
   main.push([title]);
   main.push([sub]);
   main.push([]);
-  main.push(['No.','팀','공정명','직책','사번','이름','지정일','유해위험작업 대상','','','','','','','','','','','','수정일']);
-  main.push(['','','','','','','','계',...machineLabels,'']);
+  main.push(['No.','팀','공정명','직책','사번','이름','지정일','정기교육','유해위험작업 대상','','','','','','','','','','','','수정일']);
+  main.push(['','','','','','','','','계',...machineLabels,'']);
   rows.forEach((r,idx)=>main.push([
-    idx+1,r.team,r.process,r.position,r.empno,r.name,formatDisplayDate(r.designationDate),
+    idx+1,r.team,r.process,r.position,r.empno,r.name,formatDisplayDate(r.designationDate),trainingStatusText(r.regularTraining),
     MACHINES.filter(m=>r.machines[m.id]).length,
     ...MACHINES.map(m=>r.machines[m.id]?'✓':''),r.date
   ]));
   const totalRowIdx=main.length;
-  main.push(['합계','','','','','','',
+  main.push(['합계','','','','','','','',
     rows.reduce((sum,r)=>sum+MACHINES.filter(m=>r.machines[m.id]).length,0),
     ...MACHINES.map(m=>rows.filter(r=>r.machines[m.id]).length),'']);
 
   const ws=XLSX.utils.aoa_to_sheet(main);
   excelMerge(ws,0,0,0,totalCols-1);
   excelMerge(ws,1,0,1,totalCols-1);
-  for(let c=0;c<=6;c++) excelMerge(ws,3,c,4,c);
-  excelMerge(ws,3,7,3,18);
-  excelMerge(ws,3,19,4,19);
-  excelMerge(ws,totalRowIdx,0,totalRowIdx,6);
+  for(let c=0;c<=7;c++) excelMerge(ws,3,c,4,c);
+  excelMerge(ws,3,8,3,19);
+  excelMerge(ws,3,20,4,20);
+  excelMerge(ws,totalRowIdx,0,totalRowIdx,7);
 
   const thinBorder=excelBorder('C9CED6','thin');
   const darkHeader={font:{name:'맑은 고딕',sz:10,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'333D4B'}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:excelBorder('667085','thin')};
@@ -3159,27 +3262,28 @@ function exportExcel(options){
   const checkedStyle={font:{name:'맑은 고딕',sz:10,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'3182F6'}},alignment:{horizontal:'center',vertical:'center'},border:thinBorder};
   const totalStyle={font:{name:'맑은 고딕',sz:9,bold:true,color:{rgb:'333D4B'}},fill:{patternType:'solid',fgColor:{rgb:'E5E8EB'}},alignment:{horizontal:'center',vertical:'center'},border:excelBorder('AEB4BC','thin')};
 
-  excelStyleRange(ws,3,0,3,19,darkHeader);
-  excelStyleRange(ws,4,0,4,19,midHeader);
+  excelStyleRange(ws,3,0,3,20,darkHeader);
+  excelStyleRange(ws,4,0,4,20,midHeader);
   // rowspan으로 보이는 헤더는 동일한 진한 배경 유지
-  [0,1,2,3,4,5,6,19].forEach(c=>excelStyleRange(ws,3,c,4,c,darkHeader));
+  [0,1,2,3,4,5,6,7,20].forEach(c=>excelStyleRange(ws,3,c,4,c,darkHeader));
   // 상위 작업대상 그룹은 화면과 동일하게 파란색으로 강조
-  excelStyleRange(ws,3,7,3,18,blueGroupHeader);
+  excelStyleRange(ws,3,8,3,19,blueGroupHeader);
 
   for(let r=5;r<totalRowIdx;r++){
     const alt=(r-5)%2===1;
     for(let c=0;c<totalCols;c++){
       excelCell(ws,r,c).s = (c===1||c===2) ? (alt?bodyAltLeft:bodyLeft) : (alt?bodyAlt:bodyCenter);
     }
-    excelCell(ws,r,7).s=countStyle;
-    for(let c=8;c<=18;c++) if(excelCell(ws,r,c).v==='✓') excelCell(ws,r,c).s=checkedStyle;
+    excelCell(ws,r,7).s=isTrainingCompleted(excelCell(ws,r,7).v)?checkedStyle:bodyCenter;
+    excelCell(ws,r,8).s=countStyle;
+    for(let c=9;c<=19;c++) if(excelCell(ws,r,c).v==='✓') excelCell(ws,r,c).s=checkedStyle;
   }
-  excelStyleRange(ws,totalRowIdx,0,totalRowIdx,19,totalStyle);
+  excelStyleRange(ws,totalRowIdx,0,totalRowIdx,20,totalStyle);
   excelCell(ws,0,0).s={font:{name:'맑은 고딕',sz:14,bold:true,color:{rgb:'191F28'}},alignment:{horizontal:'center',vertical:'center'}};
   excelCell(ws,1,0).s={font:{name:'맑은 고딕',sz:9,color:{rgb:'6B7684'}},alignment:{horizontal:'center',vertical:'center'}};
 
   ws['!cols']=[
-    {wch:5},{wch:13},{wch:15},{wch:9},{wch:11},{wch:10},{wch:13},{wch:6},
+    {wch:5},{wch:13},{wch:15},{wch:9},{wch:11},{wch:10},{wch:13},{wch:9},{wch:6},
     ...MACHINES.map(m=>({wch:(m.id==='compressor'||m.id==='radiation'?8:7)})),{wch:14}
   ];
   ws['!rows']=[{hpt:25},{hpt:17},{hpt:6},{hpt:22},{hpt:28},...rows.map(()=>({hpt:20})),{hpt:20}];
