@@ -57,14 +57,20 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card:nth-child(4) { animation-delay: 0.32s; }
 .card:nth-child(5) { animation-delay: 0.40s; }
 .card:nth-child(6) { animation-delay: 0.48s; }
+.card:nth-child(7) { animation-delay: 0.56s; }
+.card:nth-child(8) { animation-delay: 0.64s; }
+.card:nth-child(9) { animation-delay: 0.72s; }
 .card-hold { cursor: default; }
-.card-b:hover, .card-t:hover, .card-a:hover, .card-r:hover, .card-v:hover, .card-n:hover { transform: translateY(-7px); box-shadow: var(--shadow-hover); }
+.card-dev { cursor: default; }
+.card-b:hover, .card-t:hover, .card-a:hover, .card-r:hover, .card-v:hover, .card-n:hover, .card-g:hover { transform: translateY(-7px); box-shadow: var(--shadow-hover); }
 .card-b:hover { border-color: #BFDBFE; }
 .card-t:hover { border-color: #99F6E4; }
 .card-a:hover { border-color: #FCD34D; }
 .card-r:hover { border-color: var(--rose-mid); }
 .card-v:hover { border-color: var(--violet-mid); }
 .card-n:hover { border-color: #93C5FD; }
+.card-g:hover { border-color: #C7D2FE; }
+.card-dev:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: #A5F3FC; }
 .card-hold:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--hold-mid); }
 
 .card-bar { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: var(--radius) var(--radius) 0 0; }
@@ -75,6 +81,8 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card-v .card-bar    { background: linear-gradient(90deg, #7C3AED 0%, #A78BFA 100%); }
 .card-r .card-bar    { background: linear-gradient(90deg, #E11D48 0%, #FB7185 100%); }
 .card-n .card-bar    { background: linear-gradient(90deg, #0A2540 0%, #3B82F6 100%); }
+.card-g .card-bar    { background: linear-gradient(90deg, #4F46E5 0%, #818CF8 100%); }
+.card-c .card-bar    { background: linear-gradient(90deg, #0891B2 0%, #22D3EE 100%); }
 
 .card-no { position: absolute; top: 16px; right: 18px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: var(--text-s); }
 .icon-box { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; flex-shrink: 0; }
@@ -85,6 +93,8 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card-v    .icon-box { background: var(--violet-lt); border: 1px solid var(--violet-mid); }
 .card-r    .icon-box { background: var(--rose-lt);   border: 1px solid var(--rose-mid); }
 .card-n    .icon-box { background: #E0F2FE; border: 1px solid #93C5FD; }
+.card-g    .icon-box { background: #EEF2FF; border: 1px solid #C7D2FE; }
+.card-c    .icon-box { background: #ECFEFF; border: 1px solid #A5F3FC; }
 .icon-box svg { width: 17px; height: 17px; }
 
 .card-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 5px; }
@@ -95,6 +105,8 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card-v    .card-tag { color: var(--violet); }
 .card-r    .card-tag { color: var(--rose); }
 .card-n    .card-tag { color: #0A2540; }
+.card-g    .card-tag { color: #4F46E5; }
+.card-c    .card-tag { color: #0891B2; }
 
 .card-title { font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 700; line-height: 1.45; color: var(--text-h); margin-bottom: 7px; word-break: keep-all; }
 .card-desc  { font-family: 'Noto Sans KR', sans-serif; font-size: 11.5px; font-weight: 400; color: var(--text-m); line-height: 1.7; word-break: keep-all; flex: 1; }
@@ -119,6 +131,16 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card-v:hover .arrow-btn { background: var(--violet-lt); border-color: #DDD6FE; color: var(--violet); }
 .card-r:hover .arrow-btn { background: var(--rose-lt);   border-color: var(--rose-mid); color: var(--rose); }
 .card:hover .arrow-btn svg { transform: translate(2px, -2px); }
+
+.card-g:hover .arrow-btn { background: #EEF2FF; border-color: #C7D2FE; color: #4F46E5; }
+.dev-notice { background: #ECFEFF; border: 1px solid #A5F3FC; border-radius: 10px; padding: 9px 11px; margin-top: 10px; margin-bottom: 2px; }
+.dev-notice-title { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #0E7490; letter-spacing: 0.02em; }
+.dev-notice-title svg { width: 12px; height: 12px; flex-shrink: 0; }
+.dev-notice-sub { font-size: 10.5px; color: #0E7490; opacity: 0.85; margin-top: 3px; line-height: 1.5; font-weight: 400; font-family: 'Noto Sans KR', sans-serif; }
+.dev-badge { display: inline-flex; align-items: center; gap: 5px; background: #ECFEFF; border: 1px solid #A5F3FC; border-radius: 100px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; color: #0E7490; letter-spacing: 0.06em; font-family: 'Outfit', monospace; }
+.dev-badge svg { width: 11px; height: 11px; }
+.s-dot-dev { width: 7px; height: 7px; border-radius: 50%; background: #06B6D4; box-shadow: 0 0 0 2px rgba(6,182,212,0.2); animation: blink 2.4s ease-in-out infinite; }
+
 
 .footer { margin-top: 52px; text-align: center; animation: fadeUp 0.7s 0.48s cubic-bezier(.22,1,.36,1) both; }
 .footer-contact { margin-top: 14px; font-size: 11px; color: var(--text-s); letter-spacing: 0.01em; }
@@ -188,7 +210,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
       <span class="logo-name">YESS <span>Your (Intelligent) ESH Support System</span></span>
       <div class="divider"></div>
-      <div class="header-pill"><span class="pill-dot"></span>6 Services Active · 1 On Hold</div>
+      <div class="header-pill"><span class="pill-dot"></span>7 Services Active · 1 On Hold · 1 In Dev</div>
     </div>
     <h1>지능형 안전보건<br><em>업무지원 시스템</em></h1>
     <p class="header-sub"><b>매일유업</b> · Environment · Safety · Health</p>
@@ -214,18 +236,17 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
     </a>
 
-    <!-- 02 Audit Schedule -->
-    <a class="card card-t" href="https://maeil-esh.github.io/schedule-calendar/" target="_blank" rel="noopener">
+    <!-- 02 관리감독자 및 유해위험작업 현황 -->
+    <a class="card card-v" href="https://maeil-esh.github.io/Portal/work.html" target="_blank" rel="noopener">
       <div class="card-bar"></div><span class="card-no">02</span>
       <div class="icon-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-          <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
         </svg>
       </div>
-      <span class="card-tag">Audit Schedule</span>
-      <h2 class="card-title">MESH 내부심사<br>스케줄</h2>
-      <p class="card-desc">ISO 14001 · 45001 기반 MESH 내부심사 일정 및 심사원 배정 계획을 확인합니다.</p>
+      <span class="card-tag">Supervisor &amp; Hazardous Work</span>
+      <h2 class="card-title">관리감독자 및<br>유해위험작업 현황</h2>
+      <p class="card-desc">사업장별 관리감독자 지정 현황과 담당 공정의 유해위험작업 대상 여부를 통합 관리합니다.</p>
       <div class="card-foot">
         <span class="status"><span class="s-dot"></span>운영 중</span>
         <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
@@ -277,44 +298,37 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
     </div>
 
-    <!-- 05 관리감독자 및 유해위험작업 현황 -->
-    <a class="card card-v" href="https://maeil-esh.github.io/Portal/work.html" target="_blank" rel="noopener">
+    <!-- 05 MSDS 경고표지, 관리요령 생성 (개발 중) -->
+    <div class="card card-c card-dev" id="card-msds">
       <div class="card-bar"></div><span class="card-no">05</span>
       <div class="icon-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0891B2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.3 3.3 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0z"/>
+          <path d="M12 9v4"/><path d="M12 17h.01"/>
         </svg>
       </div>
-      <span class="card-tag">Supervisor & Hazardous Work</span>
-      <h2 class="card-title">관리감독자 및<br>유해위험작업 현황</h2>
-      <p class="card-desc">사업장별 관리감독자 지정 현황과 담당 공정의 유해위험작업 대상 여부를 통합 관리합니다.</p>
+      <span class="card-tag">MSDS &amp; GHS Labeling</span>
+      <h2 class="card-title">MSDS 경고표지 및<br>관리요령 생성</h2>
+      <p class="card-desc">산안법 제115조 화학물질 경고표지·관리요령을 자동 생성합니다. GHS 법정 그림문자 적용</p>
+      <div class="dev-notice">
+        <div class="dev-notice-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/></svg>
+          <span>개발 중 IN DEVELOPMENT</span>
+        </div>
+        <div class="dev-notice-sub">오픈 일정은 별도 공지 예정</div>
+      </div>
       <div class="card-foot">
-        <span class="status"><span class="s-dot"></span>운영 중</span>
-        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+        <span class="status"><span class="s-dot-dev"></span>개발 중</span>
+        <div class="dev-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6"/><path d="M6 20V10"/><path d="M18 20V4"/></svg>
+          <span>DEV</span>
+        </div>
       </div>
-    </a>
+    </div>
 
-    <!-- 06 산업안전보건법 배우기 -->
-    <a class="card card-r" href="https://maeil-esh.github.io/Portal/safetylaw.html" target="_blank" rel="noopener">
-      <div class="card-bar"></div><span class="card-no">06</span>
-      <div class="icon-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-        </svg>
-      </div>
-      <span class="card-tag">Safety Law Learning</span>
-      <h2 class="card-title">산업안전보건법<br>배우기</h2>
-      <p class="card-desc">산업안전보건법 핵심 조문을 타이핑하며 법 지식을 습득합니다. 랭킹 도전!</p>
-      <div class="card-foot">
-        <span class="status"><span class="s-dot"></span>운영 중</span>
-        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
-      </div>
-    </a>
-
-    <!-- 07 관리감독자 안전보건 이행평가 -->
+    <!-- 06 관리감독자 안전보건 이행평가 -->
     <a class="card card-n" href="https://maeil-esh.github.io/Portal/esh-supervisor" target="_blank" rel="noopener">
-      <div class="card-bar"></div><span class="card-no">07</span>
+      <div class="card-bar"></div><span class="card-no">06</span>
       <div class="icon-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="#0A2540" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 12l2 2 4-4"/>
@@ -330,10 +344,63 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
     </a>
 
+    <!-- 07 MESH 내부심사 스케줄 -->
+    <a class="card card-t" href="https://maeil-esh.github.io/schedule-calendar/" target="_blank" rel="noopener">
+      <div class="card-bar"></div><span class="card-no">07</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+          <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+        </svg>
+      </div>
+      <span class="card-tag">Audit Schedule</span>
+      <h2 class="card-title">MESH 내부심사<br>스케줄</h2>
+      <p class="card-desc">ISO 14001 · 45001 기반 MESH 내부심사 일정 및 심사원 배정 계획을 확인합니다.</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
+    <!-- 08 ISO 내부심사원 자격관리 -->
+    <a class="card card-g" href="https://maeil-esh.github.io/Portal/auditor.html" target="_blank" rel="noopener">
+      <div class="card-bar"></div><span class="card-no">08</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="5"/><path d="M9 12.5 7.5 22l4.5-2.7L16.5 22 15 12.5"/>
+        </svg>
+      </div>
+      <span class="card-tag">ISO Internal Auditor</span>
+      <h2 class="card-title">ISO 내부심사원<br>자격관리</h2>
+      <p class="card-desc">ISO 45001(안전보건) · 14001(환경) 내부심사원 자격현황을 통합 관리합니다. 경력 · 교육 · 참관 자동 판정.</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
+    <!-- 09 산업안전보건법 배우기 -->
+    <a class="card card-r" href="https://maeil-esh.github.io/Portal/safetylaw.html" target="_blank" rel="noopener">
+      <div class="card-bar"></div><span class="card-no">09</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+      </div>
+      <span class="card-tag">Safety Law Learning</span>
+      <h2 class="card-title">산업안전보건법<br>배우기</h2>
+      <p class="card-desc">산업안전보건법 핵심 조문을 타이핑하며 법 지식을 습득합니다. 랭킹 도전!</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
   </main>
 
   <footer class="footer">
-    <p class="footer-contact">※ Copyright 2026. ESH-MASTER.KR. All rights reserved. / 문의: 산업안전팀 정민혁 (<a href="mailto:minhyug7@maeil.com?subject=IESS 사이트 문의">minhyug7@maeil.com</a>)</p>
+    <p class="footer-contact">※ Copyright 2026. ESH-MASTER.KR. All rights reserved. / 문의: 산업안전팀 정민혁 (<a href="mailto:[EMAIL]?subject=IESS 사이트 문의">[EMAIL]</a>)</p>
   </footer>
 </div>
 
