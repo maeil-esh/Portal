@@ -6,7 +6,7 @@
 <title>ISO 내부심사원 자격현황 관리 | MESH</title>
 <link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- ISO 내부심사원 자격현황 관리 v1.0 | GAS JSONP 연동 | 자격요건 자동판정(경력·교육·참관2회) -->
+<!-- ISO 내부심사원 자격현황 관리 v1.2 | UI 110% 스케일 · 여백 최적화 | GAS JSONP 연동 | 자격 자동판정(적합/진행중) | 편집 모드 비밀번호 -->
 <style>
 :root{
   --blue50:#f0f4ff;--blue100:#d6e4ff;--blue500:#3182f6;--blue600:#1b6ef3;
@@ -21,157 +21,169 @@
   --sh2:0 4px 16px rgba(0,0,0,.10);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--gray50);color:var(--gray800);font-size:13px;-webkit-font-smoothing:antialiased}
-.btn{padding:7px 14px;border:1.5px solid var(--gray200);border-radius:var(--r6);font-size:12px;font-family:inherit;font-weight:600;cursor:pointer;background:var(--white);color:var(--gray700);display:inline-flex;align-items:center;gap:5px;white-space:nowrap;transition:all .12s;letter-spacing:-.2px}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--gray50);color:var(--gray800);font-size:14.3px;-webkit-font-smoothing:antialiased}
+.btn{padding:7.7px 15.4px;border:1.5px solid var(--gray200);border-radius:var(--r6);font-size:13.2px;font-family:inherit;font-weight:600;cursor:pointer;background:var(--white);color:var(--gray700);display:inline-flex;align-items:center;gap:5.5px;white-space:nowrap;transition:all .12s;letter-spacing:-.2px}
 .btn:hover{background:var(--gray50);border-color:var(--gray300)}
 .btn-primary{background:var(--blue500);color:var(--white);border-color:var(--blue500)}
 .btn-primary:hover{background:var(--blue600);border-color:var(--blue600)}
 .btn-danger{color:var(--red500);border-color:#ffd6d9}
 .btn-danger:hover{background:var(--red50)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
+.lock-btn{font-weight:700}
+.lock-btn.unlocked{background:var(--green50);border-color:var(--green100);color:#008f76}
+.lock-btn.unlocked:hover{background:var(--green500);border-color:var(--green500);color:#fff}
+.pw-input{width:100%;border:1.5px solid var(--gray200);border-radius:var(--r6);padding:12.1px 13.2px;font-size:17.6px;font-family:inherit;text-align:center;letter-spacing:6px;color:var(--gray900)}
+.pw-input:focus{outline:none;border-color:var(--blue500)}
+.pw-input.invalid{border-color:var(--red500);background:var(--red50);animation:shake .3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.pw-msg{font-size:12.1px;color:var(--red500);text-align:center;margin-top:8.8px;min-height:15.4px;font-weight:600}
 
 /* 상단바 */
-.topbar{background:var(--white);border-bottom:1px solid var(--gray200);height:56px;padding:0 24px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 var(--gray200)}
-.topbar-icon{width:34px;height:34px;background:var(--blue500);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.topbar-logo{font-size:14px;font-weight:800;color:var(--gray900);letter-spacing:-.3px}
-.topbar-logo span{color:var(--gray500);font-weight:400;font-size:12px;margin-left:6px}
-.topbar-badge{font-size:11px;font-weight:600;color:var(--blue500);background:var(--blue50);border:1px solid var(--blue100);padding:3px 10px;border-radius:20px}
+.topbar{background:var(--white);border-bottom:1px solid var(--gray200);height:61.6px;padding:0 26.4px;display:flex;align-items:center;gap:15.4px;position:sticky;top:0;z-index:200;box-shadow:0 1px 0 var(--gray200)}
+.topbar-icon{width:37.4px;height:37.4px;background:var(--blue500);border-radius:9.9px;display:flex;align-items:center;justify-content:center;font-size:18.7px;flex-shrink:0}
+.topbar-logo{font-size:15.4px;font-weight:800;color:var(--gray900);letter-spacing:-.3px}
+.topbar-logo span{color:var(--gray500);font-weight:400;font-size:13.2px;margin-left:6.6px}
+.topbar-badge{font-size:12.1px;font-weight:600;color:var(--blue500);background:var(--blue50);border:1px solid var(--blue100);padding:3.3px 11px;border-radius:22px}
 .topbar-space{flex:1}
-.gas-dot{width:7px;height:7px;border-radius:50%;background:var(--gray300);display:inline-block;transition:background .2s}
+.gas-dot{width:7.7px;height:7.7px;border-radius:50%;background:var(--gray300);display:inline-block;transition:background .2s}
 .gas-dot.on{background:var(--green500)}.gas-dot.err{background:var(--red500)}
-.gas-txt{font-size:11px;color:var(--gray500)}
+.gas-txt{font-size:12.1px;color:var(--gray500)}
 
 /* 네비 */
-.navbar{background:var(--white);border-bottom:2px solid var(--gray200);padding:0 24px;display:flex;align-items:flex-end;gap:0}
-.nav-tab{padding:12px 18px;font-size:13px;font-weight:600;font-family:inherit;color:var(--gray500);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;white-space:nowrap;transition:all .12s;letter-spacing:-.2px}
+.navbar{background:var(--white);border-bottom:2px solid var(--gray200);padding:0 26.4px;display:flex;align-items:flex-end;gap:0}
+.nav-tab{padding:13.2px 19.8px;font-size:14.3px;font-weight:600;font-family:inherit;color:var(--gray500);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2.2px;cursor:pointer;white-space:nowrap;transition:all .12s;letter-spacing:-.2px}
 .nav-tab:hover{color:var(--gray800)}
 .nav-tab.active{color:var(--blue500);border-bottom-color:var(--blue500)}
-.navbar-space{flex:1 1 auto;min-width:18px}
-.nav-criteria-btn{align-self:center;margin:0 7px 0 0;padding:7px 12px;border:1px solid var(--green100);border-radius:7px;background:var(--green50);color:#008f76;font-size:12px;font-family:inherit;font-weight:800;letter-spacing:-.2px;cursor:pointer;transition:all .12s}
+.navbar-space{flex:1 1 auto;min-width:19.8px}
+.nav-criteria-btn{align-self:center;margin:0 7.7px 0 0;padding:7.7px 13.2px;border:1px solid var(--green100);border-radius:7.7px;background:var(--green50);color:#008f76;font-size:13.2px;font-family:inherit;font-weight:800;letter-spacing:-.2px;cursor:pointer;transition:all .12s}
 .nav-criteria-btn:hover{background:var(--green500);border-color:var(--green500);color:#fff;box-shadow:0 3px 10px rgba(0,180,147,.18)}
-.nav-download-btn{align-self:center;padding:7px 12px;border:1px solid var(--blue100);border-radius:7px;background:var(--blue50);color:var(--blue600);font-size:12px;font-family:inherit;font-weight:800;letter-spacing:-.2px;cursor:pointer;transition:all .12s}
+.nav-download-btn{align-self:center;padding:7.7px 13.2px;border:1px solid var(--blue100);border-radius:7.7px;background:var(--blue50);color:var(--blue600);font-size:13.2px;font-family:inherit;font-weight:800;letter-spacing:-.2px;cursor:pointer;transition:all .12s}
 .nav-download-btn:hover{background:var(--blue500);border-color:var(--blue500);color:#fff;box-shadow:0 3px 10px rgba(49,130,246,.18)}
 .page{display:none}.page.active{display:block}
 
 /* 대시보드 */
-.dash-bg{min-height:calc(100vh - 110px);background:linear-gradient(145deg,#f0f4ff 0%,#f9fafb 50%,#eaf9f4 100%);padding:0 0 48px}
-.dash-hero{text-align:center;padding:40px 24px 26px}
-.dash-hero-title{font-size:32px;font-weight:800;color:var(--gray900);line-height:1.2;letter-spacing:-.8px;margin-bottom:10px}
+.dash-bg{min-height:calc(100vh - 121px);background:linear-gradient(145deg,#f0f4ff 0%,#f9fafb 50%,#eaf9f4 100%);padding:0 0 36px}
+.dash-hero{text-align:center;padding:30px 26.4px 22px}
+.dash-hero-title{font-size:35.2px;font-weight:800;color:var(--gray900);line-height:1.2;letter-spacing:-.8px;margin-bottom:11px}
 .dash-hero-title span{color:var(--blue500)}
-.dash-hero-sub{font-size:14px;color:var(--gray500);letter-spacing:-.2px}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;max-width:1000px;margin:0 auto 26px;padding:0 32px}
-.stat-card{background:var(--white);border:1px solid var(--gray200);border-radius:14px;padding:18px 20px;box-shadow:var(--sh1);text-align:center;transition:all .15s}
+.dash-hero-sub{font-size:15.4px;color:var(--gray500);letter-spacing:-.2px}
+.stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:15.4px;max-width:1500px;margin:0 auto 22px;padding:0 35.2px}
+.stat-card{background:var(--white);border:1px solid var(--gray200);border-radius:15.4px;padding:19.8px 22px;box-shadow:var(--sh1);text-align:center;transition:all .15s}
 .stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(49,130,246,.10)}
-.stat-num{font-size:28px;font-weight:800;line-height:1;color:var(--gray900)}
+.stat-num{font-size:30.8px;font-weight:800;line-height:1;color:var(--gray900)}
 .stat-num.blue{color:var(--blue500)}.stat-num.green{color:var(--green500)}.stat-num.orange{color:var(--orange500)}
-.stat-label{font-size:11px;color:var(--gray500);margin-top:7px;font-weight:600}
-.sec-title{max-width:1180px;margin:0 auto 10px;padding:0 32px;display:flex;align-items:center;gap:8px}
-.sec-title h2{font-size:15px;font-weight:800;color:var(--gray900);letter-spacing:-.3px}
-.auto-badge{font-size:10px;font-weight:700;color:var(--green500);background:var(--green50);border:1px solid var(--green100);padding:2px 8px;border-radius:10px}
-.sec-title .hint{font-size:11px;color:var(--gray400);margin-left:auto}
-.site-tbl-wrap{max-width:1180px;margin:0 auto;padding:0 32px}
+.stat-label{font-size:12.1px;color:var(--gray500);margin-top:7.7px;font-weight:600}
+.sec-title{max-width:1500px;margin:0 auto 11px;padding:0 35.2px;display:flex;align-items:center;gap:8.8px}
+.sec-title h2{font-size:16.5px;font-weight:800;color:var(--gray900);letter-spacing:-.3px}
+.auto-badge{font-size:11px;font-weight:700;color:var(--green500);background:var(--green50);border:1px solid var(--green100);padding:2.2px 8.8px;border-radius:11px}
+.sec-title .hint{font-size:12.1px;color:var(--gray400);margin-left:auto}
+.site-tbl-wrap{max-width:1500px;margin:0 auto;padding:0 35.2px}
 .site-tbl-card{background:var(--white);border:1px solid #d8dee8;border-radius:var(--r8);box-shadow:0 2px 8px rgba(15,23,42,.07);overflow:auto}
 
 /* 테이블 */
-table{border-collapse:collapse;font-size:12px;width:100%;white-space:nowrap}
-thead th{background:#344155;color:var(--white);text-align:center;font-weight:700;border-right:1px solid rgba(255,255,255,.18);position:sticky;top:0;z-index:10;height:40px;vertical-align:middle;letter-spacing:-.2px;padding:0 10px}
-thead tr:nth-child(2) th{background:#445166;height:34px;font-size:11px;top:40px}
+table{border-collapse:collapse;font-size:13.2px;width:100%;white-space:nowrap;table-layout:auto}
+thead th{background:#344155;color:var(--white);text-align:center;font-weight:700;border-right:1px solid rgba(255,255,255,.18);position:sticky;top:0;z-index:10;height:44px;vertical-align:middle;letter-spacing:-.2px;padding:0 11px}
+thead tr:nth-child(2) th{background:#445166;height:37.4px;font-size:12.1px;top:44px}
 .th-group{background:#2864a8!important}
 tbody tr:nth-child(even) td{background:#f4f7fb}
 tbody tr:hover td{background:#eaf2ff!important}
-td{border-right:1px solid #dce2ea;border-bottom:1px solid #dce2ea;padding:6px 10px;vertical-align:middle;text-align:center;height:36px}
+td{border-right:1px solid #dce2ea;border-bottom:1px solid #dce2ea;padding:6.6px 11px;vertical-align:middle;text-align:center;height:39.6px}
 td:last-child,th:last-child{border-right:none}
-.td-no{background:#f0f3f7;font-weight:700;color:#718096;font-size:11px;width:40px}
+.td-no{background:#f0f3f7;font-weight:700;color:#718096;font-size:12.1px;width:44px}
 tbody tr:nth-child(even) .td-no{background:#edf1f6}
 .td-site{font-weight:700;color:var(--gray900);text-align:left}
-.td-num{font-weight:800;font-size:13px}
+.td-num{font-weight:800;font-size:14.3px}
 .td-num.safety{color:var(--blue500)}.td-num.env{color:var(--green500)}
 .td-total{font-weight:800;color:var(--gray900);background:var(--gray50)}
-.td-sub{font-size:11px;color:var(--gray500);line-height:1.4}
+.td-sub{font-size:12.1px;color:var(--gray500);line-height:1.4}
 .td-left{text-align:left}
 tfoot td{background:#e8edf5;font-weight:800;color:var(--gray900);border-top:2px solid #b7c1cf}
 th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
-.name-chips{display:flex;gap:4px;flex-wrap:wrap}
-.chip{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:12px;border:1px solid var(--gray200);background:var(--gray50);color:var(--gray700)}
+.name-chips{display:flex;gap:4.4px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:3.3px;font-size:12.1px;font-weight:600;padding:2.2px 8.8px;border-radius:13.2px;border:1px solid var(--gray200);background:var(--gray50);color:var(--gray700)}
 .chip.safety{background:var(--blue50);border-color:var(--blue100);color:var(--blue600)}
 .chip.env{background:var(--green50);border-color:var(--green100);color:#008f76}
 .chip .warn{color:var(--orange500);font-weight:800}
 
 /* 배지 */
-.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;letter-spacing:-.2px}
+.badge{display:inline-flex;align-items:center;gap:4.4px;font-size:12.1px;font-weight:700;padding:3.3px 9.9px;border-radius:13.2px;letter-spacing:-.2px}
 .badge-fit{background:var(--green50);color:#008f76;border:1px solid var(--green100)}
 .badge-hold{background:var(--orange50);color:var(--orange500);border:1px solid #fde4b8}
 .badge-field-s{background:var(--blue50);color:var(--blue600);border:1px solid var(--blue100)}
 .badge-field-e{background:var(--green50);color:#008f76;border:1px solid var(--green100)}
 .chk{color:var(--green500);font-weight:800}.unchk{color:var(--gray300);font-weight:800}
-.report-no{font-size:11px;font-weight:700;color:var(--blue600);background:var(--blue50);padding:1px 6px;border-radius:6px}
+.report-no{font-size:12.1px;font-weight:700;color:var(--blue600);background:var(--blue50);padding:1.1px 6.6px;border-radius:6.6px}
 .report-no.empty{color:var(--gray400);background:var(--gray100)}
-.row-btn{background:none;border:1px solid var(--gray200);border-radius:4px;color:var(--gray400);font-size:11px;cursor:pointer;padding:2px 6px;transition:all .1s}
+.row-btn{background:none;border:1px solid var(--gray200);border-radius:4.4px;color:var(--gray400);font-size:12.1px;cursor:pointer;padding:2.2px 6.6px;transition:all .1s}
 .row-btn:hover{border-color:var(--blue500);color:var(--blue500)}
 
 /* 자격요건 인디케이터 */
-.req-steps{display:inline-flex;align-items:center;gap:3px}
-.req-dot{width:18px;height:18px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;background:var(--gray100);color:var(--gray400);border:1px solid var(--gray200);cursor:help}
+.req-steps{display:inline-flex;align-items:center;gap:3.3px}
+.req-dot{width:19.8px;height:19.8px;border-radius:6.6px;display:inline-flex;align-items:center;justify-content:center;font-size:9.9px;font-weight:800;background:var(--gray100);color:var(--gray400);border:1px solid var(--gray200);cursor:help}
 .req-dot.ok{background:var(--green50);color:var(--green500);border-color:var(--green100)}
-.req-line{width:8px;height:2px;background:var(--gray200);border-radius:2px}
+.req-line{width:8.8px;height:2.2px;background:var(--gray200);border-radius:2.2px}
 .req-line.ok{background:var(--green100)}
 
 /* 작업 영역 */
-.work-header{padding:16px 24px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.work-site-label{font-size:14px;font-weight:700;color:var(--gray900)}
-.work-site-badge{font-size:11px;color:var(--gray500);background:var(--gray100);padding:2px 8px;border-radius:10px}
-.work-toolbar{padding:8px 24px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.search-box,.filter-sel{border:1.5px solid var(--gray200);border-radius:var(--r6);padding:6px 10px;font-size:12px;font-family:inherit;color:var(--gray800);background:var(--white)}
-.search-box{width:160px}.filter-sel{width:130px;cursor:pointer}
+.work-header{padding:17.6px 26.4px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+.work-site-label{font-size:15.4px;font-weight:700;color:var(--gray900)}
+.work-site-badge{font-size:12.1px;color:var(--gray500);background:var(--gray100);padding:2.2px 8.8px;border-radius:11px}
+.work-toolbar{padding:8.8px 26.4px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:6.6px;flex-wrap:wrap}
+.search-box,.filter-sel{border:1.5px solid var(--gray200);border-radius:var(--r6);padding:6.6px 11px;font-size:13.2px;font-family:inherit;color:var(--gray800);background:var(--white)}
+.search-box{width:176px}.filter-sel{width:143px;cursor:pointer}
 .search-box:focus,.filter-sel:focus{outline:none;border-color:var(--blue500)}
-.hint{font-size:11px;color:var(--gray400)}
-.tbl-wrap{overflow:auto;max-height:calc(100vh - 230px);margin:12px 24px;border:1px solid #d8dee8;border-radius:var(--r8);box-shadow:0 2px 8px rgba(15,23,42,.07);background:var(--white)}
-.tbl-wrap thead th{height:38px}
+.hint{font-size:12.1px;color:var(--gray400)}
+.tbl-wrap{overflow:auto;max-height:calc(100vh - 250px);margin:13.2px 26.4px;border:1px solid #d8dee8;border-radius:var(--r8);box-shadow:0 2px 8px rgba(15,23,42,.07);background:var(--white)}
+.tbl-wrap thead th{height:41.8px}
 
 /* 모달 */
-.modal-bg{display:none;position:fixed;inset:0;background:rgba(25,31,40,.5);z-index:500;align-items:center;justify-content:center;padding:22px}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(25,31,40,.5);z-index:500;align-items:center;justify-content:center;padding:24.2px}
 .modal-bg.open{display:flex}
-.modal{background:var(--white);border-radius:15px;box-shadow:var(--sh2);width:min(780px,100%);max-height:calc(100dvh - 44px);display:flex;flex-direction:column;overflow:hidden}
-.modal-head{display:flex;align-items:center;gap:10px;padding:15px 18px;background:var(--gray800);color:#fff;flex-shrink:0}
-.modal-head-icon{display:flex;align-items:center;justify-content:center;width:29px;height:29px;border-radius:8px;background:rgba(255,255,255,.14);font-size:15px}
-.modal-head strong{font-size:15px;letter-spacing:-.25px}
-.modal-head span{font-size:11px;color:rgba(255,255,255,.68);display:block}
-.modal-close{margin-left:auto;width:32px;height:32px;border:1px solid rgba(255,255,255,.18);border-radius:8px;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-size:15px}
+.modal{background:var(--white);border-radius:16.5px;box-shadow:var(--sh2);width:min(858px,100%);max-height:calc(100dvh - 48.4px);display:flex;flex-direction:column;overflow:hidden}
+.modal-head{display:flex;align-items:center;gap:11px;padding:16.5px 19.8px;background:var(--gray800);color:#fff;flex-shrink:0}
+.modal-head-icon{display:flex;align-items:center;justify-content:center;width:31.9px;height:31.9px;border-radius:8.8px;background:rgba(255,255,255,.14);font-size:16.5px}
+.modal-head strong{font-size:16.5px;letter-spacing:-.25px}
+.modal-head span{font-size:12.1px;color:rgba(255,255,255,.68);display:block}
+.modal-close{margin-left:auto;width:35.2px;height:35.2px;border:1px solid rgba(255,255,255,.18);border-radius:8.8px;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-size:16.5px}
 .modal-close:hover{background:rgba(255,255,255,.20)}
-.modal-body{padding:18px;overflow:auto}
-.modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:12px 18px;border-top:1px solid var(--gray200);background:var(--gray50)}
+.modal-body{padding:19.8px;overflow:auto}
+.modal-foot{display:flex;justify-content:flex-end;gap:8.8px;padding:13.2px 19.8px;border-top:1px solid var(--gray200);background:var(--gray50)}
 .modal-foot .left{margin-right:auto}
 
 /* 폼 */
-.form-sec{margin-bottom:16px}
-.form-sec-title{font-size:12px;font-weight:800;color:var(--gray700);margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.form-sec-title::before{content:'';width:3px;height:12px;background:var(--blue500);border-radius:2px}
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
-.form-field label{display:block;font-size:11px;font-weight:600;color:var(--gray500);margin-bottom:4px}
+.form-sec{margin-bottom:17.6px}
+.form-sec-title{font-size:13.2px;font-weight:800;color:var(--gray700);margin-bottom:8.8px;display:flex;align-items:center;gap:6.6px}
+.form-sec-title::before{content:'';width:3.3px;height:13.2px;background:var(--blue500);border-radius:2.2px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8.8px}
+.form-field label{display:block;font-size:12.1px;font-weight:600;color:var(--gray500);margin-bottom:4.4px}
 .form-field label .req{color:var(--red500)}
-.form-field input,.form-field select{width:100%;border:1.5px solid var(--gray200);border-radius:var(--r6);padding:7px 10px;font-size:12px;font-family:inherit;color:var(--gray800)}
+.form-field input,.form-field select{width:100%;border:1.5px solid var(--gray200);border-radius:var(--r6);padding:7.7px 11px;font-size:13.2px;font-family:inherit;color:var(--gray800)}
 .form-field input:focus,.form-field select:focus{outline:none;border-color:var(--blue500)}
 .form-field input.invalid{border-color:var(--red500);background:var(--red50)}
-.form-note{font-size:11px;color:var(--gray500);background:var(--gray50);border:1px solid var(--gray200);border-radius:var(--r8);padding:9px 12px;line-height:1.6;margin-top:8px}
+.form-note{font-size:12.1px;color:var(--gray500);background:var(--gray50);border:1px solid var(--gray200);border-radius:var(--r8);padding:9.9px 13.2px;line-height:1.6;margin-top:8.8px}
 .form-note strong{color:var(--blue600)}
-.live-judge{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:var(--r8);background:var(--gray50);border:1px solid var(--gray200);margin-top:8px;font-size:11px;font-weight:600;color:var(--gray600)}
+.live-judge{display:flex;align-items:center;gap:8.8px;padding:11px 13.2px;border-radius:var(--r8);background:var(--gray50);border:1px solid var(--gray200);margin-top:8.8px;font-size:12.1px;font-weight:600;color:var(--gray600)}
 
-.criteria-tbl td{text-align:left;line-height:1.65;white-space:normal;word-break:keep-all;padding:9px 12px;height:auto}
-.criteria-tbl td.ct-head{background:#e0e4ea;color:var(--gray900);font-weight:800;text-align:center;width:130px}
+.criteria-tbl td{text-align:left;line-height:1.65;white-space:normal;word-break:keep-all;padding:9.9px 13.2px;height:auto}
+.criteria-tbl td.ct-head{background:#e0e4ea;color:var(--gray900);font-weight:800;text-align:center;width:143px}
 
 /* 로딩/토스트 */
-.loading{padding:60px;text-align:center;color:var(--gray400);font-size:13px}
-.spin{display:inline-block;width:16px;height:16px;border:2px solid var(--gray200);border-top-color:var(--blue500);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-3px;margin-right:6px}
+.loading{padding:66px;text-align:center;color:var(--gray400);font-size:14.3px}
+.spin{display:inline-block;width:17.6px;height:17.6px;border:2px solid var(--gray200);border-top-color:var(--blue500);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-3px;margin-right:6.6px}
 @keyframes sp{to{transform:rotate(360deg)}}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gray900);color:#fff;padding:11px 20px;border-radius:10px;font-size:12px;font-weight:600;z-index:900;opacity:0;transition:all .25s;box-shadow:var(--sh2)}
+.toast{position:fixed;bottom:26.4px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--gray900);color:#fff;padding:12.1px 22px;border-radius:11px;font-size:13.2px;font-weight:600;z-index:900;opacity:0;transition:all .25s;box-shadow:var(--sh2)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.err{background:var(--red500)}
 
+@media (max-width:1000px){
+  .stat-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+}
 @media (max-width:640px){
-  .dash-hero-title{font-size:24px}
-  .stat-grid{grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px}
-  .site-tbl-wrap{padding:0 16px}
-  .tbl-wrap{margin:12px 12px}
+  .dash-hero-title{font-size:26.4px}
+  .stat-grid{grid-template-columns:repeat(3,1fr);gap:8.8px;padding:0 17.6px}
+  .dash-hero{padding:22px 16px 16px}
+  .site-tbl-wrap{padding:0 17.6px}
+  .tbl-wrap{margin:13.2px 13.2px}
 }
 </style>
 </head>
@@ -180,10 +192,11 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
 <header class="topbar">
   <div class="topbar-icon">🛡️</div>
   <div class="topbar-logo">ISO 내부심사원 자격관리<span>MESH Internal Auditor Qualification</span></div>
-  <div class="topbar-badge">2026년 · v1.0</div>
+  <div class="topbar-badge">2026년 · v1.2</div>
   <div class="topbar-space"></div>
   <span class="gas-dot" id="gasDot"></span><span class="gas-txt" id="gasTxt">연결 확인 중…</span>
-  <button class="btn" onclick="loadData(true)" style="margin-left:8px">↻ 새로고침</button>
+  <button class="btn lock-btn" id="lockBtn" onclick="toggleLock()" style="margin-left:8.8px">🔒 조회 모드</button>
+  <button class="btn" onclick="loadData(true)">↻ 새로고침</button>
 </header>
 
 <nav class="navbar">
@@ -204,18 +217,18 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
   <div class="sec-title">
     <h2>🏭 사업장별 현황</h2>
     <span class="auto-badge">등록 데이터 자동 집계</span>
-    <span class="hint">⚠ = 자격요건 보완 필요 인원</span>
+    <span class="hint">⚠ = 자격 취득 진행중 인원</span>
   </div>
   <div class="site-tbl-wrap">
     <div class="site-tbl-card">
       <table>
         <thead>
           <tr>
-            <th rowspan="2">No.</th><th rowspan="2" style="min-width:130px">소속</th>
+            <th rowspan="2">No.</th><th rowspan="2" style="min-width:143px">소속</th>
             <th colspan="2" class="th-group">심사원수</th><th rowspan="2">총인원</th>
             <th colspan="2" class="th-group">세부사항 (심사원 명단)</th>
           </tr>
-          <tr><th>안전</th><th>환경</th><th style="min-width:260px">안전-심사원</th><th style="min-width:260px">환경-심사원</th></tr>
+          <tr><th>안전</th><th>환경</th><th style="min-width:286px">안전-심사원</th><th style="min-width:286px">환경-심사원</th></tr>
         </thead>
         <tbody id="siteTbody"></tbody>
         <tfoot id="siteTfoot"></tfoot>
@@ -230,14 +243,15 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
     <span class="work-site-label">심사원 자격 등록·관리</span>
     <span class="work-site-badge" id="regCount">—</span>
     <span class="work-site-badge">적합 판정: 경력 3년↑ + 외부교육 + 참관 2회 자동 산출</span>
+    <span class="work-site-badge">미충족 시 <b>진행중</b>으로 표시</span>
   </div>
   <div class="work-toolbar">
     <input class="search-box" id="q" placeholder="🔍 이름·사번·부서 검색" oninput="renderReg()">
     <select class="filter-sel" id="fSite" onchange="renderReg()"><option value="">소속 전체</option></select>
     <select class="filter-sel" id="fField" onchange="renderReg()"><option value="">분야 전체</option><option>안전/보건</option><option>환경</option></select>
-    <select class="filter-sel" id="fStat" onchange="renderReg()"><option value="">자격상태 전체</option><option>적합</option><option>보완</option></select>
+    <select class="filter-sel" id="fStat" onchange="renderReg()"><option value="">자격상태 전체</option><option>적합</option><option>진행중</option></select>
     <div style="flex:1"></div>
-    <button class="btn btn-primary" onclick="openForm()">＋ 심사원 등록</button>
+    <button class="btn btn-primary" id="addBtn" onclick="openForm()">＋ 심사원 등록</button>
   </div>
   <div class="tbl-wrap">
     <table>
@@ -247,7 +261,7 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
           <th colspan="4" class="th-group grp-end">기본정보</th>
           <th rowspan="2">분야</th>
           <th rowspan="2">자격요건<br>충족현황</th>
-          <th rowspan="2" class="grp-end">자격상태<br><span style="font-size:9px;font-weight:400">(자동판정)</span></th>
+          <th rowspan="2" class="grp-end">자격상태<br><span style="font-size:9.9px;font-weight:400">(자동판정)</span></th>
           <th rowspan="2">경력<br>3년↑</th>
           <th colspan="3" class="th-group grp-end">외부교육</th>
           <th colspan="3" class="th-group grp-end">참관 1</th>
@@ -312,7 +326,7 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
         <div class="form-field"><input id="f_비고" placeholder="특이사항 입력"></div>
       </div>
       <div class="live-judge" id="liveJudge">입력 시 자격 판정이 실시간 표시됩니다.</div>
-      <div class="form-note">💡 <strong>적합 판정은 자동 산출</strong>됩니다 — 경력 3년↑ + 외부교육 이수 + 참관 2회 완료 시 <b>적합</b>, 미충족 항목이 있으면 <b>보완</b>. 저장 즉시 대시보드 사업장별 현황에 반영됩니다.</div>
+      <div class="form-note">💡 <strong>적합 판정은 자동 산출</strong>됩니다 — 경력 3년↑ + 외부교육 이수 + 참관 2회 완료 시 <b>적합</b>, 미충족 항목이 있으면 <b>진행중</b>. 저장 즉시 대시보드 사업장별 현황에 반영됩니다.</div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-danger left" id="delBtn" style="display:none" onclick="delRec()">삭제</button>
@@ -324,7 +338,7 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
 
 <!-- 자격 기준 모달 -->
 <div class="modal-bg" id="criteriaModal" onclick="if(event.target===this)closeModal('criteriaModal')">
-  <div class="modal" style="width:min(860px,100%)">
+  <div class="modal" style="width:min(946px,100%)">
     <div class="modal-head">
       <div class="modal-head-icon">📖</div>
       <div><strong>내부심사원 자격 기준</strong><span>ISO 19011(경영시스템 심사 지침) 기반 · 사내 기준 확정 시 본 표 갱신</span></div>
@@ -335,7 +349,7 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
         <tr><td class="ct-head">① 경력</td><td>해당 분야(안전보건 또는 환경) 실무경력 <b>3년 이상</b></td></tr>
         <tr><td class="ct-head">② 외부교육</td><td>공인 교육기관의 <b>내부심사원 양성과정 이수</b> (ISO 45001 / ISO 14001)</td></tr>
         <tr><td class="ct-head">③ 참관(입회)</td><td>선임심사원 동행 하에 <b>내부심사 참관 2회 이상</b>. 참관한 심사의 보고서 번호로 이력 추적</td></tr>
-        <tr><td class="ct-head">판정</td><td>①~③ <b>모두 충족 → 적합</b> / 1개라도 미충족 → <b>보완</b> (미충족 항목은 요건 인디케이터에 회색 표시)</td></tr>
+        <tr><td class="ct-head">판정</td><td>①~③ <b>모두 충족 → 적합</b> / 1개라도 미충족 → <b>진행중</b> (미충족 항목은 요건 인디케이터에 회색 표시)</td></tr>
         <tr><td class="ct-head">독립성</td><td>심사팀 편성 시 <b>자기 소속 사업장 심사 배제</b> 원칙</td></tr>
       </table>
     </div>
@@ -343,15 +357,82 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
   </div>
 </div>
 
+<!-- 비밀번호 모달 -->
+<div class="modal-bg" id="pwModal" onclick="if(event.target===this)closeModal('pwModal')">
+  <div class="modal" style="width:min(396px,100%)">
+    <div class="modal-head">
+      <div class="modal-head-icon">🔑</div>
+      <div><strong>편집 모드 전환</strong><span>등록·수정·삭제를 하려면 비밀번호를 입력하세요</span></div>
+      <button class="modal-close" onclick="closeModal('pwModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input class="pw-input" id="pwInput" type="password" inputmode="numeric" maxlength="12"
+             placeholder="••••" onkeydown="if(event.key==='Enter')checkPw()" oninput="document.getElementById('pwMsg').textContent=''">
+      <div class="pw-msg" id="pwMsg"></div>
+      <div class="form-note" style="margin-top:4.4px">🔓 인증 후에는 <strong>브라우저 탭을 닫을 때까지</strong> 편집 모드가 유지됩니다. 조회만 하는 사용자는 인증 없이 현황 열람이 가능합니다.</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal('pwModal')">취소</button>
+      <button class="btn btn-primary" onclick="checkPw()">확인</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 /* ══════════ 설정 ══════════ */
-const GAS_URL = 'YOUR_GAS_WEBAPP_URL_HERE';   // ← GAS 웹앱 /exec URL 입력
+const GAS_URL  = 'https://script.google.com/macros/s/AKfycbyeIIszrE-7QE-0ckX-s2wKrtEqVMRJy1QT7g0fZkwPzBH1GucAvurR4V749fAxv_wd8g/exec';
+const EDIT_PW  = '1234';                       // ← 편집 모드 비밀번호 (변경 시 이 값만 수정)
 const SITES = ['중부권역-평택','중부권역-아산','동부권역-경산','동부권역-영동','청양공장','상하공장','광주공장','산업안전팀','생산기획팀'];
 const FIELDS = ['소속','부서','사번','이름','분야','경력3년이상','교육기관','교육시작일','교육종료일','교육명',
                 '참관1_사업장','참관1_일자','참관1_보고서번호','참관2_사업장','참관2_일자','참관2_보고서번호','비고'];
 let DATA = [];
+let unlocked = sessionStorage.getItem('iaq_unlocked') === '1';
+
+/* ══════════ 편집 잠금 ══════════ */
+function toggleLock(){
+  if(unlocked){
+    unlocked = false;
+    sessionStorage.removeItem('iaq_unlocked');
+    applyLock(); renderReg();
+    toast('조회 모드로 전환했습니다.');
+  } else {
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwInput').classList.remove('invalid');
+    document.getElementById('pwMsg').textContent='';
+    openModal('pwModal');
+    setTimeout(()=>document.getElementById('pwInput').focus(),100);
+  }
+}
+function checkPw(){
+  const el=document.getElementById('pwInput');
+  if(el.value === EDIT_PW){
+    unlocked = true;
+    sessionStorage.setItem('iaq_unlocked','1');
+    closeModal('pwModal'); applyLock(); renderReg();
+    toast('🔓 편집 모드로 전환되었습니다.');
+  } else {
+    el.classList.add('invalid');
+    document.getElementById('pwMsg').textContent='비밀번호가 올바르지 않습니다.';
+    el.value=''; el.focus();
+    setTimeout(()=>el.classList.remove('invalid'),400);
+  }
+}
+function applyLock(){
+  const b=document.getElementById('lockBtn');
+  b.textContent = unlocked ? '🔓 편집 모드' : '🔒 조회 모드';
+  b.className = 'btn lock-btn' + (unlocked ? ' unlocked' : '');
+  b.title = unlocked ? '클릭 시 조회 모드로 잠급니다' : '클릭 후 비밀번호 입력 시 등록·수정이 가능합니다';
+  const add=document.getElementById('addBtn');
+  if(add){ add.disabled = !unlocked; add.title = unlocked ? '' : '편집 모드에서만 등록할 수 있습니다'; }
+}
+function requireUnlock(){
+  if(unlocked) return true;
+  toast('편집하려면 먼저 🔒 조회 모드 버튼을 눌러 인증하세요.','err');
+  toggleLock();
+  return false;
+}
 
 /* ══════════ JSONP 통신 ══════════ */
 let jsonpSeq = 0;
@@ -421,14 +502,14 @@ function renderDash(){
     <div class="stat-card"><div class="stat-num blue">${s}</div><div class="stat-label">안전/보건 분야</div></div>
     <div class="stat-card"><div class="stat-num green">${e}</div><div class="stat-label">환경 분야</div></div>
     <div class="stat-card"><div class="stat-num green">${fit}</div><div class="stat-label">적합</div></div>
-    <div class="stat-card"><div class="stat-num orange">${hold}</div><div class="stat-label">보완 필요</div></div>`;
+    <div class="stat-card"><div class="stat-num orange">${hold}</div><div class="stat-label">진행중</div></div>`;
 
   let rows='',tS=0,tE=0;
   SITES.forEach((name,i)=>{
     const list=DATA.filter(a=>a['소속']===name);
     const sa=list.filter(a=>a['분야']!=='환경'), en=list.filter(a=>a['분야']==='환경');
     tS+=sa.length; tE+=en.length;
-    const chip=a=>{const j=judge(a);return `<span class="chip ${fieldCls(a['분야'])}" title="${j.fit?'적합':'보완 필요'}">${esc(a['이름'])}${j.fit?'':' <span class="warn">⚠</span>'}</span>`};
+    const chip=a=>{const j=judge(a);return `<span class="chip ${fieldCls(a['분야'])}" title="${j.fit?'적합':'자격 취득 진행중'}">${esc(a['이름'])}${j.fit?'':' <span class="warn">⚠</span>'}</span>`};
     rows+=`<tr>
       <td class="td-no">${i+1}</td><td class="td-site">${name}</td>
       <td class="td-num safety">${sa.length||''}</td><td class="td-num env">${en.length||''}</td>
@@ -440,7 +521,7 @@ function renderDash(){
   document.getElementById('siteTbody').innerHTML=rows;
   document.getElementById('siteTfoot').innerHTML=
     `<tr><td colspan="2">합계</td><td>${tS}</td><td>${tE}</td><td>${tS+tE}</td>
-     <td colspan="2" class="td-left" style="font-weight:400;color:var(--gray500);font-size:11px">안전 ${tS}명 · 환경 ${tE}명 — 등록 저장 시 실시간 반영</td></tr>`;
+     <td colspan="2" class="td-left" style="font-weight:400;color:var(--gray500);font-size:12.1px">안전 ${tS}명 · 환경 ${tE}명 — 등록 저장 시 실시간 반영</td></tr>`;
 }
 
 /* ══════════ 등록 테이블 ══════════ */
@@ -451,7 +532,7 @@ function renderReg(){
   const fStat=document.getElementById('fStat').value;
   let html='',n=0;
   DATA.forEach(a=>{
-    const j=judge(a), statTxt=j.fit?'적합':'보완';
+    const j=judge(a), statTxt=j.fit?'적합':'진행중';
     if(q && !((a['이름']||'').includes(q)||(a['사번']||'').includes(q)||(a['부서']||'').includes(q))) return;
     if(fSite && a['소속']!==fSite) return;
     if(fField && a['분야']!==fField) return;
@@ -474,13 +555,13 @@ function renderReg(){
       <td class="grp-end" style="font-weight:700;color:var(--gray900)">${esc(a['이름'])}</td>
       <td><span class="badge ${a['분야']==='환경'?'badge-field-e':'badge-field-s'}">${esc(a['분야'])}</span></td>
       <td>${steps}</td>
-      <td class="grp-end"><span class="badge ${j.fit?'badge-fit':'badge-hold'}">${j.fit?'✓ 적합':'△ 보완'}</span></td>
+      <td class="grp-end"><span class="badge ${j.fit?'badge-fit':'badge-hold'}">${j.fit?'✓ 적합':'◐ 진행중'}</span></td>
       <td>${j.career?'<span class="chk">✓</span>':'<span class="unchk">✗</span>'}</td>
       ${j.edu ? `<td>${esc(a['교육기관'])}</td><td class="td-sub">${esc(eduPeriod(a))}</td><td class="grp-end td-left">${esc(a['교육명'])}</td>`
               : `<td colspan="3" class="grp-end" style="color:var(--gray300)">교육 미이수</td>`}
       ${obs(a['참관1_사업장'],a['참관1_일자'],a['참관1_보고서번호'])}
       ${obs(a['참관2_사업장'],a['참관2_일자'],a['참관2_보고서번호'])}
-      <td><button class="row-btn" onclick="openForm('${a.ID}')">수정</button></td>
+      <td><button class="row-btn" onclick="openForm('${a.ID}')">${unlocked?'수정':'🔒 수정'}</button></td>
     </tr>`;
   });
   document.getElementById('regTbody').innerHTML = html ||
@@ -491,6 +572,7 @@ function esc(v){ return String(v==null?'':v).replace(/[&<>"]/g,c=>({'&':'&amp;',
 
 /* ══════════ 폼 ══════════ */
 function openForm(id){
+  if(!requireUnlock()) return;
   const rec = id ? DATA.find(x=>x.ID===id) : null;
   document.getElementById('formTitle').textContent = rec ? '심사원 정보 수정' : '심사원 등록';
   document.getElementById('delBtn').style.display = rec ? 'inline-flex' : 'none';
@@ -514,9 +596,10 @@ function liveJudge(){
   const mk=(ok,t)=>`<span class="badge ${ok?'badge-fit':'badge-hold'}">${ok?'✓':'△'} ${t}</span>`;
   document.getElementById('liveJudge').innerHTML =
     `실시간 판정: ${mk(j.career,'경력')} ${mk(j.edu,'교육')} ${mk(j.obs,'참관 2회')}
-     <b style="margin-left:auto;color:${j.fit?'var(--green500)':'var(--orange500)'}">→ ${j.fit?'적합':'보완'}</b>`;
+     <b style="margin-left:auto;color:${j.fit?'var(--green500)':'var(--orange500)'}">→ ${j.fit?'적합':'진행중'}</b>`;
 }
 async function saveRec(){
+  if(!requireUnlock()) return;
   const rec=collect();
   let bad=false;
   [['f_이름',rec['이름']],['f_소속',rec['소속']]].forEach(([id,v])=>{
@@ -534,6 +617,7 @@ async function saveRec(){
   finally{ btn.disabled=false; btn.textContent='저장'; }
 }
 async function delRec(){
+  if(!requireUnlock()) return;
   const id=document.getElementById('f_ID').value;
   const rec=DATA.find(x=>x.ID===id);
   if(!confirm(`[${rec?rec['이름']:''}] 심사원 정보를 삭제합니다.\n삭제 후 복구할 수 없습니다. 진행할까요?`)) return;
@@ -565,7 +649,7 @@ function exportCSV(){
   const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
   const rows=DATA.map(a=>{
     const j=judge(a);
-    return [a['소속'],a['부서'],a['사번'],a['이름'],a['분야'],j.fit?'적합':'보완',a['경력3년이상'],
+    return [a['소속'],a['부서'],a['사번'],a['이름'],a['분야'],j.fit?'적합':'진행중',a['경력3년이상'],
             a['교육기관'],a['교육시작일'],a['교육종료일'],a['교육명'],
             a['참관1_사업장'],a['참관1_일자'],a['참관1_보고서번호'],
             a['참관2_사업장'],a['참관2_일자'],a['참관2_보고서번호'],a['비고']].map(q).join(',');
@@ -583,6 +667,7 @@ function exportCSV(){
     if(id!=='fSite' && id!=='f_소속'){ el.innerHTML='<option value="">선택</option>'; }
     SITES.forEach(s=>{ const o=document.createElement('option'); o.textContent=s; el.appendChild(o); });
   });
+  applyLock();
   loadData();
 })();
 </script>
