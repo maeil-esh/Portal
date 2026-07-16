@@ -6,7 +6,7 @@
 <title>ISO 내부심사원 자격현황 관리 | MESH</title>
 <link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- ISO 내부심사원 자격현황 관리 v1.2 | UI 110% 스케일 · 여백 최적화 | GAS JSONP 연동 | 자격 자동판정(적합/진행중) | 편집 모드 비밀번호 -->
+<!-- ISO 내부심사원 자격현황 관리 v1.3 | 비고 컬럼 표시 | UI 110% 스케일 · 여백 최적화 | GAS JSONP 연동 | 자격 자동판정(적합/진행중) | 편집 모드 비밀번호 -->
 <style>
 :root{
   --blue50:#f0f4ff;--blue100:#d6e4ff;--blue500:#3182f6;--blue600:#1b6ef3;
@@ -97,6 +97,7 @@ tbody tr:nth-child(even) .td-no{background:#edf1f6}
 .td-total{font-weight:800;color:var(--gray900);background:var(--gray50)}
 .td-sub{font-size:12.1px;color:var(--gray500);line-height:1.4}
 .td-left{text-align:left}
+.td-memo{text-align:left;font-size:12.1px;color:var(--gray600);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 tfoot td{background:#e8edf5;font-weight:800;color:var(--gray900);border-top:2px solid #b7c1cf}
 th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
 .name-chips{display:flex;gap:4.4px;flex-wrap:wrap}
@@ -192,7 +193,7 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
 <header class="topbar">
   <div class="topbar-icon">🛡️</div>
   <div class="topbar-logo">ISO 내부심사원 자격관리<span>MESH Internal Auditor Qualification</span></div>
-  <div class="topbar-badge">2026년 · v1.2</div>
+  <div class="topbar-badge">2026년 · v1.3</div>
   <div class="topbar-space"></div>
   <span class="gas-dot" id="gasDot"></span><span class="gas-txt" id="gasTxt">연결 확인 중…</span>
   <button class="btn lock-btn" id="lockBtn" onclick="toggleLock()" style="margin-left:8.8px">🔒 조회 모드</button>
@@ -266,6 +267,7 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
           <th colspan="3" class="th-group grp-end">외부교육</th>
           <th colspan="3" class="th-group grp-end">참관 1</th>
           <th colspan="3" class="th-group grp-end">참관 2</th>
+          <th rowspan="2" style="min-width:132px">비고</th>
           <th rowspan="2">관리</th>
         </tr>
         <tr>
@@ -472,7 +474,7 @@ function eduPeriod(a){
 /* ══════════ 데이터 로드 ══════════ */
 async function loadData(manual){
   setGas('load','불러오는 중…');
-  document.getElementById('regTbody').innerHTML = '<tr><td colspan="18" class="loading"><span class="spin"></span>데이터를 불러오는 중…</td></tr>';
+  document.getElementById('regTbody').innerHTML = '<tr><td colspan="20" class="loading"><span class="spin"></span>데이터를 불러오는 중…</td></tr>';
   try{
     DATA = await jsonp({action:'list'});
     setGas('on','Sheets 연결됨 · '+DATA.length+'명');
@@ -483,7 +485,7 @@ async function loadData(manual){
     DATA = [];
     renderDash();
     document.getElementById('regTbody').innerHTML =
-      '<tr><td colspan="18" class="loading" style="color:var(--red500)">⚠ '+err.message+'</td></tr>';
+      '<tr><td colspan="20" class="loading" style="color:var(--red500)">⚠ '+err.message+'</td></tr>';
     document.getElementById('regCount').textContent = '연결 실패';
   }
 }
@@ -561,11 +563,12 @@ function renderReg(){
               : `<td colspan="3" class="grp-end" style="color:var(--gray300)">교육 미이수</td>`}
       ${obs(a['참관1_사업장'],a['참관1_일자'],a['참관1_보고서번호'])}
       ${obs(a['참관2_사업장'],a['참관2_일자'],a['참관2_보고서번호'])}
+      <td class="td-memo" title="${esc(a['비고'])}">${a['비고'] ? esc(a['비고']) : '<span style="color:var(--gray300)">—</span>'}</td>
       <td><button class="row-btn" onclick="openForm('${a.ID}')">${unlocked?'수정':'🔒 수정'}</button></td>
     </tr>`;
   });
   document.getElementById('regTbody').innerHTML = html ||
-    '<tr><td colspan="18" class="loading">조건에 해당하는 심사원이 없습니다.</td></tr>';
+    '<tr><td colspan="20" class="loading">조건에 해당하는 심사원이 없습니다.</td></tr>';
   document.getElementById('regCount').textContent = `표시 ${n}명 / 전체 ${DATA.length}명`;
 }
 function esc(v){ return String(v==null?'':v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
