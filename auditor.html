@@ -6,7 +6,7 @@
 <title>ISO 내부심사원 자격현황 관리 | MESH</title>
 <link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- ISO 내부심사원 자격현황 관리 v1.3 | 비고 컬럼 표시 | UI 110% 스케일 · 여백 최적화 | GAS JSONP 연동 | 자격 자동판정(적합/진행중) | 편집 모드 비밀번호 -->
+<!-- ISO 내부심사원 자격현황 관리 v1.5 | 비고 컬럼 표시 | UI 110% 스케일 · 여백 최적화 | GAS JSONP 연동 | 자격 자동판정(적합/진행중) | 편집 모드 비밀번호 -->
 <style>
 :root{
   --blue50:#f0f4ff;--blue100:#d6e4ff;--blue500:#3182f6;--blue600:#1b6ef3;
@@ -115,6 +115,18 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
 .chk{color:var(--green500);font-weight:800}.unchk{color:var(--gray300);font-weight:800}
 .report-no{font-size:12.1px;font-weight:700;color:var(--blue600);background:var(--blue50);padding:1.1px 6.6px;border-radius:6.6px}
 .report-no.empty{color:var(--gray400);background:var(--gray100)}
+.report-no.exempt{color:#008f76;background:var(--green50);border:1px solid var(--green100)}
+.ph{color:var(--gray300);font-style:italic;font-size:11.5px}
+.lock-btn.unlocked ~ *  td.ed{cursor:cell}
+.unlocked-mode td.ed{cursor:cell}
+.unlocked-mode td.ed:hover{background:var(--blue50);outline:1px dashed var(--blue500);outline-offset:-2px}
+td.editing{background:#fffef2;padding:2px 4px}
+.ied-wrap{display:block}
+.ied-row{display:flex;gap:4px;align-items:center;flex-wrap:nowrap}
+.ied{font-family:inherit;font-size:12.1px;padding:3px 5px;border:1.5px solid var(--blue500);border-radius:5px;outline:none;width:100%;box-sizing:border-box;background:#fff}
+.ied-half{width:50%}
+.ied-chk{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:#008f76;white-space:nowrap;cursor:pointer}
+.ied-chk input{width:13px;height:13px;accent-color:#008f76}
 .row-btn{background:none;border:1px solid var(--gray200);border-radius:4.4px;color:var(--gray400);font-size:12.1px;cursor:pointer;padding:2.2px 6.6px;transition:all .1s}
 .row-btn:hover{border-color:var(--blue500);color:var(--blue500)}
 
@@ -193,7 +205,7 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
 <header class="topbar">
   <div class="topbar-icon">🛡️</div>
   <div class="topbar-logo">ISO 내부심사원 자격관리<span>MESH Internal Auditor Qualification</span></div>
-  <div class="topbar-badge">2026년 · v1.3</div>
+  <div class="topbar-badge">2026년 · v1.5</div>
   <div class="topbar-space"></div>
   <span class="gas-dot" id="gasDot"></span><span class="gas-txt" id="gasTxt">연결 확인 중…</span>
   <button class="btn lock-btn" id="lockBtn" onclick="toggleLock()" style="margin-left:8.8px">🔒 조회 모드</button>
@@ -321,6 +333,7 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
           <div class="form-field"><label>참관2 사업장</label><select id="f_참관2_사업장" onchange="liveJudge()"></select></div>
           <div class="form-field"><label>참관2 일자</label><input id="f_참관2_일자" type="date" oninput="liveJudge()"></div>
           <div class="form-field"><label>참관2 보고서 번호</label><input id="f_참관2_보고서번호" oninput="liveJudge()"></div>
+          <div class="form-field"><label>참관 면제 (초기부여)</label><select id="f_참관면제" onchange="liveJudge()"><option value="">해당없음</option><option value="Y">면제 — 1기 창단·경력인정</option></select></div>
         </div>
       </div>
       <div class="form-sec">
@@ -328,7 +341,7 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
         <div class="form-field"><input id="f_비고" placeholder="특이사항 입력"></div>
       </div>
       <div class="live-judge" id="liveJudge">입력 시 자격 판정이 실시간 표시됩니다.</div>
-      <div class="form-note">💡 <strong>적합 판정은 자동 산출</strong>됩니다 — 경력 3년↑ + 외부교육 이수 + 참관 2회 완료 시 <b>적합</b>, 미충족 항목이 있으면 <b>진행중</b>. 저장 즉시 대시보드 사업장별 현황에 반영됩니다.</div>
+      <div class="form-note">💡 <strong>적합 판정은 자동 산출</strong>됩니다 — 경력 3년↑ + 외부교육 이수 + 참관 2회 완료 시 <b>적합</b>, 미충족 항목이 있으면 <b>진행중</b>. <b>참관 면제(초기부여)</b> 선택 시 참관 요건은 경력인정으로 충족 처리됩니다. 저장 즉시 대시보드 사업장별 현황에 반영됩니다.</div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-danger left" id="delBtn" style="display:none" onclick="delRec()">삭제</button>
@@ -351,6 +364,7 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
         <tr><td class="ct-head">① 경력</td><td>해당 분야(안전보건 또는 환경) 실무경력 <b>3년 이상</b></td></tr>
         <tr><td class="ct-head">② 외부교육</td><td>공인 교육기관의 <b>내부심사원 양성과정 이수</b> (ISO 45001 / ISO 14001)</td></tr>
         <tr><td class="ct-head">③ 참관(입회)</td><td>선임심사원 동행 하에 <b>내부심사 참관 2회 이상</b>. 참관한 심사의 보고서 번호로 이력 추적</td></tr>
+        <tr><td class="ct-head">③ 참관 면제</td><td><b>1기 창단 심사원</b> 등 선행 심사가 없어 참관이 불가능한 경우, 수정 화면에서 <b>「참관 면제(초기부여)」</b> 선택 시 참관 요건을 <b>경력인정으로 충족 처리</b>. 사유는 비고에 기록(예: 자격위원회 승인일)</td></tr>
         <tr><td class="ct-head">판정</td><td>①~③ <b>모두 충족 → 적합</b> / 1개라도 미충족 → <b>진행중</b> (미충족 항목은 요건 인디케이터에 회색 표시)</td></tr>
         <tr><td class="ct-head">독립성</td><td>심사팀 편성 시 <b>자기 소속 사업장 심사 배제</b> 원칙</td></tr>
       </table>
@@ -386,9 +400,9 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
 /* ══════════ 설정 ══════════ */
 const GAS_URL  = 'https://script.google.com/macros/s/AKfycbyeIIszrE-7QE-0ckX-s2wKrtEqVMRJy1QT7g0fZkwPzBH1GucAvurR4V749fAxv_wd8g/exec';
 const EDIT_PW  = '1234';                       // ← 편집 모드 비밀번호 (변경 시 이 값만 수정)
-const SITES = ['중부권역-평택','중부권역-아산','동부권역-경산','동부권역-영동','청양공장','상하공장','광주공장','산업안전팀','생산기획팀'];
+const SITES = ['본사','중부권역-평택','중부권역-아산','동부권역-경산','동부권역-영동','청양공장','상하공장','광주공장','산업안전팀','생산기획팀'];
 const FIELDS = ['소속','부서','사번','이름','분야','경력3년이상','교육기관','교육시작일','교육종료일','교육명',
-                '참관1_사업장','참관1_일자','참관1_보고서번호','참관2_사업장','참관2_일자','참관2_보고서번호','비고'];
+                '참관1_사업장','참관1_일자','참관1_보고서번호','참관2_사업장','참관2_일자','참관2_보고서번호','참관면제','비고'];
 let DATA = [];
 let unlocked = sessionStorage.getItem('iaq_unlocked') === '1';
 
@@ -422,6 +436,7 @@ function checkPw(){
   }
 }
 function applyLock(){
+  document.body.classList.toggle('unlocked-mode', unlocked);
   const b=document.getElementById('lockBtn');
   b.textContent = unlocked ? '🔓 편집 모드' : '🔒 조회 모드';
   b.className = 'btn lock-btn' + (unlocked ? ' unlocked' : '');
@@ -460,8 +475,10 @@ function jsonp(params){
 function judge(a){
   const career = String(a['경력3년이상']||'').toUpperCase()==='Y';
   const edu    = !!(String(a['교육기관']||'').trim() && String(a['교육명']||'').trim());
-  const obs    = !!(String(a['참관1_보고서번호']||'').trim() && String(a['참관2_보고서번호']||'').trim());
-  return {career, edu, obs, fit: career && edu && obs};
+  const exempt = String(a['참관면제']||'').toUpperCase()==='Y';
+  const obsReal= !!(String(a['참관1_보고서번호']||'').trim() && String(a['참관2_보고서번호']||'').trim());
+  const obs    = exempt || obsReal;
+  return {career, edu, obs, exempt, obsReal, fit: career && edu && obs};
 }
 function fieldCls(f){ return f==='환경' ? 'env' : 'safety'; }
 function eduPeriod(a){
@@ -546,32 +563,134 @@ function renderReg(){
       <span class="req-line ${j.career&&j.edu?'ok':''}"></span>
       ${dot(j.edu,'교','외부교육 이수: '+(j.edu?'충족':'미이수'))}
       <span class="req-line ${j.edu&&j.obs?'ok':''}"></span>
-      ${dot(j.obs,'참','참관 2회: '+(j.obs?'충족':'미완료'))}
+      ${dot(j.obs,'참','참관 2회: '+(j.obs?(j.exempt&&!j.obsReal?'면제(초기부여)':'충족'):'미완료'))}
     </span>`;
-    const obs=(site,date,rep)=> rep ?
-      `<td>${esc(site)}</td><td class="td-sub">${esc(date)}</td><td class="grp-end"><span class="report-no">${esc(rep)}</span></td>`
-      : `<td colspan="2" style="color:var(--gray300)">—</td><td class="grp-end"><span class="report-no empty">미실시</span></td>`;
+    const exFlag=j.exempt;
+    const ph=(t)=>`<span class="ph">${t}</span>`;
+    // 참관 3열(사업장/일자/보고서번호) — 항상 개별 편집 셀로 렌더
+    const obs=(fSite,fDate,fRep,rec)=>{
+      const site=rec[fSite], date=rec[fDate], rep=rec[fRep];
+      const repCell = rep
+        ? `<span class="report-no">${esc(rep)}</span>`
+        : (exFlag ? `<span class="report-no exempt">면제</span>` : `<span class="report-no empty">미실시</span>`);
+      return `<td class="ed" data-id="${rec.ID}" data-f="${fSite}" title="더블클릭하여 수정">${site?esc(site):ph('사업장')}</td>`
+           + `<td class="td-sub ed" data-id="${rec.ID}" data-f="${fDate}" title="더블클릭하여 수정">${date?esc(date):ph('일자')}</td>`
+           + `<td class="grp-end ed" data-id="${rec.ID}" data-f="${fRep}" title="더블클릭하여 수정 · 면제 지정 가능">${repCell}</td>`;
+    };
     html+=`<tr>
       <td class="td-no">${n}</td>
-      <td>${esc(a['소속'])}</td><td>${esc(a['부서'])}</td><td class="td-sub">${esc(a['사번'])}</td>
-      <td class="grp-end" style="font-weight:700;color:var(--gray900)">${esc(a['이름'])}</td>
-      <td><span class="badge ${a['분야']==='환경'?'badge-field-e':'badge-field-s'}">${esc(a['분야'])}</span></td>
+      <td class="ed" data-id="${a.ID}" data-f="소속" title="더블클릭하여 수정">${esc(a['소속'])}</td>
+      <td class="ed" data-id="${a.ID}" data-f="부서" title="더블클릭하여 수정">${a['부서']?esc(a['부서']):ph('부서')}</td>
+      <td class="td-sub ed" data-id="${a.ID}" data-f="사번" title="더블클릭하여 수정">${a['사번']?esc(a['사번']):ph('사번')}</td>
+      <td class="grp-end ed" data-id="${a.ID}" data-f="이름" style="font-weight:700;color:var(--gray900)" title="더블클릭하여 수정">${esc(a['이름'])}</td>
+      <td class="ed" data-id="${a.ID}" data-f="분야" title="더블클릭하여 수정"><span class="badge ${a['분야']==='환경'?'badge-field-e':'badge-field-s'}">${esc(a['분야'])}</span></td>
       <td>${steps}</td>
-      <td class="grp-end"><span class="badge ${j.fit?'badge-fit':'badge-hold'}">${j.fit?'✓ 적합':'◐ 진행중'}</span></td>
-      <td>${j.career?'<span class="chk">✓</span>':'<span class="unchk">✗</span>'}</td>
-      ${j.edu ? `<td>${esc(a['교육기관'])}</td><td class="td-sub">${esc(eduPeriod(a))}</td><td class="grp-end td-left">${esc(a['교육명'])}</td>`
-              : `<td colspan="3" class="grp-end" style="color:var(--gray300)">교육 미이수</td>`}
-      ${obs(a['참관1_사업장'],a['참관1_일자'],a['참관1_보고서번호'])}
-      ${obs(a['참관2_사업장'],a['참관2_일자'],a['참관2_보고서번호'])}
-      <td class="td-memo" title="${esc(a['비고'])}">${a['비고'] ? esc(a['비고']) : '<span style="color:var(--gray300)">—</span>'}</td>
+      <td class="grp-end"><span class="badge ${j.fit?'badge-fit':'badge-hold'}">${j.fit?(j.exempt?'✓ 적합·면제':'✓ 적합'):'◐ 진행중'}</span></td>
+      <td class="ed" data-id="${a.ID}" data-f="경력3년이상" title="더블클릭하여 수정">${j.career?'<span class="chk">✓</span>':'<span class="unchk">✗</span>'}</td>
+      <td class="ed" data-id="${a.ID}" data-f="교육기관" title="더블클릭하여 수정">${a['교육기관']?esc(a['교육기관']):ph('기관')}</td>
+      <td class="td-sub ed" data-id="${a.ID}" data-f="교육기간" title="더블클릭하여 교육시작·종료일 수정">${eduPeriod(a)?esc(eduPeriod(a)):ph('기간')}</td>
+      <td class="grp-end td-left ed" data-id="${a.ID}" data-f="교육명" title="더블클릭하여 수정">${a['교육명']?esc(a['교육명']):ph('교육명')}</td>
+      ${obs('참관1_사업장','참관1_일자','참관1_보고서번호',a)}
+      ${obs('참관2_사업장','참관2_일자','참관2_보고서번호',a)}
+      <td class="td-memo ed" data-id="${a.ID}" data-f="비고" title="더블클릭하여 수정">${a['비고'] ? esc(a['비고']) : ph('—')}</td>
       <td><button class="row-btn" onclick="openForm('${a.ID}')">${unlocked?'수정':'🔒 수정'}</button></td>
     </tr>`;
   });
   document.getElementById('regTbody').innerHTML = html ||
     '<tr><td colspan="20" class="loading">조건에 해당하는 심사원이 없습니다.</td></tr>';
+  if(!window._inlineBound){
+    window._inlineBound = true;
+    document.getElementById('regTbody').addEventListener('dblclick', function(e){
+      const td = e.target.closest('td.ed');
+      if(td) beginInline(td);
+    });
+  }
   document.getElementById('regCount').textContent = `표시 ${n}명 / 전체 ${DATA.length}명`;
 }
 function esc(v){ return String(v==null?'':v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+/* ══════════ 인라인 편집 (편집 모드 · 셀 더블클릭) ══════════ */
+let editingCell = null;
+const FIELD_OPTS = ['안전/보건','환경'];
+function edMeta(f){
+  if(f==='소속'||f==='참관1_사업장'||f==='참관2_사업장') return {t:'select', opts:SITES.map(s=>[s,s])};
+  if(f==='분야')        return {t:'select', opts:FIELD_OPTS.map(s=>[s,s])};
+  if(f==='경력3년이상') return {t:'select', opts:[['Y','✓ 충족 (Y)'],['N','✗ 미충족 (N)']]};
+  if(f==='교육기간')    return {t:'period'};
+  if(f==='참관1_보고서번호'||f==='참관2_보고서번호') return {t:'report'};
+  if(/일자|시작일|종료일/.test(f)) return {t:'date'};
+  return {t:'text'};
+}
+function beginInline(td){
+  if(!unlocked){ toast('편집하려면 먼저 🔒 조회 모드 버튼으로 인증하세요.','err'); return; }
+  if(editingCell) return;
+  const id=td.dataset.id, f=td.dataset.f;
+  if(!id||!f) return;
+  const rec=DATA.find(x=>x.ID===id); if(!rec) return;
+  editingCell=td; td.classList.add('editing');
+  const meta=edMeta(f), cur=rec[f]||'';
+  let inner='';
+  if(meta.t==='select'){
+    inner=`<select class="ied">`+meta.opts.map(o=>`<option value="${esc(o[0])}" ${o[0]===cur?'selected':''}>${esc(o[1])}</option>`).join('')+`</select>`;
+  } else if(meta.t==='date'){
+    inner=`<input class="ied" type="date" value="${esc(cur)}">`;
+  } else if(meta.t==='period'){
+    inner=`<span class="ied-row"><input class="ied ied-half" type="date" title="교육 시작일" value="${esc(rec['교육시작일']||'')}"><input class="ied ied-half" type="date" title="교육 종료일" value="${esc(rec['교육종료일']||'')}"></span>`;
+  } else if(meta.t==='report'){
+    const ex=String(rec['참관면제']||'').toUpperCase()==='Y';
+    inner=`<span class="ied-row"><input class="ied" type="text" placeholder="보고서 번호" value="${esc(cur)}"><label class="ied-chk"><input type="checkbox" class="ied-ex" ${ex?'checked':''}>면제(초기부여)</label></span>`;
+  } else {
+    inner=`<input class="ied" type="text" value="${esc(cur)}">`;
+  }
+  td.innerHTML=`<span class="ied-wrap">${inner}</span>`;
+  const first=td.querySelector('.ied'); if(first){ first.focus(); if(first.select) try{first.select();}catch(_){} }
+  const commit=()=>commitInline(td,id,f);
+  const cancel=()=>{ editingCell=null; renderReg(); };
+  td.querySelectorAll('input,select').forEach(inp=>{
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){ e.preventDefault(); commit(); }
+      else if(e.key==='Escape'){ e.preventDefault(); cancel(); }
+    });
+  });
+  if(meta.t==='select'){ first.addEventListener('change',commit); }
+  td.addEventListener('focusout',()=>{ setTimeout(()=>{ if(editingCell===td && !td.contains(document.activeElement)) commit(); },130); });
+}
+async function commitInline(td,id,f){
+  if(editingCell!==td) return;
+  const rec=DATA.find(x=>x.ID===id); if(!rec){ editingCell=null; renderReg(); return; }
+  const meta=edMeta(f), patch={};
+  if(meta.t==='period'){
+    const d=td.querySelectorAll('.ied'), s=d[0].value.trim(), e=d[1].value.trim();
+    if(s!==(rec['교육시작일']||'')) patch['교육시작일']=s;
+    if(e!==(rec['교육종료일']||'')) patch['교육종료일']=e;
+  } else if(meta.t==='report'){
+    const v=td.querySelector('.ied').value.trim();
+    const ex=td.querySelector('.ied-ex').checked?'Y':'';
+    if(v!==(rec[f]||'')) patch[f]=v;
+    if(ex!==(String(rec['참관면제']||'').toUpperCase()==='Y'?'Y':'')) patch['참관면제']=ex;
+  } else {
+    const v=td.querySelector('.ied').value.trim();
+    if(v!==(rec[f]||'')) patch[f]=v;
+  }
+  editingCell=null;
+  const keys=Object.keys(patch);
+  if(!keys.length){ renderReg(); return; }
+  if((f==='이름'||f==='소속') && !patch[f] && patch[f]!==undefined){
+    toast(f+'은(는) 비울 수 없습니다.','err'); renderReg(); return;
+  }
+  const prev={}; keys.forEach(k=>prev[k]=rec[k]);
+  Object.assign(rec,patch);
+  const payload={}; FIELDS.forEach(k=>payload[k]=rec[k]||''); payload.ID=rec.ID;
+  renderDash(); renderReg();
+  try{
+    await jsonp({action:'save', payload:JSON.stringify(payload)});
+    toast('수정되었습니다.');
+  }catch(err){
+    Object.assign(rec,prev);        // 실패 시 롤백
+    toast('저장 실패: '+err.message,'err');
+    renderDash(); renderReg();
+  }
+}
 
 /* ══════════ 폼 ══════════ */
 function openForm(id){
@@ -598,8 +717,8 @@ function liveJudge(){
   const j=judge(collect());
   const mk=(ok,t)=>`<span class="badge ${ok?'badge-fit':'badge-hold'}">${ok?'✓':'△'} ${t}</span>`;
   document.getElementById('liveJudge').innerHTML =
-    `실시간 판정: ${mk(j.career,'경력')} ${mk(j.edu,'교육')} ${mk(j.obs,'참관 2회')}
-     <b style="margin-left:auto;color:${j.fit?'var(--green500)':'var(--orange500)'}">→ ${j.fit?'적합':'진행중'}</b>`;
+    `실시간 판정: ${mk(j.career,'경력')} ${mk(j.edu,'교육')} ${mk(j.obs, j.exempt?'참관 면제':'참관 2회')}
+     <b style="margin-left:auto;color:${j.fit?'var(--green500)':'var(--orange500)'}">→ ${j.fit?(j.exempt?'적합 · 면제':'적합'):'진행중'}</b>`;
 }
 async function saveRec(){
   if(!requireUnlock()) return;
@@ -648,14 +767,14 @@ function toast(msg,type){
 }
 function exportCSV(){
   const head=['소속','부서','사번','이름','분야','자격상태','경력3년이상','교육기관','교육시작일','교육종료일','교육명',
-              '참관1_사업장','참관1_일자','참관1_보고서번호','참관2_사업장','참관2_일자','참관2_보고서번호','비고'];
+              '참관1_사업장','참관1_일자','참관1_보고서번호','참관2_사업장','참관2_일자','참관2_보고서번호','참관면제','비고'];
   const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
   const rows=DATA.map(a=>{
     const j=judge(a);
-    return [a['소속'],a['부서'],a['사번'],a['이름'],a['분야'],j.fit?'적합':'진행중',a['경력3년이상'],
+    return [a['소속'],a['부서'],a['사번'],a['이름'],a['분야'],j.fit?(j.exempt?'적합(면제)':'적합'):'진행중',a['경력3년이상'],
             a['교육기관'],a['교육시작일'],a['교육종료일'],a['교육명'],
             a['참관1_사업장'],a['참관1_일자'],a['참관1_보고서번호'],
-            a['참관2_사업장'],a['참관2_일자'],a['참관2_보고서번호'],a['비고']].map(q).join(',');
+            a['참관2_사업장'],a['참관2_일자'],a['참관2_보고서번호'],(String(a['참관면제']||'').toUpperCase()==='Y'?'면제':''),a['비고']].map(q).join(',');
   });
   const blob=new Blob(['\uFEFF'+head.map(q).join(',')+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
   const u=URL.createObjectURL(blob), l=document.createElement('a');
