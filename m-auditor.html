@@ -6,7 +6,7 @@
 <title>ISO 내부심사원 자격현황 관리 | MESH</title>
 <link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- ISO 내부심사원 자격현황 관리 v1.5 | 비고 컬럼 표시 | UI 110% 스케일 · 여백 최적화 | GAS JSONP 연동 | 자격 자동판정(적합/진행중) | 편집 모드 비밀번호 -->
+<!-- ISO 내부심사원 자격현황 관리 v1.5.1 면제표시패치 | 비고 컬럼 표시 | UI 110% 스케일 · 여백 최적화 | GAS JSONP 연동 | 자격 자동판정(적합/진행중) | 편집 모드 비밀번호 -->
 <style>
 :root{
   --blue50:#f0f4ff;--blue100:#d6e4ff;--blue500:#3182f6;--blue600:#1b6ef3;
@@ -116,6 +116,7 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
 .report-no{font-size:12.1px;font-weight:700;color:var(--blue600);background:var(--blue50);padding:1.1px 6.6px;border-radius:6.6px}
 .report-no.empty{color:var(--gray400);background:var(--gray100)}
 .report-no.exempt{color:#008f76;background:var(--green50);border:1px solid var(--green100)}
+td.obs-exempt{background:var(--green50)!important;color:#008f76;font-weight:700}
 .ph{color:var(--gray300);font-style:italic;font-size:11.5px}
 .lock-btn.unlocked ~ *  td.ed{cursor:cell}
 .unlocked-mode td.ed{cursor:cell}
@@ -570,9 +571,15 @@ function renderReg(){
     // 참관 3열(사업장/일자/보고서번호) — 항상 개별 편집 셀로 렌더
     const obs=(fSite,fDate,fRep,rec)=>{
       const site=rec[fSite], date=rec[fDate], rep=rec[fRep];
+      // 참관 면제 대상자는 목록에서도 참관 구간 전체를 면제로 명확히 표시
+      if(exFlag){
+        return `<td class="ed obs-exempt" data-id="${rec.ID}" data-f="${fSite}" title="더블클릭하여 수정"><span class="report-no exempt">면제</span></td>`
+             + `<td class="td-sub ed obs-exempt" data-id="${rec.ID}" data-f="${fDate}" title="더블클릭하여 수정"><span class="report-no exempt">면제</span></td>`
+             + `<td class="grp-end ed obs-exempt" data-id="${rec.ID}" data-f="${fRep}" title="더블클릭하여 수정 · 면제 지정 가능"><span class="report-no exempt">면제</span></td>`;
+      }
       const repCell = rep
         ? `<span class="report-no">${esc(rep)}</span>`
-        : (exFlag ? `<span class="report-no exempt">면제</span>` : `<span class="report-no empty">미실시</span>`);
+        : `<span class="report-no empty">미실시</span>`;
       return `<td class="ed" data-id="${rec.ID}" data-f="${fSite}" title="더블클릭하여 수정">${site?esc(site):ph('사업장')}</td>`
            + `<td class="td-sub ed" data-id="${rec.ID}" data-f="${fDate}" title="더블클릭하여 수정">${date?esc(date):ph('일자')}</td>`
            + `<td class="grp-end ed" data-id="${rec.ID}" data-f="${fRep}" title="더블클릭하여 수정 · 면제 지정 가능">${repCell}</td>`;
