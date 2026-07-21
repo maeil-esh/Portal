@@ -142,6 +142,10 @@ td.editing{background:#fffef2;padding:2px 4px}
 .work-header{padding:17.6px 26.4px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:11px;flex-wrap:wrap}
 .work-site-label{font-size:15.4px;font-weight:700;color:var(--gray900)}
 .work-site-badge{font-size:12.1px;color:var(--gray500);background:var(--gray100);padding:2.2px 8.8px;border-radius:11px}
+.autosave-badge{font-size:12.1px;font-weight:700;padding:2.2px 8.8px;border-radius:11px;background:var(--gray100);color:var(--gray500);transition:all .15s}
+.autosave-badge.saving{background:var(--blue50);color:var(--blue600)}
+.autosave-badge.saved{background:var(--green50);color:#008f76}
+.autosave-badge.error{background:var(--red50);color:var(--red500)}
 .work-toolbar{padding:8.8px 26.4px;background:var(--white);border-bottom:1px solid var(--gray200);display:flex;align-items:center;gap:6.6px;flex-wrap:wrap}
 .search-box,.filter-sel{border:1.5px solid var(--gray200);border-radius:var(--r6);padding:6.6px 11px;font-size:13.2px;font-family:inherit;color:var(--gray800);background:var(--white)}
 .search-box{width:176px}.filter-sel{width:143px;cursor:pointer}
@@ -258,6 +262,7 @@ td.editing{background:#fffef2;padding:2px 4px}
     <span class="work-site-badge" id="regCount">—</span>
     <span class="work-site-badge">적합 판정: 경력 3년↑ + 외부교육 + 참관 2회 자동 산출</span>
     <span class="work-site-badge">미충족 시 <b>진행중</b>으로 표시</span>
+    <span class="autosave-badge" id="autoSaveState">자동저장 대기</span>
   </div>
   <div class="work-toolbar">
     <input class="search-box" id="q" placeholder="🔍 이름·사번·부서 검색" oninput="renderReg()">
@@ -623,9 +628,20 @@ function renderReg(){
 }
 function esc(v){ return String(v==null?'':v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
-/* ══════════ 인라인 편집 (편집 모드 · 셀 더블클릭) ══════════ */
+/* ══════════ 인라인 편집 (편집 모드 · 셀 더블클릭 · 자동저장) ══════════ */
 let editingCell = null;
 const FIELD_OPTS = ['안전/보건','환경'];
+const AUTO_SAVE_DELAY = 500; // 입력이 잠시 멈춘 뒤 저장. 연속 입력 시 계속 갱신
+const autoSaveTimers = new Map();
+const autoSaveChains = new Map();
+let autoSaveSeq = 0;
+
+function setAutoSaveState(state, text){
+  const el=document.getElementById('autoSaveState');
+  if(!el) return;
+  el.className='autosave-badge'+(state?' '+state:'');
+  el.textContent=text;
+}
 function edMeta(f){
   if(f==='소속'||f==='참관1_사업장'||f==='참관2_사업장') return {t:'select', opts:SITES.map(s=>[s,s])};
   if(f==='분야')        return {t:'select', opts:FIELD_OPTS.map(s=>[s,s])};
@@ -634,6 +650,65 @@ function edMeta(f){
   if(f==='참관1_보고서번호'||f==='참관2_보고서번호') return {t:'report'};
   if(/일자|시작일|종료일/.test(f)) return {t:'date'};
   return {t:'text'};
+}
+function readInlinePatch(td,rec,f){
+  const meta=edMeta(f), patch={};
+  if(meta.t==='period'){
+    const d=td.querySelectorAll('.ied');
+    const s=(d[0]?.value||'').trim(), e=(d[1]?.value||'').trim();
+    if(s!==(rec['교육시작일']||'')) patch['교육시작일']=s;
+    if(e!==(rec['교육종료일']||'')) patch['교육종료일']=e;
+  } else if(meta.t==='report'){
+    const v=(td.querySelector('.ied')?.value||'').trim();
+    const ex=td.querySelector('.ied-ex')?.checked?'Y':'';
+    if(v!==(rec[f]||'')) patch[f]=v;
+    if(ex!==(isYes(rec['참관면제'])?'Y':'')) patch['참관면제']=ex;
+  } else {
+    const v=(td.querySelector('.ied')?.value||'').trim();
+    if(v!==(rec[f]||'')) patch[f]=v;
+  }
+  return patch;
+}
+function payloadFrom(rec){
+  const payload={}; FIELDS.forEach(k=>payload[k]=rec[k]||''); payload.ID=rec.ID;
+  return payload;
+}
+function queueRecordSave(rec, prev){
+  const id=rec.ID;
+  const seq=++autoSaveSeq;
+  setAutoSaveState('saving','저장 중…');
+  const prior=autoSaveChains.get(id)||Promise.resolve();
+  const job=prior.catch(()=>{}).then(()=>jsonp({action:'save',payload:JSON.stringify(payloadFrom(rec))}));
+  autoSaveChains.set(id,job);
+  return job.then(()=>{
+    if(seq===autoSaveSeq) setAutoSaveState('saved','✓ 자동저장 완료');
+    return true;
+  }).catch(err=>{
+    if(prev) Object.assign(rec,prev);
+    setAutoSaveState('error','자동저장 실패');
+    toast('자동저장 실패: '+err.message,'err');
+    throw err;
+  });
+}
+function scheduleInlineAutosave(td,id,f,immediate=false){
+  const key=id+'|'+f;
+  clearTimeout(autoSaveTimers.get(key));
+  const run=async()=>{
+    if(!td.isConnected || editingCell!==td) return;
+    const rec=DATA.find(x=>x.ID===id); if(!rec) return;
+    const patch=readInlinePatch(td,rec,f);
+    const keys=Object.keys(patch); if(!keys.length) return;
+    if((f==='이름'||f==='소속') && patch[f]!==undefined && !patch[f]){
+      setAutoSaveState('error',f+' 필수');
+      return;
+    }
+    const prev={}; keys.forEach(k=>prev[k]=rec[k]);
+    Object.assign(rec,patch); // 다음 입력은 최신 저장값과 비교
+    try{ await queueRecordSave(rec,prev); }
+    catch(_){ /* 상태/토스트는 queueRecordSave에서 처리 */ }
+  };
+  if(immediate) run();
+  else autoSaveTimers.set(key,setTimeout(run,AUTO_SAVE_DELAY));
 }
 function beginInline(td){
   if(!unlocked){ toast('편집하려면 먼저 🔒 조회 모드 버튼으로 인증하세요.','err'); return; }
@@ -661,49 +736,35 @@ function beginInline(td){
   const commit=()=>commitInline(td,id,f);
   const cancel=()=>{ editingCell=null; renderReg(); };
   td.querySelectorAll('input,select').forEach(inp=>{
+    inp.addEventListener('input',()=>scheduleInlineAutosave(td,id,f));
+    inp.addEventListener('change',()=>scheduleInlineAutosave(td,id,f,true));
     inp.addEventListener('keydown',e=>{
       if(e.key==='Enter'){ e.preventDefault(); commit(); }
       else if(e.key==='Escape'){ e.preventDefault(); cancel(); }
     });
   });
-  if(meta.t==='select'){ first.addEventListener('change',commit); }
-  td.addEventListener('focusout',()=>{ setTimeout(()=>{ if(editingCell===td && !td.contains(document.activeElement)) commit(); },130); });
+  td.addEventListener('focusout',()=>{ setTimeout(()=>{ if(editingCell===td && !td.contains(document.activeElement)) commit(); },180); });
 }
 async function commitInline(td,id,f){
   if(editingCell!==td) return;
+  const key=id+'|'+f;
+  clearTimeout(autoSaveTimers.get(key));
   const rec=DATA.find(x=>x.ID===id); if(!rec){ editingCell=null; renderReg(); return; }
-  const meta=edMeta(f), patch={};
-  if(meta.t==='period'){
-    const d=td.querySelectorAll('.ied'), s=d[0].value.trim(), e=d[1].value.trim();
-    if(s!==(rec['교육시작일']||'')) patch['교육시작일']=s;
-    if(e!==(rec['교육종료일']||'')) patch['교육종료일']=e;
-  } else if(meta.t==='report'){
-    const v=td.querySelector('.ied').value.trim();
-    const ex=td.querySelector('.ied-ex').checked?'Y':'';
-    if(v!==(rec[f]||'')) patch[f]=v;
-    if(ex!==(isYes(rec['참관면제'])?'Y':'')) patch['참관면제']=ex;
+  const patch=readInlinePatch(td,rec,f);
+  if((f==='이름'||f==='소속') && patch[f]!==undefined && !patch[f]){
+    toast(f+'은(는) 비울 수 없습니다.','err'); return;
+  }
+  if(Object.keys(patch).length){
+    const prev={}; Object.keys(patch).forEach(k=>prev[k]=rec[k]);
+    Object.assign(rec,patch);
+    try{ await queueRecordSave(rec,prev); }
+    catch(_){ editingCell=null; renderDash(); renderReg(); return; }
   } else {
-    const v=td.querySelector('.ied').value.trim();
-    if(v!==(rec[f]||'')) patch[f]=v;
+    const pending=autoSaveChains.get(id);
+    if(pending) try{ await pending; }catch(_){}
   }
   editingCell=null;
-  const keys=Object.keys(patch);
-  if(!keys.length){ renderReg(); return; }
-  if((f==='이름'||f==='소속') && !patch[f] && patch[f]!==undefined){
-    toast(f+'은(는) 비울 수 없습니다.','err'); renderReg(); return;
-  }
-  const prev={}; keys.forEach(k=>prev[k]=rec[k]);
-  Object.assign(rec,patch);
-  const payload={}; FIELDS.forEach(k=>payload[k]=rec[k]||''); payload.ID=rec.ID;
   renderDash(); renderReg();
-  try{
-    await jsonp({action:'save', payload:JSON.stringify(payload)});
-    toast('수정되었습니다.');
-  }catch(err){
-    Object.assign(rec,prev);        // 실패 시 롤백
-    toast('저장 실패: '+err.message,'err');
-    renderDash(); renderReg();
-  }
 }
 
 /* ══════════ 폼 ══════════ */
