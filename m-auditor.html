@@ -633,12 +633,13 @@ function renderReg(){
 }
 function esc(v){ return String(v==null?'':v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
-/* ══════════ 인라인 편집 (편집 모드 · 셀 더블클릭 · 자동저장) ══════════ */
+/* ══════════ 인라인 편집 (편집 모드 · 셀 더블클릭 · 무중단 자동저장) ══════════ */
 let editingCell = null;
 const FIELD_OPTS = ['안전/보건','환경'];
-const AUTO_SAVE_DELAY = 500; // 입력이 잠시 멈춘 뒤 저장. 연속 입력 시 계속 갱신
-const autoSaveTimers = new Map();
-const autoSaveChains = new Map();
+
+// 레코드별 최신 상태만 저장한다.
+// 입력 즉시 첫 저장을 시작하고, 저장 중 들어온 추가 입력은 최신 값으로 합쳐 다음 요청 1회만 전송한다.
+const saveStates = new Map();
 let autoSaveSeq = 0;
 
 function setAutoSaveState(state, text){
@@ -678,42 +679,55 @@ function payloadFrom(rec){
   const payload={}; FIELDS.forEach(k=>payload[k]=rec[k]||''); payload.ID=rec.ID;
   return payload;
 }
-function queueRecordSave(rec, prev){
-  const id=rec.ID;
-  const seq=++autoSaveSeq;
+function getSaveState(id){
+  if(!saveStates.has(id)) saveStates.set(id,{running:false,dirty:false,latest:null,promise:Promise.resolve(),lastSaved:null});
+  return saveStates.get(id);
+}
+function requestRecordSave(rec){
+  const st=getSaveState(rec.ID);
+  st.latest=payloadFrom(rec);
+  st.dirty=true;
+  if(!st.running) st.promise=flushRecordSave(rec.ID);
+  return st.promise;
+}
+async function flushRecordSave(id){
+  const st=getSaveState(id);
+  if(st.running) return st.promise;
+  st.running=true;
   setAutoSaveState('saving','저장 중…');
-  const prior=autoSaveChains.get(id)||Promise.resolve();
-  const job=prior.catch(()=>{}).then(()=>jsonp({action:'save',payload:JSON.stringify(payloadFrom(rec))}));
-  autoSaveChains.set(id,job);
-  return job.then(()=>{
-    if(seq===autoSaveSeq) setAutoSaveState('saved','✓ 자동저장 완료');
-    return true;
-  }).catch(err=>{
-    if(prev) Object.assign(rec,prev);
+  try{
+    while(st.dirty){
+      st.dirty=false;
+      const payload={...st.latest};
+      const seq=++autoSaveSeq;
+      await jsonp({action:'save',payload:JSON.stringify(payload)});
+      st.lastSaved=payload;
+      // 저장 중 값이 바뀌었으면 while 루프가 최신값을 즉시 한 번 더 저장한다.
+      if(!st.dirty && seq===autoSaveSeq) setAutoSaveState('saved','✓ 자동저장 완료');
+    }
+  }catch(err){
+    st.dirty=false;
     setAutoSaveState('error','자동저장 실패');
     toast('자동저장 실패: '+err.message,'err');
     throw err;
-  });
+  }finally{
+    st.running=false;
+    // finally 직전에 새 입력이 들어온 극단적 경우 재시작
+    if(st.dirty) st.promise=flushRecordSave(id);
+  }
+  return true;
 }
-function scheduleInlineAutosave(td,id,f,immediate=false){
-  const key=id+'|'+f;
-  clearTimeout(autoSaveTimers.get(key));
-  const run=async()=>{
-    if(!td.isConnected || editingCell!==td) return;
-    const rec=DATA.find(x=>x.ID===id); if(!rec) return;
-    const patch=readInlinePatch(td,rec,f);
-    const keys=Object.keys(patch); if(!keys.length) return;
-    if((f==='이름'||f==='소속') && patch[f]!==undefined && !patch[f]){
-      setAutoSaveState('error',f+' 필수');
-      return;
-    }
-    const prev={}; keys.forEach(k=>prev[k]=rec[k]);
-    Object.assign(rec,patch); // 다음 입력은 최신 저장값과 비교
-    try{ await queueRecordSave(rec,prev); }
-    catch(_){ /* 상태/토스트는 queueRecordSave에서 처리 */ }
-  };
-  if(immediate) run();
-  else autoSaveTimers.set(key,setTimeout(run,AUTO_SAVE_DELAY));
+function applyInlineChange(td,id,f){
+  if(!td.isConnected || editingCell!==td) return;
+  const rec=DATA.find(x=>x.ID===id); if(!rec) return;
+  const patch=readInlinePatch(td,rec,f);
+  const keys=Object.keys(patch); if(!keys.length) return;
+  if((f==='이름'||f==='소속') && patch[f]!==undefined && !patch[f]){
+    setAutoSaveState('error',f+' 필수');
+    return;
+  }
+  Object.assign(rec,patch); // 화면/판정 데이터는 입력 즉시 반영
+  requestRecordSave(rec).catch(()=>{}); // 네트워크 저장은 백그라운드 처리, 입력 포커스 유지
 }
 function beginInline(td){
   if(!unlocked){ toast('편집하려면 먼저 🔒 조회 모드 버튼으로 인증하세요.','err'); return; }
@@ -741,33 +755,31 @@ function beginInline(td){
   const commit=()=>commitInline(td,id,f);
   const cancel=()=>{ editingCell=null; renderReg(); };
   td.querySelectorAll('input,select').forEach(inp=>{
-    inp.addEventListener('input',()=>scheduleInlineAutosave(td,id,f));
-    inp.addEventListener('change',()=>scheduleInlineAutosave(td,id,f,true));
+    inp.addEventListener('input',()=>applyInlineChange(td,id,f));
+    inp.addEventListener('change',()=>applyInlineChange(td,id,f));
     inp.addEventListener('keydown',e=>{
       if(e.key==='Enter'){ e.preventDefault(); commit(); }
       else if(e.key==='Escape'){ e.preventDefault(); cancel(); }
     });
   });
-  td.addEventListener('focusout',()=>{ setTimeout(()=>{ if(editingCell===td && !td.contains(document.activeElement)) commit(); },180); });
+  td.addEventListener('focusout',()=>{
+    setTimeout(()=>{ if(editingCell===td && !td.contains(document.activeElement)) commit(); },0);
+  });
 }
-async function commitInline(td,id,f){
+function commitInline(td,id,f){
   if(editingCell!==td) return;
-  const key=id+'|'+f;
-  clearTimeout(autoSaveTimers.get(key));
   const rec=DATA.find(x=>x.ID===id); if(!rec){ editingCell=null; renderReg(); return; }
   const patch=readInlinePatch(td,rec,f);
   if((f==='이름'||f==='소속') && patch[f]!==undefined && !patch[f]){
-    toast(f+'은(는) 비울 수 없습니다.','err'); return;
+    toast(f+'은(는) 비울 수 없습니다.','err');
+    const first=td.querySelector('.ied'); if(first) first.focus();
+    return;
   }
   if(Object.keys(patch).length){
-    const prev={}; Object.keys(patch).forEach(k=>prev[k]=rec[k]);
     Object.assign(rec,patch);
-    try{ await queueRecordSave(rec,prev); }
-    catch(_){ editingCell=null; renderDash(); renderReg(); return; }
-  } else {
-    const pending=autoSaveChains.get(id);
-    if(pending) try{ await pending; }catch(_){}
+    requestRecordSave(rec).catch(()=>{});
   }
+  // 저장 응답을 기다리지 않고 편집을 종료한다. 네트워크 저장은 계속 백그라운드에서 진행된다.
   editingCell=null;
   renderDash(); renderReg();
 }
