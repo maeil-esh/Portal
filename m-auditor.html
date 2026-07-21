@@ -6,7 +6,7 @@
 <title>ISO 내부심사원 자격현황 관리 | MESH</title>
 <link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
-<!-- ISO 내부심사원 자격현황 관리 v1.5.1 면제표시패치 | 비고 컬럼 표시 | UI 110% 스케일 · 여백 최적화 | GAS JSONP 연동 | 자격 자동판정(적합/진행중) | 편집 모드 비밀번호 -->
+<!-- ISO 내부심사원 자격현황 관리 v1.5 | 비고 컬럼 표시 | UI 110% 스케일 · 여백 최적화 | GAS JSONP 연동 | 자격 자동판정(적합/진행중) | 편집 모드 비밀번호 -->
 <style>
 :root{
   --blue50:#f0f4ff;--blue100:#d6e4ff;--blue500:#3182f6;--blue600:#1b6ef3;
@@ -116,7 +116,7 @@ th.grp-end,td.grp-end{border-right:2px solid #b7c1cf!important}
 .report-no{font-size:12.1px;font-weight:700;color:var(--blue600);background:var(--blue50);padding:1.1px 6.6px;border-radius:6.6px}
 .report-no.empty{color:var(--gray400);background:var(--gray100)}
 .report-no.exempt{color:#008f76;background:var(--green50);border:1px solid var(--green100)}
-td.obs-exempt{background:var(--green50)!important;color:#008f76;font-weight:700}
+.obs-exempt{background:var(--green50)!important;color:#008f76!important;font-weight:700}
 .ph{color:var(--gray300);font-style:italic;font-size:11.5px}
 .lock-btn.unlocked ~ *  td.ed{cursor:cell}
 .unlocked-mode td.ed{cursor:cell}
@@ -473,11 +473,19 @@ function jsonp(params){
 }
 
 /* ══════════ 판정 로직 ══════════ */
+function isYes(v){
+  const s = String(v||'').trim().toUpperCase();
+  return s==='Y' || s==='YES' || s==='TRUE' || s==='1' || s==='면제' || s.indexOf('면제')>-1;
+}
 function judge(a){
-  const career = String(a['경력3년이상']||'').toUpperCase()==='Y';
+  const career = isYes(a['경력3년이상']);
   const edu    = !!(String(a['교육기관']||'').trim() && String(a['교육명']||'').trim());
-  const exempt = String(a['참관면제']||'').toUpperCase()==='Y';
-  const obsReal= !!(String(a['참관1_보고서번호']||'').trim() && String(a['참관2_보고서번호']||'').trim());
+  const rep1   = String(a['참관1_보고서번호']||'').trim();
+  const rep2   = String(a['참관2_보고서번호']||'').trim();
+  // GAS/시트에 '참관면제' 컬럼이 아직 없어도 보고서번호의 '면제' 값을 통해 복원
+  const legacyExempt = isYes(rep1) && isYes(rep2);
+  const exempt = isYes(a['참관면제']) || legacyExempt;
+  const obsReal= !!(rep1 && rep2 && !legacyExempt);
   const obs    = exempt || obsReal;
   return {career, edu, obs, exempt, obsReal, fit: career && edu && obs};
 }
@@ -568,15 +576,14 @@ function renderReg(){
     </span>`;
     const exFlag=j.exempt;
     const ph=(t)=>`<span class="ph">${t}</span>`;
-    // 참관 3열(사업장/일자/보고서번호) — 항상 개별 편집 셀로 렌더
+    // 참관 3열(사업장/일자/보고서번호) — 면제자는 목록에서도 명확히 '면제'로 표시
     const obs=(fSite,fDate,fRep,rec)=>{
-      const site=rec[fSite], date=rec[fDate], rep=rec[fRep];
-      // 참관 면제 대상자는 목록에서도 참관 구간 전체를 면제로 명확히 표시
       if(exFlag){
-        return `<td class="ed obs-exempt" data-id="${rec.ID}" data-f="${fSite}" title="더블클릭하여 수정"><span class="report-no exempt">면제</span></td>`
-             + `<td class="td-sub ed obs-exempt" data-id="${rec.ID}" data-f="${fDate}" title="더블클릭하여 수정"><span class="report-no exempt">면제</span></td>`
-             + `<td class="grp-end ed obs-exempt" data-id="${rec.ID}" data-f="${fRep}" title="더블클릭하여 수정 · 면제 지정 가능"><span class="report-no exempt">면제</span></td>`;
+        return `<td class="ed obs-exempt" data-id="${rec.ID}" data-f="${fSite}" title="참관 면제 대상 · 더블클릭하여 수정">면제</td>`
+             + `<td class="td-sub ed obs-exempt" data-id="${rec.ID}" data-f="${fDate}" title="참관 면제 대상 · 더블클릭하여 수정">면제</td>`
+             + `<td class="grp-end ed obs-exempt" data-id="${rec.ID}" data-f="${fRep}" title="참관 면제 대상 · 더블클릭하여 면제 해제 가능"><span class="report-no exempt">면제</span></td>`;
       }
+      const site=rec[fSite], date=rec[fDate], rep=rec[fRep];
       const repCell = rep
         ? `<span class="report-no">${esc(rep)}</span>`
         : `<span class="report-no empty">미실시</span>`;
@@ -644,7 +651,7 @@ function beginInline(td){
   } else if(meta.t==='period'){
     inner=`<span class="ied-row"><input class="ied ied-half" type="date" title="교육 시작일" value="${esc(rec['교육시작일']||'')}"><input class="ied ied-half" type="date" title="교육 종료일" value="${esc(rec['교육종료일']||'')}"></span>`;
   } else if(meta.t==='report'){
-    const ex=String(rec['참관면제']||'').toUpperCase()==='Y';
+    const ex=isYes(rec['참관면제']);
     inner=`<span class="ied-row"><input class="ied" type="text" placeholder="보고서 번호" value="${esc(cur)}"><label class="ied-chk"><input type="checkbox" class="ied-ex" ${ex?'checked':''}>면제(초기부여)</label></span>`;
   } else {
     inner=`<input class="ied" type="text" value="${esc(cur)}">`;
@@ -674,7 +681,7 @@ async function commitInline(td,id,f){
     const v=td.querySelector('.ied').value.trim();
     const ex=td.querySelector('.ied-ex').checked?'Y':'';
     if(v!==(rec[f]||'')) patch[f]=v;
-    if(ex!==(String(rec['참관면제']||'').toUpperCase()==='Y'?'Y':'')) patch['참관면제']=ex;
+    if(ex!==(isYes(rec['참관면제'])?'Y':'')) patch['참관면제']=ex;
   } else {
     const v=td.querySelector('.ied').value.trim();
     if(v!==(rec[f]||'')) patch[f]=v;
@@ -711,7 +718,13 @@ function openForm(id){
     el.value = rec ? (rec[k]||'') : (k==='경력3년이상' ? 'Y' : '');
     el.classList.remove('invalid');
   });
-  if(!rec){ document.getElementById('f_소속').selectedIndex=0; document.getElementById('f_분야').selectedIndex=0; }
+  if(rec){
+    // 이전 GAS가 참관면제 컬럼을 반환하지 않아도 '면제' 보고서번호에서 선택값 복원
+    document.getElementById('f_참관면제').value = judge(rec).exempt ? 'Y' : '';
+  } else {
+    document.getElementById('f_소속').selectedIndex=0;
+    document.getElementById('f_분야').selectedIndex=0;
+  }
   liveJudge();
   openModal('regModal');
 }
@@ -730,6 +743,15 @@ function liveJudge(){
 async function saveRec(){
   if(!requireUnlock()) return;
   const rec=collect();
+  // 구형 GAS/시트가 '참관면제' 컬럼을 저장하지 못하는 경우를 대비해
+  // 기존 참관 보고서번호 컬럼에도 '면제'를 기록하여 재조회 후 판정이 유지되도록 함
+  if(isYes(rec['참관면제'])){
+    rec['참관1_보고서번호']='면제';
+    rec['참관2_보고서번호']='면제';
+  } else {
+    if(isYes(rec['참관1_보고서번호'])) rec['참관1_보고서번호']='';
+    if(isYes(rec['참관2_보고서번호'])) rec['참관2_보고서번호']='';
+  }
   let bad=false;
   [['f_이름',rec['이름']],['f_소속',rec['소속']]].forEach(([id,v])=>{
     const el=document.getElementById(id);
@@ -781,7 +803,7 @@ function exportCSV(){
     return [a['소속'],a['부서'],a['사번'],a['이름'],a['분야'],j.fit?(j.exempt?'적합(면제)':'적합'):'진행중',a['경력3년이상'],
             a['교육기관'],a['교육시작일'],a['교육종료일'],a['교육명'],
             a['참관1_사업장'],a['참관1_일자'],a['참관1_보고서번호'],
-            a['참관2_사업장'],a['참관2_일자'],a['참관2_보고서번호'],(String(a['참관면제']||'').toUpperCase()==='Y'?'면제':''),a['비고']].map(q).join(',');
+            a['참관2_사업장'],a['참관2_일자'],a['참관2_보고서번호'],(isYes(a['참관면제'])?'면제':''),a['비고']].map(q).join(',');
   });
   const blob=new Blob(['\uFEFF'+head.map(q).join(',')+'\n'+rows.join('\n')],{type:'text/csv;charset=utf-8'});
   const u=URL.createObjectURL(blob), l=document.createElement('a');
