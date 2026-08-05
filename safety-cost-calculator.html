@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -411,6 +412,48 @@ body{margin:0;background:#f4f6fb;color:#1a2233;
 </div>
 </div>
 </div>
+</div>
+
+<!-- 건설업 안전보건 기술지도 안내 -->
+<div class="oshc-tech-overlay" id="ssTechGuideOverlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="ssTechGuideTitle" aria-describedby="ssTechGuideSummary">
+  <div class="oshc-tech-modal" role="document">
+    <div class="oshc-tech-head">
+      <span class="oshc-tech-icon" aria-hidden="true">!</span>
+      <div>
+        <span class="oshc-tech-kicker">공사금액 1억 원 이상</span>
+        <strong id="ssTechGuideTitle">건설업 안전보건 기술지도 대상 여부를 확인하세요</strong>
+      </div>
+      <button class="oshc-tech-close" id="ssTechGuideClose" type="button" aria-label="안내 팝업 닫기">×</button>
+    </div>
+    <div class="oshc-tech-body">
+      <p class="oshc-tech-summary" id="ssTechGuideSummary">입력한 부가가치세 포함 총공사금액이 <b id="ssTechGuideAmount">1억 원 이상</b>입니다. 아래 기준에 해당하면 공사 착공 전 건설재해예방전문지도기관과 기술지도계약 체결 여부를 검토해야 합니다.</p>
+      <div class="oshc-tech-callout">
+        <strong>기술지도 대상 금액 범위</strong>
+        <span>공사금액 <b>1억 원 이상 120억 원 미만</b>의 건설공사<br><small>토목공사는 150억 원 미만</small></span>
+      </div>
+      <div class="oshc-tech-grid">
+        <section>
+          <h3>실시 원칙</h3>
+          <p><b>공사 시작 후 15일 이내마다 1회</b> 실시합니다.</p>
+          <p class="oshc-tech-example">예: 공사기간 164일 → 164 ÷ 15 = 10.9회 → 소수점 이하 버림에 따라 10회</p>
+        </section>
+        <section>
+          <h3>주요 제외 대상</h3>
+          <ul>
+            <li>공사기간이 1개월 미만인 공사</li>
+            <li>육지와 연결되지 않은 섬 지역의 공사</li>
+            <li>사업주가 자격을 갖춘 안전관리자를 선임해 전담하도록 한 공사</li>
+            <li>유해위험방지계획서를 제출해야 하는 공사</li>
+          </ul>
+        </section>
+      </div>
+      <p class="oshc-tech-note">※ 실제 착공일은 공사도급계약서, 착공신고서, 사용승인서 등을 종합해 판단합니다. 가설울타리 설치 등 준비행위만으로는 착공으로 보지 않을 수 있으며, 15일 이내 1회 원칙을 지킬 수 없는 합리적 사유가 있는지는 지방고용노동관서에서 판단합니다.</p>
+      <p class="oshc-tech-legal">본 안내는 입력금액에 따른 확인 알림이며, 최종 대상 여부는 공사기간·공사종류·안전관리자 선임 및 제외요건을 함께 확인해야 합니다.</p>
+    </div>
+    <div class="oshc-tech-foot">
+      <button class="oshc-tech-confirm" id="ssTechGuideConfirm" type="button">확인했습니다</button>
+    </div>
+  </div>
 </div>
 
 <!-- 저장 이력 관리 -->
@@ -1126,6 +1169,36 @@ background: linear-gradient(135deg, #f8f0d8, #f0e0b8);
 .oshc-save-msg{min-height:18px;margin:5px 0 0;color:#00a486;font-size:12px;font-weight:700;line-height:1.45;}
 .oshc-save-msg.is-error{color:#f04452;}
 
+/* ── 공사금액 1억 원 이상 기술지도 안내 ── */
+.oshc-tech-overlay{position:fixed;inset:0;z-index:10100;background:rgba(25,31,40,.64);padding:20px;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.oshc-tech-modal{width:min(720px,100%);max-height:calc(100dvh - 40px);display:flex;flex-direction:column;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 28px 90px rgba(25,31,40,.32);font-family:'NanumSquareNeo','Nanum Square Neo','Noto Sans KR',sans-serif;}
+.oshc-tech-head{display:flex;align-items:center;gap:12px;padding:20px 22px;border-bottom:1px solid #ffe3b3;background:linear-gradient(135deg,#fff8e8,#fffdf8);}
+.oshc-tech-icon{flex:0 0 38px;width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#ff9f0a;color:#fff;font-size:23px;font-weight:900;box-shadow:0 5px 14px rgba(255,159,10,.24);}
+.oshc-tech-head>div{display:flex;min-width:0;flex-direction:column;gap:3px;}
+.oshc-tech-kicker{color:#d87800;font-size:11px;font-weight:800;letter-spacing:.03em;}
+.oshc-tech-head strong{color:#191f28;font-size:18px;line-height:1.35;letter-spacing:-.025em;}
+.oshc-tech-close{margin-left:auto;flex:0 0 34px;width:34px;height:34px;border:1px solid #e5e8eb;border-radius:10px;background:#fff;color:#6b7684;font-size:22px;line-height:1;cursor:pointer;}
+.oshc-tech-close:hover{background:#f2f4f6;color:#191f28;}
+.oshc-tech-body{padding:20px 22px 8px;overflow:auto;color:#333d4b;}
+.oshc-tech-summary{margin:0 0 14px;font-size:14px;line-height:1.65;}
+.oshc-tech-summary b{color:#e07800;}
+.oshc-tech-callout{display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:14px 16px;border:1.5px solid #ffcc80;border-radius:13px;background:#fff8e8;}
+.oshc-tech-callout>strong{flex:0 0 145px;color:#b85f00;font-size:13px;}
+.oshc-tech-callout>span{font-size:14px;line-height:1.55;color:#333d4b;}
+.oshc-tech-callout small{color:#6b7684;font-size:12px;}
+.oshc-tech-grid{display:grid;grid-template-columns:1fr 1.35fr;gap:12px;}
+.oshc-tech-grid section{padding:14px;border:1px solid #e5e8eb;border-radius:13px;background:#f9fafb;}
+.oshc-tech-grid h3{margin:0 0 8px;color:#191f28;font-size:13px;}
+.oshc-tech-grid p{margin:0;color:#4e5968;font-size:12.5px;line-height:1.6;}
+.oshc-tech-grid ul{margin:0;padding-left:18px;color:#4e5968;font-size:12px;line-height:1.7;}
+.oshc-tech-example{margin-top:7px!important;padding-top:7px;border-top:1px dashed #d1d6db;color:#6b7684!important;font-size:11.5px!important;}
+.oshc-tech-note,.oshc-tech-legal{padding-left:1.3em;text-indent:-1.3em;word-break:keep-all;}
+.oshc-tech-note{margin:14px 0 0;color:#6b7684;font-size:11.5px;line-height:1.65;}
+.oshc-tech-legal{margin:8px 0 0;color:#8b95a1;font-size:10.5px;line-height:1.55;}
+.oshc-tech-foot{padding:14px 22px 18px;background:#fff;}
+.oshc-tech-confirm{width:100%;height:46px;border:0;border-radius:12px;background:#333d4b;color:#fff;font:800 14px 'NanumSquareNeo','Nanum Square Neo','Noto Sans KR',sans-serif;cursor:pointer;}
+.oshc-tech-confirm:hover{background:#191f28;}
+
 .oshc-history-overlay{
   position:fixed;inset:0;z-index:10050;background:rgba(25,31,40,.58);padding:24px;
   align-items:center;justify-content:center;backdrop-filter:blur(3px);
@@ -1192,6 +1265,16 @@ background: linear-gradient(135deg, #f8f0d8, #f0e0b8);
   #oshcPrintArea .oshc-print-project{grid-template-columns:1fr;}
   #oshcPrintArea .oshc-print-project>div{border-right:0;border-bottom:1px solid #e5e8eb;}
   #oshcPrintArea .oshc-print-project>div:last-child{border-bottom:0;}
+  .oshc-tech-overlay{padding:10px;}
+  .oshc-tech-modal{max-height:calc(100dvh - 20px);border-radius:15px;}
+  .oshc-tech-head{padding:16px 14px;align-items:flex-start;}
+  .oshc-tech-head strong{font-size:16px;}
+  .oshc-tech-icon{flex-basis:34px;width:34px;height:34px;}
+  .oshc-tech-body{padding:16px 14px 6px;}
+  .oshc-tech-callout{align-items:flex-start;flex-direction:column;gap:5px;padding:12px;}
+  .oshc-tech-callout>strong{flex:auto;}
+  .oshc-tech-grid{grid-template-columns:1fr;}
+  .oshc-tech-foot{padding:12px 14px 14px;}
 }
 
 
@@ -1277,7 +1360,7 @@ const RATE_SETS={
     legacySpecial:{l:"특수 및 기타 건설공사",a:1.85,b:1.20,c:3250000,d:1.27,e:1.38}
   }}
 };
-const MIN_GROSS=2e7,HISTORY_KEY="oshcCalculatorHistoryV1",F10=5000000000n,G10=50000000000n,RATE_DEN=100000n,COMPARE_DEN=1000000n;
+const MIN_GROSS=2e7,TECH_GUIDE_GROSS=1e8,HISTORY_KEY="oshcCalculatorHistoryV1",F10=5000000000n,G10=50000000000n,RATE_DEN=100000n,COMPARE_DEN=1000000n;
 const $=id=>document.getElementById(id),
 E=s=>String(s??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch])),
 N=v=>{v=String(v||"").replace(/[^\d]/g,"");if(!v)return 0;const n=Number(v);return Number.isSafeInteger(n)?n:0},
@@ -1305,6 +1388,11 @@ const TC=()=>N($("ssMatDirect").value)+N($("ssMatIndirect").value)+N($("ssLaborD
 const TC10=()=>BN(TC())*10n;
 const U=()=>{const v=N($("ssCostInput").value);let base,vat,gross;if(costMode==="gross"){gross=v;base=Math.round(gross/1.1);vat=gross-base}else{base=v;vat=Math.round(base*.1);gross=base+vat}return{base,vat,gross,t10:BN(gross)*7n}};
 const DU=()=>{const v=N($("ssDirectGrossCost").value);let base,vat,gross;if(directCostMode==="gross"){gross=v;base=Math.round(gross/1.1);vat=gross-base}else{base=v;vat=Math.round(base*.1);gross=base+vat}return{base,vat,gross}};
+let techGuideThresholdReached=false,techGuideLastFocus=null;
+const currentGrossCost=()=>$("ssTargetUnknown").checked?U().gross:DU().gross;
+const openTechGuide=()=>{const gross=currentGrossCost();if(gross<TECH_GUIDE_GROSS)return;techGuideLastFocus=document.activeElement;$("ssTechGuideAmount").textContent=W(gross);$("ssTechGuideOverlay").style.display="flex";document.body.style.overflow="hidden";setTimeout(()=>$("ssTechGuideConfirm").focus(),0)};
+const closeTechGuide=()=>{$("ssTechGuideOverlay").style.display="none";document.body.style.overflow="";if(techGuideLastFocus&&typeof techGuideLastFocus.focus==="function")techGuideLastFocus.focus();techGuideLastFocus=null};
+const checkTechGuideThreshold=()=>{const reached=currentGrossCost()>=TECH_GUIDE_GROSS;if(reached&&!techGuideThresholdReached)openTechGuide();techGuideThresholdReached=reached};
 
 const basisCopy=()=>{
   const v=$("ssContractBasis").value;
@@ -1437,12 +1525,12 @@ const deleteRecord=id=>{const list=readHistory(),target=list.find(x=>x.id===id);
 const renderHistory=(query="")=>{const q=String(query||"").trim().toLowerCase(),list=readHistory().filter(x=>!q||[x.projectName,x.department,x.author,x.fee].join(" ").toLowerCase().includes(q)),box=$("ssHistoryList");if(!list.length){box.innerHTML='<div class="oshc-history-empty">'+(q?'검색 조건에 맞는 산정 이력이 없습니다.':'저장된 산정 이력이 없습니다.<br>산정 완료 후 <b>현재 산정내역 저장</b>을 눌러 보관하세요.')+'</div>';return}box.innerHTML='<table class="oshc-history-table"><colgroup><col style="width:15%"><col style="width:25%"><col style="width:14%"><col style="width:12%"><col style="width:14%"><col style="width:20%"></colgroup><thead><tr><th>저장일시</th><th>공사명칭</th><th>부서명</th><th>작성자</th><th style="text-align:right">최소 계상금액</th><th style="text-align:right">관리</th></tr></thead><tbody>'+list.map(x=>'<tr><td>'+E(formatSavedAt(x.savedAt))+'</td><td class="oshc-history-name">'+E(x.projectName||"-")+'</td><td>'+E(x.department||"-")+'</td><td>'+E(x.author||"-")+'</td><td class="oshc-history-fee">'+E(x.fee||"-")+'</td><td><div class="oshc-history-actions"><button class="oshc-history-load" type="button" data-load-record="'+E(x.id)+'">불러오기</button><button class="oshc-history-delete" type="button" data-delete-record="'+E(x.id)+'">삭제</button></div></td></tr>').join("")+'</tbody></table>';box.querySelectorAll("[data-load-record]").forEach(btn=>btn.addEventListener("click",()=>{const r=readHistory().find(x=>x.id===btn.dataset.loadRecord);if(r)applyRecord(r)}));box.querySelectorAll("[data-delete-record]").forEach(btn=>btn.addEventListener("click",()=>deleteRecord(btn.dataset.deleteRecord)))};
 const openHistory=()=>{$("ssHistoryOverlay").style.display="flex";$("ssHistorySearch").value="";renderHistory();setTimeout(()=>$("ssHistorySearch").focus(),0);document.body.style.overflow="hidden"},closeHistory=()=>{$("ssHistoryOverlay").style.display="none";document.body.style.overflow=""},refresh=()=>{A();Z()};
 
-$("ssCostInput").addEventListener("input",function(){C(this);V();refresh()});$("ssDirectGrossCost").addEventListener("input",function(){C(this);DV();refresh()});["ssMatDirect","ssMatIndirect","ssLaborDirect","ssMaterial"].forEach(id=>$(id).addEventListener("input",function(){C(this);refresh()}));
-$("ssContractDate").addEventListener("change",()=>{populateTypes();refresh()});$("ssContractBasis").addEventListener("change",()=>{updateContractBasisHelp();updateAmountLabels();refresh()});$("ssType").addEventListener("change",refresh);$("ssHealthTarget").addEventListener("change",refresh);$("ssTargetUnknown").addEventListener("change",()=>{M();setMaterialValidation();refresh()});$("ssMaterialCase").addEventListener("change",()=>{M();$("outMaterialBlock").style.display=$("ssMaterialCase").checked?"block":"none";setMaterialValidation();refresh()});
+$("ssCostInput").addEventListener("input",function(){C(this);V();refresh();checkTechGuideThreshold()});$("ssDirectGrossCost").addEventListener("input",function(){C(this);DV();refresh();checkTechGuideThreshold()});["ssMatDirect","ssMatIndirect","ssLaborDirect","ssMaterial"].forEach(id=>$(id).addEventListener("input",function(){C(this);refresh()}));
+$("ssContractDate").addEventListener("change",()=>{populateTypes();refresh()});$("ssContractBasis").addEventListener("change",()=>{updateContractBasisHelp();updateAmountLabels();refresh()});$("ssType").addEventListener("change",refresh);$("ssHealthTarget").addEventListener("change",refresh);$("ssTargetUnknown").addEventListener("change",()=>{M();setMaterialValidation();refresh();techGuideThresholdReached=false;checkTechGuideThreshold()});$("ssMaterialCase").addEventListener("change",()=>{M();$("outMaterialBlock").style.display=$("ssMaterialCase").checked?"block":"none";setMaterialValidation();refresh()});
 $("ssSwitchToDetailed").addEventListener("click",()=>{const sourceMode=costMode,sourceValue=$("ssCostInput").value;$("ssTargetUnknown").checked=false;setDirectMode(sourceMode,true);$("ssDirectGrossCost").value=sourceValue;M();DV();setMaterialValidation("공사원가계산서에서 직접재료비·간접재료비·직접노무비를 부가가치세 제외 금액으로 입력해 주세요. 발주자 제공 재료비 또는 완제품 가액은 별도 입력란에만 입력합니다.",false);refresh();$("targetCostBox").scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>$("ssMatDirect").focus(),250)});
-$("ssShowCostTable").addEventListener("click",function(){const box=$("costTableBox"),show=box.style.display==="none";box.style.display=show?"block":"none";this.textContent=show?"📄 계약예규상 공사원가계산서 구성항목 닫기":"📄 계약예규상 공사원가계산서 구성항목 보기";this.classList.toggle("is-active",show)});$("modeGross").addEventListener("click",()=>{setMode("gross",true);refresh()});$("modeBase").addEventListener("click",()=>{setMode("base",true);refresh()});$("directModeGross").addEventListener("click",()=>{setDirectMode("gross",true);refresh()});$("directModeBase").addEventListener("click",()=>{setDirectMode("base",true);refresh()});
-$("ssReset").addEventListener("click",()=>{[$("ssProjectName"),$("ssDepartment"),$("ssAuthor")].forEach(el=>el.value="");$("ssContractDate").value=todayLocal();$("ssContractBasis").value="general";updateContractBasisHelp();populateTypes("arch");$("ssHealthTarget").checked=false;$("ssTargetUnknown").checked=true;setMode("gross",true);setDirectMode("gross",true);["ssDirectGrossCost","ssMatDirect","ssMatIndirect","ssLaborDirect","ssMaterial"].forEach(id=>$(id).value="");$("ssMaterialCase").checked=false;$("materialCaseBox").style.display="none";$("outMaterialBlock").style.display="none";$("costTableBox").style.display="none";$("ssShowCostTable").textContent="📄 계약예규상 공사원가계산서 구성항목 보기";$("ssShowCostTable").classList.remove("is-active");$("outTargetApplied").textContent="-";$("outTargetFormula").textContent="-";resetResult();$("outProof").textContent="부가가치세 포함 여부를 선택하고 총공사금액을 입력하면\n고시 적용 여부와 최소 계상금액이 자동으로 표시됩니다";$("ssMsg").textContent="";setSaveMsg("");M();refresh()});
-$("ssSaveRecord").addEventListener("click",saveRecord);$("ssHistoryOpen").addEventListener("click",openHistory);$("ssHistoryClose").addEventListener("click",closeHistory);$("ssHistoryDone").addEventListener("click",closeHistory);$("ssHistorySearch").addEventListener("input",function(){renderHistory(this.value)});$("ssHistoryClear").addEventListener("click",()=>{const list=readHistory();if(list.length&&confirm("저장된 산정 이력을 모두 삭제하시겠습니까?")&&writeHistory([])){updateHistoryCount();renderHistory();setSaveMsg("산정 이력을 모두 삭제했습니다.")}});$("ssHistoryOverlay").addEventListener("click",function(e){if(e.target===this)closeHistory()});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("ssHistoryOverlay").style.display!=="none")closeHistory()});["ssProjectName","ssDepartment","ssAuthor"].forEach(id=>$(id).addEventListener("input",()=>setSaveMsg("")));$("ssPdfDownload").addEventListener("click",generatePdf);
+$("ssShowCostTable").addEventListener("click",function(){const box=$("costTableBox"),show=box.style.display==="none";box.style.display=show?"block":"none";this.textContent=show?"📄 계약예규상 공사원가계산서 구성항목 닫기":"📄 계약예규상 공사원가계산서 구성항목 보기";this.classList.toggle("is-active",show)});$("modeGross").addEventListener("click",()=>{setMode("gross",true);techGuideThresholdReached=false;refresh()});$("modeBase").addEventListener("click",()=>{setMode("base",true);techGuideThresholdReached=false;refresh()});$("directModeGross").addEventListener("click",()=>{setDirectMode("gross",true);techGuideThresholdReached=false;refresh()});$("directModeBase").addEventListener("click",()=>{setDirectMode("base",true);techGuideThresholdReached=false;refresh()});
+$("ssReset").addEventListener("click",()=>{[$("ssProjectName"),$("ssDepartment"),$("ssAuthor")].forEach(el=>el.value="");$("ssContractDate").value=todayLocal();$("ssContractBasis").value="general";updateContractBasisHelp();populateTypes("arch");$("ssHealthTarget").checked=false;$("ssTargetUnknown").checked=true;setMode("gross",true);setDirectMode("gross",true);["ssDirectGrossCost","ssMatDirect","ssMatIndirect","ssLaborDirect","ssMaterial"].forEach(id=>$(id).value="");$("ssMaterialCase").checked=false;$("materialCaseBox").style.display="none";$("outMaterialBlock").style.display="none";$("costTableBox").style.display="none";$("ssShowCostTable").textContent="📄 계약예규상 공사원가계산서 구성항목 보기";$("ssShowCostTable").classList.remove("is-active");$("outTargetApplied").textContent="-";$("outTargetFormula").textContent="-";resetResult();$("outProof").textContent="부가가치세 포함 여부를 선택하고 총공사금액을 입력하면\n고시 적용 여부와 최소 계상금액이 자동으로 표시됩니다";$("ssMsg").textContent="";setSaveMsg("");techGuideThresholdReached=false;M();refresh()});
+$("ssSaveRecord").addEventListener("click",saveRecord);$("ssHistoryOpen").addEventListener("click",openHistory);$("ssHistoryClose").addEventListener("click",closeHistory);$("ssHistoryDone").addEventListener("click",closeHistory);$("ssHistorySearch").addEventListener("input",function(){renderHistory(this.value)});$("ssHistoryClear").addEventListener("click",()=>{const list=readHistory();if(list.length&&confirm("저장된 산정 이력을 모두 삭제하시겠습니까?")&&writeHistory([])){updateHistoryCount();renderHistory();setSaveMsg("산정 이력을 모두 삭제했습니다.")}});$("ssHistoryOverlay").addEventListener("click",function(e){if(e.target===this)closeHistory()});$("ssTechGuideClose").addEventListener("click",closeTechGuide);$("ssTechGuideConfirm").addEventListener("click",closeTechGuide);$("ssTechGuideOverlay").addEventListener("click",function(e){if(e.target===this)closeTechGuide()});document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("ssTechGuideOverlay").style.display!=="none")closeTechGuide();else if(e.key==="Escape"&&$("ssHistoryOverlay").style.display!=="none")closeHistory()});["ssProjectName","ssDepartment","ssAuthor"].forEach(id=>$(id).addEventListener("input",()=>setSaveMsg("")));$("ssPdfDownload").addEventListener("click",generatePdf);
 
 if(!$("ssContractDate").value)$("ssContractDate").value=todayLocal();updateContractBasisHelp();populateTypes("arch");updateAmountLabels();updateHistoryCount();M();updateMaterialBasisHelp();refresh();
 })();
