@@ -60,6 +60,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card:nth-child(7) { animation-delay: 0.56s; }
 .card:nth-child(8) { animation-delay: 0.64s; }
 .card:nth-child(9) { animation-delay: 0.72s; }
+.card:nth-child(10) { animation-delay: 0.80s; }
 .card-hold { cursor: default; }
 .card-dev { cursor: default; }
 .card-b:hover, .card-t:hover, .card-a:hover, .card-r:hover, .card-v:hover, .card-n:hover, .card-g:hover { transform: translateY(-7px); box-shadow: var(--shadow-hover); }
@@ -210,7 +211,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
       <span class="logo-name">YESS <span>Your (Intelligent) ESH Support System</span></span>
       <div class="divider"></div>
-      <div class="header-pill"><span class="pill-dot"></span>7 Services Active · 1 On Hold · 1 In Dev</div>
+      <div class="header-pill"><span class="pill-dot"></span>8 Services Active · 1 On Hold · 1 In Dev</div>
     </div>
     <h1>지능형 안전보건<br><em>업무지원 시스템</em></h1>
     <p class="header-sub"><b>매일유업</b> · Environment · Safety · Health</p>
@@ -271,9 +272,27 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
     </a>
 
-    <!-- 04 AI-JSA (일시 보류) -->
-    <div class="card card-hold" id="card-jsa">
+    <!-- 04 건설업 산업안전보건관리비 계상 지원 -->
+    <a class="card card-t" href="https://maeil-esh.github.io/Portal/safety-cost-calculator" target="_blank" rel="noopener">
       <div class="card-bar"></div><span class="card-no">04</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="2.5" width="16" height="19" rx="2"/>
+          <path d="M8 6.5h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/>
+        </svg>
+      </div>
+      <span class="card-tag">Safety Cost Calculator</span>
+      <h2 class="card-title">건설업 산업안전보건관리비<br>계상 지원</h2>
+      <p class="card-desc">공사정보와 대상액을 입력하면 고시 적용 여부 및 최소 계상금액을 산정하고, 적용기준·질의회시를 함께 확인할 수 있습니다.</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
+    <!-- 05 AI-JSA (일시 보류) -->
+    <div class="card card-hold" id="card-jsa">
+      <div class="card-bar"></div><span class="card-no">05</span>
       <div class="icon-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>
@@ -298,9 +317,9 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
     </div>
 
-    <!-- 05 MSDS 경고표지, 관리요령 생성 (개발 중) -->
+    <!-- 06 MSDS 경고표지, 관리요령 생성 (개발 중) -->
     <div class="card card-c card-dev" id="card-msds">
-      <div class="card-bar"></div><span class="card-no">05</span>
+      <div class="card-bar"></div><span class="card-no">06</span>
       <div class="icon-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="#0891B2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M10.3 3.3 2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.3a2 2 0 0 0-3.4 0z"/>
@@ -326,9 +345,9 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
     </div>
 
-    <!-- 06 관리감독자 안전보건 이행평가 -->
+    <!-- 07 관리감독자 안전보건 이행평가 -->
     <a class="card card-n" href="https://maeil-esh.github.io/Portal/esh-supervisor" target="_blank" rel="noopener">
-      <div class="card-bar"></div><span class="card-no">06</span>
+      <div class="card-bar"></div><span class="card-no">07</span>
       <div class="icon-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="#0A2540" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 12l2 2 4-4"/>
@@ -344,9 +363,9 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
     </a>
 
-    <!-- 07 MESH 내부심사 스케줄 -->
+    <!-- 08 MESH 내부심사 스케줄 -->
     <a class="card card-t" href="https://maeil-esh.github.io/schedule-calendar/" target="_blank" rel="noopener">
-      <div class="card-bar"></div><span class="card-no">07</span>
+      <div class="card-bar"></div><span class="card-no">08</span>
       <div class="icon-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
@@ -362,9 +381,9 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
     </a>
 
-    <!-- 08 ISO 내부심사원 자격관리 -->
+    <!-- 09 ISO 내부심사원 자격관리 -->
     <a class="card card-g" href="https://maeil-esh.github.io/Portal/m-auditor.html" target="_blank" rel="noopener">
-      <div class="card-bar"></div><span class="card-no">08</span>
+      <div class="card-bar"></div><span class="card-no">09</span>
       <div class="icon-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="8" r="5"/><path d="M9 12.5 7.5 22l4.5-2.7L16.5 22 15 12.5"/>
@@ -379,9 +398,9 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
     </a>
 
-    <!-- 09 산업안전보건법 배우기 -->
+    <!-- 10 산업안전보건법 배우기 -->
     <a class="card card-r" href="https://maeil-esh.github.io/Portal/safetylaw.html" target="_blank" rel="noopener">
-      <div class="card-bar"></div><span class="card-no">09</span>
+      <div class="card-bar"></div><span class="card-no">10</span>
       <div class="icon-box">
         <svg viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
