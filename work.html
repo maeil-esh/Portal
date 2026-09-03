@@ -3413,8 +3413,30 @@ function drawSpacedRight(ctx, text, rightX, y, gap=4.5, px=13){
   let x=rightX-total;
   chars.forEach((ch,i)=>{ ctx.fillText(ch,x,y); x+=widths[i]+gap; });
 }
+function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, px=12){
+  const value=String(text||'').trim();
+  if(!value) return y;
+  setCanvasFont(ctx,px);
+  const words=value.split(/\s+/);
+  let line='';
+  for(let i=0;i<words.length;i++){
+    const test=line ? line+' '+words[i] : words[i];
+    if(ctx.measureText(test).width>maxWidth && line){
+      ctx.fillText(line,x,y);
+      y+=lineHeight;
+      line=words[i];
+    }else{
+      line=test;
+    }
+  }
+  if(line){
+    ctx.fillText(line,x,y);
+    y+=lineHeight;
+  }
+  return y;
+}
 function makeDesignationOverlayPng(r, site, pageWidth, pageHeight){
-  // 원본 PDF 서식은 그대로 유지하고, 입력값만 투명 레이어로 올립니다.
+  // 원본 PDF 서식은 그대로 유지하고, 입력값과 추가 업무 문구만 투명 레이어로 올립니다.
   const scale=4;
   const canvas=document.createElement('canvas');
   canvas.width=Math.round(pageWidth*scale); canvas.height=Math.round(pageHeight*scale);
@@ -3425,6 +3447,15 @@ function makeDesignationOverlayPng(r, site, pageWidth, pageHeight){
   drawFittedText(ctx,affiliation,166,171.2,350,13,9);
   drawFittedText(ctx,r.position,166,201.2,350,13,9);
   drawFittedText(ctx,r.name,166,231.2,350,13,9);
+  drawWrappedText(
+    ctx,
+    '8. 해당 작업의 안전보건 확보에 필요한 인력·장비·보호구·시설개선 등의 필요사항을 파악하여 보고하고, 개선조치가 적기에 이행될 수 있도록 확인·관리하는 업무',
+    76,
+    593,
+    492,
+    17,
+    11.2
+  );
   const d=designationDateParts(r.designationDate);
   drawSpacedRight(ctx,d.y,247,699.4,4.0,12);
   drawSpacedRight(ctx,d.m,307,699.4,3.4,12);
