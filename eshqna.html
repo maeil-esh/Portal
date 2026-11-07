@@ -224,11 +224,12 @@ tbody td{border-bottom-color:#e5e8eb}
 
 <script>
 /* ═════ 설정: GAS 웹 앱 배포 URL을 아래에 붙여 넣으세요 ═════ */
-const API = "https://script.google.com/macros/s/AKfycby39fn_hTtPrKbUjdiqU5hWJNzKf7NHyfRN_w8c5ls3u9-GBVcnVyHD2vDjkO_aNWto/exec";
+const API = "https://script.google.com/macros/s/여기에_배포_URL/exec";
 
 /* ---------- 기준 데이터 ---------- */
 const SITES=["평택","아산","경산","영동","청양","상하","광주","MIC"];
-const DEPTS=["생산팀","품질팀","공무팀","물류팀","관리팀","연구소","안전환경팀"];
+const DEPTS={"평택":["낙농운영1팀P","중부권역_공무환경팀P","중부권역_생산1팀","중부권역_생산2팀","중부권역_생산3팀","중부권역_안전보건P","중부권역_지원팀P","중부권역_테크니컬지원","중부권역_품질보증팀P","평택_물류팀"],"아산":["아산물류창고","중부권역_공무환경팀A","중부권역_생산4팀","중부권역_안전보건A","중부권역_지원팀A","중부권역_품질보증팀A"],"경산":["경산_물류팀","경산_품질보증팀","낙농운영2팀","동부권역_공무환경1팀","동부권역_생산1팀","동부권역_안전보건K","동부권역_지원팀K","동부권역_테크니컬"],"영동":["동부권역_공무환경2팀","동부권역_생산2팀","동부권역_안전보건Y","동부권역_지원팀Y","영동_품질보증팀"],"청양":["청양_공무환경팀","청양_생산팀","청양_안전보건","청양_지원팀","청양_테크니컬지원","청양_품질보증팀","청양물류창고"],"상하":["상하_공무환경팀","상하_생산1팀","상하_생산2팀","상하_안전보건","상하_지원팀","상하_테크니컬지원","상하_품질보증팀","상하물류창고"],"광주":["광주_공무환경팀","광주_물류팀","광주_생산1팀","광주_생산2팀","광주_안전보건","광주_지원팀","광주_품질보증팀","낙농운영1팀G"],"MIC":["FS음료셀","MIC_뉴트리션연구소","MIC_뉴트리션연구소장","MIC_식품연구소","MIC_식품연구소장","글로벌프로젝트","메디컬/소재연구셀","발효셀","분석연구팀","분유/유아식셀","식물성셀","식품법규팀","유가공셀","유지/믹스셀","음료셀","포장연구팀","품질기획팀","품질안전본부","프로틴/기능영양식셀","기타"]};  /* 사업장별 소속부서 */
+const deptOpts=site=>site&&DEPTS[site]?opt(DEPTS[site],"","선택 안 함"):'<option value="">사업장을 먼저 선택</option>';
 /* 구분1: 일반(10-xx) / 안전보건(11-xx) / 환경(12-xx) */
 const DOCS={
  "일반":[["MESH-10-01","M-ESH 경영매뉴얼"],["MESH-10-02","M-ESH 경영검토절차서"],["MESH-10-03","M-ESH 방침 및 목표관리절차서"],["MESH-10-04","M-ESH 리스크관리절차서"],["MESH-10-05","M-ESH 준수의무사항관리절차서"],["MESH-10-06","M-ESH 교육훈련절차서"],["MESH-10-07","M-ESH 의사소통관리절차서"],["MESH-10-08","M-ESH 문서관리절차서"],["MESH-10-09","M-ESH 비상사태대응절차서"],["MESH-10-10","M-ESH 내부심사절차서"],["MESH-10-11","M-ESH 시정조치관리절차서"],["MESH-10-12","M-ESH 사고관리절차서"],["MESH-10-13","M-ESH 변경관리절차서"],["MESH-10-14","M-ESH ESH관리규칙"],["MESH-10-15","M-ESH 지능형 영상관리 시스템 운영 절차서"]],
@@ -308,7 +309,7 @@ function viewNew(){
       <div class="fld">
         <div class="row">
           <label class="f">사업장 *<select id="f-site">${opt(SITES,"","선택")}</select></label>
-          <label class="f">소속부서<select id="f-dept">${opt(DEPTS,"","선택 안 함")}</select></label>
+          <label class="f">소속부서<select id="f-dept" disabled>${deptOpts("")}</select></label>
           <label class="f">이름<input type="text" id="f-name" maxlength="30" placeholder="미입력 시 익명 접수"></label>
         </div>
         <label class="f" style="margin-top:10px">이메일 <small style="color:var(--muted);font-weight:400">(선택)</small><input type="email" id="f-email" maxlength="80" autocomplete="email" placeholder="회신 메일이 필요하면 이메일을 작성해 주세요"></label>
@@ -351,6 +352,7 @@ function viewNew(){
   </form>`;
   draftFiles=[];
   const docwrap=$("#docwrap");
+  $("#f-site").onchange=()=>{const dp=$("#f-dept"),st=$("#f-site").value;dp.innerHTML=deptOpts(st);dp.disabled=!st};
   main.querySelectorAll('input[name=c2]').forEach(r=>r.onchange=()=>{docwrap.hidden=main.querySelector('input[name=c2]:checked').value!=="MESH"});
   main.querySelectorAll('input[name=c1]').forEach(r=>r.onchange=()=>{$("#f-doc").innerHTML=docOpts(r.value,"","선택 안 함")});
   main.querySelectorAll('input[name=pub]').forEach(r=>r.onchange=()=>{const pub=main.querySelector('input[name=pub]:checked').value==="1";$("#pwwrap").hidden=pub;$("#ck2wrap").hidden=!pub;$("#pubnote").textContent=pub?PUB_NOTE:PRIV_NOTE});
@@ -370,7 +372,7 @@ function viewNew(){
   ["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over")}));
   ["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over")}));
   drop.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
-  $("#f").addEventListener("reset",()=>setTimeout(()=>{draftFiles=[];drawFiles();$("#qlen").textContent="0";docwrap.hidden=true;$("#pwwrap").hidden=true;$("#ck2wrap").hidden=false;$("#pubnote").textContent=PUB_NOTE;$("#f-doc").innerHTML=docOpts("안전보건","","선택 안 함");$("#ferr").textContent=""}));
+  $("#f").addEventListener("reset",()=>setTimeout(()=>{draftFiles=[];drawFiles();$("#qlen").textContent="0";$("#f-dept").innerHTML=deptOpts("");$("#f-dept").disabled=true;docwrap.hidden=true;$("#pwwrap").hidden=true;$("#ck2wrap").hidden=false;$("#pubnote").textContent=PUB_NOTE;$("#f-doc").innerHTML=docOpts("안전보건","","선택 안 함");$("#ferr").textContent=""}));
   const b64=f=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(",")[1]);fr.onerror=()=>rej(new Error(f.name+" 파일을 읽을 수 없습니다."));fr.readAsDataURL(f)});
   $("#f").addEventListener("submit",async e=>{e.preventDefault();
     const site=$("#f-site").value,q=$("#f-q").value.trim(),err=$("#ferr");
