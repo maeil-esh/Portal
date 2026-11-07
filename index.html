@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YESS-업무지원시스템</title>
+<link id="site-favicon" rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232563EB'/><text x='50%25' y='53%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black,Arial' font-weight='900' font-size='12' fill='white'>YE.</text><circle cx='25' cy='25' r='4' fill='%2310B981'/></svg>" type="image/svg+xml">
+<link id="site-favicon-apple" rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232563EB'/><text x='50%25' y='53%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black,Arial' font-weight='900' font-size='12' fill='white'>YE.</text><circle cx='25' cy='25' r='4' fill='%2310B981'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #F5F6FA; --bg-white: #FFFFFF;
+  --blue: #2563EB; --blue-lt: #EFF4FF; --blue-mid: #DBEAFE;
+  --teal: #0D9488; --teal-lt: #EFFAF8; --teal-mid: #CCFBF1;
+  --amber: #D97706; --amber-lt: #FFFBEB; --amber-mid: #FDE68A;
+  --violet: #7C3AED; --violet-lt: #F5F3FF; --violet-mid: #DDD6FE;
+  --rose: #E11D48; --rose-lt: #FFF1F2; --rose-mid: #FECDD3;
+  --hold: #64748B; --hold-dark: #334155; --hold-lt: #F1F5F9; --hold-mid: #CBD5E1;
+  --text-h: #0F172A; --text-b: #334155; --text-m: #64748B; --text-s: #94A3B8;
+  --border: #E2E8F0; --radius: 22px;
+  --shadow-card: 0 2px 16px rgba(15,23,42,0.06), 0 1px 3px rgba(15,23,42,0.04);
+  --shadow-hover: 0 16px 48px rgba(15,23,42,0.12), 0 4px 12px rgba(15,23,42,0.06);
+}
+html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'Noto Sans KR', sans-serif; color: var(--text-b); overflow-x: hidden; }
+.bg-blob { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.bg-blob::before { content: ''; position: absolute; width: 700px; height: 700px; top: -200px; left: -150px; border-radius: 50%; background: radial-gradient(circle, rgba(37,99,235,0.07) 0%, transparent 70%); }
+.bg-blob::after  { content: ''; position: absolute; width: 600px; height: 600px; bottom: -150px; right: -100px; border-radius: 50%; background: radial-gradient(circle, rgba(13,148,136,0.07) 0%, transparent 70%); }
+.bg-dots { position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(circle, rgba(15,23,42,0.06) 1px, transparent 1px); background-size: 28px 28px; }
+.wrapper { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 72px 24px 56px; }
+.header { text-align: center; margin-bottom: 60px; animation: fadeDown 0.75s cubic-bezier(.22,1,.36,1) both; }
+.logo-row { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+.logo-mark { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px; background: var(--blue); }
+.logo-mark svg { width: 18px; height: 18px; }
+.logo-name { font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 0.06em; color: var(--text-h); }
+.logo-name span { font-weight: 300; color: var(--text-m); margin-left: 6px; font-size: 13px; letter-spacing: 0.04em; }
+.divider { width: 1px; height: 20px; background: var(--border); }
+.header-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--blue-lt); border: 1px solid var(--blue-mid); border-radius: 100px; padding: 4px 14px 4px 10px; font-size: 11.5px; font-weight: 500; color: var(--blue); letter-spacing: 0.03em; }
+.pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); animation: blink 2.4s ease-in-out infinite; }
+.header h1 { font-family: 'Noto Sans KR', sans-serif; font-size: clamp(32px, 5vw, 56px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; color: var(--text-h); margin-bottom: 14px; }
+.header h1 em { font-style: normal; font-weight: 700; color: var(--blue); }
+.header-sub { font-size: 15px; color: var(--text-m); font-weight: 300; letter-spacing: 0.02em; }
+.header-sub b { font-weight: 500; color: var(--text-b); }
+
+/* ── 그리드: 6열 ── */
+.grid { display: grid; grid-template-columns: repeat(6, 210px); gap: 16px; width: 100%; max-width: 1380px; }
+@media (max-width: 1380px) { .grid { grid-template-columns: repeat(3, 1fr); max-width: 780px; } }
+@media (max-width: 820px)  { .grid { grid-template-columns: repeat(2, 1fr); max-width: 560px; } }
+@media (max-width: 560px)  { .grid { grid-template-columns: 1fr; max-width: 320px; } }
+
+.card { position: relative; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 22px 22px; text-decoration: none; color: inherit; display: flex; flex-direction: column; box-shadow: var(--shadow-card); transition: transform 0.28s cubic-bezier(.22,1,.36,1), box-shadow 0.28s cubic-bezier(.22,1,.36,1), border-color 0.2s ease; overflow: hidden; animation: fadeUp 0.65s cubic-bezier(.22,1,.36,1) both; }
+.card:nth-child(1) { animation-delay: 0.08s; }
+.card:nth-child(2) { animation-delay: 0.16s; }
+.card:nth-child(3) { animation-delay: 0.24s; }
+.card:nth-child(4) { animation-delay: 0.32s; }
+.card:nth-child(5) { animation-delay: 0.40s; }
+.card:nth-child(6) { animation-delay: 0.48s; }
+.card:nth-child(7) { animation-delay: 0.56s; }
+.card:nth-child(8) { animation-delay: 0.64s; }
+.card:nth-child(9) { animation-delay: 0.72s; }
+.card:nth-child(10) { animation-delay: 0.80s; }
+.card-hold { cursor: default; }
+.card-dev { cursor: default; }
+.card-b:hover, .card-t:hover, .card-a:hover, .card-r:hover, .card-v:hover, .card-n:hover, .card-g:hover, .card-c:hover { transform: translateY(-7px); box-shadow: var(--shadow-hover); }
+.card-b:hover { border-color: #BFDBFE; }
+.card-t:hover { border-color: #99F6E4; }
+.card-a:hover { border-color: #FCD34D; }
+.card-r:hover { border-color: var(--rose-mid); }
+.card-v:hover { border-color: var(--violet-mid); }
+.card-n:hover { border-color: #93C5FD; }
+.card-g:hover { border-color: #C7D2FE; }
+.card-c:hover { border-color: #A5F3FC; }
+.card-dev:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: #A5F3FC; }
+.card-hold:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--hold-mid); }
+
+.card-bar { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: var(--radius) var(--radius) 0 0; }
+.card-b .card-bar    { background: linear-gradient(90deg, #2563EB 0%, #60A5FA 100%); }
+.card-t .card-bar    { background: linear-gradient(90deg, #0D9488 0%, #34D399 100%); }
+.card-a .card-bar    { background: linear-gradient(90deg, #D97706 0%, #FCD34D 100%); }
+.card-hold .card-bar { background: linear-gradient(90deg, #64748B 0%, #94A3B8 100%); }
+.card-v .card-bar    { background: linear-gradient(90deg, #7C3AED 0%, #A78BFA 100%); }
+.card-r .card-bar    { background: linear-gradient(90deg, #E11D48 0%, #FB7185 100%); }
+.card-n .card-bar    { background: linear-gradient(90deg, #0A2540 0%, #3B82F6 100%); }
+.card-g .card-bar    { background: linear-gradient(90deg, #4F46E5 0%, #818CF8 100%); }
+.card-c .card-bar    { background: linear-gradient(90deg, #0891B2 0%, #22D3EE 100%); }
+
+.card-no { position: absolute; top: 16px; right: 18px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: var(--text-s); }
+.icon-box { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; flex-shrink: 0; }
+.card-b    .icon-box { background: var(--blue-lt);   border: 1px solid var(--blue-mid); }
+.card-t    .icon-box { background: var(--teal-lt);   border: 1px solid var(--teal-mid); }
+.card-a    .icon-box { background: var(--amber-lt);  border: 1px solid var(--amber-mid); }
+.card-hold .icon-box { background: var(--hold-lt);   border: 1px solid var(--hold-mid); }
+.card-v    .icon-box { background: var(--violet-lt); border: 1px solid var(--violet-mid); }
+.card-r    .icon-box { background: var(--rose-lt);   border: 1px solid var(--rose-mid); }
+.card-n    .icon-box { background: #E0F2FE; border: 1px solid #93C5FD; }
+.card-g    .icon-box { background: #EEF2FF; border: 1px solid #C7D2FE; }
+.card-c    .icon-box { background: #ECFEFF; border: 1px solid #A5F3FC; }
+.icon-box svg { width: 17px; height: 17px; }
+
+.card-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 5px; }
+.card-b    .card-tag { color: var(--blue); }
+.card-t    .card-tag { color: var(--teal); }
+.card-a    .card-tag { color: var(--amber); }
+.card-hold .card-tag { color: var(--hold-dark); }
+.card-v    .card-tag { color: var(--violet); }
+.card-r    .card-tag { color: var(--rose); }
+.card-n    .card-tag { color: #0A2540; }
+.card-g    .card-tag { color: #4F46E5; }
+.card-c    .card-tag { color: #0891B2; }
+
+.card-title { font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 700; line-height: 1.45; color: var(--text-h); margin-bottom: 7px; word-break: keep-all; }
+.card-desc  { font-family: 'Noto Sans KR', sans-serif; font-size: 11.5px; font-weight: 400; color: var(--text-m); line-height: 1.7; word-break: keep-all; flex: 1; }
+.card-foot  { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+.status { display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 400; color: var(--text-m); }
+.s-dot      { width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 0 2px rgba(16,185,129,0.2); animation: blink 2.4s ease-in-out infinite; }
+.s-dot-hold { width: 7px; height: 7px; border-radius: 50%; background: var(--hold); box-shadow: 0 0 0 2px rgba(100,116,139,0.2); }
+
+.hold-notice { background: var(--hold-lt); border: 1px solid var(--hold-mid); border-radius: 10px; padding: 9px 11px; margin-top: 10px; margin-bottom: 2px; }
+.hold-notice-title { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--hold-dark); letter-spacing: 0.02em; }
+.hold-notice-title svg { width: 12px; height: 12px; flex-shrink: 0; }
+.hold-notice-sub { font-size: 10.5px; color: var(--hold-dark); opacity: 0.8; margin-top: 3px; line-height: 1.5; font-weight: 400; font-family: 'Noto Sans KR', sans-serif; }
+.hold-badge { display: inline-flex; align-items: center; gap: 5px; background: var(--hold-lt); border: 1px solid var(--hold-mid); border-radius: 100px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; color: var(--hold-dark); letter-spacing: 0.06em; font-family: 'Outfit', monospace; }
+.hold-badge svg { width: 11px; height: 11px; }
+
+.arrow-btn { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; padding: 6px 14px 6px 12px; border-radius: 100px; border: 1px solid var(--border); transition: all 0.22s ease; color: var(--text-m); }
+.arrow-btn svg { width: 13px; height: 13px; transition: transform 0.22s ease; }
+.card-b:hover .arrow-btn { background: var(--blue-lt);   border-color: #BFDBFE; color: var(--blue); }
+.card-t:hover .arrow-btn { background: var(--teal-lt);   border-color: #99F6E4; color: var(--teal); }
+.card-a:hover .arrow-btn { background: var(--amber-lt);  border-color: #FCD34D; color: var(--amber); }
+.card-v:hover .arrow-btn { background: var(--violet-lt); border-color: #DDD6FE; color: var(--violet); }
+.card-r:hover .arrow-btn { background: var(--rose-lt);   border-color: var(--rose-mid); color: var(--rose); }
+.card:hover .arrow-btn svg { transform: translate(2px, -2px); }
+
+.card-g:hover .arrow-btn { background: #EEF2FF; border-color: #C7D2FE; color: #4F46E5; }
+.card-c:hover .arrow-btn { background: #ECFEFF; border-color: #A5F3FC; color: #0891B2; }
+.dev-notice { background: #ECFEFF; border: 1px solid #A5F3FC; border-radius: 10px; padding: 9px 11px; margin-top: 10px; margin-bottom: 2px; }
+.dev-notice-title { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #0E7490; letter-spacing: 0.02em; }
+.dev-notice-title svg { width: 12px; height: 12px; flex-shrink: 0; }
+.dev-notice-sub { font-size: 10.5px; color: #0E7490; opacity: 0.85; margin-top: 3px; line-height: 1.5; font-weight: 400; font-family: 'Noto Sans KR', sans-serif; }
+.dev-badge { display: inline-flex; align-items: center; gap: 5px; background: #ECFEFF; border: 1px solid #A5F3FC; border-radius: 100px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; color: #0E7490; letter-spacing: 0.06em; font-family: 'Outfit', monospace; }
+.dev-badge svg { width: 11px; height: 11px; }
+.s-dot-dev { width: 7px; height: 7px; border-radius: 50%; background: #06B6D4; box-shadow: 0 0 0 2px rgba(6,182,212,0.2); animation: blink 2.4s ease-in-out infinite; }
+
+
+.footer { margin-top: 52px; text-align: center; animation: fadeUp 0.7s 0.48s cubic-bezier(.22,1,.36,1) both; }
+.footer-contact { margin-top: 14px; font-size: 11px; color: var(--text-s); letter-spacing: 0.01em; }
+.footer-contact a { color: var(--blue); text-decoration: none; font-weight: 500; }
+.footer-contact a:hover { text-decoration: underline; }
+
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeUp   { from { opacity: 0; transform: translateY(22px);  } to { opacity: 1; transform: translateY(0); } }
+@keyframes blink    { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.card:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+/* ── 전광판 뉴스 티커 ── */
+#news-ticker{position:fixed;top:0;left:0;right:0;z-index:999;height:44px;background:#0A1628;border-bottom:1px solid rgba(37,99,235,.3);display:flex;align-items:center;overflow:hidden;box-shadow:0 2px 14px rgba(0,0,0,.35)}
+.tk-label{flex-shrink:0;display:flex;align-items:center;gap:6px;height:100%;background:#2563EB;padding:0 16px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:#fff;letter-spacing:.12em;white-space:nowrap;border-right:1px solid rgba(255,255,255,.12)}
+.tk-track{flex:1;overflow:hidden;position:relative;height:100%;mask-image:linear-gradient(to right,transparent 0,#000 30px,#000 calc(100% - 30px),transparent 100%)}
+.tk-inner{display:inline-flex;align-items:center;height:100%;white-space:nowrap;will-change:transform;gap:0}
+.tk-inner.running{animation:tkScroll var(--tk-dur,60s) linear infinite}
+.tk-inner:hover{animation-play-state:paused}
+.tk-item{display:inline-flex;align-items:center;gap:8px;padding:0 36px 0 0;font-size:14px;color:#CBD5E1;font-family:'Noto Sans KR',sans-serif;font-weight:400}
+.tk-item a{color:inherit;text-decoration:none}.tk-item a:hover{color:#fff;text-decoration:underline}
+.tk-badge{flex-shrink:0;font-size:11px;font-weight:700;letter-spacing:.08em;padding:3px 8px;border-radius:3px;font-family:'Outfit',monospace}
+.bd-moel{background:rgba(37,99,235,.25);color:#7CB9F4;border:1px solid rgba(37,99,235,.4)}
+.bd-kosha{background:rgba(16,185,129,.18);color:#4ADE80;border:1px solid rgba(16,185,129,.35)}
+.bd-news{background:rgba(239,68,68,.18);color:#FCA5A5;border:1px solid rgba(239,68,68,.35)}
+.bd-rule{background:rgba(245,158,11,.18);color:#FCD34D;border:1px solid rgba(245,158,11,.35)}
+.bd-env{background:rgba(34,197,94,.18);color:#86EFAC;border:1px solid rgba(34,197,94,.35)}
+.tk-dot{width:3px;height:3px;border-radius:50%;background:rgba(255,255,255,.15);flex-shrink:0;margin:0 14px}
+.tk-load{color:rgba(255,255,255,.3);font-size:11.5px;font-family:'Outfit',sans-serif;padding-left:18px;display:flex;align-items:center;gap:8px}
+.tk-spin{width:11px;height:11px;border-radius:50%;border:1.5px solid rgba(37,99,235,.25);border-top-color:#60A5FA;animation:tkspin .8s linear infinite;flex-shrink:0}
+.tk-refresh{flex-shrink:0;width:28px;height:100%;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(255,255,255,.07);cursor:pointer;color:rgba(255,255,255,.25);font-size:12px;transition:color .2s;background:none;border-top:none;border-right:none;border-bottom:none}
+.tk-refresh:hover{color:#60A5FA}
+.tk-time{flex-shrink:0;font-size:12px;font-family:'Outfit',monospace;color:rgba(255,255,255,.25);padding:0 10px;border-left:1px solid rgba(255,255,255,.07);white-space:nowrap}
+@keyframes tkScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes tkspin{to{transform:rotate(360deg)}}
+.wrapper{padding-top:calc(72px + 44px)!important}
+
+.ver-blink { color: #E11D48; font-size: 11px; font-weight: 700; font-family: 'Outfit', monospace; letter-spacing: 0.06em; margin-left: 5px; animation: verBlink 5.5s ease-in-out infinite; }
+@keyframes verBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+</style>
+</head>
+<body>
+<!-- 전광판 -->
+<div id="news-ticker">
+  <div class="tk-label">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    ESH NEWS
+  </div>
+  <div class="tk-track">
+    <div class="tk-inner" id="tk-inner">
+      <div class="tk-load"><div class="tk-spin"></div>뉴스를 불러오는 중...</div>
+    </div>
+  </div>
+  <div class="tk-time" id="tk-time"></div>
+  <button class="tk-refresh" id="tk-refresh-btn" title="새로고침">↻</button>
+</div>
+
+<div class="bg-blob"></div>
+<div class="bg-dots"></div>
+<div class="wrapper">
+  <header class="header">
+    <div class="logo-row">
+      <div class="logo-mark">
+        <svg viewBox="0 0 18 18" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 2L15.5 5.5V12.5L9 16L2.5 12.5V5.5L9 2Z"/>
+          <path d="M9 2V16M2.5 5.5L15.5 12.5M15.5 5.5L2.5 12.5"/>
+        </svg>
+      </div>
+      <span class="logo-name">YESS <span>Your (Intelligent) ESH Support System</span></span>
+      <div class="divider"></div>
+      <div class="header-pill"><span class="pill-dot"></span>9 Services Active · 1 On Hold</div>
+    </div>
+    <h1>지능형 안전보건<br><em>업무지원 시스템</em></h1>
+    <p class="header-sub"><b>매일유업</b> · Environment · Safety · Health</p>
+  </header>
+
+  <main class="grid">
+
+    <!-- 01 KPI Dashboard -->
+    <a class="card card-b" href="https://maeil-esh.github.io/esh-kpi-dashboard/" target="_blank" rel="noopener">
+      <div class="card-bar"></div><span class="card-no">01</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 17.5h7M17.5 14v7"/>
+        </svg>
+      </div>
+      <span class="card-tag">KPI Dashboard</span>
+      <h2 class="card-title">ESH 전산화시스템<br>모니터링<span class="ver-blink">Ver2.0</span></h2>
+      <p class="card-desc">사업장 관리감독자 접속 현황 및 이력을 모니터링합니다.</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
+    <!-- 02 관리감독자 및 유해위험작업 현황 -->
+    <a class="card card-v" href="https://maeil-esh.github.io/Portal/work.html" target="_blank" rel="noopener">
+      <div class="card-bar"></div><span class="card-no">02</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+      </div>
+      <span class="card-tag">Supervisor &amp; Hazardous Work</span>
+      <h2 class="card-title">관리감독자 및<br>유해위험작업 현황</h2>
+      <p class="card-desc">사업장별 관리감독자 지정 현황과 담당 공정의 유해위험작업 대상 여부를 통합 관리합니다.</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
+    <!-- 03 Newsletter -->
+    <a class="card card-a" href="https://script.google.com/macros/s/AKfycbwDi67lm6pgonJ-cjV1KSKPjWv1OKY8bXnTTq45pCzflzgo6pmnrgzRkUUAjbW4ltl-sw/exec" target="_blank" rel="noopener">
+      <div class="card-bar"></div><span class="card-no">03</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+      </div>
+      <span class="card-tag">Weekly Insight</span>
+      <h2 class="card-title">안전보건환경<br>인사이트 뉴스레터</h2>
+      <p class="card-desc">AI 기반 ESH 인사이트를 매주 월요일 자동 발송합니다. 구독 신청 및 관리</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
+    <!-- 04 건설업 산업안전보건관리비 계상 지원 -->
+    <a class="card card-t" href="https://maeil-esh.github.io/Portal/safety-cost-calculator" target="_blank" rel="noopener">
+      <div class="card-bar"></div><span class="card-no">04</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="2.5" width="16" height="19" rx="2"/>
+          <path d="M8 6.5h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h2M14 19h2"/>
+        </svg>
+      </div>
+      <span class="card-tag">Safety Cost Calculator</span>
+      <h2 class="card-title">건설업 산업안전보건관리비<br>계상 지원</h2>
+      <p class="card-desc">공사정보와 대상액을 입력하면 고시 적용 여부 및 최소 계상금액을 산정하고, 적용기준·질의회시를 함께 확인할 수 있습니다.</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
+    <!-- 05 AI-JSA (일시 보류) -->
+    <div class="card card-hold" id="card-jsa">
+      <div class="card-bar"></div><span class="card-no">05</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>
+        </svg>
+      </div>
+      <span class="card-tag">AI Risk Assessment</span>
+      <h2 class="card-title">AI-JSA<br>위험성평가</h2>
+      <p class="card-desc">작업 내용을 입력하면 AI가 유해·위험요인을 자동 도출하고 감소대책을 제안합니다. (작업안전분석 기반)</p>
+      <div class="hold-notice">
+        <div class="hold-notice-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          <span>일시 보류 ON HOLD</span>
+        </div>
+        <div class="hold-notice-sub">재개 일정은 별도 공지 예정</div>
+      </div>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot-hold"></span>일시 보류</span>
+        <div class="hold-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="9" x2="10" y2="15"/><line x1="14" y1="9" x2="14" y2="15"/></svg>
+          <span>HOLD</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 ESH 질의응답 -->
+    <a class="card card-c" href="https://maeil-esh.github.io/Portal/eshqna.html" target="_blank" rel="noopener">
+      <div class="card-bar"></div><span class="card-no">06</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0891B2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          <path d="M9.5 8.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5"/><path d="M12 14.5h.01"/>
+        </svg>
+      </div>
+      <span class="card-tag">ESH Q&amp;A</span>
+      <h2 class="card-title">ESH 질의응답<br>창구</h2>
+      <p class="card-desc">안전보건·환경 법령 및 MESH 절차 문의를 접수하면 산업안전팀이 검토 후 답변합니다. 공개 질의는 검색 가능</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
+    <!-- 07 관리감독자 안전보건 이행평가 -->
+    <a class="card card-n" href="https://maeil-esh.github.io/Portal/esh-supervisor" target="_blank" rel="noopener">
+      <div class="card-bar"></div><span class="card-no">07</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0A2540" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 12l2 2 4-4"/>
+          <path d="M21 12c0 5-3.5 7.5-9 9-5.5-1.5-9-4-9-9V5l9-3 9 3z"/>
+        </svg>
+      </div>
+      <span class="card-tag">Supervisor Compliance</span>
+      <h2 class="card-title">관리감독자<br>안전보건 이행평가</h2>
+      <p class="card-desc">중대재해처벌법 의무이행 평가를 위해 관리감독자별 체크리스트, 안전활동, MESH 내부심사 정보를 지원합니다.</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
+    <!-- 08 MESH 내부심사 스케줄 -->
+    <a class="card card-t" href="https://maeil-esh.github.io/schedule-calendar/" target="_blank" rel="noopener">
+      <div class="card-bar"></div><span class="card-no">08</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0D9488" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+          <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+        </svg>
+      </div>
+      <span class="card-tag">Audit Schedule</span>
+      <h2 class="card-title">MESH 내부심사<br>스케줄</h2>
+      <p class="card-desc">ISO 14001 · 45001 기반 MESH 내부심사 일정 및 심사원 배정 계획을 확인합니다.</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
+    <!-- 09 ISO 내부심사원 자격관리 -->
+    <a class="card card-g" href="https://maeil-esh.github.io/Portal/m-auditor.html" target="_blank" rel="noopener">
+      <div class="card-bar"></div><span class="card-no">09</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="8" r="5"/><path d="M9 12.5 7.5 22l4.5-2.7L16.5 22 15 12.5"/>
+        </svg>
+      </div>
+      <span class="card-tag">ISO Internal Auditor</span>
+      <h2 class="card-title">ISO 내부심사원<br>자격관리</h2>
+      <p class="card-desc">ISO 45001(안전보건) · 14001(환경) 내부심사원 자격현황을 통합 관리합니다. 경력 · 교육 · 참관 자동 판정.</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
+    <!-- 10 산업안전보건법 배우기 -->
+    <a class="card card-r" href="https://maeil-esh.github.io/Portal/safetylaw.html" target="_blank" rel="noopener">
+      <div class="card-bar"></div><span class="card-no">10</span>
+      <div class="icon-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#E11D48" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+      </div>
+      <span class="card-tag">Safety Law Learning</span>
+      <h2 class="card-title">산업안전보건법<br>배우기</h2>
+      <p class="card-desc">산업안전보건법 핵심 조문을 타이핑하며 법 지식을 습득합니다. 랭킹 도전!</p>
+      <div class="card-foot">
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
+      </div>
+    </a>
+
+  </main>
+
+  <footer class="footer">
+    <p class="footer-contact">※ Copyright 2026. ESH-MASTER.KR. All rights reserved. / 문의: 산업안전팀 정민혁 (<a href="mailto:[EMAIL]?subject=IESS 사이트 문의">[EMAIL]</a>)</p>
+  </footer>
+</div>
+
+<script>
+  const TK = {
+    inner:      document.getElementById('tk-inner'),
+    timeEl:     document.getElementById('tk-time'),
+    refreshBtn: document.getElementById('tk-refresh-btn'),
+    feeds: [
+      { url: 'https://api.rss2json.com/v1/api.json?count=10&rss_url=' + encodeURIComponent('https://www.moel.go.kr/news/enews/report/rss.do'),        cat: '노동부',   cls: 'bd-moel'  },
+      { url: 'https://api.rss2json.com/v1/api.json?count=10&rss_url=' + encodeURIComponent('https://www.kosha.or.kr/kosha/data/rssCenter.do?gubun=A'), cat: 'KOSHA',   cls: 'bd-kosha' },
+      { url: 'https://api.rss2json.com/v1/api.json?count=10&rss_url=' + encodeURIComponent('http://www.anjunj.com/rss/allArticle.xml'),               cat: '안전저널', cls: 'bd-news'  },
+      { url: 'https://api.rss2json.com/v1/api.json?count=10&rss_url=' + encodeURIComponent('https://www.me.go.kr/home/web/rss/rss.do?menuId=10257'),  cat: '환경부',   cls: 'bd-env'   },
+      { url: 'https://api.rss2json.com/v1/api.json?count=10&rss_url=' + encodeURIComponent('https://www.law.go.kr/LSW/rss/rssBoardList.do?bbsId=1'),  cat: '법령',     cls: 'bd-rule'  },
+      { url: 'https://api.rss2json.com/v1/api.json?count=10&rss_url=' + encodeURIComponent('https://www.kosha.or.kr/kosha/data/rssCenter.do?gubun=B'), cat: 'KOSHA',   cls: 'bd-kosha' },
+    ],
+    updateTime() {
+      const n = new Date();
+      this.timeEl.textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0') + ' 기준';
+    },
+    buildItem(cat, cls, text, link) {
+      const inner = link ? `<a href="${link}" target="_blank" rel="noopener">${text}</a>` : text;
+      return `<span class="tk-item"><span class="tk-badge ${cls}">${cat}</span>${inner}</span><span class="tk-dot"></span>`;
+    },
+    render(items) {
+      if (!items.length) return;
+      const dur = Math.min(240, Math.max(90, items.length * 10));
+      this.inner.innerHTML = items.map(i => this.buildItem(i.cat, i.cls, i.text, i.link)).join('')
+                           + items.map(i => this.buildItem(i.cat, i.cls, i.text, i.link)).join('');
+      this.inner.style.setProperty('--tk-dur', dur + 's');
+      this.inner.classList.remove('running');
+      void this.inner.offsetWidth;
+      this.inner.classList.add('running');
+      this.updateTime();
+    },
+    async fetchFeed(feed) {
+      try {
+        const ts  = Math.floor(Date.now() / (10 * 60 * 1000));
+        const res = await fetch(feed.url + '&_t=' + ts, { signal: AbortSignal.timeout(6000), cache: 'no-store' });
+        if (!res.ok) return [];
+        const data = await res.json();
+        if (data.status !== 'ok' || !Array.isArray(data.items)) return [];
+        return data.items.slice(0, 6).map(item => ({
+          cat: feed.cat, cls: feed.cls,
+          text: (item.title || '').replace(/<[^>]+>/g, '').trim().slice(0, 60),
+          link: item.link || null,
+          date: item.pubDate ? new Date(item.pubDate) : null,
+        })).filter(i => i.text.length > 4);
+      } catch { return []; }
+    },
+    fallback: [
+      { cat: '노동부',   cls: 'bd-moel',  text: '고용노동부 산업안전보건 정책 · 보도자료',          link: 'https://www.moel.go.kr/news/enews/report/enewsView.do' },
+      { cat: 'KOSHA',   cls: 'bd-kosha', text: '안전보건공단 공지사항 · 안전보건 자료실',          link: 'https://www.kosha.or.kr/kosha/data/notice.do' },
+      { cat: '안전저널', cls: 'bd-news',  text: '안전저널 최신 산업재해 · 안전보건 뉴스',          link: 'http://www.anjunj.com' },
+      { cat: '환경부',   cls: 'bd-env',   text: '환경부 화학물질 · 환경안전 최신 공지',            link: 'https://www.me.go.kr/home/web/main.do' },
+      { cat: '법령',     cls: 'bd-rule',  text: '국가법령정보센터 산업안전보건법 · 중대재해처벌법', link: 'https://www.law.go.kr' },
+    ],
+    async fetchAll() {
+      const results = await Promise.allSettled(this.feeds.map(f => this.fetchFeed(f)));
+      const items   = results.filter(r => r.status === 'fulfilled').flatMap(r => r.value);
+      items.sort((a,b) => { if(!a.date&&!b.date)return 0; if(!a.date)return 1; if(!b.date)return -1; return b.date-a.date; });
+      this.render(items.length ? items : this.fallback);
+    },
+    refresh() {
+      this.inner.innerHTML = '<div class="tk-load"><div class="tk-spin"></div>새로고침 중...</div>';
+      this.inner.classList.remove('running');
+      this.fetchAll();
+    },
+    init() {
+      this.fetchAll();
+      setInterval(() => this.fetchAll(), 5 * 60 * 1000);
+      setInterval(() => this.updateTime(), 60 * 1000);
+      this.refreshBtn.addEventListener('click', () => this.refresh());
+    }
+  };
+  TK.init();
+
+  (function() {
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('selectstart', e => e.preventDefault());
+    document.addEventListener('copy',  e => e.preventDefault());
+    document.addEventListener('cut',   e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F12') { e.preventDefault(); return false; }
+      if ((e.ctrlKey||e.metaKey) && e.shiftKey && ['i','I','j','J','c','C','k','K'].includes(e.key)) { e.preventDefault(); return false; }
+      if ((e.ctrlKey||e.metaKey) && ['u','U','s','S','a','A','p','P'].includes(e.key)) { e.preventDefault(); return false; }
+    });
+  })();
+</script>
+</body>
+</html>
