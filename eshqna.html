@@ -201,6 +201,7 @@ label.f{font-size:12.5px;font-weight:600;color:#4e5968}
 .btn{border-color:var(--line-strong);color:#333d4b}
 .btn:hover{background:#f4f6f9;border-color:#b0b8c1}
 tbody tr:hover td{background:#f4f8ff}
+.ans>.lab small{display:block;font-weight:400;color:#6b7684;font-size:12px;margin-top:2px}
 tbody td{border-bottom-color:#e5e8eb}
 .consent details{color:#4e5968}
 </style>
@@ -464,6 +465,7 @@ function filesChips(r){
   return r.nf?`<span class="chip"><span>📎 첨부 ${r.nf}개</span></span>`:"";
 }
 function detailHtml(r){
+  if(r.locked&&r.blind)return `<div class="detail-box"><div><h4><span class="doc">${esc(r.id)}</span></h4><p>관리자에 의해 블라인드 처리된 질의입니다.</p></div><div><h4>ESH 담당자 답변 ${badge(r.st)}</h4><p>-</p></div></div>`;
   if(r.locked){
     const canOpen=mode==="user"&&tab==="mine";
     return `<div class="detail-box"><div><h4>비공개 질의 · <span class="doc">${esc(r.id)}</span></h4><p>비공개로 접수된 질의입니다.</p>${canOpen?`<div class="row" style="margin-top:10px"><input type="password" id="u-pw" placeholder="비밀번호" autocomplete="off"><button class="btn sm pri" data-unlock="${esc(r.id)}">열람</button></div>`:""}</div>
@@ -482,19 +484,24 @@ function rowHtml(r,cols,span){
     dept:`<td>${r.dept?esc(r.dept):'<span class="tag">-</span>'}</td>`,c1:`<td>${esc(r.c1)}</td>`,c2:`<td>${esc(r.c2)}</td>`,
     c2q:`<td>${esc(r.c2)}${r.doc?`<div class="doc">${esc(r.doc)}</div><div class="tag">${esc(DOC_NAME[r.doc]||"")}</div>`:""}</td>`,
     doc:`<td>${docCell}</td>`,
-    q:`<td class="q"><div class="t">${r.pub===false?"🔒 ":""}${r.locked?"비공개 질의입니다":esc(r.q)}</div></td>`,
-    a:`<td class="q"><div class="t">${r.a?(r.locked?"🔒 비공개 답변입니다":esc(r.a)):'<span class="tag">답변 대기 중</span>'}</div></td>`,
+    q:`<td class="q"><div class="t">${r.del?"🗑 ":""}${r.blind&&r.locked?"🚫 관리자에 의해 블라인드 처리된 질의입니다":(r.blind?"🚫 ":"")+(r.pub===false?"🔒 ":"")+(r.locked?"비공개 질의입니다":esc(r.q))}</div></td>`,
+    a:`<td class="q"><div class="t">${r.blind&&r.locked?'<span class="tag">-</span>':r.a?(r.locked?"🔒 비공개 답변입니다":esc(r.a)):'<span class="tag">답변 대기 중</span>'}</div></td>`,
     aAt:`<td class="date">${r.aAt?esc(r.aAt):'<span class="tag">-</span>'}</td>`,st:`<td>${badge(r.st)}</td>`,
     files:`<td class="clip">${nf?"📎 "+nf:"-"}</td>`,
-    btn:`<td><button class="btn sm ${r.st==="wait"?"pri":""}" data-ans="${esc(r.id)}">${r.st==="wait"?"답변하기":"수정"}</button></td>`
+    who:`<td>${r.name?esc(r.name):(r.locked?'<span class="tag">-</span>':'<span class="tag">익명</span>')}</td>`,
+    btn:`<td>${r.del?`<button class="btn sm" data-restore="${esc(r.id)}">복구</button> <button class="btn sm" data-purge="${esc(r.id)}" style="color:var(--danger)">영구삭제</button>`:`<button class="btn sm ${r.st==="wait"?"pri":""}" data-ans="${esc(r.id)}">${r.st==="wait"?"답변하기":"수정"}</button>`}</td>`
   };
   let h=`<tr class="clickable" data-row="${esc(r.id)}">${cols.map(c=>cell[c]).join("")}</tr>`;
   if(openRow===r.id)h+=`<tr class="detail"><td colspan="${span}">${detailHtml(r)}</td></tr>`;
   return h;
 }
 function bindRows(){
-  main.querySelectorAll("[data-row]").forEach(tr=>tr.onclick=e=>{if(e.target.closest("[data-ans]"))return;openRow=openRow===tr.dataset.row?null:tr.dataset.row;redraw()});
+  main.querySelectorAll("[data-row]").forEach(tr=>tr.onclick=e=>{if(e.target.closest("[data-ans],[data-restore],[data-purge]"))return;openRow=openRow===tr.dataset.row?null:tr.dataset.row;redraw()});
   main.querySelectorAll("[data-ans]").forEach(b=>b.onclick=()=>{answering=b.dataset.ans;render();window.scrollTo(0,0)});
+  main.querySelectorAll("[data-restore]").forEach(b=>b.onclick=async()=>{b.disabled=true;try{await api("adminDelete",{token,id:b.dataset.restore,mode:"restore"});toast(`${b.dataset.restore} 복구했습니다`);viewManage()}catch(e){toast(e.message);b.disabled=false}});
+  main.querySelectorAll("[data-purge]").forEach(b=>b.onclick=async()=>{
+    if(!confirm(`${b.dataset.purge} 을(를) 영구삭제합니다.\n질의·답변 내용과 첨부파일이 삭제되며 복구할 수 없습니다. 계속할까요?`))return;
+    b.disabled=true;try{await api("adminDelete",{token,id:b.dataset.purge,mode:"purge"});toast(`${b.dataset.purge} 영구삭제했습니다`);viewManage()}catch(e){toast(e.message);b.disabled=false}});
   main.querySelectorAll("[data-unlock]").forEach(b=>b.onclick=async()=>{
     const pw=$("#u-pw").value;if(!pw)return toast("비밀번호를 입력해 주세요.");
     b.disabled=true;
@@ -540,12 +547,12 @@ function viewAll(){loading();api("listPublic").then(r=>{rows=r;redraw=drawAll;dr
 function drawAll(){
   const list=applyFilters([...rows],false),per=8,slice=list.slice((page-1)*per,page*per);
   main.innerHTML=`<h1>전체 질의</h1>
-  <p class="lede">모든 사업장의 질의와 답변을 공개합니다. 이름·사업장·부서 등 개인정보는 표시하지 않습니다. 같은 내용을 이미 묻고 답한 사례가 있는지 먼저 검색해 보세요.</p>
+  <p class="lede">모든 사업장의 질의와 답변을 공개합니다. 작성자 이름은 첫 글자만 표시하고 나머지는 가리며, 사업장·부서 등 다른 개인정보는 표시하지 않습니다. 같은 내용을 이미 묻고 답한 사례가 있는지 먼저 검색해 보세요.</p>
   <div class="panel">${filtersHtml(false)}
     <div class="tablehead">검색 결과 <b>${list.length}</b>건</div>
     <div class="tscroll"><table>
-      <thead><tr><th class="sort" data-dir="${flt.sortDir}">질의일시</th><th>구분1</th><th>구분2</th><th>문서번호</th><th>질의내용</th><th>답변내용</th><th>답변일시</th><th>상태</th><th>첨부</th></tr></thead>
-      <tbody>${slice.length?slice.map(r=>rowHtml(r,["at","c1","c2","doc","q","a","aAt","st","files"],9)).join(""):`<tr><td colspan="9" class="empty">조건에 맞는 질의가 없습니다. 기간이나 키워드를 바꿔 보세요.</td></tr>`}</tbody>
+      <thead><tr><th class="sort" data-dir="${flt.sortDir}">질의일시</th><th>작성자</th><th>구분1</th><th>구분2</th><th>문서번호</th><th>질의내용</th><th>답변내용</th><th>답변일시</th><th>상태</th><th>첨부</th></tr></thead>
+      <tbody>${slice.length?slice.map(r=>rowHtml(r,["at","who","c1","c2","doc","q","a","aAt","st","files"],10)).join(""):`<tr><td colspan="10" class="empty">조건에 맞는 질의가 없습니다. 기간이나 키워드를 바꿔 보세요.</td></tr>`}</tbody>
     </table></div>${pager(list.length,per)}</div>`;
   bindFilters(false);bindRows();bindPager();
 }
@@ -565,25 +572,38 @@ function viewLogin(){
   });
 }
 
+/* ---------- CSV 내려받기 (현재 목록, 엑셀 호환 UTF-8 BOM) ---------- */
+function exportCsv(list){
+  if(!list.length)return toast("내려받을 질의가 없습니다.");
+  const head=["접수번호","접수일시","사업장","소속부서","이름","이메일","구분1","구분2","문서번호","질의내용","답변내용","답변일시","상태","공개여부","블라인드","삭제일시"];
+  const cell=v=>{v=String(v??"");if(/^[=+\-@\t\r]/.test(v))v="'"+v;return `"${v.replace(/"/g,'""')}"`};
+  const lines=[head.map(cell).join(",")].concat(list.map(r=>[r.id,r.at,r.site,r.dept,r.name||"익명",r.email,r.c1,r.c2,r.doc,r.q,r.a,r.aAt,ST[r.st].t,r.pub===false?"비공개":"공개",r.blind?"Y":"",r.del||""].map(cell).join(",")));
+  const blob=new Blob(["\ufeff"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+  const d=new Date(),ymd=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`ESH질의응답_${ymd}.csv`;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);toast(`${list.length}건을 내려받았습니다. 개인정보가 포함되어 있으니 관리에 유의해 주세요.`);
+}
+
 /* ---------- 3-1. 관리자 답변 관리 ---------- */
 function viewManage(){loading();api("adminList",{token}).then(r=>{rows=r;redraw=drawManage;drawManage()}).catch(e=>errView(e,viewManage))}
 function drawManage(){
-  const list=applyFilters([...rows],true);
-  const cnt=k=>k==="all"?list.length:list.filter(r=>r.st===k).length;
-  const stats=[["all","전체"],["wait","답변대기"],["done","완료"],["hold","보류"],["plan","개선예정"]];
-  const shown=adminStat==="all"?list:list.filter(r=>r.st===adminStat);
+  const base=applyFilters([...rows],true),list=base.filter(r=>!r.del),trash=base.filter(r=>r.del);
+  const cnt=k=>k==="all"?list.length:k==="trash"?trash.length:k==="blind"?list.filter(r=>r.blind).length:list.filter(r=>r.st===k).length;
+  const stats=[["all","전체"],["wait","답변대기"],["done","완료"],["hold","보류"],["plan","개선예정"],["blind","블라인드"],["trash","휴지통"]];
+  const shown=adminStat==="all"?list:adminStat==="trash"?trash:adminStat==="blind"?list.filter(r=>r.blind):list.filter(r=>r.st===adminStat);
   const per=8,slice=shown.slice((page-1)*per,page*per);
   main.innerHTML=`<h1>답변 관리</h1>
-  <p class="lede">접수된 질의를 확인하고 답변을 등록합니다. 행을 누르면 원문을 펼쳐 보고, ‘답변하기’로 답변 입력 화면으로 이동합니다. 🔒는 비공개 질의입니다.</p>
+  <p class="lede">접수된 질의를 확인하고 답변을 등록합니다. 행을 누르면 원문을 펼쳐 보고, ‘답변하기’로 답변 입력 화면으로 이동합니다. 🔒 비공개, 🚫 블라인드, 🗑 휴지통 건입니다. 질의 수정·블라인드·삭제는 답변 입력 화면 하단의 ‘관리 작업’에서 처리합니다.</p>
   <div class="stats">${stats.map(([k,t])=>`<button class="stat" aria-pressed="${adminStat===k}" data-stat="${k}"><small>${t}</small><b>${cnt(k)}</b></button>`).join("")}</div>
   <div class="panel">${filtersHtml(true)}
-    <div class="tablehead">표시 <b>${shown.length}</b>건 · 질의일시 순 정렬은 머리글을 누르세요 <span style="flex:1"></span><button class="btn sm" id="refresh">새로고침</button><button class="btn sm" id="logout">로그아웃</button></div>
+    <div class="tablehead">표시 <b>${shown.length}</b>건 · 질의일시 순 정렬은 머리글을 누르세요 <span style="flex:1"></span><button class="btn sm" id="csv">CSV 내려받기</button><button class="btn sm" id="refresh">새로고침</button><button class="btn sm" id="logout">로그아웃</button></div>
     <div class="tscroll"><table>
       <thead><tr><th></th><th class="sort" data-dir="${flt.sortDir}">질의일시</th><th>사업장</th><th>부서</th><th>이름</th><th>구분1</th><th>구분2</th><th>질의내용</th><th>답변내용</th><th>답변일시</th><th>상태</th><th>첨부</th></tr></thead>
       <tbody>${slice.length?slice.map(r=>rowHtml(r,["btn","at","site","dept","name","c1","c2q","q","a","aAt","st","files"],12)).join(""):`<tr><td colspan="12" class="empty">해당 조건의 질의가 없습니다.</td></tr>`}</tbody>
     </table></div>${pager(shown.length,per)}</div>`;
   main.querySelectorAll("[data-stat]").forEach(b=>b.onclick=()=>{adminStat=b.dataset.stat;page=1;redraw()});
   $("#refresh").onclick=viewManage;
+  $("#csv").onclick=()=>exportCsv(shown);
   $("#logout").onclick=()=>{token="";try{sessionStorage.removeItem("shetok")}catch(_){}render()};
   bindFilters(true);bindRows();bindPager();
 }
@@ -607,8 +627,50 @@ function viewAnswer(){
     <div class="lab">처리 이력</div>
     <div class="hist"><span><span class="mono">${esc(r.at)}</span> 접수 (${r.name?esc(r.name):"익명"})</span>${r.aAt?`<span><span class="mono">${esc(r.aAt)}</span> ${ST[r.st].t} 처리 (${esc(r.by||"ESH 담당자")})</span>`:""}</div>
   </div>
-  <div class="actions"><span class="err" id="aerr"></span><button type="button" class="btn" id="cancel">취소</button><button type="submit" class="btn pri" id="asave">답변 저장</button></div></form>`;
+  <div class="actions"><span class="err" id="aerr"></span><button type="button" class="btn" id="cancel">취소</button><button type="submit" class="btn pri" id="asave"${r.del?" disabled":""}>답변 저장</button></div></form>
+  <h2 style="font-size:16px;margin:28px 0 10px">관리 작업</h2>
+  <div class="panel"><div class="ans">
+    ${r.del?`<div class="lab">삭제됨</div><div><div class="note" style="color:var(--danger);margin:0 0 10px">🗑 휴지통에 있는 질의입니다 (${esc(r.del)} 삭제). 사용자 화면에는 표시되지 않습니다.</div>
+      <div class="row" style="gap:8px"><button type="button" class="btn sm" id="g-restore" style="flex:0 0 auto">복구</button><button type="button" class="btn sm" id="g-purge" style="flex:0 0 auto;color:var(--danger)">영구삭제</button></div></div>`
+    :`<div class="lab">질의 수정<small>개인정보 삭제·오기 정정</small></div><div>
+      <details><summary style="cursor:pointer;font-weight:600">질의 내용·구분 수정하기</summary>
+        <div class="row" style="margin:12px 0 8px">
+          <label class="f">구분1<select id="e-c1">${opt(["일반","안전보건","환경"],r.c1)}</select></label>
+          <label class="f">구분2<select id="e-c2">${opt(["관계법령","MESH"],r.c2)}</select></label>
+          <label class="f" id="e-docw" ${r.c2==="MESH"?"":"hidden"} style="flex:1 1 260px">문서번호<select id="e-doc">${docOpts(r.c1,r.doc,"선택 안 함")}</select></label>
+        </div>
+        <textarea id="e-q" maxlength="2000">${esc(r.q)}</textarea>
+        <label class="f" style="margin-top:8px">수정 사유 (관리 이력에 기록)<input type="text" id="e-note" maxlength="100" placeholder="예) 연락처 등 개인정보 삭제"></label>
+        <div class="note" style="margin-top:6px">※ 수정 전 원문은 보관되지 않습니다. 공개/비공개 전환은 신청자 동의 문제로 지원하지 않습니다(공개 제한은 아래 블라인드를 사용).</div>
+        <div class="row" style="margin-top:8px"><span class="err" id="e-err" style="flex:1"></span><button type="button" class="btn sm pri" id="e-save" style="flex:0 0 auto">수정 저장</button></div>
+      </details></div>
+    <div class="lab">블라인드<small>전체 질의 화면에서 가림</small></div><div>
+      ${r.pub===false?'<span class="tag" style="white-space:normal">비공개 질의는 전체 질의 화면에서 이미 내용이 가려져 있어 블라인드가 필요하지 않습니다.</span>'
+      :`<div class="tag" style="white-space:normal;margin-bottom:8px">${r.blind?"🚫 현재 블라인드 상태입니다. 전체 질의에는 ‘관리자에 의해 블라인드 처리된 질의’로만 표시됩니다.":"부적절하거나 개인정보가 포함된 공개 질의를 전체 질의에서 즉시 가립니다. 질의자 본인(나의 질의)과 관리자는 계속 볼 수 있습니다."}</div>
+        <div class="row"><input type="text" id="b-note" maxlength="100" placeholder="사유 (관리 이력에 기록)"><button type="button" class="btn sm ${r.blind?"":"pri"}" id="b-btn" style="flex:0 0 auto">${r.blind?"블라인드 해제":"블라인드 처리"}</button></div>`}
+    </div>
+    <div class="lab">삭제<small>휴지통으로 이동</small></div><div>
+      <div class="tag" style="white-space:normal;margin-bottom:8px">삭제하면 사용자 화면에서 즉시 사라지고 관리자 ‘휴지통’으로 이동합니다. 휴지통에서 복구하거나 영구삭제할 수 있습니다.</div>
+      <button type="button" class="btn sm" id="d-trash" style="color:var(--danger)">휴지통으로 이동</button></div>`}
+    <div class="lab">관리 이력</div><div><div class="hist" id="loghist">불러오는 중…</div></div>
+  </div></div>`;
   const back=()=>{answering=null;render()};
+  const reload=async msg=>{rows=await api("adminList",{token});toast(msg);viewAnswer()};
+  const act=(btn,fn)=>btn&&(btn.onclick=async()=>{btn.disabled=true;try{await fn()}catch(ex){if(/세션 만료|로그인이 필요/.test(ex.message))return errView(ex);toast(ex.message);btn.disabled=false}});
+  api("adminLog",{token,id:r.id}).then(l=>{$("#loghist").innerHTML=l.length?l.map(x=>`<span><span class="mono">${esc(x.at)}</span> ${esc(x.act)}${x.detail?" · "+esc(x.detail):""}</span>`).join(""):'<span>관리 이력이 없습니다.</span>'}).catch(()=>{$("#loghist").textContent="이력을 불러오지 못했습니다."});
+  if($("#e-c1")){
+    $("#e-c1").onchange=()=>{$("#e-doc").innerHTML=docOpts($("#e-c1").value,"","선택 안 함")};
+    $("#e-c2").onchange=()=>{$("#e-docw").hidden=$("#e-c2").value!=="MESH"};
+    act($("#e-save"),async()=>{const q=$("#e-q").value.trim();if(q.length<5){$("#e-err").textContent="질의 내용을 입력해 주세요.";throw new Error("질의 내용을 입력해 주세요.")}
+      await api("adminEdit",{token,id:r.id,q,c1:$("#e-c1").value,c2:$("#e-c2").value,doc:$("#e-c2").value==="MESH"?$("#e-doc").value:"",note:$("#e-note").value.trim()});await reload("질의를 수정했습니다.")});
+    act($("#b-btn"),async()=>{await api("adminBlind",{token,id:r.id,on:!r.blind,note:$("#b-note").value.trim()});await reload(r.blind?"블라인드를 해제했습니다.":"블라인드 처리했습니다.")});
+    act($("#d-trash"),async()=>{if(!confirm(`${r.id} 을(를) 삭제(휴지통 이동)합니다. 사용자 화면에서 즉시 사라지며 휴지통에서 복구할 수 있습니다.`))throw new Error("취소했습니다.");
+      await api("adminDelete",{token,id:r.id,mode:"trash"});toast(`${r.id} 을(를) 휴지통으로 이동했습니다`);answering=null;viewManage()});
+  }else{
+    act($("#g-restore"),async()=>{await api("adminDelete",{token,id:r.id,mode:"restore"});toast(`${r.id} 복구했습니다`);answering=null;viewManage()});
+    act($("#g-purge"),async()=>{if(!confirm(`${r.id} 을(를) 영구삭제합니다.\n질의·답변 내용과 첨부파일이 삭제되며 복구할 수 없습니다. 계속할까요?`))throw new Error("취소했습니다.");
+      await api("adminDelete",{token,id:r.id,mode:"purge"});toast(`${r.id} 영구삭제했습니다`);answering=null;viewManage()});
+  }
   $("#back").onclick=back;$("#cancel").onclick=back;
   $("#af").addEventListener("submit",async e=>{e.preventDefault();
     const a=$("#a-text").value.trim(),s=main.querySelector('input[name=ast]:checked');
