@@ -252,7 +252,7 @@ tbody td{border-bottom-color:#e5e8eb}
 .dash thead th{background:#344155;color:#fff}
 .dash td.n,.dash th.n{text-align:right}
 #tip{position:fixed;z-index:50;background:#191f28;color:#fff;font-size:12px;padding:6px 9px;border-radius:6px;pointer-events:none;max-width:240px;line-height:1.5}
-.dash-go{margin:2px 0 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dash-go{margin:2px 0 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .formtop{margin-top:6px}
 .dash-go a{text-decoration:none}
 .hb .bs{transition:width .8s cubic-bezier(.2,.7,.2,1)}
@@ -267,7 +267,32 @@ tbody td{border-bottom-color:#e5e8eb}
 .sk-row{display:flex;gap:12px;align-items:center;margin:12px 0}.sk-row .sk-l{margin:0}
 .scan i{animation:blink 1.2s infinite;font-style:normal}.scan i:nth-child(2){animation-delay:.2s}.scan i:nth-child(3){animation-delay:.4s}
 @keyframes shim{to{background-position:-200% 0}}@keyframes blink{0%,100%{opacity:.2}50%{opacity:1}}
-.dash-err{text-align:left}.tblcard{padding:10px 18px}
+.dash-err{text-align:left}
+/* ───── 컴팩트 현황 카드 ───── */
+.dash{margin:0 0 14px}
+.dash-head{margin-bottom:8px}.dash-head h1{font-size:18px}
+.dcard.cp{display:grid;grid-template-columns:minmax(270px,1.15fr) 1.25fr 1.2fr;padding:0}
+.cp-col{padding:14px 18px;min-width:0}.cp-col+.cp-col{border-left:1px solid #e5e8eb}
+.cp-t{font-size:12.5px;font-weight:700;color:#191f28;margin:0 0 8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cp-t .lg{font-weight:500;font-size:11.5px;color:#4e5968}.cp-t .lg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin:0 3px 0 6px;vertical-align:0}
+.cp-a{display:flex;align-items:center;gap:14px}
+.gauge{width:150px;flex:0 0 150px;height:auto}.gauge text{font-family:inherit}
+.gauge .gn{font-size:25px;font-weight:800;fill:#191f28}.gauge .gu{font-size:12px;font-weight:700;fill:#4e5968}.gauge .gl{font-size:8.5px;fill:#4e5968}
+.gauge path{transition:stroke-dasharray .9s cubic-bezier(.2,.7,.2,1)}
+.mini{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;flex:1}
+.mini div{display:flex;flex-direction:column;line-height:1.2}.mini b{font-size:19px;font-weight:800;color:#191f28}.mini span{font-size:11.5px;color:#4e5968}
+.sites{display:grid;grid-template-columns:1fr 1fr;gap:5px 18px}
+.hb.sm{grid-template-columns:34px 1fr 20px;gap:7px;min-height:20px}.hb.sm .nm{font-size:12px}.hb.sm .tr,.hb.sm .bs{height:9px}.hb.sm .val{font-size:12px}
+.pr{margin:0 0 9px}.pr:last-child{margin:0}.pr-t{font-size:11.5px;color:#4e5968;margin:0 0 3px;font-weight:600}
+.pr-b{display:flex;gap:2px;height:20px;border-radius:5px;overflow:hidden;background:#eef1f5}
+.ps{height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;transition:width .8s cubic-bezier(.2,.7,.2,1);outline:0}
+.ps:focus-visible{box-shadow:inset 0 0 0 2px #fff}
+details.more{margin-top:8px;font-size:12.5px;color:#4e5968}details.more>summary{cursor:pointer;font-weight:600;padding:4px 2px}
+details.more .cols{height:100px}
+.dash details.more table{margin-top:0}
+@media(max-width:900px){.dcard.cp{grid-template-columns:1fr}.cp-col+.cp-col{border-left:0;border-top:1px solid #e5e8eb}.sites{grid-template-columns:1fr 1fr}}
+@media(max-width:420px){.cp-a{flex-direction:column;align-items:flex-start}.sites{grid-template-columns:1fr}}
+.tblcard{padding:10px 18px}
 @media(prefers-reduced-motion:reduce){.hb .bs,.col,.donut circle{transition:none}.sk-l,.scan i{animation:none}}
 
 @media(max-width:560px){.dgrid{grid-template-columns:1fr}.kpi .v{font-size:24px}}
@@ -384,8 +409,7 @@ function tipBind(root){
 }
 function dashSkeleton(){
   return `<div class="dash-head"><h1>접수 현황</h1><span class="dash-asof scan">현황 집계 중<i>.</i><i>.</i><i>.</i></span></div>
-  <div class="kpis">${'<div class="kpi sk"><div class="sk-l w40"></div><div class="sk-l w60 big"></div><div class="sk-l w50"></div></div>'.repeat(4)}</div>
-  <div class="dgrid"><div class="dcard wide sk"><div class="sk-l w30"></div>${'<div class="sk-row"><span class="sk-l w10"></span><span class="sk-l bar"></span></div>'.repeat(5)}</div></div>`;
+  <div class="dcard cp sk"><div class="cp-col"><span class="sk-l w60 big"></span><span class="sk-l w40"></span></div><div class="cp-col"><span class="sk-l w50"></span><span class="sk-l"></span><span class="sk-l"></span><span class="sk-l"></span></div><div class="cp-col"><span class="sk-l w50"></span><span class="sk-l"></span><span class="sk-l"></span></div></div>`;
 }
 function dashError(msg){
   return `<div class="dcard dash-err"><h3>접수 현황</h3><div class="sub" style="margin:0 0 10px">현황을 불러오지 못했습니다. 질의 접수는 아래에서 정상적으로 이용하실 수 있습니다.</div><button class="btn" id="dretry" type="button">다시 불러오기</button><div class="dash-asof" style="margin-top:8px">${esc(msg||"")}</div></div>`;
@@ -412,45 +436,44 @@ function drawDash(d){
   if(!d||!d.total){box.innerHTML='<div class="dcard"><h3>접수 현황</h3><div class="sub" style="margin:0">아직 접수된 질의가 없습니다. 아래에서 첫 질의를 남겨 주세요.</div></div>';return}
   const answered=d.total-d.st.wait, rate=Math.round(answered/d.total*100);
   const sites=d.bySite.filter(b=>b.total>0).sort((a,b)=>b.total-a.total||SITES.indexOf(a.site)-SITES.indexOf(b.site));
-  /* 누적 막대(답변 완료+대기): rows=[{nm,total,wait}] */
-  const stack=(rows,mx)=>rows.map(r=>{const a=r.total-r.wait;
-    const sg=(n,c,tip,last)=>n>0?`<div class="bs${last?" last":""}" style="width:0;background:${c}" data-w="${(n/mx*100).toFixed(2)}" data-tip="${esc(tip)}" role="img" aria-label="${esc(tip)}"></div>`:"";
-    return `<div class="hb"><span class="nm">${esc(r.nm)}</span><div class="tr">${sg(a,C_DONE,`${r.nm} · 답변 완료 ${a}건`,r.wait===0)}${sg(r.wait,C_WAIT,`${r.nm} · 답변 대기 ${r.wait}건`,true)}</div><span class="val">${r.total}</span></div>`}).join("");
-  const siteRows=stack(sites.map(b=>({nm:b.site,total:b.total,wait:b.wait})),Math.max(1,...sites.map(b=>b.total)));
-  const cat=o=>{const e=Object.entries(o).map(([k,v])=>({nm:k,total:v.n,wait:v.wait})).sort((a,b)=>b.total-a.total);return stack(e,Math.max(1,...e.map(x=>x.total)))};
+  const smx=Math.max(1,...sites.map(b=>b.total));
+  const sg=(n,c,tip,last)=>n>0?`<div class="bs${last?" last":""}" style="width:0;background:${c}" data-w="${(n/smx*100).toFixed(2)}" data-tip="${esc(tip)}" role="img" aria-label="${esc(tip)}"></div>`:"";
+  const siteRows=sites.map(b=>{const a=b.total-b.wait;
+    return `<div class="hb sm"><span class="nm">${esc(b.site)}</span><div class="tr">${sg(a,C_DONE,`${b.site} · 답변 완료 ${a}건`,b.wait===0)}${sg(b.wait,C_WAIT,`${b.site} · 답변 대기 ${b.wait}건`,true)}</div><span class="val">${b.total}</span></div>`}).join("");
+  /* 반원 게이지: 주황(대기) 바탕 위에 파랑(답변 완료) */
+  const L=Math.PI*52, arc="M8 62 A52 52 0 0 1 112 62";
+  const gauge=`<svg viewBox="0 0 120 70" class="gauge" role="img" aria-label="답변 완료율 ${rate}%, 답변 ${answered}건, 대기 ${d.st.wait}건">
+    <path d="${arc}" fill="none" stroke="${d.st.wait?C_WAIT:"#e5e8eb"}" stroke-width="12" data-tip="답변 대기 ${d.st.wait}건"/>
+    <path d="${arc}" fill="none" stroke="${C_DONE}" stroke-width="12" stroke-dasharray="0 ${L.toFixed(1)}" data-arc="${(L*rate/100).toFixed(1)} ${L.toFixed(1)}" data-tip="답변 완료 ${answered}건 (${rate}%)"/>
+    <text x="60" y="52" text-anchor="middle" class="gn"><tspan data-n="${rate}">0</tspan><tspan class="gu">%</tspan></text><text x="60" y="66" text-anchor="middle" class="gl">답변 완료율</text></svg>`;
+  /* 비율 막대(100%): 구분1 / 구분2 / 공개여부 */
+  const TINT=[["#2a78d6","#fff"],["#6ea6ea","#0b2a52"],["#b9d4f5","#0b2a52"]];
+  const prop=(title,items)=>{const it=items.filter(x=>x.n>0).sort((a,b)=>b.n-a.n);
+    return `<div class="pr"><div class="pr-t">${esc(title)}</div><div class="pr-b">${it.map((x,i)=>{const t=x.t||TINT[Math.min(i,2)];const p=x.n/d.total*100;
+      return `<div class="ps" style="width:0;background:${t[0]};color:${t[1]}" data-w="${p.toFixed(2)}" data-tip="${esc(title+" · "+x.nm+" "+x.n+"건 ("+Math.round(p)+"%)")}" role="img" aria-label="${esc(x.nm+" "+x.n+"건")}"><span>${p>=14?esc(x.nm)+" "+x.n:p>=7?x.n:""}</span></div>`}).join("")}</div></div>`};
+  const c1=Object.entries(d.c1).map(([k,v])=>({nm:k,n:v.n})),c2=Object.entries(d.c2).map(([k,v])=>({nm:k,n:v.n}));
+  const po=d.pub.open.n,pp=d.pub.priv.n;
   const mm=Math.max(1,...d.monthly.map(m=>m.n));
   const cols=d.monthly.map(m=>`<div class="colw">${m.n?`<span class="cv">${m.n}</span>`:""}<div class="col" style="height:0" data-h="${(m.n/mm*80).toFixed(1)}" data-tip="${esc(m.ym.replace("-","년 ")+"월 · "+m.n+"건")}"></div></div>`).join("");
   const cx=d.monthly.map(m=>`<span>${+m.ym.slice(5)}월</span>`).join("");
-  /* 공개여부 도넛 */
-  const po=d.pub.open.n,pp=d.pub.priv.n,R=42,CI=2*Math.PI*R,lo=po/d.total*CI,lp=pp/d.total*CI;
-  const donut=`<div class="donutw"><svg viewBox="0 0 120 120" class="donut" role="img" aria-label="공개 ${po}건, 비공개 ${pp}건"><circle cx="60" cy="60" r="${R}" fill="none" stroke="#eef1f5" stroke-width="16"/>
-    <circle cx="60" cy="60" r="${R}" fill="none" stroke="${C_DONE}" stroke-width="16" transform="rotate(-90 60 60)" stroke-dasharray="0 ${CI}" data-arc="${Math.max(0,lo-2).toFixed(1)} ${CI.toFixed(1)}" data-tip="공개 ${po}건 (${Math.round(po/d.total*100)}%)"/>
-    <circle cx="60" cy="60" r="${R}" fill="none" stroke="${C_PRIV}" stroke-width="16" transform="rotate(${(-90+po/d.total*360).toFixed(2)} 60 60)" stroke-dasharray="0 ${CI}" data-arc="${Math.max(0,lp-2).toFixed(1)} ${CI.toFixed(1)}" data-tip="비공개 ${pp}건 (${Math.round(pp/d.total*100)}%)"/>
-    <text x="60" y="58" text-anchor="middle" class="dn">${d.total}</text><text x="60" y="73" text-anchor="middle" class="dl">전체</text></svg>
-    <div class="dlg"><div><i style="background:${C_DONE}"></i>공개<b>${po}건</b><small>${Math.round(po/d.total*100)}%</small></div><div><i style="background:${C_PRIV}"></i>비공개<b>${pp}건</b><small>${Math.round(pp/d.total*100)}%</small></div></div></div>`;
   const docs=d.docs.length?`<div class="dcard"><h3>자주 묻는 문서 TOP ${d.docs.length}</h3><div class="sub">문서가 지정된 질의 기준</div>${d.docs.map(x=>`<div class="docrow"><span><span class="mono">${esc(x.doc)}</span>${esc(DOC_NAME[x.doc]||"")}</span><b>${x.n}건</b></div>`).join("")}</div>`:"";
   const tbl=(h,rows)=>`<table><thead><tr>${h.map((x,i)=>`<th${i?' class="n"':""}>${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((x,i)=>`<td${i?' class="n"':""}>${esc(x)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
-  const lg=`<div class="legend"><span><i style="background:${C_DONE}"></i>답변 완료</span><span><i style="background:${C_WAIT}"></i>답변 대기</span></div>`;
   const catRows=[...Object.entries(d.c1).map(([k,v])=>["구분1 · "+k,v.n,v.n-v.wait,v.wait]),...Object.entries(d.c2).map(([k,v])=>["구분2 · "+k,v.n,v.n-v.wait,v.wait]),["공개",po,po-d.pub.open.wait,d.pub.open.wait],["비공개",pp,pp-d.pub.priv.wait,d.pub.priv.wait]];
   box.innerHTML=`
-  <div class="dash-head"><h1>접수 현황</h1><span class="dash-asof">${esc(d.at)} 기준 · 건수만 집계하며 질의 내용은 공개되지 않습니다</span></div>
-  <div class="kpis">
-    <div class="kpi"><div class="k">누적 접수</div><div class="v"><span data-n="${d.total}">0</span><small>건</small></div><div class="s">이번 달 ${d.thisMonth}건</div></div>
-    <div class="kpi"><div class="k"><i class="dot" style="background:${C_DONE}"></i>답변 완료</div><div class="v"><span data-n="${answered}">0</span><small>건</small></div><div class="s">답변 완료율 ${rate}%</div></div>
-    <div class="kpi"><div class="k"><i class="dot" style="background:${C_WAIT}"></i>답변 대기</div><div class="v"><span data-n="${d.st.wait}">0</span><small>건</small></div><div class="s">담당자 검토 중</div></div>
-    <div class="kpi"><div class="k">평균 답변 소요</div><div class="v">${d.avgDays==null?"-":`<span data-n="${d.avgDays}" data-dec="1">0</span><small>일</small>`}</div><div class="s">접수 → 답변 등록</div></div>
+  <div class="dash-head"><h1>접수 현황</h1><span class="dash-asof">${esc(d.at)} 기준 · 건수만 집계 · 질의 내용은 공개되지 않습니다</span></div>
+  <div class="dcard cp">
+    <div class="cp-col cp-a">${gauge}
+      <div class="mini"><div><b data-n="${d.total}">0</b><span>누적 접수</span></div><div><b data-n="${answered}" style="color:#1d5fb4">0</b><span>답변 완료</span></div><div><b data-n="${d.st.wait}" style="color:#b4501f">0</b><span>답변 대기</span></div><div><b>${d.avgDays==null?"-":d.avgDays+"일"}</b><span>평균 소요</span></div></div>
+    </div>
+    <div class="cp-col cp-b"><div class="cp-t">사업장별 접수 <span class="lg"><i style="background:${C_DONE}"></i>완료 <i style="background:${C_WAIT}"></i>대기</span></div><div class="sites">${siteRows}</div></div>
+    <div class="cp-col cp-c"><div class="cp-t">분야·공개 현황</div>${prop("구분1",c1)}${prop("구분2",c2)}${prop("공개여부",[{nm:"공개",n:po,t:[C_DONE,"#fff"]},{nm:"비공개",n:pp,t:[C_PRIV,"#fff"]}])}</div>
   </div>
-  <div class="dgrid">
-    <div class="dcard wide"><h3>사업장별 접수 현황</h3><div class="sub">건수 많은 순</div>${lg}${siteRows}
-      <details><summary>표로 보기</summary>${tbl(["사업장","접수","답변 완료","답변 대기"],sites.map(b=>[b.site,b.total,b.total-b.wait,b.wait]))}</details></div>
-    <div class="dcard"><h3>구분1 현황</h3><div class="sub">일반 · 안전보건 · 환경</div>${lg}${cat(d.c1)}</div>
-    <div class="dcard"><h3>구분2 현황</h3><div class="sub">관계법령 · MESH</div>${lg}${cat(d.c2)}</div>
-    <div class="dcard"><h3>공개 여부</h3><div class="sub">공개 질의 vs 비공개 질의</div>${donut}</div>
-    <div class="dcard"><h3>월별 접수 추이</h3><div class="sub">최근 6개월</div><div class="cols">${cols}</div><div class="cx">${cx}</div>
-      <details><summary>표로 보기</summary>${tbl(["월","접수"],d.monthly.map(m=>[m.ym,m.n]))}</details></div>
-    ${docs}
-    <div class="dcard wide tblcard"><details><summary>분야·공개여부 수치 표로 보기</summary>${tbl(["구분","접수","답변 완료","답변 대기"],catRows)}</details></div>
-  </div>`;
+  <details class="more"><summary>상세 보기 (월별 추이 · 자주 묻는 문서 · 표)</summary>
+    <div class="dgrid" style="margin-top:10px">
+      <div class="dcard"><h3>월별 접수 추이</h3><div class="sub">최근 6개월</div><div class="cols">${cols}</div><div class="cx">${cx}</div></div>
+      ${docs}
+      <div class="dcard wide"><h3>수치 표</h3><div class="sub">사업장·분야·공개여부</div>${tbl(["구분","접수","답변 완료","답변 대기"],[...sites.map(b=>["사업장 · "+b.site,b.total,b.total-b.wait,b.wait]),...catRows])}</div>
+    </div></details>`;
   tipBind(box);countUp(box);growIn(box);
 }
 async function loadDash(force){
