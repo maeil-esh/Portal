@@ -1,0 +1,625 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>ESH 질의응답 창구</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap">
+<style>
+:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+/* Layout: 상단 앱바(모드 전환) + 탭 + 단일 작업영역. 사용자(접수/나의 질의/전체 질의) ↔ 관리자(답변 관리) */
+:root{
+  --bg:#f3f5f4; --surface:#ffffff; --sunken:#e9eeec; --line:#d3dbd8; --line-strong:#aab7b2;
+  --fg:#17211f; --muted:#5b6965; --accent:#1d5c55; --accent-ink:#ffffff; --accent-soft:#dcebe7;
+  --wait:#8a5a00; --wait-bg:#fbefd6; --done:#1e6b3a; --done-bg:#dcf1e2;
+  --hold:#6a6f76; --hold-bg:#e7e9ec; --plan:#2a4f9e; --plan-bg:#e0e8fa; --danger:#b3261e;
+  --font:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111816; --surface:#18211f; --sunken:#1f2a27; --line:#2d3a37; --line-strong:#465652;
+  --fg:#e5ecea; --muted:#97a6a1; --accent:#6fbfb2; --accent-ink:#0d1a18; --accent-soft:#1f3632;
+  --wait:#f0c26a; --wait-bg:#3a2e14; --done:#7ed49a; --done-bg:#183324; --hold:#b4b9c0; --hold-bg:#2a2e33;
+  --plan:#9db8f2; --plan-bg:#1e2a44; --danger:#ff8a80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111816; --surface:#18211f; --sunken:#1f2a27; --line:#2d3a37; --line-strong:#465652;
+  --fg:#e5ecea; --muted:#97a6a1; --accent:#6fbfb2; --accent-ink:#0d1a18; --accent-soft:#1f3632;
+  --wait:#f0c26a; --wait-bg:#3a2e14; --done:#7ed49a; --done-bg:#183324; --hold:#b4b9c0; --hold-bg:#2a2e33;
+  --plan:#9db8f2; --plan-bg:#1e2a44; --danger:#ff8a80; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:14px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.app{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-block:12px}
+.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+.brand b{font-size:17px;letter-spacing:-.01em}
+.brand span{font-size:12px;color:var(--muted)}
+.mode{display:inline-flex;border:1px solid var(--line-strong);border-radius:999px;padding:2px;background:var(--sunken)}
+.mode button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;font-weight:600;padding:5px 14px;border-radius:999px;cursor:pointer}
+.mode button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+nav.tabs{display:flex;gap:4px;overflow-x:auto}
+nav.tabs button{border:0;background:none;font:inherit;font-weight:600;color:var(--muted);padding:10px 14px;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+nav.tabs .cnt{font-family:var(--mono);font-size:11px;margin-left:6px;background:var(--wait-bg);color:var(--wait);padding:1px 6px;border-radius:999px}
+main{padding-block:24px 64px}
+h1{font-size:20px;margin:0 0 4px;text-wrap:balance}
+.lede{color:var(--muted);margin:0 0 20px;max-width:68ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* form */
+.form{display:grid;grid-template-columns:150px 1fr;}
+.form>.lab{padding:16px 18px;font-weight:600;border-bottom:1px solid var(--line);background:var(--sunken)}
+.form>.lab small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.form>.fld{padding:12px 18px;border-bottom:1px solid var(--line);min-width:0}
+.form>.lab:last-of-type,.form>.fld:last-child{border-bottom:0}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1 1 160px;min-width:0}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+input[type=text],input[type=date],select,textarea{font:inherit;font-size:14px;color:var(--fg);background:var(--surface);border:1px solid var(--line-strong);border-radius:4px;padding:8px 10px;width:100%}
+textarea{min-height:150px;resize:vertical}
+.note{font-size:12px;color:var(--danger);margin-top:8px}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:4px;overflow:hidden}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{padding:7px 16px;cursor:pointer;font-weight:500;border-right:1px solid var(--line-strong)}
+.seg label:last-of-type{border-right:0}
+.seg input:checked+label{background:var(--accent);color:var(--accent-ink)}
+.seg input:focus-visible+label{outline:2px solid var(--accent);outline-offset:-2px}
+.drop{border:1px dashed var(--line-strong);border-radius:4px;padding:14px;text-align:center;color:var(--muted);cursor:pointer;background:var(--bg)}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.files{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;background:var(--sunken);border:1px solid var(--line);border-radius:4px;padding:3px 8px;max-width:100%}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0}
+.consent{display:flex;flex-direction:column;gap:8px;padding:16px 18px;border-top:1px solid var(--line)}
+.consent label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.consent input{margin-top:3px;accent-color:var(--accent)}
+.consent details{font-size:12px;color:var(--muted);margin-left:24px}
+.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;padding:14px 18px;border-top:1px solid var(--line)}
+.btn{font:inherit;font-weight:600;font-size:14px;padding:9px 18px;border-radius:4px;border:1px solid var(--line-strong);background:var(--surface);color:var(--fg);cursor:pointer}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.err{color:var(--danger);font-size:13px;margin-right:auto;align-self:center}
+
+/* filters + table */
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--sunken);border-radius:var(--r) var(--r) 0 0}
+.filters .kw{grid-column:span 2}
+.filters .go{display:flex;gap:6px;align-items:flex-end}
+.tablehead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;font-size:13px;color:var(--muted)}
+.tablehead b{color:var(--fg);font-family:var(--mono)}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.stat{flex:1 1 130px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;cursor:pointer;text-align:left;font:inherit;color:var(--fg)}
+.stat[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.stat small{display:block;color:var(--muted);font-size:12px}
+.stat b{font-family:var(--mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.tscroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px 12px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600;background:var(--surface);white-space:nowrap}
+th.sort{cursor:pointer;user-select:none}
+th.sort::after{content:" ↕";opacity:.4}
+th.sort[data-dir="asc"]::after{content:" ↑";opacity:1}
+th.sort[data-dir="desc"]::after{content:" ↓";opacity:1}
+td.num,td.date{font-family:var(--mono);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.q{min-width:240px;max-width:420px}
+td.q .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+tr.clickable{cursor:pointer}
+tr.clickable:hover td{background:var(--accent-soft)}
+tr.detail td{background:var(--bg);padding:0}
+.detail-box{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px}
+.detail-box h4{margin:0 0 6px;font-size:12px;color:var(--muted)}
+.detail-box p{margin:0;white-space:pre-wrap}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.s-wait{background:var(--wait-bg);color:var(--wait)}
+.s-done{background:var(--done-bg);color:var(--done)}
+.s-hold{background:var(--hold-bg);color:var(--hold)}
+.s-plan{background:var(--plan-bg);color:var(--plan)}
+.tag{font-size:12px;color:var(--muted);white-space:nowrap}
+.doc{font-family:var(--mono);font-size:12px}
+.empty{padding:40px 16px;text-align:center;color:var(--muted)}
+.clip{font-size:12px;color:var(--muted);white-space:nowrap}
+.pager{display:flex;justify-content:center;gap:4px;padding:12px;border-top:1px solid var(--line)}
+.pager button{min-width:32px}
+
+/* answer view */
+.ans{display:grid;grid-template-columns:150px 1fr}
+.ans>div{padding:12px 18px;border-bottom:1px solid var(--line);min-width:0}
+.ans>.lab{background:var(--sunken);font-weight:600}
+.ro{display:flex;flex-wrap:wrap;gap:6px 18px}
+.ro span{white-space:nowrap}
+.ro em{font-style:normal;color:var(--muted);font-size:12px;margin-right:4px}
+.qtext{white-space:pre-wrap;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:12px;margin:0}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.opt{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line-strong);border-radius:4px;padding:10px 12px;cursor:pointer}
+.opt input{accent-color:var(--accent);margin-top:3px}
+.opt b{display:block}
+.opt small{color:var(--muted);font-size:12px;line-height:1.45}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.back{border:0;background:none;color:var(--accent);font:inherit;font-weight:600;cursor:pointer;padding:0;margin-bottom:12px}
+.hist{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.hist .mono{font-family:var(--mono)}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:4px;font-weight:600;z-index:20;max-width:calc(100% - 32px)}
+.done-card{padding:28px;text-align:center}
+.done-card .no{font-family:var(--mono);font-size:20px;margin:8px 0 4px}
+.mock{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+
+@media (max-width:680px){
+  .form,.ans{grid-template-columns:1fr}
+  .form>.lab,.ans>.lab{padding:10px 14px 6px;border-bottom:0}
+  .form>.fld,.ans>div{padding:6px 14px 14px}
+  .detail-box{grid-template-columns:1fr}
+  .filters .kw{grid-column:auto}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<style>
+/* 화면 톤: 관리감독자 및 유해위험작업 현황 화면과 동일한 블루·그레이·슬레이트 계열 (라이트 고정) */
+:root:root:root{--bg:#f2f4f6;--surface:#ffffff;--sunken:#f9fafb;--line:#e5e8eb;--line-strong:#d1d6db;--fg:#191f28;--muted:#6b7684;
+  --accent:#3182f6;--accent-ink:#ffffff;--accent-soft:#f0f4ff;
+  --wait:#b86e00;--wait-bg:#fff7e6;--done:#008f76;--done-bg:#e8f9f0;--hold:#6b7684;--hold-bg:#f2f4f6;--plan:#1b6ef3;--plan-bg:#f0f4ff;--danger:#f04452;
+  --font:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--mono:"Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;--r:12px;color-scheme:light}
+body{letter-spacing:-.1px}
+header.app{box-shadow:0 1px 0 var(--line)}
+.brand{align-items:center}
+.brand::before{content:"Q";display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;background:var(--accent);color:#fff;font-weight:800;font-size:17px;flex:0 0 34px}
+.brand b{font-weight:800;color:#191f28;font-size:15px;letter-spacing:-.3px}
+.mode{background:#f2f4f6;border-color:#e5e8eb}
+nav.tabs{border-top:0}
+nav.tabs button{letter-spacing:-.2px}
+nav.tabs button:hover{color:#333d4b}
+nav.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.panel,.stat{border-color:#e5e8eb;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04)}
+.btn{border-width:1.5px;border-color:var(--line);border-radius:6px;color:#4e5968;letter-spacing:-.2px}
+.btn:hover{background:#f9fafb;border-color:#d1d6db}
+.btn.pri{color:#fff;border-color:var(--accent)}
+.btn.pri:hover{background:#1b6ef3;border-color:#1b6ef3}
+input[type=text],input[type=password],input[type=date],select,textarea{border-width:1.5px;border-color:var(--line);border-radius:6px;transition:border-color .15s}
+input[type=text]:focus,input[type=password]:focus,input[type=date]:focus,select:focus,textarea:focus{border-color:var(--accent)}
+thead th{background:#344155;color:#fff;font-weight:700;letter-spacing:-.2px;border-top:0;border-right:1px solid rgba(255,255,255,.18)}
+.form>.lab,.filters{background:#f9fafb}
+.lab,.ans>.lab{color:#333d4b}
+.chip{background:#f9fafb}
+a.chip{text-decoration:none;color:var(--fg)}
+.btn{white-space:nowrap}
+.drop{display:block}
+td{white-space:nowrap}
+td.q,td.empty,tr.detail td{white-space:normal}
+
+/* 가시성 보정안: 톤 유지, 명도 대비만 미세 조정 */
+:root:root:root{--bg:#eef1f5;--muted:#4e5968;--line:#dde1e6;--line-strong:#c3cad3;--sunken:#f4f6f9;--accent-soft:#e8f1ff}
+.panel,.stat{border-color:#d9dee4;box-shadow:0 1px 3px rgba(25,31,40,.08),0 1px 2px rgba(25,31,40,.05)}
+input[type=text],input[type=password],input[type=date],input[type=email],select,textarea{border-color:var(--line-strong);background:#fff;font-size:14px;color:var(--fg);border-radius:6px;padding:8px 10px;width:100%;font:inherit;font-size:14px;border-width:1.5px;border-style:solid}
+input[type=email]:focus{border-color:var(--accent)}
+input:focus,select:focus,textarea:focus{outline:0;box-shadow:0 0 0 3px rgba(49,130,246,.16)}
+::placeholder{color:#8b95a1;opacity:1}
+label.f{font-size:12.5px;font-weight:600;color:#4e5968}
+.form>.lab,.ans>.lab,.filters{background:#f4f6f9;color:#191f28}
+.form>.lab small{color:#6b7684;font-size:12px}
+.note{color:#4e5968;font-size:12.5px;line-height:1.6}
+.note b{color:var(--accent)}
+.lede{color:#4e5968}
+.btn{border-color:var(--line-strong);color:#333d4b}
+.btn:hover{background:#f4f6f9;border-color:#b0b8c1}
+tbody tr:hover td{background:#f4f8ff}
+tbody td{border-bottom-color:#e5e8eb}
+.consent details{color:#4e5968}
+</style>
+</head><body>
+
+<header class="app">
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand"><b>ESH 질의응답</b><span>안전보건·환경 문의 및 민원 창구</span></div>
+      <div class="mode" role="group" aria-label="모드 전환">
+        <button id="m-user" aria-pressed="true">사용자</button>
+        <button id="m-admin" aria-pressed="false">관리자</button>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist" id="tabs"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ═════ 설정: GAS 웹 앱 배포 URL을 아래에 붙여 넣으세요 ═════ */
+const API = "https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycby39fn_hTtPrKbUjdiqU5hWJNzKf7NHyfRN_w8c5ls3u9-GBVcnVyHD2vDjkO_aNWto/exec/exec";
+
+/* ---------- 기준 데이터 ---------- */
+const SITES=["평택","아산","경산","영동","청양","상하","광주","MIC"];
+const DEPTS=["생산팀","품질팀","공무팀","물류팀","관리팀","연구소","안전환경팀"];
+/* 구분1: 일반(10-xx) / 안전보건(11-xx) / 환경(12-xx) */
+const DOCS={
+ "일반":[["MESH-10-01","M-ESH 경영매뉴얼"],["MESH-10-02","M-ESH 경영검토절차서"],["MESH-10-03","M-ESH 방침 및 목표관리절차서"],["MESH-10-04","M-ESH 리스크관리절차서"],["MESH-10-05","M-ESH 준수의무사항관리절차서"],["MESH-10-06","M-ESH 교육훈련절차서"],["MESH-10-07","M-ESH 의사소통관리절차서"],["MESH-10-08","M-ESH 문서관리절차서"],["MESH-10-09","M-ESH 비상사태대응절차서"],["MESH-10-10","M-ESH 내부심사절차서"],["MESH-10-11","M-ESH 시정조치관리절차서"],["MESH-10-12","M-ESH 사고관리절차서"],["MESH-10-13","M-ESH 변경관리절차서"],["MESH-10-14","M-ESH ESH관리규칙"],["MESH-10-15","M-ESH 지능형 영상관리 시스템 운영 절차서"]],
+ "안전보건":[["MESH-11-01","산업안전보건위원회 운영절차서"],["MESH-11-02","안전보건운영관리절차서"],["MESH-11-03","안전보호구 관리 지침서"],["MESH-11-04","물질안전보건자료 관리 지침서"],["MESH-11-05","지게차 안전운행 지침서"],["MESH-11-06","위험물안전관리지침서"],["MESH-11-07","밀폐공간작업지침서"],["MESH-11-08","작업환경측정 지침서"],["MESH-11-09","보건관리 지침서"],["MESH-11-10","유해위험 기계기구 관리 지침서"],["MESH-11-11","위험성평가 절차서"],["MESH-11-12","안전작업허가 지침서"],["MESH-11-13","도급 시 안전관리절차서"],["MESH-11-14","작업장소음관리 지침서"],["MESH-11-15","근골격계유해요인조사 지침서"],["MESH-11-16","LOTO 운영 지침서"],["MESH-11-17","방사선기기 안전관리 지침서"]],
+ "환경":[["MESH-12-01","환경영향평가 절차서"],["MESH-12-02","환경운영관리 절차서"],["MESH-12-03","환경모니터링 지침서"],["MESH-12-04","대기환경관리 지침서"],["MESH-12-05","수질환경관리 지침서"],["MESH-12-06","폐기물관리 지침서"],["MESH-12-07","화학물질관리 지침서"]]
+};
+const DOC_NAME=Object.fromEntries(Object.values(DOCS).flat());
+const docOpts=(c1,sel,ph)=>{const o=d=>`<option value="${d[0]}"${d[0]===sel?" selected":""}>${d[0]} ${d[1]}</option>`;
+  const keys=c1&&DOCS[c1]?[c1]:Object.keys(DOCS);
+  return `<option value="">${ph}</option>`+(keys.length===1?DOCS[keys[0]].map(o).join(""):keys.map(k=>`<optgroup label="${k}">${DOCS[k].map(o).join("")}</optgroup>`).join(""))};
+const ST={wait:{t:"접수",c:"s-wait"},done:{t:"완료",c:"s-done"},hold:{t:"보류",c:"s-hold"},plan:{t:"개선예정",c:"s-plan"}};
+const ST_DESC={
+  done:"텍스트 답변으로 질의내용이 해결되는 경우",
+  hold:"질의가 구체적이지 않아 답변할 수 없거나, 법령·MESH 절차와 관련 없는 질의",
+  plan:"현재 해결은 어려우나 MESH 개정 시 반영해 개선할 수 있는 경우"
+};
+const PUB_NOTE="질의·답변이 개인정보를 제외하고 ‘전체 질의’에 공개됩니다.";
+const PRIV_NOTE="ESH 담당자와 질의자 본인만 볼 수 있습니다. 이름을 입력하면 ‘나의 질의’ 목록에서, 익명이면 접수번호와 비밀번호로 ‘접수번호 조회’에서 확인하며, 내용을 열람할 때는 항상 비밀번호가 필요합니다. 비밀번호는 분실 시 복구할 수 없고, 시스템 관리 권한이 있는 ESH 담당자는 열람할 수 있습니다.";
+
+/* ---------- 상태 ---------- */
+let mode="user", tab="new", rows=[], answering=null, openRow=null, adminStat="all", page=1, token="", redraw=()=>{};
+try{token=sessionStorage.getItem("shetok")||""}catch(_){}
+const flt={from:"",to:"",c1:"",c2:"",doc:"",st:"",site:"",kw:"",sortDir:"desc"};
+let mineQ={name:"",site:""}, lookupPre="", draftFiles=[];
+const $=s=>document.querySelector(s), main=$("#main");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const badge=st=>`<span class="badge ${ST[st].c}">${ST[st].t}</span>`;
+function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2800)}
+const opt=(arr,sel,ph)=>(ph!==undefined?`<option value="">${ph}</option>`:"")+arr.map(v=>`<option${v===sel?" selected":""}>${v}</option>`).join("");
+const loading=()=>{main.innerHTML='<div class="empty">불러오는 중…</div>'};
+
+/* ---------- 서버 통신 (POST, text/plain → 사전요청 없이 GAS 호출) ---------- */
+async function api(action,payload={},ms=60000){
+  if(!API||API.includes("여기에"))throw new Error("index.html 상단의 API 주소(GAS 배포 URL)가 설정되지 않았습니다.");
+  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),ms);
+  try{
+    const r=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,...payload}),signal:ctl.signal});
+    const j=await r.json();
+    if(!j.ok)throw new Error(j.error||"요청에 실패했습니다.");
+    return j.data;
+  }catch(e){
+    if(e.name==="AbortError")throw new Error("응답 시간이 초과되었습니다. 잠시 후 다시 시도해 주세요.");
+    if(e instanceof TypeError)throw new Error("서버에 연결할 수 없습니다. 네트워크 상태(사내 방화벽 포함)를 확인해 주세요.");
+    throw e;
+  }finally{clearTimeout(t)}
+}
+function errView(e,retry){
+  if(/세션 만료|로그인이 필요/.test(e.message)){token="";try{sessionStorage.removeItem("shetok")}catch(_){}toast("관리자 세션이 만료되었습니다. 다시 로그인해 주세요.");answering=null;return render()}
+  main.innerHTML=`<div class="panel done-card"><div class="err" style="margin:0 0 14px">${esc(e.message)}</div><button class="btn" id="retry">다시 시도</button></div>`;
+  $("#retry").onclick=retry;
+}
+
+/* ---------- 탭 ---------- */
+const TABS={user:[["new","질의 접수"],["mine","나의 질의"],["lookup","접수번호 조회"],["all","전체 질의"]],admin:[["manage","답변 관리"],["all","전체 질의(공개뷰)"]]};
+function renderTabs(){
+  const list=(mode==="admin"&&!token)?[]:TABS[mode];
+  $("#tabs").innerHTML=list.map(([k,t])=>`<button role="tab" aria-selected="${tab===k}" data-tab="${k}">${t}</button>`).join("");
+}
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("[data-tab]");if(!b)return;tab=b.dataset.tab;answering=null;openRow=null;page=1;render()});
+function setMode(m){Object.assign(flt,{from:"",to:"",c1:"",c2:"",doc:"",st:"",site:"",kw:""});adminStat="all";mode=m;tab=m==="user"?"new":"manage";answering=null;openRow=null;page=1;
+  $("#m-user").setAttribute("aria-pressed",m==="user");$("#m-admin").setAttribute("aria-pressed",m==="admin");render()}
+$("#m-user").onclick=()=>setMode("user");$("#m-admin").onclick=()=>setMode("admin");
+
+function render(){renderTabs();
+  if(mode==="user"){if(tab==="new")viewNew();else if(tab==="mine")viewMine();else if(tab==="lookup")viewLookup();else viewAll()}
+  else{if(!token)viewLogin();else if(answering)viewAnswer();else if(tab==="manage")viewManage();else viewAll()}
+}
+
+/* ---------- 1. 접수 ---------- */
+function viewNew(){
+  main.innerHTML=`
+  <h1>질의 접수</h1>
+  <p class="lede">안전보건·환경 관련 법령이나 MESH 절차에 대한 문의, 개선 의견, 민원을 남겨 주세요. ESH 담당자가 검토 후 회신합니다.</p>
+  <form class="panel" id="f" novalidate>
+    <div class="form">
+      <div class="lab">신청인 정보<small>선택</small></div>
+      <div class="fld">
+        <div class="row">
+          <label class="f">사업장 *<select id="f-site">${opt(SITES,"","선택")}</select></label>
+          <label class="f">소속부서<select id="f-dept">${opt(DEPTS,"","선택 안 함")}</select></label>
+          <label class="f">이름<input type="text" id="f-name" maxlength="30" placeholder="미입력 시 익명 접수"></label>
+        </div>
+        <label class="f" style="margin-top:10px">이메일 <small style="color:var(--muted);font-weight:400">(선택)</small><input type="email" id="f-email" maxlength="80" autocomplete="email" placeholder="회신 메일이 필요하면 이메일을 작성해 주세요"></label>
+        <div class="note">※ 이름과 소속부서를 입력하지 않으면 개별 피드백(나의 질의 조회)에 제한이 있을 수 있습니다.<br>※ 이메일을 작성하시면 <b>접수 확인</b>과 <b>답변 등록</b> 시 해당 주소로 안내 메일이 발송됩니다. 작성하지 않으면 메일은 발송되지 않으며 화면에서 확인하실 수 있습니다.</div>
+      </div>
+      <div class="lab">질의항목 구분</div>
+      <div class="fld">
+        <div class="row" style="align-items:flex-end">
+          <div style="flex:0 1 auto"><div class="f" style="font-size:12px;color:var(--muted);margin-bottom:4px">구분1</div>
+            <div class="seg"><input type="radio" name="c1" id="c1a" value="일반"><label for="c1a">일반</label><input type="radio" name="c1" id="c1b" value="안전보건" checked><label for="c1b">안전보건</label><input type="radio" name="c1" id="c1c" value="환경"><label for="c1c">환경</label></div></div>
+          <div style="flex:0 1 auto"><div class="f" style="font-size:12px;color:var(--muted);margin-bottom:4px">구분2</div>
+            <div class="seg"><input type="radio" name="c2" id="c2a" value="관계법령" checked><label for="c2a">관계법령</label><input type="radio" name="c2" id="c2b" value="MESH"><label for="c2b">MESH</label></div></div>
+          <label class="f" id="docwrap" hidden style="flex:1 1 280px">해당 문서번호 (선택)<select id="f-doc">${docOpts("안전보건","","선택 안 함")}</select></label>
+        </div>
+      </div>
+      <div class="lab">공개 여부</div>
+      <div class="fld">
+        <div class="row" style="align-items:flex-end">
+          <div style="flex:0 1 auto"><div class="seg"><input type="radio" name="pub" id="pub1" value="1" checked><label for="pub1">공개</label><input type="radio" name="pub" id="pub0" value="0"><label for="pub0">비공개</label></div></div>
+          <label class="f" id="pwwrap" hidden style="flex:1 1 220px">비밀번호 * (4자리 이상)<input type="password" id="f-pw" maxlength="20" autocomplete="new-password"></label>
+        </div>
+        <div class="tag" id="pubnote" style="white-space:normal;margin-top:6px">${PUB_NOTE}</div>
+      </div>
+      <div class="lab">질의 내용 *</div>
+      <div class="fld"><textarea id="f-q" maxlength="2000" placeholder="상황, 장소, 관련 설비나 작업을 구체적으로 적어 주세요. 구체적이지 않은 질의는 '보류' 처리될 수 있습니다."></textarea>
+        <div class="tag" style="text-align:right"><span id="qlen">0</span> / 2,000자</div></div>
+      <div class="lab">첨부파일<small>선택 · 최대 5개</small></div>
+      <div class="fld">
+        <label class="drop" id="drop" for="f-file">파일을 끌어 놓거나 눌러서 선택<br><span class="tag">jpg, png, pdf, docx(워드), xlsx(엑셀) · 파일당 10MB · 합계 25MB</span></label>
+        <input type="file" id="f-file" multiple accept=".jpg,.jpeg,.png,.pdf,.docx,.xlsx" hidden>
+        <div class="files" id="flist"></div>
+      </div>
+    </div>
+    <div class="consent">
+      <label><input type="checkbox" id="ck1"> <span><b>[필수]</b> 개인정보 수집·이용·제공에 동의합니다.</span></label>
+      <details><summary>수집 항목 및 이용 목적</summary>수집 항목: 이름, 사업장, 소속부서, 이메일(선택) · 이용 목적: 질의 회신, 처리 결과 안내 및 접수·답변 알림 메일 발송 · 보유 기간: 처리 완료 후 3년</details>
+      <label id="ck2wrap"><input type="checkbox" id="ck2"> <span><b>[필수]</b> 개인정보를 제외한 질의 내용과 답변이 전체 공개되어 활용될 수 있음에 동의합니다.</span></label>
+    </div>
+    <div class="actions"><span class="err" id="ferr"></span><button type="reset" class="btn">초기화</button><button type="submit" class="btn pri" id="fsubmit">접수하기</button></div>
+  </form>`;
+  draftFiles=[];
+  const docwrap=$("#docwrap");
+  main.querySelectorAll('input[name=c2]').forEach(r=>r.onchange=()=>{docwrap.hidden=main.querySelector('input[name=c2]:checked').value!=="MESH"});
+  main.querySelectorAll('input[name=c1]').forEach(r=>r.onchange=()=>{$("#f-doc").innerHTML=docOpts(r.value,"","선택 안 함")});
+  main.querySelectorAll('input[name=pub]').forEach(r=>r.onchange=()=>{const pub=main.querySelector('input[name=pub]:checked').value==="1";$("#pwwrap").hidden=pub;$("#ck2wrap").hidden=!pub;$("#pubnote").textContent=pub?PUB_NOTE:PRIV_NOTE});
+  $("#f-q").oninput=e=>$("#qlen").textContent=e.target.value.length.toLocaleString();
+  const fi=$("#f-file"),drop=$("#drop");
+  const MB=1024*1024;
+  const addFiles=list=>{const ok=/\.(jpe?g|png|pdf|docx|xlsx)$/i;
+    for(const f of list){if(!ok.test(f.name)){toast(`${f.name}: 허용되지 않는 형식입니다`);continue}
+      if(f.size>10*MB){toast(`${f.name}: 10MB를 넘습니다`);continue}
+      if(draftFiles.length>=5){toast("첨부는 최대 5개입니다");break}
+      if(draftFiles.reduce((s,x)=>s+x.size,0)+f.size>25*MB){toast("첨부 합계는 25MB까지입니다");break}
+      draftFiles.push(f)}
+    drawFiles()};
+  const drawFiles=()=>$("#flist").innerHTML=draftFiles.map((f,i)=>`<span class="chip"><span>${esc(f.name)}</span><button type="button" aria-label="삭제" data-i="${i}">×</button></span>`).join("");
+  $("#flist").onclick=e=>{const b=e.target.closest("[data-i]");if(b){draftFiles.splice(+b.dataset.i,1);drawFiles()}};
+  fi.onchange=()=>{addFiles(fi.files);fi.value=""};
+  ["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over")}));
+  ["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over")}));
+  drop.addEventListener("drop",e=>addFiles(e.dataTransfer.files));
+  $("#f").addEventListener("reset",()=>setTimeout(()=>{draftFiles=[];drawFiles();$("#qlen").textContent="0";docwrap.hidden=true;$("#pwwrap").hidden=true;$("#ck2wrap").hidden=false;$("#pubnote").textContent=PUB_NOTE;$("#f-doc").innerHTML=docOpts("안전보건","","선택 안 함");$("#ferr").textContent=""}));
+  const b64=f=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(",")[1]);fr.onerror=()=>rej(new Error(f.name+" 파일을 읽을 수 없습니다."));fr.readAsDataURL(f)});
+  $("#f").addEventListener("submit",async e=>{e.preventDefault();
+    const site=$("#f-site").value,q=$("#f-q").value.trim(),err=$("#ferr");
+    if(!site)return err.textContent="사업장을 선택해 주세요.";
+    if(q.length<10)return err.textContent="질의 내용을 10자 이상 입력해 주세요.";
+    const pub=main.querySelector('input[name=pub]:checked').value==="1",pw=$("#f-pw").value;
+    if(!pub&&pw.length<4)return err.textContent="비공개 질의는 비밀번호를 4자리 이상 입력해 주세요.";
+    if(!$("#ck1").checked||(pub&&!$("#ck2").checked))return err.textContent=pub?"필수 동의 항목 2개에 모두 체크해 주세요.":"개인정보 수집·이용 동의(필수)에 체크해 주세요.";
+    const email=$("#f-email").value.trim();
+    if(email&&!/^[^\s@,;]+@[^\s@,;]+\.[^\s@,;]+$/.test(email))return err.textContent="이메일 형식이 올바르지 않습니다.";
+    err.textContent="";
+    const c2=main.querySelector('input[name=c2]:checked').value,name=$("#f-name").value.trim();
+    const btn=$("#fsubmit");btn.disabled=true;btn.textContent="접수 중…";
+    try{
+      const files=await Promise.all(draftFiles.map(async f=>({name:f.name,b64:await b64(f)})));
+      const res=await api("submit",{name,site,dept:$("#f-dept").value,c1:main.querySelector('input[name=c1]:checked').value,c2,
+        doc:c2==="MESH"?$("#f-doc").value:"",q,email,pub,pw:pub?"":pw,consent:true,consentPublic:pub,files},180000);
+      const msg=pub?(name?"‘나의 질의’에서 처리 상태와 답변을 확인할 수 있습니다.":"익명으로 접수되어 개별 회신 확인은 어렵습니다. 답변은 ‘전체 질의’에 공개됩니다.")
+        :(name?"비공개로 접수되었습니다. ‘나의 질의’에서 처리 상태를 확인하고, 내용은 비밀번호로 열람할 수 있습니다.":"비공개로 접수되었습니다. 위 접수번호와 입력하신 비밀번호로 ‘접수번호 조회’에서 확인할 수 있으니 접수번호를 꼭 보관해 주세요. 비밀번호는 복구할 수 없습니다.");
+      const mailMsg=res.mail==="sent"?`<p class="lede" style="margin:0 auto 8px">접수 확인 메일을 <b>${esc(email)}</b>로 보냈습니다. 답변이 등록되면 같은 주소로 알려 드립니다.</p>`
+        :res.mail==="failed"?`<p class="lede" style="margin:0 auto 8px;color:var(--danger)">접수는 완료되었으나 확인 메일 발송에 실패했습니다. 주소를 확인하시고, 접수번호를 보관해 주세요.</p>`
+        :`<p class="lede" style="margin:0 auto 8px;color:var(--muted)">이메일을 작성하지 않아 안내 메일은 발송되지 않습니다. 화면에서 처리 상태를 확인해 주세요.</p>`;
+      main.innerHTML=`<div class="panel done-card"><div class="tag">접수가 완료되었습니다</div><div class="no">${esc(res.id)}</div>
+        <p class="lede" style="margin:8px auto 8px">${msg}</p>${mailMsg}<div style="height:12px"></div>
+        <div class="row" style="justify-content:center;gap:8px"><button class="btn" id="again">새 질의 작성</button><button class="btn pri" id="gonext">${name?"나의 질의 보기":(pub?"전체 질의 보기":"접수번호 조회")}</button></div></div>`;
+      $("#again").onclick=()=>viewNew();
+      $("#gonext").onclick=()=>{if(name){mineQ={name,site};tab="mine"}else if(pub){tab="all"}else{tab="lookup";lookupPre=res.id}openRow=null;render()};
+    }catch(ex){err.textContent=ex.message;btn.disabled=false;btn.textContent="접수하기"}
+  });
+}
+
+/* ---------- 2-1. 나의 질의 ---------- */
+function viewMine(){
+  if(!mineQ.name){
+    main.innerHTML=`<h1>나의 질의</h1>
+    <p class="lede">질의 접수 때 입력한 이름과 사업장으로 내가 남긴 질의의 처리 상태를 확인합니다. 비공개 질의의 내용은 비밀번호를 입력해야 열람할 수 있습니다.</p>
+    <form class="panel" id="mf" novalidate><div class="form">
+      <div class="lab">사업장</div><div class="fld"><select id="m-site">${opt(SITES,"","선택")}</select></div>
+      <div class="lab">이름</div><div class="fld"><input type="text" id="m-name" maxlength="30" autocomplete="off"></div>
+    </div><div class="actions"><span class="err" id="merr"></span><button class="btn pri" type="submit">조회</button></div></form>`;
+    $("#mf").addEventListener("submit",e=>{e.preventDefault();
+      const name=$("#m-name").value.trim(),site=$("#m-site").value;
+      if(!name||!site)return $("#merr").textContent="사업장과 이름을 입력해 주세요.";
+      mineQ={name,site};openRow=null;viewMine()});
+    return;
+  }
+  loading();
+  api("mine",mineQ).then(r=>{rows=r;redraw=drawMine;drawMine()}).catch(e=>errView(e,viewMine));
+}
+function drawMine(){
+  main.innerHTML=`<h1>나의 질의</h1>
+  <p class="lede">${esc(mineQ.name)} · ${esc(mineQ.site)} 이름으로 접수한 질의입니다. 행을 누르면 질의 원문과 답변을 볼 수 있습니다. <button class="back" id="chg" style="margin:0 0 0 8px">다른 이름으로 조회</button></p>
+  <div class="panel"><div class="tablehead">총 <b>${rows.length}</b>건 · 답변대기 <b>${rows.filter(r=>r.st==="wait").length}</b>건</div>
+  <div class="tscroll"><table>
+    <thead><tr><th>질의일시</th><th>구분1</th><th>구분2</th><th>질의내용</th><th>답변일시</th><th>상태</th><th>첨부</th></tr></thead>
+    <tbody>${rows.length?rows.map(r=>rowHtml(r,["at","c1","c2q","q","aAt","st","files"],7)).join(""):`<tr><td colspan="7" class="empty">해당 이름으로 접수된 질의가 없습니다. 접수 때 입력한 이름·사업장과 같은지 확인해 주세요.</td></tr>`}</tbody>
+  </table></div></div>`;
+  $("#chg").onclick=()=>{mineQ={name:"",site:""};viewMine()};
+  bindRows();
+}
+
+/* ---------- 2-3. 접수번호 조회 ---------- */
+function viewLookup(){
+  main.innerHTML=`<h1>접수번호 조회</h1>
+  <p class="lede">익명으로 접수했거나 비공개로 접수한 질의는 접수번호와 비밀번호로 확인할 수 있습니다.</p>
+  <form class="panel" id="lf" novalidate><div class="form">
+    <div class="lab">접수번호</div><div class="fld"><input type="text" id="l-id" placeholder="예) ESH-261016-003" autocomplete="off" value="${esc(lookupPre)}"></div>
+    <div class="lab">비밀번호</div><div class="fld"><input type="password" id="l-pw" autocomplete="off"></div>
+  </div><div class="actions"><span class="err" id="lerr"></span><button type="submit" class="btn pri" id="lbtn">조회</button></div></form><div id="lres"></div>`;
+  lookupPre="";
+  $("#lf").addEventListener("submit",async e=>{e.preventDefault();
+    const id=$("#l-id").value.trim(),pw=$("#l-pw").value;$("#lres").innerHTML="";
+    if(!id||!pw)return $("#lerr").textContent="접수번호와 비밀번호를 입력해 주세요.";
+    $("#lerr").textContent="";const b=$("#lbtn");b.disabled=true;
+    try{
+      const r=await api("lookup",{id,pw});
+      const nf=r.nf?`<div class="files"><span class="chip"><span>📎 첨부 ${r.nf}개</span></span></div>`:"";
+      $("#lres").innerHTML=`<div class="panel" style="margin-top:16px"><div class="tablehead"><b>${esc(r.id)}</b> · ${esc(r.at)} 접수 · ${badge(r.st)}</div><div class="detail-box">
+        <div><h4>질의 원문</h4><p>${esc(r.q)}</p>${nf}</div>
+        <div><h4>ESH 담당자 답변 ${badge(r.st)}</h4><p>${r.a?esc(r.a):"아직 답변이 등록되지 않았습니다."}</p>${r.aAt?`<div class="tag" style="margin-top:6px">${esc(r.aAt)} 회신</div>`:""}</div></div></div>`;
+    }catch(ex){$("#lerr").textContent=ex.message}
+    b.disabled=false;
+  });
+}
+
+/* ---------- 공통 행 렌더 ---------- */
+function filesChips(r){
+  if(r.files)return r.files.map(f=>`<a class="chip" href="https://drive.google.com/file/d/${esc(f.id)}/view" target="_blank" rel="noopener"><span>📎 ${esc(f.n)}</span></a>`).join("");
+  return r.nf?`<span class="chip"><span>📎 첨부 ${r.nf}개</span></span>`:"";
+}
+function detailHtml(r){
+  if(r.locked){
+    const canOpen=mode==="user"&&tab==="mine";
+    return `<div class="detail-box"><div><h4>비공개 질의 · <span class="doc">${esc(r.id)}</span></h4><p>비공개로 접수된 질의입니다.</p>${canOpen?`<div class="row" style="margin-top:10px"><input type="password" id="u-pw" placeholder="비밀번호" autocomplete="off"><button class="btn sm pri" data-unlock="${esc(r.id)}">열람</button></div>`:""}</div>
+      <div><h4>ESH 담당자 답변 ${badge(r.st)}</h4><p>${r.a?"비공개 답변입니다.":"아직 답변이 등록되지 않았습니다."}</p></div></div>`;
+  }
+  const f=filesChips(r);
+  return `<div class="detail-box">
+    <div><h4>질의 원문 · <span class="doc">${esc(r.id)}</span></h4><p>${esc(r.q)}</p>${f?`<div class="files">${f}</div>`:""}</div>
+    <div><h4>ESH 담당자 답변 ${badge(r.st)}</h4><p>${r.a?esc(r.a):"아직 답변이 등록되지 않았습니다."}</p>${r.aAt?`<div class="tag" style="margin-top:6px">${esc(r.aAt)} 회신</div>`:""}</div></div>`;
+}
+function rowHtml(r,cols,span){
+  const nf=r.files?r.files.length:(r.nf||0);
+  const docCell=r.doc?`<span class="doc">${esc(r.doc)}</span><div class="tag">${esc(DOC_NAME[r.doc]||"")}</div>`:'<span class="tag">-</span>';
+  const cell={
+    at:`<td class="date">${esc(r.at)}</td>`,name:`<td>${r.name?esc(r.name):'<span class="tag">익명</span>'}</td>`,site:`<td>${esc(r.site)}</td>`,
+    dept:`<td>${r.dept?esc(r.dept):'<span class="tag">-</span>'}</td>`,c1:`<td>${esc(r.c1)}</td>`,c2:`<td>${esc(r.c2)}</td>`,
+    c2q:`<td>${esc(r.c2)}${r.doc?`<div class="doc">${esc(r.doc)}</div><div class="tag">${esc(DOC_NAME[r.doc]||"")}</div>`:""}</td>`,
+    doc:`<td>${docCell}</td>`,
+    q:`<td class="q"><div class="t">${r.pub===false?"🔒 ":""}${r.locked?"비공개 질의입니다":esc(r.q)}</div></td>`,
+    a:`<td class="q"><div class="t">${r.a?(r.locked?"🔒 비공개 답변입니다":esc(r.a)):'<span class="tag">답변 대기 중</span>'}</div></td>`,
+    aAt:`<td class="date">${r.aAt?esc(r.aAt):'<span class="tag">-</span>'}</td>`,st:`<td>${badge(r.st)}</td>`,
+    files:`<td class="clip">${nf?"📎 "+nf:"-"}</td>`,
+    btn:`<td><button class="btn sm ${r.st==="wait"?"pri":""}" data-ans="${esc(r.id)}">${r.st==="wait"?"답변하기":"수정"}</button></td>`
+  };
+  let h=`<tr class="clickable" data-row="${esc(r.id)}">${cols.map(c=>cell[c]).join("")}</tr>`;
+  if(openRow===r.id)h+=`<tr class="detail"><td colspan="${span}">${detailHtml(r)}</td></tr>`;
+  return h;
+}
+function bindRows(){
+  main.querySelectorAll("[data-row]").forEach(tr=>tr.onclick=e=>{if(e.target.closest("[data-ans]"))return;openRow=openRow===tr.dataset.row?null:tr.dataset.row;redraw()});
+  main.querySelectorAll("[data-ans]").forEach(b=>b.onclick=()=>{answering=b.dataset.ans;render();window.scrollTo(0,0)});
+  main.querySelectorAll("[data-unlock]").forEach(b=>b.onclick=async()=>{
+    const pw=$("#u-pw").value;if(!pw)return toast("비밀번호를 입력해 주세요.");
+    b.disabled=true;
+    try{const full=await api("lookup",{id:b.dataset.unlock,pw});const i=rows.findIndex(x=>x.id===full.id);if(i>=0)rows[i]={...rows[i],...full};redraw()}
+    catch(e){toast(e.message);b.disabled=false}
+  });
+}
+
+/* ---------- 필터 ---------- */
+function filtersHtml(admin){
+  return `<div class="filters">
+    <label class="f">질의일 시작<input type="date" id="x-from" value="${flt.from}"></label>
+    <label class="f">질의일 종료<input type="date" id="x-to" value="${flt.to}"></label>
+    ${admin?`<label class="f">사업장<select id="x-site">${opt(SITES,flt.site,"전체")}</select></label>`:""}
+    <label class="f">구분1<select id="x-c1">${opt(["일반","안전보건","환경"],flt.c1,"전체")}</select></label>
+    <label class="f">구분2<select id="x-c2">${opt(["관계법령","MESH"],flt.c2,"전체")}</select></label>
+    <label class="f">문서번호<select id="x-doc">${docOpts(flt.c1,flt.doc,"전체")}</select></label>
+    ${admin?"":`<label class="f">답변상태<select id="x-st"><option value="">전체</option>${Object.entries(ST).map(([k,v])=>`<option value="${k}"${flt.st===k?" selected":""}>${v.t}</option>`).join("")}</select></label>`}
+    <label class="f kw">키워드<input type="text" id="x-kw" value="${esc(flt.kw)}" placeholder="질의·답변 내용 검색"></label>
+    <div class="go"><button class="btn pri" id="x-go">조회</button><button class="btn" id="x-reset">초기화</button></div>
+  </div>`;
+}
+function bindFilters(admin){
+  const read=()=>{flt.from=$("#x-from").value;flt.to=$("#x-to").value;flt.c1=$("#x-c1").value;flt.c2=$("#x-c2").value;flt.doc=$("#x-doc").value;flt.kw=$("#x-kw").value.trim();
+    if(admin)flt.site=$("#x-site").value;else flt.st=$("#x-st").value;page=1;openRow=null;redraw()};
+  $("#x-c1").onchange=()=>{$("#x-doc").innerHTML=docOpts($("#x-c1").value,"","전체")};
+  $("#x-go").onclick=read;$("#x-kw").onkeydown=e=>{if(e.key==="Enter")read()};
+  $("#x-reset").onclick=()=>{Object.assign(flt,{from:"",to:"",c1:"",c2:"",doc:"",st:"",site:"",kw:""});adminStat="all";page=1;redraw()};
+  const th=main.querySelector("th.sort");if(th)th.onclick=()=>{flt.sortDir=flt.sortDir==="desc"?"asc":"desc";redraw()};
+}
+function applyFilters(list,admin){
+  const kw=flt.kw.toLowerCase();
+  list=list.filter(r=>(!flt.from||r.at.slice(0,10)>=flt.from)&&(!flt.to||r.at.slice(0,10)<=flt.to)&&(!flt.c1||r.c1===flt.c1)&&(!flt.c2||r.c2===flt.c2)
+    &&(!flt.doc||r.doc===flt.doc)&&(!kw||((r.q||"")+" "+(r.a||"")).toLowerCase().includes(kw))&&(!admin||!flt.site||r.site===flt.site)&&(admin||!flt.st||r.st===flt.st));
+  return list.sort((a,b)=>flt.sortDir==="desc"?b.at.localeCompare(a.at):a.at.localeCompare(b.at));
+}
+function pager(n,per){const pages=Math.max(1,Math.ceil(n/per));if(pages<2)return"";
+  return `<div class="pager">${Array.from({length:pages},(_,i)=>`<button class="btn sm${page===i+1?" pri":""}" data-pg="${i+1}">${i+1}</button>`).join("")}</div>`}
+function bindPager(){main.querySelectorAll("[data-pg]").forEach(b=>b.onclick=()=>{page=+b.dataset.pg;redraw()})}
+
+/* ---------- 2-2. 전체 질의 (공개, 개인정보 제외) ---------- */
+function viewAll(){loading();api("listPublic").then(r=>{rows=r;redraw=drawAll;drawAll()}).catch(e=>errView(e,viewAll))}
+function drawAll(){
+  const list=applyFilters([...rows],false),per=8,slice=list.slice((page-1)*per,page*per);
+  main.innerHTML=`<h1>전체 질의</h1>
+  <p class="lede">모든 사업장의 질의와 답변을 공개합니다. 이름·사업장·부서 등 개인정보는 표시하지 않습니다. 같은 내용을 이미 묻고 답한 사례가 있는지 먼저 검색해 보세요.</p>
+  <div class="panel">${filtersHtml(false)}
+    <div class="tablehead">검색 결과 <b>${list.length}</b>건</div>
+    <div class="tscroll"><table>
+      <thead><tr><th class="sort" data-dir="${flt.sortDir}">질의일시</th><th>구분1</th><th>구분2</th><th>문서번호</th><th>질의내용</th><th>답변내용</th><th>답변일시</th><th>상태</th><th>첨부</th></tr></thead>
+      <tbody>${slice.length?slice.map(r=>rowHtml(r,["at","c1","c2","doc","q","a","aAt","st","files"],9)).join(""):`<tr><td colspan="9" class="empty">조건에 맞는 질의가 없습니다. 기간이나 키워드를 바꿔 보세요.</td></tr>`}</tbody>
+    </table></div>${pager(list.length,per)}</div>`;
+  bindFilters(false);bindRows();bindPager();
+}
+
+/* ---------- 3-0. 관리자 로그인 ---------- */
+function viewLogin(){
+  main.innerHTML=`<h1>관리자 로그인</h1>
+  <p class="lede">ESH 담당자 전용 화면입니다. 관리자 비밀번호를 입력해 주세요.</p>
+  <form class="panel" id="af0" novalidate><div class="form">
+    <div class="lab">비밀번호</div><div class="fld"><input type="password" id="a-pw" autocomplete="current-password"></div>
+  </div><div class="actions"><span class="err" id="aerr0"></span><button type="submit" class="btn pri" id="abtn0">로그인</button></div></form>`;
+  $("#af0").addEventListener("submit",async e=>{e.preventDefault();
+    const pw=$("#a-pw").value;if(!pw)return $("#aerr0").textContent="비밀번호를 입력해 주세요.";
+    const b=$("#abtn0");b.disabled=true;$("#aerr0").textContent="";
+    try{const r=await api("adminLogin",{pw});token=r.token;try{sessionStorage.setItem("shetok",token)}catch(_){}tab="manage";render()}
+    catch(ex){$("#aerr0").textContent=ex.message;b.disabled=false}
+  });
+}
+
+/* ---------- 3-1. 관리자 답변 관리 ---------- */
+function viewManage(){loading();api("adminList",{token}).then(r=>{rows=r;redraw=drawManage;drawManage()}).catch(e=>errView(e,viewManage))}
+function drawManage(){
+  const list=applyFilters([...rows],true);
+  const cnt=k=>k==="all"?list.length:list.filter(r=>r.st===k).length;
+  const stats=[["all","전체"],["wait","답변대기"],["done","완료"],["hold","보류"],["plan","개선예정"]];
+  const shown=adminStat==="all"?list:list.filter(r=>r.st===adminStat);
+  const per=8,slice=shown.slice((page-1)*per,page*per);
+  main.innerHTML=`<h1>답변 관리</h1>
+  <p class="lede">접수된 질의를 확인하고 답변을 등록합니다. 행을 누르면 원문을 펼쳐 보고, ‘답변하기’로 답변 입력 화면으로 이동합니다. 🔒는 비공개 질의입니다.</p>
+  <div class="stats">${stats.map(([k,t])=>`<button class="stat" aria-pressed="${adminStat===k}" data-stat="${k}"><small>${t}</small><b>${cnt(k)}</b></button>`).join("")}</div>
+  <div class="panel">${filtersHtml(true)}
+    <div class="tablehead">표시 <b>${shown.length}</b>건 · 질의일시 순 정렬은 머리글을 누르세요 <span style="flex:1"></span><button class="btn sm" id="refresh">새로고침</button><button class="btn sm" id="logout">로그아웃</button></div>
+    <div class="tscroll"><table>
+      <thead><tr><th></th><th class="sort" data-dir="${flt.sortDir}">질의일시</th><th>사업장</th><th>부서</th><th>이름</th><th>구분1</th><th>구분2</th><th>질의내용</th><th>답변내용</th><th>답변일시</th><th>상태</th><th>첨부</th></tr></thead>
+      <tbody>${slice.length?slice.map(r=>rowHtml(r,["btn","at","site","dept","name","c1","c2q","q","a","aAt","st","files"],12)).join(""):`<tr><td colspan="12" class="empty">해당 조건의 질의가 없습니다.</td></tr>`}</tbody>
+    </table></div>${pager(shown.length,per)}</div>`;
+  main.querySelectorAll("[data-stat]").forEach(b=>b.onclick=()=>{adminStat=b.dataset.stat;page=1;redraw()});
+  $("#refresh").onclick=viewManage;
+  $("#logout").onclick=()=>{token="";try{sessionStorage.removeItem("shetok")}catch(_){}render()};
+  bindFilters(true);bindRows();bindPager();
+}
+
+/* ---------- 3-2. 답변 입력 ---------- */
+function viewAnswer(){
+  const r=rows.find(x=>x.id===answering);if(!r){answering=null;return render()}
+  const cur=r.st==="wait"?"":r.st,f=filesChips(r);
+  main.innerHTML=`<button class="back" id="back">← 답변 관리 목록</button>
+  <h1>답변 입력 <span class="doc" style="font-weight:400;color:var(--muted)">${esc(r.id)}</span></h1>
+  <p class="lede">답변과 처리 상태를 저장하면 질의자의 ‘나의 질의’와 ‘전체 질의’(공개 건)에 바로 반영됩니다. 저장 시 담당자에게, 질의자가 이메일을 남긴 경우 질의자에게도 안내 메일이 발송됩니다(이미 답변된 건을 수정해 저장해도 다시 발송).</p>
+  <form class="panel" id="af" novalidate><div class="ans">
+    <div class="lab">신청정보</div>
+    <div class="ro"><span><em>사업장</em>${esc(r.site)}</span><span><em>부서</em>${esc(r.dept||"-")}</span><span><em>이름</em>${r.name?esc(r.name):"익명"}</span><span><em>구분</em>${esc(r.c1)} / ${esc(r.c2)}</span><span><em>공개</em>${r.pub===false?"비공개":"공개"}</span><span><em>이메일</em>${r.email?esc(r.email):"없음"}</span>${r.doc?`<span><em>문서</em><span class="doc">${esc(r.doc)}</span> ${esc(DOC_NAME[r.doc]||"")}</span>`:""}</div>
+    <div class="lab">질의일시</div><div class="doc">${esc(r.at)}</div>
+    <div class="lab">질의내용</div><div><p class="qtext">${esc(r.q)}</p></div>
+    <div class="lab">첨부파일</div><div>${f?`<div class="files" style="margin:0">${f}</div>`:'<span class="tag">첨부 없음</span>'}</div>
+    <div class="lab">답변내용 *</div><div><textarea id="a-text" maxlength="5000" placeholder="근거 법령 조항이나 MESH 문서번호를 함께 적어 주세요.">${esc(r.a)}</textarea></div>
+    <div class="lab">답변상태 *</div>
+    <div class="opts">${["done","hold","plan"].map(k=>`<label class="opt"><input type="radio" name="ast" value="${k}"${cur===k?" checked":""}><span><b>${ST[k].t}</b><small>${ST_DESC[k]}</small></span></label>`).join("")}</div>
+    <div class="lab">처리 이력</div>
+    <div class="hist"><span><span class="mono">${esc(r.at)}</span> 접수 (${r.name?esc(r.name):"익명"})</span>${r.aAt?`<span><span class="mono">${esc(r.aAt)}</span> ${ST[r.st].t} 처리 (${esc(r.by||"ESH 담당자")})</span>`:""}</div>
+  </div>
+  <div class="actions"><span class="err" id="aerr"></span><button type="button" class="btn" id="cancel">취소</button><button type="submit" class="btn pri" id="asave">답변 저장</button></div></form>`;
+  const back=()=>{answering=null;render()};
+  $("#back").onclick=back;$("#cancel").onclick=back;
+  $("#af").addEventListener("submit",async e=>{e.preventDefault();
+    const a=$("#a-text").value.trim(),s=main.querySelector('input[name=ast]:checked');
+    if(a.length<5)return $("#aerr").textContent="답변 내용을 입력해 주세요.";
+    if(!s)return $("#aerr").textContent="답변상태(완료·보류·개선예정)를 선택해 주세요.";
+    const b=$("#asave");b.disabled=true;b.textContent="저장 중…";
+    try{const rs=await api("answer",{token,id:r.id,a,st:s.value}),m=rs.mail||{};
+      toast(`${r.id} 답변을 ‘${ST[s.value].t}’로 저장했습니다`+(m.requester==="sent"?" · 질의자에게 메일 발송":m.requester==="failed"?" · 질의자 메일 발송 실패(주소 확인)":""));back()}
+    catch(ex){if(/세션 만료|로그인이 필요/.test(ex.message))return errView(ex);$("#aerr").textContent=ex.message;b.disabled=false;b.textContent="답변 저장"}
+  });
+}
+
+render();
+</script>
+
+</body></html>
