@@ -18,6 +18,7 @@
   --amber: #D97706; --amber-lt: #FFFBEB; --amber-mid: #FDE68A;
   --violet: #7C3AED; --violet-lt: #F5F3FF; --violet-mid: #DDD6FE;
   --rose: #E11D48; --rose-lt: #FFF1F2; --rose-mid: #FECDD3;
+  --orange: #EA580C; --orange-lt: #FFF7ED; --orange-mid: #FED7AA;
   --hold: #64748B; --hold-dark: #334155; --hold-lt: #F1F5F9; --hold-mid: #CBD5E1;
   --text-h: #0F172A; --text-b: #334155; --text-m: #64748B; --text-s: #94A3B8;
   --border: #E2E8F0; --radius: 22px;
@@ -63,7 +64,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card:nth-child(10) { animation-delay: 0.80s; }
 .card-hold { cursor: default; }
 .card-dev { cursor: default; }
-.card-b:hover, .card-t:hover, .card-a:hover, .card-r:hover, .card-v:hover, .card-n:hover, .card-g:hover, .card-c:hover { transform: translateY(-7px); box-shadow: var(--shadow-hover); }
+.card-b:hover, .card-t:hover, .card-a:hover, .card-r:hover, .card-v:hover, .card-n:hover, .card-g:hover, .card-c:hover, .card-j:hover { transform: translateY(-7px); box-shadow: var(--shadow-hover); }
 .card-b:hover { border-color: #BFDBFE; }
 .card-t:hover { border-color: #99F6E4; }
 .card-a:hover { border-color: #FCD34D; }
@@ -72,6 +73,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card-n:hover { border-color: #93C5FD; }
 .card-g:hover { border-color: #C7D2FE; }
 .card-c:hover { border-color: #A5F3FC; }
+.card-j:hover { border-color: #FDBA74; }
 .card-dev:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: #A5F3FC; }
 .card-hold:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--hold-mid); }
 
@@ -85,6 +87,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card-n .card-bar    { background: linear-gradient(90deg, #0A2540 0%, #3B82F6 100%); }
 .card-g .card-bar    { background: linear-gradient(90deg, #4F46E5 0%, #818CF8 100%); }
 .card-c .card-bar    { background: linear-gradient(90deg, #0891B2 0%, #22D3EE 100%); }
+.card-j .card-bar    { background: linear-gradient(90deg, #EA580C 0%, #FB923C 100%); }
 
 .card-no { position: absolute; top: 16px; right: 18px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; color: var(--text-s); }
 .icon-box { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; flex-shrink: 0; }
@@ -97,6 +100,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card-n    .icon-box { background: #E0F2FE; border: 1px solid #93C5FD; }
 .card-g    .icon-box { background: #EEF2FF; border: 1px solid #C7D2FE; }
 .card-c    .icon-box { background: #ECFEFF; border: 1px solid #A5F3FC; }
+.card-j    .icon-box { background: var(--orange-lt); border: 1px solid var(--orange-mid); }
 .icon-box svg { width: 17px; height: 17px; }
 
 .card-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 5px; }
@@ -109,6 +113,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 .card-n    .card-tag { color: #0A2540; }
 .card-g    .card-tag { color: #4F46E5; }
 .card-c    .card-tag { color: #0891B2; }
+.card-j    .card-tag { color: var(--orange); }
 
 .card-title { font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 700; line-height: 1.45; color: var(--text-h); margin-bottom: 7px; word-break: keep-all; }
 .card-desc  { font-family: 'Noto Sans KR', sans-serif; font-size: 11.5px; font-weight: 400; color: var(--text-m); line-height: 1.7; word-break: keep-all; flex: 1; }
@@ -136,6 +141,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
 
 .card-g:hover .arrow-btn { background: #EEF2FF; border-color: #C7D2FE; color: #4F46E5; }
 .card-c:hover .arrow-btn { background: #ECFEFF; border-color: #A5F3FC; color: #0891B2; }
+.card-j:hover .arrow-btn { background: var(--orange-lt); border-color: #FDBA74; color: var(--orange); }
 .dev-notice { background: #ECFEFF; border: 1px solid #A5F3FC; border-radius: 10px; padding: 9px 11px; margin-top: 10px; margin-bottom: 2px; }
 .dev-notice-title { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #0E7490; letter-spacing: 0.02em; }
 .dev-notice-title svg { width: 12px; height: 12px; flex-shrink: 0; }
@@ -213,7 +219,7 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
       <span class="logo-name">YESS <span>Your (Intelligent) ESH Support System</span></span>
       <div class="divider"></div>
-      <div class="header-pill"><span class="pill-dot"></span>9 Services Active · 1 On Hold</div>
+      <div class="header-pill"><span class="pill-dot"></span>10 Services Active</div>
     </div>
     <h1>지능형 안전보건<br><em>업무지원 시스템</em></h1>
     <p class="header-sub"><b>매일유업</b> · Environment · Safety · Health</p>
@@ -292,32 +298,22 @@ html, body { min-height: 100vh; background: var(--bg); font-family: 'Outfit', 'N
       </div>
     </a>
 
-    <!-- 05 AI-JSA (일시 보류) -->
-    <div class="card card-hold" id="card-jsa">
+    <!-- 05 AI-JSA 위험성평가 -->
+    <a class="card card-j" id="card-jsa" href="https://maeil-esh.github.io/Portal/jsa.html" target="_blank" rel="noopener">
       <div class="card-bar"></div><span class="card-no">05</span>
       <div class="icon-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/>
         </svg>
       </div>
       <span class="card-tag">AI Risk Assessment</span>
       <h2 class="card-title">AI-JSA<br>위험성평가</h2>
-      <p class="card-desc">작업 내용을 입력하면 AI가 유해·위험요인을 자동 도출하고 감소대책을 제안합니다. (작업안전분석 기반)</p>
-      <div class="hold-notice">
-        <div class="hold-notice-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-          <span>일시 보류 ON HOLD</span>
-        </div>
-        <div class="hold-notice-sub">재개 일정은 별도 공지 예정</div>
-      </div>
+      <p class="card-desc">작업 정보를 입력하면 AI가 MESH-11-11 기준으로 유해·위험요인과 감소대책을 도출합니다. 표준형 93종 라이브러리와 인쇄(PDF)를 제공합니다.</p>
       <div class="card-foot">
-        <span class="status"><span class="s-dot-hold"></span>일시 보류</span>
-        <div class="hold-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="9" x2="10" y2="15"/><line x1="14" y1="9" x2="14" y2="15"/></svg>
-          <span>HOLD</span>
-        </div>
+        <span class="status"><span class="s-dot"></span>운영 중</span>
+        <div class="arrow-btn">바로가기<svg viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 11 L11 2 M4.5 2 H11 V8.5"/></svg></div>
       </div>
-    </div>
+    </a>
 
     <!-- 06 ESH 질의응답 -->
     <a class="card card-c" href="https://maeil-esh.github.io/Portal/eshqna.html" target="_blank" rel="noopener">
