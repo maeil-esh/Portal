@@ -279,6 +279,24 @@ tbody td{border-bottom-color:#e5e8eb}
 .scan i{animation:blink 1.2s infinite;font-style:normal}.scan i:nth-child(2){animation-delay:.2s}.scan i:nth-child(3){animation-delay:.4s}
 @keyframes shim{to{background-position:-200% 0}}@keyframes blink{0%,100%{opacity:.2}50%{opacity:1}}
 .dash-err{text-align:left}
+/* ───── 관리자 질의·답변 팝업 (접수 양식과 같은 좌측 라벨 · 우측 입력 구성) ───── */
+body.mopen{overflow:hidden}
+#modal{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px}
+.mback{position:absolute;inset:0;background:rgba(25,31,40,.55);animation:mfade .15s ease-out}
+.mdlg{position:relative;background:#fff;border-radius:14px;width:min(920px,100%);max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 24px 64px rgba(0,0,0,.32);overflow:hidden;outline:0;animation:mpop .18s ease-out}
+.mhead{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid #e5e8eb}
+.mhead b{font-size:16px;color:#191f28}.mhead .mid{margin:0 10px 0 10px;color:#6b7684}
+.mx{border:0;background:#f2f4f6;color:#4e5968;width:32px;height:32px;border-radius:8px;font-size:15px;cursor:pointer;flex:0 0 32px}.mx:hover{background:#e5e8eb}
+.mbody{overflow:auto;flex:1;min-height:0}
+.mnote{margin:0;padding:12px 20px;background:#f4f8ff;color:#3a4b66;font-size:12.5px;line-height:1.6;border-bottom:1px solid #e5e8eb}
+.msec{padding:10px 20px;background:#344155;color:#fff;font-weight:700;font-size:13px}
+.mbody .ans{border:0}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;align-items:center;padding:12px 20px;border-top:1px solid #e5e8eb;background:#fff}
+.mfoot .err{margin-right:auto;font-size:13px}
+@keyframes mfade{from{opacity:0}to{opacity:1}}@keyframes mpop{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+@media(max-width:640px){#modal{padding:0}.mdlg{max-height:100vh;height:100vh;border-radius:0;width:100%}}
+@media(prefers-reduced-motion:reduce){.mback,.mdlg{animation:none}}
+
 /* ───── 컴팩트 현황 카드 ───── */
 .dash{margin:0 0 14px}
 .dash-head{margin-bottom:8px}.dash-head h1{font-size:18px}
@@ -397,9 +415,9 @@ function setMode(m){Object.assign(flt,{from:"",to:"",c1:"",c2:"",doc:"",st:"",si
   $("#m-user").setAttribute("aria-pressed",m==="user");$("#m-admin").setAttribute("aria-pressed",m==="admin");render()}
 $("#m-user").onclick=()=>setMode("user");$("#home").onclick=e=>{e.preventDefault();setMode("user");scrollTo({top:0,behavior:"smooth"})};$("#m-admin").onclick=()=>setMode("admin");
 
-function render(){renderTabs();
+function render(){closeModal();renderTabs();
   if(mode==="user"){if(tab==="new")viewNew();else if(tab==="mine")viewMine();else if(tab==="lookup")viewLookup();else viewAll()}
-  else{if(!token)viewLogin();else if(answering)viewAnswer();else if(tab==="manage")viewManage();else viewAll()}
+  else{if(!token)viewLogin();else if(tab==="manage")viewManage();else viewAll()}
 }
 
 /* ---------- 1. 접수 ---------- */
@@ -703,8 +721,8 @@ function rowHtml(r,cols,span){
   return h;
 }
 function bindRows(){
-  main.querySelectorAll("[data-row]").forEach(tr=>tr.onclick=e=>{if(e.target.closest("[data-ans],[data-restore],[data-purge]"))return;openRow=openRow===tr.dataset.row?null:tr.dataset.row;redraw()});
-  main.querySelectorAll("[data-ans]").forEach(b=>b.onclick=()=>{answering=b.dataset.ans;render();window.scrollTo(0,0)});
+  main.querySelectorAll("[data-row]").forEach(tr=>tr.onclick=e=>{if(e.target.closest("[data-ans],[data-restore],[data-purge]"))return;if(mode==="admin"&&tab==="manage"){answering=tr.dataset.row;return viewAnswer()}openRow=openRow===tr.dataset.row?null:tr.dataset.row;redraw()});
+  main.querySelectorAll("[data-ans]").forEach(b=>b.onclick=()=>{answering=b.dataset.ans;viewAnswer()});
   main.querySelectorAll("[data-restore]").forEach(b=>b.onclick=async()=>{b.disabled=true;try{await api("adminDelete",{token,id:b.dataset.restore,mode:"restore"});toast(`${b.dataset.restore} 복구했습니다`);viewManage()}catch(e){toast(e.message);b.disabled=false}});
   main.querySelectorAll("[data-purge]").forEach(b=>b.onclick=async()=>{
     if(!confirm(`${b.dataset.purge} 을(를) 영구삭제합니다.\n질의·답변 내용과 첨부파일이 삭제되며 복구할 수 없습니다. 계속할까요?`))return;
@@ -801,7 +819,7 @@ function drawManage(){
   const shown=adminStat==="all"?list:adminStat==="trash"?trash:adminStat==="blind"?list.filter(r=>r.blind):list.filter(r=>r.st===adminStat);
   const per=8,slice=shown.slice((page-1)*per,page*per);
   main.innerHTML=`<h1>답변 관리</h1>
-  <p class="lede">접수된 질의를 확인하고 답변을 등록합니다. 행을 누르면 원문을 펼쳐 보고, ‘답변하기’로 답변 입력 화면으로 이동합니다. 🔒 비공개, 🚫 블라인드, 🗑 휴지통 건입니다. 질의 수정·블라인드·삭제는 답변 입력 화면 하단의 ‘관리 작업’에서 처리합니다.</p>
+  <p class="lede">접수된 질의를 확인하고 답변을 등록합니다. 행을 누르거나 ‘답변하기’를 누르면 질의 확인·답변 팝업이 열립니다. 🔒 비공개, 🚫 블라인드, 🗑 휴지통 건입니다. 질의 수정·블라인드·삭제는 팝업 하단의 ‘관리 작업’에서 처리합니다.</p>
   <div class="stats">${stats.map(([k,t])=>`<button class="stat" aria-pressed="${adminStat===k}" data-stat="${k}"><small>${t}</small><b>${cnt(k)}</b></button>`).join("")}</div>
   <div class="panel">${filtersHtml(true)}
     <div class="tablehead">표시 <b>${shown.length}</b>건 · 질의일시 순 정렬은 머리글을 누르세요 <span style="flex:1"></span><button class="btn sm" id="csv">CSV 내려받기</button><button class="btn sm" id="refresh">새로고침</button><button class="btn sm" id="logout">로그아웃</button></div>
@@ -817,13 +835,21 @@ function drawManage(){
 }
 
 /* ---------- 3-2. 답변 입력 ---------- */
+let modalDirty=false;
+function modalKey(e){if(e.key==="Escape")closeAnswer()}
+function closeModal(){const m=document.getElementById("modal");if(m)m.remove();document.body.classList.remove("mopen");document.removeEventListener("keydown",modalKey);answering=null}
+function closeAnswer(refresh){closeModal();if(refresh){modalDirty=false;viewManage()}else if(modalDirty){modalDirty=false;redraw()}}
 function viewAnswer(){
-  const r=rows.find(x=>x.id===answering);if(!r){answering=null;return render()}
+  const r=rows.find(x=>x.id===answering);if(!r){answering=null;return}
   const cur=r.st==="wait"?"":r.st,f=filesChips(r);
-  main.innerHTML=`<button class="back" id="back">← 답변 관리 목록</button>
-  <h1>답변 입력 <span class="doc" style="font-weight:400;color:var(--muted)">${esc(r.id)}</span></h1>
-  <p class="lede">답변과 처리 상태를 저장하면 질의자의 ‘나의 질의’와 ‘전체 질의’(공개 건)에 바로 반영됩니다. 저장 시 담당자에게, 질의자가 이메일을 남긴 경우 질의자에게도 안내 메일이 발송됩니다(이미 답변된 건을 수정해 저장해도 다시 발송).</p>
-  <form class="panel" id="af" novalidate><div class="ans">
+  let m=document.getElementById("modal");const had=!!m,keep=had?m.querySelector(".mbody").scrollTop:0;
+  if(!m){m=document.createElement("div");m.id="modal";document.body.appendChild(m);document.body.classList.add("mopen");document.addEventListener("keydown",modalKey)}
+  m.innerHTML=`<div class="mback" id="mback"></div>
+  <div class="mdlg" role="dialog" aria-modal="true" aria-labelledby="mtitle" tabindex="-1">
+  <div class="mhead"><div><b id="mtitle">질의 확인 · 답변 입력</b><span class="doc mid">${esc(r.id)}</span>${badge(r.st)}</div><button type="button" class="mx" id="mclose" aria-label="닫기">✕</button></div>
+  <div class="mbody">
+  <p class="mnote">답변과 처리 상태를 저장하면 질의자의 ‘나의 질의’와 ‘전체 질의’(공개 건)에 바로 반영됩니다. 저장 시 담당자에게, 질의자가 이메일을 남긴 경우 질의자에게도 안내 메일이 발송됩니다(이미 답변된 건을 수정해 저장해도 다시 발송됩니다).</p>
+  <form id="af" novalidate><div class="ans">
     <div class="lab">신청정보</div>
     <div class="ro"><span><em>사업장</em>${esc(r.site)}</span><span><em>부서</em>${esc(r.dept||"-")}</span><span><em>이름</em>${r.name?esc(r.name):"익명"}</span><span><em>구분</em>${esc(r.c1)} / ${esc(r.c2)}</span><span><em>공개</em>${r.pub===false?"비공개":"공개"}</span><span><em>이메일</em>${r.email?esc(r.email):"없음"}</span>${r.doc?`<span><em>문서</em><span class="doc">${esc(r.doc)}</span> ${esc(DOC_NAME[r.doc]||"")}</span>`:""}</div>
     <div class="lab">질의일시</div><div class="doc">${esc(r.at)}</div>
@@ -834,10 +860,9 @@ function viewAnswer(){
     <div class="opts">${["done","hold","plan"].map(k=>`<label class="opt"><input type="radio" name="ast" value="${k}"${cur===k?" checked":""}><span><b>${ST[k].t}</b><small>${ST_DESC[k]}</small></span></label>`).join("")}</div>
     <div class="lab">처리 이력</div>
     <div class="hist"><span><span class="mono">${esc(r.at)}</span> 접수 (${r.name?esc(r.name):"익명"})</span>${r.aAt?`<span><span class="mono">${esc(r.aAt)}</span> ${ST[r.st].t} 처리 (${esc(r.by||"ESH 담당자")})</span>`:""}</div>
-  </div>
-  <div class="actions"><span class="err" id="aerr"></span><button type="button" class="btn" id="cancel">취소</button><button type="submit" class="btn pri" id="asave"${r.del?" disabled":""}>답변 저장</button></div></form>
-  <h2 style="font-size:16px;margin:28px 0 10px">관리 작업</h2>
-  <div class="panel"><div class="ans">
+  </div></form>
+  <div class="msec">관리 작업</div>
+  <div class="ans">
     ${r.del?`<div class="lab">삭제됨</div><div><div class="note" style="color:var(--danger);margin:0 0 10px">🗑 휴지통에 있는 질의입니다 (${esc(r.del)} 삭제). 사용자 화면에는 표시되지 않습니다.</div>
       <div class="row" style="gap:8px"><button type="button" class="btn sm" id="g-restore" style="flex:0 0 auto">복구</button><button type="button" class="btn sm" id="g-purge" style="flex:0 0 auto;color:var(--danger)">영구삭제</button></div></div>`
     :`<div class="lab">질의 수정<small>개인정보 삭제·오기 정정</small></div><div>
@@ -861,9 +886,11 @@ function viewAnswer(){
       <div class="tag" style="white-space:normal;margin-bottom:8px">삭제하면 사용자 화면에서 즉시 사라지고 관리자 ‘휴지통’으로 이동합니다. 휴지통에서 복구하거나 영구삭제할 수 있습니다.</div>
       <button type="button" class="btn sm" id="d-trash" style="color:var(--danger)">휴지통으로 이동</button></div>`}
     <div class="lab">관리 이력</div><div><div class="hist" id="loghist">불러오는 중…</div></div>
-  </div></div>`;
-  const back=()=>{answering=null;render()};
-  const reload=async msg=>{rows=await api("adminList",{token});toast(msg);viewAnswer()};
+  </div></div>
+  <div class="mfoot"><span class="err" id="aerr"></span><button type="button" class="btn" id="cancel">닫기</button><button type="submit" form="af" class="btn pri" id="asave"${r.del?" disabled":""}>답변 저장</button></div></div>`;
+  m.querySelector(".mbody").scrollTop=keep;if(!had)m.querySelector(".mdlg").focus();
+  const back=()=>closeAnswer(true);
+  const reload=async msg=>{rows=await api("adminList",{token});modalDirty=true;toast(msg);viewAnswer()};
   const act=(btn,fn)=>btn&&(btn.onclick=async()=>{btn.disabled=true;try{await fn()}catch(ex){if(/세션 만료|로그인이 필요/.test(ex.message))return errView(ex);toast(ex.message);btn.disabled=false}});
   api("adminLog",{token,id:r.id}).then(l=>{$("#loghist").innerHTML=l.length?l.map(x=>`<span><span class="mono">${esc(x.at)}</span> ${esc(x.act)}${x.detail?" · "+esc(x.detail):""}</span>`).join(""):'<span>관리 이력이 없습니다.</span>'}).catch(()=>{$("#loghist").textContent="이력을 불러오지 못했습니다."});
   if($("#e-c1")){
@@ -873,15 +900,15 @@ function viewAnswer(){
       await api("adminEdit",{token,id:r.id,q,c1:$("#e-c1").value,c2:$("#e-c2").value,doc:$("#e-c2").value==="MESH"?$("#e-doc").value:"",note:$("#e-note").value.trim()});await reload("질의를 수정했습니다.")});
     act($("#b-btn"),async()=>{await api("adminBlind",{token,id:r.id,on:!r.blind,note:$("#b-note").value.trim()});await reload(r.blind?"블라인드를 해제했습니다.":"블라인드 처리했습니다.")});
     act($("#d-trash"),async()=>{if(!confirm(`${r.id} 을(를) 삭제(휴지통 이동)합니다. 사용자 화면에서 즉시 사라지며 휴지통에서 복구할 수 있습니다.`))throw new Error("취소했습니다.");
-      await api("adminDelete",{token,id:r.id,mode:"trash"});toast(`${r.id} 을(를) 휴지통으로 이동했습니다`);answering=null;viewManage()});
+      await api("adminDelete",{token,id:r.id,mode:"trash"});toast(`${r.id} 을(를) 휴지통으로 이동했습니다`);closeAnswer(true)});
   }else{
-    act($("#g-restore"),async()=>{await api("adminDelete",{token,id:r.id,mode:"restore"});toast(`${r.id} 복구했습니다`);answering=null;viewManage()});
+    act($("#g-restore"),async()=>{await api("adminDelete",{token,id:r.id,mode:"restore"});toast(`${r.id} 복구했습니다`);closeAnswer(true)});
     act($("#g-purge"),async()=>{if(!confirm(`${r.id} 을(를) 영구삭제합니다.\n질의·답변 내용과 첨부파일이 삭제되며 복구할 수 없습니다. 계속할까요?`))throw new Error("취소했습니다.");
-      await api("adminDelete",{token,id:r.id,mode:"purge"});toast(`${r.id} 영구삭제했습니다`);answering=null;viewManage()});
+      await api("adminDelete",{token,id:r.id,mode:"purge"});toast(`${r.id} 영구삭제했습니다`);closeAnswer(true)});
   }
-  $("#back").onclick=back;$("#cancel").onclick=back;
+  $("#mclose").onclick=$("#cancel").onclick=()=>closeAnswer();$("#mback").onclick=()=>closeAnswer();
   $("#af").addEventListener("submit",async e=>{e.preventDefault();
-    const a=$("#a-text").value.trim(),s=main.querySelector('input[name=ast]:checked');
+    const a=$("#a-text").value.trim(),s=m.querySelector('input[name=ast]:checked');
     if(a.length<5)return $("#aerr").textContent="답변 내용을 입력해 주세요.";
     if(!s)return $("#aerr").textContent="답변상태(완료·보류·개선예정)를 선택해 주세요.";
     const b=$("#asave");b.disabled=true;b.textContent="저장 중…";
