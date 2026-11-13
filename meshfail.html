@@ -1,46 +1,72 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MESH 부적합 사례 검색기</title>
+<meta name="color-scheme" content="dark light">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<script>try{var t=localStorage.getItem("yess-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <style>
-:root{--navy:#1B2C5C;--blue:#1D4F9F;--bg:#F4F6FA;--line:#D9DEE8;--mut:#5B6577;--hl:#FFF2A8}
-*{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;background:var(--bg);color:#1c2333;font-size:14px}
-header{background:var(--navy);color:#fff;padding:14px 22px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-header h1{margin:0;font-size:18px}header span{font-size:12px;opacity:.8}
-main{max-width:1180px;margin:0 auto;padding:16px 20px 60px}
-.box{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px}
-#q{width:100%;font-size:16px;padding:11px 14px;border:2px solid var(--blue);border-radius:8px;outline:none}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
-.lab{font-size:12px;color:var(--mut);width:56px;flex:none;font-weight:700}
-.chip{border:1px solid var(--line);background:#fff;border-radius:16px;padding:4px 11px;font-size:12.5px;cursor:pointer;user-select:none;font-family:inherit}
-.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
-.chip .n{opacity:.65;font-size:11px;margin-left:3px}
-.tools{display:flex;justify-content:space-between;align-items:center;margin:4px 2px 10px;gap:10px;flex-wrap:wrap}
-.btn{border:1px solid var(--blue);background:#fff;color:var(--blue);border-radius:6px;padding:5px 12px;font-size:12.5px;cursor:pointer;font-family:inherit}
-.btn:hover{background:var(--blue);color:#fff}
-#count{font-weight:700;color:var(--navy)}
-#bars{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.bar{font-size:11.5px;background:#EEF2FA;border-radius:4px;padding:3px 8px;color:var(--navy)}
-.card{background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:8px;padding:11px 14px;margin-bottom:9px}
-.card.env{border-left-color:#2E8B57}.card.ps{border-left-color:#C0392B}
-.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px;margin-bottom:6px}
-.tag{padding:2px 8px;border-radius:10px;background:#EEF2FA;color:var(--navy);font-weight:700}
-.tag.site{background:var(--navy);color:#fff}.tag.ps{background:#FDE9E7;color:#C0392B}.tag.env{background:#E4F3EA;color:#2E8B57}
+/* YESS 포털 디자인 통일: 블랙 + 세이프티 라임 (다크 기본 / 라이트 지원) */
+:root{--bg:#09090B;--sf:#111113;--sf2:#1A1A1E;--line:rgba(255,255,255,.14);--line2:rgba(255,255,255,.28);
+  --fg:#FAFAFA;--fg2:#C4C4CC;--mut:#A0A0AA;--accent:#C6F432;--ink:#0B0F00;--soft:rgba(198,244,50,.12);--hl:#C6F432;--hl-ink:#0B0F00;
+  --env:#5EE6A8;--env-bg:rgba(94,230,168,.14);--ps:#FF7B7B;--ps-bg:rgba(255,107,107,.15);--warn-bg:rgba(251,191,36,.16);--warn-tx:#FCD34D;color-scheme:dark}
+:root[data-theme="light"]{--bg:#F6F6F3;--sf:#FFFFFF;--sf2:#F0F0EC;--line:rgba(0,0,0,.14);--line2:rgba(0,0,0,.32);
+  --fg:#0B0B0C;--fg2:#2E2E34;--mut:#52525B;--accent:#18181B;--ink:#FFFFFF;--soft:rgba(0,0,0,.06);--hl:#E9FF8A;--hl-ink:#111;
+  --env:#0A7A4F;--env-bg:#DDF5E8;--ps:#C62839;--ps-bg:#FDE3E6;--warn-bg:#FFF1D6;--warn-tx:#8A5200;color-scheme:light}
+@media(prefers-color-scheme:light){:root:not([data-theme]){--bg:#F6F6F3;--sf:#FFFFFF;--sf2:#F0F0EC;--line:rgba(0,0,0,.14);--line2:rgba(0,0,0,.32);
+  --fg:#0B0B0C;--fg2:#2E2E34;--mut:#52525B;--accent:#18181B;--ink:#FFFFFF;--soft:rgba(0,0,0,.06);--hl:#E9FF8A;--hl-ink:#111;
+  --env:#0A7A4F;--env-bg:#DDF5E8;--ps:#C62839;--ps-bg:#FDE3E6;--warn-bg:#FFF1D6;--warn-tx:#8A5200;color-scheme:light}}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);color:var(--fg);font-size:15px;line-height:1.55;letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
+header{background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);color:var(--fg);padding:16px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:20}
+header h1{margin:0;font-size:20px;font-weight:800;letter-spacing:-.03em}
+header h1::before{content:"YE";display:inline-grid;place-items:center;width:30px;height:30px;margin-right:10px;border-radius:8px;background:var(--accent);color:var(--ink);font:700 12px ui-monospace,Menlo,monospace;vertical-align:middle}
+header span{font-size:13px;color:var(--mut)}
+#theme-tg{margin-left:auto;width:34px;height:34px;border-radius:50%;border:1px solid var(--line2);background:var(--sf2);color:var(--fg);display:inline-grid;place-items:center;padding:0;cursor:pointer}
+#theme-tg:hover{border-color:var(--fg)}
+main{max-width:1180px;margin:0 auto;padding:24px 20px 72px}
+.box{background:var(--sf);border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-bottom:14px}
+#q{width:100%;font:inherit;font-size:17px;padding:14px 18px;border:2px solid var(--line2);border-radius:14px;outline:none;background:var(--bg);color:var(--fg)}
+#q:focus{border-color:var(--accent)}
+#q::placeholder{color:var(--mut)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.lab{font-size:13px;color:var(--mut);width:56px;flex:none;font-weight:700}
+.chip{border:1px solid var(--line2);background:transparent;color:var(--fg2);border-radius:999px;padding:5px 13px;font-size:13.5px;cursor:pointer;user-select:none;font-family:inherit}
+.chip:hover{border-color:var(--fg)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--ink);font-weight:700}
+.chip .n{opacity:.7;font-size:12px;margin-left:4px}
+.tools{display:flex;justify-content:space-between;align-items:center;margin:6px 2px 12px;gap:10px;flex-wrap:wrap}
+.btn{border:1px solid var(--line2);background:transparent;color:var(--fg);border-radius:10px;padding:7px 14px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn:hover{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+#count{font-weight:800;color:var(--fg)}
+#bars{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.bar{font-size:12.5px;background:var(--sf2);border-radius:8px;padding:4px 10px;color:var(--fg2)}
+.card{background:var(--sf);border:1px solid var(--line);border-radius:20px;padding:0 20px 16px;margin-bottom:12px;overflow:hidden;transition:border-color .2s,transform .25s}
+.card:hover{border-color:var(--line2);transform:translateY(-2px)}
+.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:13px;margin:0 -20px 14px;padding:11px 20px;background:var(--sf2);border-bottom:1px solid var(--line)}
+.card.ps .meta{background:var(--ps-bg)}.card.env .meta{background:var(--env-bg)}
+.tag{padding:3px 10px;border-radius:999px;background:var(--sf);border:1px solid var(--line);color:var(--fg2);font-weight:700}
+.tag.site{background:var(--accent);border-color:var(--accent);color:var(--ink)}.tag.ps{background:transparent;border-color:var(--ps);color:var(--ps)}.tag.env{background:transparent;border-color:var(--env);color:var(--env)}
 .dept{color:var(--mut)}
-.body{white-space:pre-wrap;line-height:1.55;font-size:13.5px}
-.foot{margin-top:7px;font-size:12px;color:var(--mut);display:flex;gap:14px;flex-wrap:wrap}
-.foot b{color:#333}.topics{margin-top:6px;display:flex;gap:5px;flex-wrap:wrap}
-.topics span{font-size:11px;border:1px solid var(--line);border-radius:10px;padding:1px 8px;color:var(--mut);cursor:pointer}
-mark{background:var(--hl);padding:0 1px;border-radius:2px}
-#more{display:block;margin:12px auto}
-.empty{text-align:center;color:var(--mut);padding:40px}
-.badge{background:#FFF2A8;color:#6b5200;border-radius:10px;padding:2px 8px;font-weight:700}.hint{font-size:12px;color:var(--mut);margin-top:8px}
-label.sw{font-size:12.5px;color:var(--mut);cursor:pointer}
+.body{white-space:pre-wrap;line-height:1.65;font-size:14.5px;color:var(--fg)}
+.foot{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line2);display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 22px;font-size:13.5px;color:var(--fg2)}
+.foot span{display:flex;flex-direction:column;gap:2px;min-width:0;overflow-wrap:anywhere}
+.foot b{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--mut)}
+.topics{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap}
+.topics span{font-size:12px;border:1px solid var(--line2);border-radius:999px;padding:2px 10px;color:var(--mut);cursor:pointer}
+.topics span:hover{color:var(--fg);border-color:var(--fg)}
+mark{background:var(--hl);color:var(--hl-ink);padding:0 2px;border-radius:3px}
+#more{display:block;margin:14px auto}
+.empty{text-align:center;color:var(--mut);padding:48px}
+.badge{background:var(--warn-bg);color:var(--warn-tx);border-radius:999px;padding:3px 10px;font-weight:700}.hint{font-size:13px;color:var(--mut);margin-top:10px}
+label.sw{font-size:13.5px;color:var(--mut);cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style></head><body>
-<header><h1>MESH 부적합 사례 검색기</h1><span id="meta"></span></header>
+<header><h1>MESH 부적합 사례 검색기</h1><span id="meta"></span><button id="theme-tg" type="button" aria-label="화면 모드 전환" title="화면 모드"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button></header>
 <main>
 <div class="box">
  <input id="q" type="search" placeholder="문장으로 물어보세요  예) 청양공장에서 질산 경고표지 문제 있었어? · 작년 하반기 밀폐공간 허가서 · 끼임 방호 미설치" autofocus>
- <div class="hint">문장·조사가 섞여도 핵심어를 뽑아 찾고, 사업장·기간(예: 청양, 26년 상반기, 작년)은 자동 인식합니다. 단어 앞에 - 를 붙이면 제외. <label class="sw"><input type="checkbox" id="syn" checked> 유사어 포함</label> <label class="sw"><input type="checkbox" id="strict"> 모든 단어 일치만</label></div><div id="interp" class="hint" style="color:#1B2C5C;font-weight:700"></div>
+ <div class="hint">문장·조사가 섞여도 핵심어를 뽑아 찾고, 사업장·기간(예: 청양, 26년 상반기, 작년)은 자동 인식합니다. 단어 앞에 - 를 붙이면 제외. <label class="sw"><input type="checkbox" id="syn" checked> 유사어 포함</label> <label class="sw"><input type="checkbox" id="strict"> 모든 단어 일치만</label></div><div id="interp" class="hint" style="color:var(--fg);font-weight:700"></div>
  <div class="row"><span class="lab">사업장</span><span id="f-site"></span></div>
  <div class="row"><span class="lab">기간</span><span id="f-per"></span></div>
  <div class="row"><span class="lab">점검</span><span id="f-chk"></span><span class="lab" style="margin-left:14px">분야</span><span id="f-fld"></span><span class="lab" style="margin-left:14px">구분</span><span id="f-kind"></span></div>
@@ -125,4 +151,7 @@ document.getElementById("reset").onclick=()=>{st.q="";document.getElementById("q
 document.getElementById("csv").onclick=()=>{const{rows}=filt();const H=["기간","점검","사업장","분야","구분","부서","내용","근거","조항","유형","위험요소","주제태그","조치현황","관리번호"];const q=s=>'"'+String(s||"").replace(/"/g,'""')+'"';const lines=[H.join(",")].concat(rows.map(r=>[r.p,r.k,r.s,r.f,r.n,r.d,r.c,r.g,r.j,r.t,r.w,r.m.join(";"),r.a,r.v].map(q).join(",")));const b=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="부적합_검색결과.csv";a.click()};
 document.getElementById("meta").textContent=`총 ${D.length}건 · 24 1Q ~ 26 2H · 8개 사업장 · 오프라인 작동`;
 render();
-</script></body></html>
+</script><script>
+document.getElementById('theme-tg').addEventListener('click',function(){var r=document.documentElement,c=r.dataset.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'),n=c==='dark'?'light':'dark';r.dataset.theme=n;try{localStorage.setItem('yess-theme',n)}catch(e){}});
+</script>
+</body></html>
