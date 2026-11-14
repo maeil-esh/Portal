@@ -8,7 +8,7 @@
 <link rel="icon" href="data:,">
 <meta name="color-scheme" content="dark light">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<script>try{var t=localStorage.getItem("yess-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<script>try{var t=localStorage.getItem("yess-theme");document.documentElement.dataset.theme=t||"light"}catch(e){}</script>
 <!-- v5.4.1: 정기교육 이수율 표시 크기 축소·상단 헤더 높이 안정화 / v5.4.0: 정기교육 이수율/이수상태 토글 + 전체 헤더 정렬 + 기본정보 구간 간격 축소·가운데 정렬 / v5.3.5: 저장 이력 임시+서버 병합 표시(목록 교체 깜빡임 제거) + 서버 저장 성공 시 임시 이력을 서버 이력으로 승격 / v5.3.4: 저장 타임아웃 보완 / v5.3.3: 이력 한 줄 목록·삭제 / v5.3.2: 수급사·위원회 옵션 -->
 <style>
 /* YESS 포털 디자인 통일: 블랙 + 세이프티 라임 (다크 기본 / 라이트 지원) */
@@ -3848,6 +3848,27 @@ let isSyncing = false;
 let saveQueued = false;
 const dirtySites = new Set();
 
+/* ── 데이터 보호 장치 (입력 중 자동 최신화가 입력 내용을 덮어쓰는 문제 방지) ──
+   - 저장 안 된 변경/저장 중/입력 중에는 서버 데이터로 화면을 덮어쓰지 않고 뒤로 미룹니다.
+   - 불러오기 요청 중 사용자가 수정했다면, 늦게 도착한 응답은 버리고 다시 시도합니다.
+   - 최초 불러오기가 성공하기 전에는 저장하지 않습니다(빈 데이터로 서버를 덮어쓰는 사고 방지). */
+let editVersion = 0, lastInputAt = 0, dataLoadedOnce = false, reloadRetryTimer = null;
+document.addEventListener('input', ()=>{ lastInputAt = Date.now(); }, true);
+function isUserEditing(){
+  const a = document.activeElement;
+  const typing = !!a && (/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) || a.isContentEditable);
+  return typing || (Date.now() - lastInputAt < 10000);
+}
+function hasPendingLocalChanges(){ return dirtySites.size > 0 || isSyncing || saveQueued; }
+function reloadBusy(){ return dataLoadedOnce && (hasPendingLocalChanges() || isUserEditing()); }
+function deferReload(ms){
+  clearTimeout(reloadRetryTimer);
+  reloadRetryTimer = setTimeout(()=>reloadAllFromGAS({manual:false}), ms || 15000);
+}
+window.addEventListener('beforeunload', e=>{
+  if(dirtySites.size > 0 || isSyncing){ e.preventDefault(); e.returnValue = ''; return ''; }
+});
+
 function setSyncMsg(msg, color){
   const el = document.getElementById('autoSyncMsg');
   if(el){ el.textContent = msg; el.style.color = color||'var(--gray400)'; }
@@ -3857,6 +3878,7 @@ function setSyncMsg(msg, color){
 
 // 데이터 변경 시 호출 → 2초 디바운스 후 변경된 사업장만 자동 저장
 function triggerAutoSave(site){
+  editVersion++;
   const target = String(site || curSite || '').trim();
   if(target) dirtySites.add(target);
   clearTimeout(autoSaveTimer);
@@ -3867,6 +3889,10 @@ function triggerAutoSave(site){
 
 function autoSaveAll(){
   if(GAS_URL==='YOUR_GAS_DEPLOYMENT_URL') return;
+  if(!dataLoadedOnce){
+    setSyncMsg('● 데이터를 불러오기 전에는 저장하지 않습니다', 'var(--orange500)');
+    return;
+  }
   if(isSyncing){ saveQueued = true; return; }
 
   const targets = [...dirtySites].filter(s=>siteData[s] && !isDeprecatedSite(s));
@@ -3968,6 +3994,16 @@ function reloadAllFromGAS(options){
     bootstrapReloadQueued = true;
     return;
   }
+  if(!options.manual && reloadBusy()){
+    setSyncMsg('● 입력 중 — 최신화 보류', 'var(--orange500)');
+    deferReload(15000);
+    return;
+  }
+  if(options.manual && dataLoadedOnce && hasPendingLocalChanges()){
+    if(!confirm('저장되지 않은 변경사항이 있습니다.\n지금 불러오면 입력한 내용이 사라질 수 있습니다. 계속할까요?')) return;
+    dirtySites.clear();
+  }
+  const reloadStartVer = editVersion;
   bootstrapLoading = true;
   if(options.manual) toast('불러오는 중...','');
   setSyncMsg('↓ 불러오는 중...', 'var(--blue500)');
@@ -3975,8 +4011,15 @@ function reloadAllFromGAS(options){
 
   requestBootstrapData(res=>{
     bootstrapLoading = false;
+    if(res?.result==='success' && Array.isArray(res.data) && !options.manual && dataLoadedOnce && (editVersion !== reloadStartVer || reloadBusy())){
+      // 불러오는 동안 사용자가 수정했거나 입력 중이면 이 응답은 버립니다(입력 내용 보호).
+      setSyncMsg('● 입력 중 — 최신화 보류', 'var(--orange500)');
+      deferReload(10000);
+      return;
+    }
     if(res?.result==='success' && Array.isArray(res.data)){
       LD.progress(88, '데이터 처리 중...');
+      dataLoadedOnce = true;
       const loadedOrder = Array.isArray(res.order) ? res.order : [];
       applyMasterMap(res.masters || res.master || {});
       applyLoadedSiteOrder(loadedOrder);
