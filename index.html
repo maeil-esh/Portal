@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="dark light">
+<meta name="color-scheme" content="light dark">
 <title>YESS-업무지원시스템</title>
 <link id="site-favicon" rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232563EB'/><text x='50%25' y='53%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black,Arial' font-weight='900' font-size='12' fill='white'>YE.</text><circle cx='25' cy='25' r='4' fill='%2310B981'/></svg>" type="image/svg+xml">
 <link id="site-favicon-apple" rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232563EB'/><text x='50%25' y='53%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black,Arial' font-weight='900' font-size='12' fill='white'>YE.</text><circle cx='25' cy='25' r='4' fill='%2310B981'/></svg>">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<script>try{var t=localStorage.getItem('yess-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<script>try{var t=localStorage.getItem('yess-theme');document.documentElement.dataset.theme=t||"light"}catch(e){}</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -44,7 +44,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   mask-image:radial-gradient(ellipse 80% 60% at 50% 0,#000 20%,transparent 75%);
   -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 0,#000 20%,transparent 75%)}
 
-.wrapper{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:calc(44px + 88px) 28px 56px}
+.wrapper{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:calc(54px + 88px) 28px 56px}
 
 /* hero */
 .hero{margin-bottom:64px;animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
@@ -98,36 +98,38 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .footer{margin-top:56px;padding-top:24px;border-top:1px solid var(--line);font-size:12px;color:var(--fg-3);line-height:1.7}
 .footer a{color:var(--fg-2);text-decoration:underline;text-underline-offset:3px}
 
-/* ticker */
-#news-ticker{position:fixed;top:0;left:0;right:0;z-index:999;height:44px;display:flex;align-items:center;overflow:hidden;
-  background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-.tk-label{flex-shrink:0;display:flex;align-items:center;gap:8px;height:100%;padding:0 18px;font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.14em;color:var(--fg);border-right:1px solid var(--line);white-space:nowrap}
-.live{width:7px;height:7px;border-radius:50%;background:#FF4D4F;animation:pulse 1.6s ease-in-out infinite}
-.tk-track{flex:1;overflow:hidden;position:relative;height:100%;mask-image:linear-gradient(to right,transparent 0,#000 30px,#000 calc(100% - 30px),transparent 100%);-webkit-mask-image:linear-gradient(to right,transparent 0,#000 30px,#000 calc(100% - 30px),transparent 100%)}
+/* ticker — 전광판 (고대비 LED 스타일: 라이트/다크 공통) */
+#news-ticker{position:fixed;top:0;left:0;right:0;z-index:999;height:54px;display:flex;align-items:center;overflow:hidden;
+  background:#0A0A0C;border-bottom:1px solid rgba(255,255,255,.16);box-shadow:0 8px 28px -14px rgba(0,0,0,.55)}
+.tk-label{flex-shrink:0;display:flex;align-items:center;gap:9px;height:100%;padding:0 22px;font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.14em;color:#0B0F00;background:#C6F432;white-space:nowrap}
+.live{width:8px;height:8px;border-radius:50%;background:#E11D48;box-shadow:0 0 0 3px rgba(225,29,72,.25);animation:pulse 1.2s ease-in-out infinite}
+.tk-track{flex:1;overflow:hidden;position:relative;height:100%;mask-image:linear-gradient(to right,transparent 0,#000 26px,#000 calc(100% - 26px),transparent 100%);-webkit-mask-image:linear-gradient(to right,transparent 0,#000 26px,#000 calc(100% - 26px),transparent 100%)}
 .tk-inner{display:inline-flex;align-items:center;height:100%;white-space:nowrap;will-change:transform}
 .tk-inner.running{animation:tkScroll var(--tk-dur,60s) linear infinite}
 .tk-inner:hover{animation-play-state:paused}
-.tk-item{display:inline-flex;align-items:center;gap:10px;padding:0 4px 0 0;font-size:13.5px;color:var(--fg-2)}
-.tk-item a{color:inherit;text-decoration:none}.tk-item a:hover{color:var(--fg);text-decoration:underline;text-underline-offset:3px}
-.tk-badge{flex-shrink:0;font-size:10.5px;font-weight:600;letter-spacing:.06em;padding:3px 8px;border-radius:6px;font-family:var(--mono);border:1px solid var(--line-2);color:var(--fg)}
-.bd-moel{background:rgba(96,165,250,.14)}.bd-kosha{background:rgba(52,211,153,.14)}.bd-news{background:rgba(248,113,113,.14)}.bd-rule{background:rgba(251,191,36,.14)}.bd-env{background:rgba(163,230,53,.14)}
-.tk-dot{width:3px;height:3px;border-radius:50%;background:var(--fg-3);flex-shrink:0;margin:0 22px}
-.tk-load{color:var(--fg-3);font-size:12px;padding-left:18px;display:flex;align-items:center;gap:8px}
-.tk-spin{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--line-2);border-top-color:var(--fg);animation:spin .8s linear infinite;flex-shrink:0}
-.tk-refresh{flex-shrink:0;width:40px;height:100%;display:flex;align-items:center;justify-content:center;border:none;border-left:1px solid var(--line);background:none;color:var(--fg-3);font-size:14px;cursor:pointer;transition:color .2s}
-.tk-refresh:hover{color:var(--fg)}
-.tk-time{flex-shrink:0;font-size:11.5px;font-family:var(--mono);color:var(--fg-3);padding:0 14px;border-left:1px solid var(--line);white-space:nowrap}
+.tk-item{display:inline-flex;align-items:center;gap:12px;font-size:16px;font-weight:500;color:#F4F4F5;letter-spacing:-.01em}
+.tk-item a{color:inherit;text-decoration:none}.tk-item a:hover{color:#C6F432;text-decoration:underline;text-underline-offset:4px}
+.tk-badge{flex-shrink:0;font-size:12px;font-weight:700;letter-spacing:.04em;padding:4px 10px;border-radius:6px;font-family:var(--font);color:#fff}
+.bd-moel{background:#2563EB}.bd-kosha{background:#059669}.bd-news{background:#E11D48}.bd-rule{background:#C2610A}.bd-env{background:#4D7C0F}
+.tk-dot{width:6px;height:6px;border-radius:50%;background:#C6F432;flex-shrink:0;margin:0 28px}
+.tk-load{color:#A1A1AA;font-size:14px;padding-left:18px;display:flex;align-items:center;gap:8px}
+.tk-spin{width:12px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.25);border-top-color:#C6F432;animation:spin .8s linear infinite;flex-shrink:0}
+.tk-refresh{flex-shrink:0;width:46px;height:100%;display:flex;align-items:center;justify-content:center;border:none;border-left:1px solid rgba(255,255,255,.16);background:none;color:#D4D4D8;font-size:16px;cursor:pointer;transition:color .2s,background .2s}
+.tk-refresh:hover{color:#0B0F00;background:#C6F432}
+.tk-refresh svg{width:17px;height:17px}
+.tk-time{flex-shrink:0;font-size:12.5px;font-family:var(--mono);color:#D4D4D8;padding:0 16px;border-left:1px solid rgba(255,255,255,.16);white-space:nowrap}
 
 @keyframes tkScroll{to{transform:translateX(-50%)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* 카드 진입·호버 모션만 줄이고, 전광판(뉴스 흐름)은 유지 */
+@media(prefers-reduced-motion:reduce){.card,.hero{animation:none!important}.card{transition:none!important}.card:hover{transform:none}}
 
 /* responsive */
 @media(max-width:1100px){.card{grid-column:span 6}.card.feat{grid-column:span 12;grid-row:auto}.card.wide{grid-column:span 6}}
 @media(max-width:680px){
-  .wrapper{padding:calc(44px + 56px) 16px 40px}
+  .wrapper{padding:calc(54px + 56px) 16px 40px}
   .hero{margin-bottom:40px}
   .grid{grid-template-columns:1fr;grid-auto-rows:auto;gap:10px}
   .card,.card.feat,.card.wide{grid-column:auto;padding:20px}
@@ -146,8 +148,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     </div>
   </div>
   <div class="tk-time" id="tk-time"></div>
-  <button class="tk-refresh" id="tk-refresh-btn" title="새로고침" aria-label="뉴스 새로고침">↻</button>
-  <button class="tk-refresh" id="theme-btn" title="화면 모드" aria-label="화면 모드 전환">◐</button>
+  <button class="tk-refresh" id="tk-refresh-btn" title="새로고침" aria-label="뉴스 새로고침"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></button>
+  <button class="tk-refresh" id="theme-btn" title="화면 모드" aria-label="화면 모드 전환"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
 </div>
 
 <div class="wrapper">
@@ -331,9 +333,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     },
     render(items) {
       if (!items.length) return;
-      const dur = Math.min(240, Math.max(90, items.length * 10));
-      this.inner.innerHTML = items.map(i => this.buildItem(i.cat, i.cls, i.text, i.link)).join('')
-                           + items.map(i => this.buildItem(i.cat, i.cls, i.text, i.link)).join('');
+      const one = items.map(i => this.buildItem(i.cat, i.cls, i.text, i.link)).join('');
+      const track = this.inner.parentElement;
+      this.inner.innerHTML = one;
+      let w = this.inner.scrollWidth;
+      const need = track.clientWidth + 80;
+      const set = (w > 0 && w < need) ? one.repeat(Math.ceil(need / w)) : one;   // 한 묶음이 트랙보다 짧으면 반복해서 채움
+      this.inner.innerHTML = set + set;                                            // 2묶음 = -50% 이동 시 끊김 없는 순환
+      w = this.inner.scrollWidth / 2;
+      const dur = Math.max(25, Math.round(w / 75));                                // 초당 약 75px
       this.inner.style.setProperty('--tk-dur', dur + 's');
       this.inner.classList.remove('running');
       void this.inner.offsetWidth;
