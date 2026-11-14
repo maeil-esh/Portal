@@ -1764,7 +1764,33 @@ function moveRow(id, dir){
   });
 }
 
+/* ── 입력 흐름 유지: 표를 다시 그려도 커서 위치와 스크롤을 그대로 복원 ── */
+let __rtTimer=null;
+function renderTableSoon(){ clearTimeout(__rtTimer); __rtTimer=setTimeout(()=>{ __rtTimer=null; renderTable(); },0); }
+function tableCellKey(el){
+  const td=el&&el.closest?el.closest('#tableBody td'):null; const tr=td?td.closest('tr[data-id]'):null;
+  if(!td||!tr) return null;
+  return {id:tr.dataset.id, idx:[...tr.children].indexOf(td), inner:el!==td, caret:(typeof el.selectionStart==='number'?el.selectionStart:null)};
+}
+function tableScroller(){
+  let el=document.getElementById('tableBody'); el=el&&el.parentElement;
+  while(el&&el!==document.body){ const cs=getComputedStyle(el); if(/(auto|scroll)/.test(cs.overflowY+cs.overflowX)) return el; el=el.parentElement; }
+  return null;
+}
 function renderTable(){
+  const key=tableCellKey(document.activeElement), sc=tableScroller();
+  const st=sc?[sc.scrollTop,sc.scrollLeft]:null, wy=window.scrollY;
+  renderTableRaw();
+  if(sc&&st){ sc.scrollTop=st[0]; sc.scrollLeft=st[1]; }
+  if(Math.abs(window.scrollY-wy)>2) window.scrollTo(window.scrollX,wy);
+  if(!key) return;
+  const tr=document.querySelector('#tableBody tr[data-id="'+key.id+'"]'); const td=tr&&tr.children[key.idx];
+  if(!td) return;
+  const target=key.inner?td.querySelector('input,select,textarea'):td;
+  if(!target) return;
+  try{ target.focus({preventScroll:true}); if(key.caret!=null&&target.setSelectionRange) target.setSelectionRange(key.caret,key.caret); }catch(e){}
+}
+function renderTableRaw(){
   const q    = document.getElementById('searchBox').value.trim().toLowerCase();
   const dept = document.getElementById('filterDept').value;
   const rows = sd().rows;
@@ -1935,8 +1961,8 @@ function buildMasterSelectOptions(list, current, placeholder){
   ).join('');
 }
 
-function setF(id,f,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r[f]=f==='empno'?empnoText(v):v; r.date=today(); if(['name','empno','team','process'].includes(f))renderTable(); triggerAutoSave(); }
-function setDesignationDate(id,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r.designationDate=normalizeDateInput(v)||''; r.date=today(); renderTable(); triggerAutoSave(); }
+function setF(id,f,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r[f]=f==='empno'?empnoText(v):v; r.date=today(); if(['name','empno','team','process'].includes(f))renderTableSoon(); triggerAutoSave(); }
+function setDesignationDate(id,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r.designationDate=normalizeDateInput(v)||''; r.date=today(); renderTableSoon(); triggerAutoSave(); }
 function toggleCheck(id,mid){ if(!isUnlocked()){ requireAuth(()=>{ const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }); return; } const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }
 
 /* ════ 행 순서 변경 ════ */
@@ -3454,6 +3480,26 @@ function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight, px=12){
   }
   return y;
 }
+function drawHangingItem(ctx, text, numX, textX, y, rightX, lineHeight, startPx=12.5, minPx=10, maxLines=2){
+  const value=String(text||'').trim();
+  if(!value) return y;
+  const words=value.split(/\s+/);
+  let size=startPx, lines=[];
+  while(true){
+    setCanvasFont(ctx,size);
+    lines=[]; let line='', first=true;
+    for(const w of words){
+      const test=line?line+' '+w:w;
+      const avail=rightX-(first?numX:textX);
+      if(ctx.measureText(test).width>avail && line){ lines.push(line); line=w; first=false; } else line=test;
+    }
+    if(line) lines.push(line);
+    if(lines.length<=maxLines || size<=minPx) break;
+    size-=.5;                                   // 줄 수가 넘치면 글자를 조금 줄여서 날짜 줄과 겹치지 않게 함
+  }
+  lines.forEach((ln,i)=>ctx.fillText(ln,i===0?numX:textX,y+i*lineHeight));
+  return y+lines.length*lineHeight;
+}
 function makeDesignationOverlayPng(r, site, pageWidth, pageHeight){
   // 원본 PDF 서식은 그대로 유지하고, 입력값과 추가 업무 문구만 투명 레이어로 올립니다.
   const scale=4;
@@ -3466,14 +3512,11 @@ function makeDesignationOverlayPng(r, site, pageWidth, pageHeight){
   drawFittedText(ctx,affiliation,166,171.2,350,13,9);
   drawFittedText(ctx,r.position,166,201.2,350,13,9);
   drawFittedText(ctx,r.name,166,231.2,350,13,9);
-  drawWrappedText(
+  // 8번 업무: 템플릿의 7번 항목(y≈596~636) 바로 아래에 이어 쓰고, 번호/들여쓰기·우측 한계를 템플릿(1~7번)과 맞춥니다.
+  drawHangingItem(
     ctx,
     '8. 해당 작업의 안전보건 확보에 필요한 인력·장비·보호구·시설개선 등의 필요사항을 파악하여 보고하고, 개선조치가 적기에 이행될 수 있도록 확인·관리하는 업무',
-    76,
-    593,
-    492,
-    17,
-    11.2
+    89, 107, 640.5, 502, 17.5, 12, 11, 3   // 글자 크기는 서식 1~7번과 같은 12pt 고정(3줄까지 허용, 날짜 줄과 겹치지 않는 간격)
   );
   const d=designationDateParts(r.designationDate);
   drawSpacedRight(ctx,d.y,247,699.4,4.0,12);
@@ -3481,12 +3524,131 @@ function makeDesignationOverlayPng(r, site, pageWidth, pageHeight){
   drawSpacedRight(ctx,d.d,367,699.4,3.4,12);
   return canvas.toDataURL('image/png');
 }
+/* ══════════════════════════════════════════
+   관리감독자 지정서 — 새 레이아웃 (A4, 전체를 직접 그려 PDF로 저장)
+   · 원본 서식 위에 덧쓰던 방식에서, 비율·여백·글자 위계를 정리한 레이아웃으로 변경
+   · 문구는 기존 지정서와 동일(가독성을 위해 구두점·가운뎃점만 정리) · 디자인: A안(균형형)
+══════════════════════════════════════════ */
+const DESIG_DUTIES=[
+  '사업장내 관리감독자가 지휘, 감독하는 작업과 관련된 기계·기구 또는 설비의 안전보건 점검 및 이상 유무의 확인.',
+  '관리감독자에게 소속된 근로자의 작업복, 보호구 및 방호장치의 점검과 그 착용·사용에 관한 교육·지도',
+  '해당 작업에서 발생한 산업재해에 관한 보고 및 이에 대한 응급처치',
+  '해당 작업의 작업장 정리·정돈 및 통로확보에 대한 확인·감독',
+  '산업보건의, 안전관리자, 보건관리자의 지도·조언에 대한 협조',
+  '법 제36조에 따른 위험성평가를 위한 업무에 기인하는 유해·위험요인의 파악 및 그 결과에 따른 개선조치의 시행',
+  '그 밖에 해당 작업의 안전보건에 관한 사항으로서 고용노동부령으로 정하는 사항',
+  '해당 작업의 안전보건 확보에 필요한 인력·장비·보호구·시설개선 등의 필요사항을 파악하여 보고하고, 개선조치가 적기에 이행될 수 있도록 확인·관리하는 업무'
+];
+const DESIG_FONT='"Pretendard Variable","Pretendard","Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",sans-serif';
+function dFont(ctx,weight,px){ ctx.font=weight+' '+px+'px '+DESIG_FONT; }
+function dSpacing(ctx,px){ if('letterSpacing' in ctx) ctx.letterSpacing=(px||0)+'px'; }
+function dWrap(ctx,text,maxW){
+  const words=String(text||'').trim().split(/\s+/), lines=[]; let line='';
+  const push=w=>{ // 한 단어가 폭을 넘으면 글자 단위로 분할
+    if(ctx.measureText(w).width<=maxW){ line=w; return; }
+    let part=''; for(const ch of w){ if(ctx.measureText(part+ch).width>maxW && part){ lines.push(part); part=ch; } else part+=ch; } line=part;
+  };
+  for(const w of words){
+    const t=line?line+' '+w:w;
+    if(ctx.measureText(t).width>maxW && line){ lines.push(line); line=''; push(w); } else if(!line) push(w); else line=t;
+  }
+  if(line) lines.push(line);
+  return lines;
+}
+function dRoundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+function makeDesignationPagePng(r, site, PW, PH){
+  /* 지정서 A안(균형형): 제목 28 / 인적사항 값 13.5 / 본문 12 / 업무 목록 11.5pt */
+  const SC=4, cv=document.createElement('canvas');
+  cv.width=Math.round(PW*SC); cv.height=Math.round(PH*SC);
+  const ctx=cv.getContext('2d'); ctx.scale(SC,SC);
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,PW,PH); ctx.textBaseline='alphabetic';
+  const INK='#111111', SUB='#6B6B6B', LINE='#D6D6D0', SOFT='#F5F5F2', MX=58, W=PW-MX*2;
+
+  // 외곽선 + 상단 포인트 + 회사명
+  ctx.strokeStyle='#1A1A1A'; ctx.lineWidth=.9; dRoundRect(ctx,30,30,PW-60,PH-60,6); ctx.stroke();
+  ctx.fillStyle=INK; ctx.fillRect(MX,58,34,4);
+  dFont(ctx,'800',11); dSpacing(ctx,1.2); ctx.fillText('매일유업',MX,84); dSpacing(ctx,0);
+  ctx.strokeStyle=LINE; ctx.lineWidth=.7; ctx.beginPath(); ctx.moveTo(MX,96); ctx.lineTo(PW-MX,96); ctx.stroke();
+
+  // 제목
+  ctx.textAlign='center'; dFont(ctx,'800',28); dSpacing(ctx,6);
+  ctx.fillText('관리감독자 지정서',PW/2+3,150); dSpacing(ctx,0); ctx.textAlign='left';
+
+  // 인적사항
+  const rows=[['소  속',[site,r.team].filter(Boolean).join(' / ')],['직  책',r.position||''],['성  명',r.name||'']];
+  const RH=34, TY=178, LW=92;
+  ctx.fillStyle=SOFT; dRoundRect(ctx,MX,TY,W,RH*3,8); ctx.fill();
+  ctx.strokeStyle=LINE; ctx.lineWidth=.8; dRoundRect(ctx,MX,TY,W,RH*3,8); ctx.stroke();
+  rows.forEach((row,i)=>{
+    const y0=TY+i*RH;
+    if(i>0){ ctx.beginPath(); ctx.moveTo(MX,y0); ctx.lineTo(MX+W,y0); ctx.stroke(); }
+    ctx.fillStyle=SUB; dFont(ctx,'700',10); dSpacing(ctx,2); ctx.fillText(row[0],MX+20,y0+RH/2+3.5); dSpacing(ctx,0);
+    ctx.fillStyle=INK; let px=13.5; dFont(ctx,'600',px);
+    while(ctx.measureText(row[1]).width>W-LW-34 && px>9){ px-=.5; dFont(ctx,'600',px); }
+    ctx.fillText(row[1],MX+LW+18,y0+RH/2+px*.35);
+  });
+  ctx.strokeStyle=LINE; ctx.lineWidth=.7; ctx.beginPath(); ctx.moveTo(MX+LW,TY); ctx.lineTo(MX+LW,TY+RH*3); ctx.stroke();
+
+  // 지정 문구
+  ctx.fillStyle=INK; dFont(ctx,'500',12);
+  let y=TY+RH*3+26;
+  dWrap(ctx,'위 사람을 산업안전보건법 제16조 및 시행령 제15조에 의거, 사업장 안전·보건관리에 대한 업무를 수행하기 위한 관리감독자로 지정합니다.',W).forEach(ln=>{ ctx.fillText(ln,MX,y); y+=21; });
+
+  // 업무 목록 제목
+  y+=6;
+  ctx.fillStyle=INK; ctx.fillRect(MX,y-11,3,13);
+  dFont(ctx,'800',13); ctx.fillText('관리감독자 업무',MX+11,y); y+=14;
+
+  // 업무 목록: 11.5pt 기본, 서명 영역과 겹치면 글자를 조금씩 줄여 맞춤
+  const NX=MX+24, signLimit=PH-52;
+  let fs=11.5, pad=6, layout, lh=fs*1.6;
+  for(;;){
+    lh=fs*1.6;
+    dFont(ctx,'400',fs);
+    layout=DESIG_DUTIES.map(t=>{
+      const w=W-24-4; let ls=dWrap(ctx,t,w);
+      if(ls.length>1 && ls[ls.length-1].replace(/\s/g,'').length<=4) ls=dWrap(ctx,t,w*0.86);   // 한두 글자만 남는 마지막 줄 방지
+      return ls;
+    });
+    const total=layout.reduce((a,l)=>a+(l.length-1)*lh+fs+pad*2,0);
+    const dateY=Math.max(y+total+42,700);
+    if(dateY+54<=signLimit || fs<=9.5) break;
+    fs-=.25; pad=Math.max(4,pad-.15);
+  }
+  ctx.strokeStyle=LINE; ctx.lineWidth=.6;
+  layout.forEach((lines,i)=>{
+    ctx.beginPath(); ctx.moveTo(MX,y); ctx.lineTo(MX+W,y); ctx.stroke();
+    y+=pad+fs;
+    ctx.fillStyle=INK; dFont(ctx,'800',fs); ctx.fillText(String(i+1),MX+6,y);
+    dFont(ctx,'400',fs);
+    lines.forEach((ln,k)=>ctx.fillText(ln,NX,y+k*lh));
+    y+=(lines.length-1)*lh+pad;
+  });
+  ctx.beginPath(); ctx.moveTo(MX,y); ctx.lineTo(MX+W,y); ctx.stroke();
+
+  // 날짜 · 서명
+  const d=designationDateParts(r.designationDate);
+  const dateTxt=(d.y?d.y:'    ')+'년  '+(d.m?d.m:'  ')+'월  '+(d.d?d.d:'  ')+'일';
+  const dateY=Math.max(y+42,700), signY=dateY+54;
+  ctx.fillStyle=INK; ctx.textAlign='center'; dFont(ctx,'600',14); dSpacing(ctx,2);
+  ctx.fillText(dateTxt,PW/2+1,dateY); dSpacing(ctx,0);
+  dFont(ctx,'800',15); dSpacing(ctx,1.5);
+  const nm='매일유업 대표이사', nw=ctx.measureText(nm).width, cx=PW/2-26;
+  ctx.fillText(nm,cx,signY); dSpacing(ctx,0); ctx.textAlign='left';
+  const sx=cx+nw/2+12, sy=signY-24;
+  ctx.setLineDash([2.5,2.5]); ctx.strokeStyle='#9A9A94'; ctx.lineWidth=.8; dRoundRect(ctx,sx,sy,40,40,5); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='#8A8A84'; dFont(ctx,'600',9.5); ctx.textAlign='center'; ctx.fillText('직 인',sx+20,sy+17); ctx.fillText('생 략',sx+20,sy+30); ctx.textAlign='left';
+  return cv.toDataURL('image/png');
+}
 async function createDesignationPdfBlob(r,site){
   await ensureDesignationPdfModules(false);
-  const pdfDoc=await window.PDFLib.PDFDocument.load(base64ToUint8Array(DESIGNATION_TEMPLATE_PDF_BASE64));
-  const page=pdfDoc.getPages()[0];
-  const png=await pdfDoc.embedPng(makeDesignationOverlayPng(r,site,page.getWidth(),page.getHeight()));
-  page.drawImage(png,{x:0,y:0,width:page.getWidth(),height:page.getHeight()});
+  try{ await Promise.all(['400','500','600','700','800'].map(w=>document.fonts.load(w+' 16px "Pretendard Variable"'))); }catch(e){}
+  const PW=595.32, PH=841.92;
+  const pdfDoc=await window.PDFLib.PDFDocument.create();
+  const page=pdfDoc.addPage([PW,PH]);
+  const png=await pdfDoc.embedPng(makeDesignationPagePng(r,site,PW,PH));
+  page.drawImage(png,{x:0,y:0,width:PW,height:PH});
+  pdfDoc.setTitle('관리감독자 지정서 - '+(r.name||''));
   const bytes=await pdfDoc.save({useObjectStreams:false});
   return new Blob([bytes],{type:'application/pdf'});
 }
@@ -3844,6 +4006,7 @@ function updateLockUI(){
    자동 동기화
 ══════════════════════════════════════════ */
 let autoSaveTimer = null;
+let saveRetryDelay = 0, saveRetryTimer = null, saveErrorNotified = false;
 let isSyncing = false;
 let saveQueued = false;
 const dirtySites = new Set();
@@ -3865,6 +4028,11 @@ function deferReload(ms){
   clearTimeout(reloadRetryTimer);
   reloadRetryTimer = setTimeout(()=>reloadAllFromGAS({manual:false}), ms || 15000);
 }
+function flushPendingSave(){
+  if(dirtySites.size>0 && !isSyncing && dataLoadedOnce){ clearTimeout(autoSaveTimer); autoSaveAll(); }
+}
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') flushPendingSave(); });
+window.addEventListener('pagehide', flushPendingSave);
 window.addEventListener('beforeunload', e=>{
   if(dirtySites.size > 0 || isSyncing){ e.preventDefault(); e.returnValue = ''; return ''; }
 });
@@ -3900,8 +4068,8 @@ function autoSaveAll(){
   targets.forEach(s=>dirtySites.delete(s));
 
   isSyncing = true;
-  setSyncMsg('↑ 저장 중...', 'var(--blue500)');
-  beginSaveOverlay('변경사항 저장 중...', targets.length>1 ? targets.length+'개 사업장을 순서대로 저장하고 있습니다.' : targets[0]+' 데이터를 서버에 반영하고 있습니다.');
+  setSyncMsg('↑ 자동 저장 중...', 'var(--blue500)');
+  if(false) beginSaveOverlay('변경사항 저장 중...', targets.length>1 ? targets.length+'개 사업장을 순서대로 저장하고 있습니다.' : targets[0]+' 데이터를 서버에 반영하고 있습니다.');
   let idx = 0;
   let hasError = false;
   let lastError = '';
@@ -3930,10 +4098,14 @@ function autoSaveAll(){
 function onSaveDone(hasError, lastError){
   isSyncing = false;
   if(hasError){
-    setSyncMsg('● 저장 오류', 'var(--red500)');
+    saveRetryDelay = Math.min(saveRetryDelay ? saveRetryDelay*2 : 5000, 60000);
+    setSyncMsg('● 저장 실패 — '+Math.round(saveRetryDelay/1000)+'초 후 자동 재시도', 'var(--red500)');
     finishSaveOverlay(false, '저장하지 못했습니다', lastError || '잠시 후 다시 시도해 주세요.');
-    toast('❌ 저장 오류: '+(lastError||'잠시 후 다시 시도해 주세요.'),'err');
+    if(!saveErrorNotified){ toast('⚠️ 저장이 지연되고 있습니다. 자동으로 다시 시도합니다.','err'); saveErrorNotified = true; }
+    clearTimeout(saveRetryTimer);
+    saveRetryTimer = setTimeout(()=>{ autoSaveAll(); }, saveRetryDelay);
   } else {
+    saveRetryDelay = 0; saveErrorNotified = false; clearTimeout(saveRetryTimer);
     setGasOk();
     setSyncMsg('✓ 저장됨 '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}), 'var(--green500)');
   }
