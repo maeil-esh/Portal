@@ -3557,12 +3557,82 @@ function dWrap(ctx,text,maxW){
 }
 function dRoundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 function makeDesignationPagePng(r, site, PW, PH){
-  /* 지정서 A안(균형형): 제목 28 / 인적사항 값 13.5 / 본문 12 / 업무 목록 11.5pt */
+  /* 지정서 A안(균형형) — 세로 자동 배분
+     1) 글자 크기 전체를 같은 비율(k)로 키우거나 줄여서, 본문 영역에 맞는 가장 큰 크기를 찾고
+     2) 그래도 남는 공간은 제목 위·표 위·본문 아래·업무 목록 사이에 나눠서 위로 몰리지 않게 합니다.
+     (글꼴이 Pretendard/맑은 고딕 등으로 바뀌어도 자동으로 다시 맞춰집니다) */
   const SC=4, cv=document.createElement('canvas');
   cv.width=Math.round(PW*SC); cv.height=Math.round(PH*SC);
   const ctx=cv.getContext('2d'); ctx.scale(SC,SC);
   ctx.fillStyle='#fff'; ctx.fillRect(0,0,PW,PH); ctx.textBaseline='alphabetic';
   const INK='#111111', SUB='#6B6B6B', LINE='#D6D6D0', SOFT='#F5F5F2', MX=58, W=PW-MX*2;
+  const TOP=104, DATE_Y=PH-142, SIGN_Y=PH-88, LIMIT=DATE_Y-48;
+  const rows=[['소  속',[site,r.team].filter(Boolean).join(' / ')],['직  책',r.position||''],['성  명',r.name||'']];
+  const BODY='위 사람을 산업안전보건법 제16조 및 시행령 제15조에 의거, 사업장 안전·보건관리에 대한 업무를 수행하기 위한 관리감독자로 지정합니다.';
+
+  // 본문 영역을 그리거나(draw=true) 높이만 계산(draw=false)
+  function paint(k, g, draw){
+    const T=(t,x,y)=>{ if(draw) ctx.fillText(t,x,y); };
+    let y=TOP+g.pre;
+    // 제목
+    y+=28*k;
+    ctx.fillStyle=INK; ctx.textAlign='center'; dFont(ctx,'800',28*k); dSpacing(ctx,6*k);
+    T('관리감독자 지정서',PW/2+3*k,y); dSpacing(ctx,0); ctx.textAlign='left';
+    y+=24*k+g.title;
+    // 인적사항 표
+    const RH=34*k, TY=y, LW=92;
+    if(draw){
+      ctx.fillStyle=SOFT; dRoundRect(ctx,MX,TY,W,RH*3,8); ctx.fill();
+      ctx.strokeStyle=LINE; ctx.lineWidth=.8; dRoundRect(ctx,MX,TY,W,RH*3,8); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(MX+LW,TY); ctx.lineTo(MX+LW,TY+RH*3); ctx.stroke();
+    }
+    rows.forEach((row,i)=>{
+      const y0=TY+i*RH;
+      if(draw&&i>0){ ctx.strokeStyle=LINE; ctx.lineWidth=.8; ctx.beginPath(); ctx.moveTo(MX,y0); ctx.lineTo(MX+W,y0); ctx.stroke(); }
+      ctx.fillStyle=SUB; dFont(ctx,'700',10*k); dSpacing(ctx,2); T(row[0],MX+20,y0+RH/2+3.5*k); dSpacing(ctx,0);
+      ctx.fillStyle=INK; let px=13.5*k; dFont(ctx,'600',px);
+      while(ctx.measureText(row[1]).width>W-LW-34 && px>9){ px-=.5; dFont(ctx,'600',px); }
+      T(row[1],MX+LW+18,y0+RH/2+px*.35);
+    });
+    y=TY+RH*3+g.table;
+    // 지정 문구
+    ctx.fillStyle=INK; dFont(ctx,'500',12*k);
+    y+=26*k;
+    const bl=dWrap(ctx,BODY,W);
+    bl.forEach((ln,i)=>{ T(ln,MX,y); if(i<bl.length-1) y+=21*k; });
+    // 업무 목록 제목
+    y+=30*k+g.body;
+    if(draw){ ctx.fillStyle=INK; ctx.fillRect(MX,y-11*k,3,13*k); }
+    dFont(ctx,'800',13*k); T('관리감독자 업무',MX+11,y);
+    y+=14*k;
+    // 업무 목록
+    const fs=11.5*k, lh=fs*1.6, pad=6*k+g.item, NX=MX+24*k;
+    dFont(ctx,'400',fs);
+    const layout=DESIG_DUTIES.map(t=>{
+      const w=W-24*k-4; let ls=dWrap(ctx,t,w);
+      if(ls.length>1 && ls[ls.length-1].replace(/\s/g,'').length<=4) ls=dWrap(ctx,t,w*0.86);   // 한두 글자만 남는 마지막 줄 방지
+      return ls;
+    });
+    ctx.strokeStyle=LINE; ctx.lineWidth=.6;
+    layout.forEach((lines,i)=>{
+      if(draw){ ctx.beginPath(); ctx.moveTo(MX,y); ctx.lineTo(MX+W,y); ctx.stroke(); }
+      y+=pad+fs;
+      ctx.fillStyle=INK; dFont(ctx,'800',fs); T(String(i+1),MX+6*k,y);
+      dFont(ctx,'400',fs);
+      lines.forEach((ln,j)=>T(ln,NX,y+j*lh));
+      y+=(lines.length-1)*lh+pad;
+    });
+    if(draw){ ctx.beginPath(); ctx.moveTo(MX,y); ctx.lineTo(MX+W,y); ctx.stroke(); }
+    return y;
+  }
+
+  // 1) 들어가는 가장 큰 비율 찾기 (최대 1.2배, 최소 0.8배)
+  const zero={pre:0,title:0,table:0,body:0,item:0};
+  let k=1.2;
+  while(k>0.8 && paint(k,zero,false)>LIMIT) k=Math.round((k-.02)*100)/100;
+  // 2) 남는 공간을 구간별로 나눠 균형 배치
+  const spare=Math.max(0,LIMIT-paint(k,zero,false));
+  const g={pre:spare*.14, title:spare*.16, table:spare*.18, body:spare*.2, item:spare*.32/16};
 
   // 외곽선 + 상단 포인트 + 회사명
   ctx.strokeStyle='#1A1A1A'; ctx.lineWidth=.9; dRoundRect(ctx,30,30,PW-60,PH-60,6); ctx.stroke();
@@ -3570,74 +3640,20 @@ function makeDesignationPagePng(r, site, PW, PH){
   dFont(ctx,'800',11); dSpacing(ctx,1.2); ctx.fillText('매일유업',MX,84); dSpacing(ctx,0);
   ctx.strokeStyle=LINE; ctx.lineWidth=.7; ctx.beginPath(); ctx.moveTo(MX,96); ctx.lineTo(PW-MX,96); ctx.stroke();
 
-  // 제목
-  ctx.textAlign='center'; dFont(ctx,'800',28); dSpacing(ctx,6);
-  ctx.fillText('관리감독자 지정서',PW/2+3,150); dSpacing(ctx,0); ctx.textAlign='left';
+  paint(k,g,true);
 
-  // 인적사항
-  const rows=[['소  속',[site,r.team].filter(Boolean).join(' / ')],['직  책',r.position||''],['성  명',r.name||'']];
-  const RH=34, TY=178, LW=92;
-  ctx.fillStyle=SOFT; dRoundRect(ctx,MX,TY,W,RH*3,8); ctx.fill();
-  ctx.strokeStyle=LINE; ctx.lineWidth=.8; dRoundRect(ctx,MX,TY,W,RH*3,8); ctx.stroke();
-  rows.forEach((row,i)=>{
-    const y0=TY+i*RH;
-    if(i>0){ ctx.beginPath(); ctx.moveTo(MX,y0); ctx.lineTo(MX+W,y0); ctx.stroke(); }
-    ctx.fillStyle=SUB; dFont(ctx,'700',10); dSpacing(ctx,2); ctx.fillText(row[0],MX+20,y0+RH/2+3.5); dSpacing(ctx,0);
-    ctx.fillStyle=INK; let px=13.5; dFont(ctx,'600',px);
-    while(ctx.measureText(row[1]).width>W-LW-34 && px>9){ px-=.5; dFont(ctx,'600',px); }
-    ctx.fillText(row[1],MX+LW+18,y0+RH/2+px*.35);
-  });
-  ctx.strokeStyle=LINE; ctx.lineWidth=.7; ctx.beginPath(); ctx.moveTo(MX+LW,TY); ctx.lineTo(MX+LW,TY+RH*3); ctx.stroke();
-
-  // 지정 문구
-  ctx.fillStyle=INK; dFont(ctx,'500',12);
-  let y=TY+RH*3+26;
-  dWrap(ctx,'위 사람을 산업안전보건법 제16조 및 시행령 제15조에 의거, 사업장 안전·보건관리에 대한 업무를 수행하기 위한 관리감독자로 지정합니다.',W).forEach(ln=>{ ctx.fillText(ln,MX,y); y+=21; });
-
-  // 업무 목록 제목
-  y+=6;
-  ctx.fillStyle=INK; ctx.fillRect(MX,y-11,3,13);
-  dFont(ctx,'800',13); ctx.fillText('관리감독자 업무',MX+11,y); y+=14;
-
-  // 업무 목록: 11.5pt 기본, 서명 영역과 겹치면 글자를 조금씩 줄여 맞춤
-  const NX=MX+24, signLimit=PH-52;
-  let fs=11.5, pad=6, layout, lh=fs*1.6;
-  for(;;){
-    lh=fs*1.6;
-    dFont(ctx,'400',fs);
-    layout=DESIG_DUTIES.map(t=>{
-      const w=W-24-4; let ls=dWrap(ctx,t,w);
-      if(ls.length>1 && ls[ls.length-1].replace(/\s/g,'').length<=4) ls=dWrap(ctx,t,w*0.86);   // 한두 글자만 남는 마지막 줄 방지
-      return ls;
-    });
-    const total=layout.reduce((a,l)=>a+(l.length-1)*lh+fs+pad*2,0);
-    const dateY=Math.max(y+total+42,700);
-    if(dateY+54<=signLimit || fs<=9.5) break;
-    fs-=.25; pad=Math.max(4,pad-.15);
-  }
-  ctx.strokeStyle=LINE; ctx.lineWidth=.6;
-  layout.forEach((lines,i)=>{
-    ctx.beginPath(); ctx.moveTo(MX,y); ctx.lineTo(MX+W,y); ctx.stroke();
-    y+=pad+fs;
-    ctx.fillStyle=INK; dFont(ctx,'800',fs); ctx.fillText(String(i+1),MX+6,y);
-    dFont(ctx,'400',fs);
-    lines.forEach((ln,k)=>ctx.fillText(ln,NX,y+k*lh));
-    y+=(lines.length-1)*lh+pad;
-  });
-  ctx.beginPath(); ctx.moveTo(MX,y); ctx.lineTo(MX+W,y); ctx.stroke();
-
-  // 날짜 · 서명
+  // 날짜 · 서명 (하단 고정)
   const d=designationDateParts(r.designationDate);
   const dateTxt=(d.y?d.y:'    ')+'년  '+(d.m?d.m:'  ')+'월  '+(d.d?d.d:'  ')+'일';
-  const dateY=Math.max(y+42,700), signY=dateY+54;
-  ctx.fillStyle=INK; ctx.textAlign='center'; dFont(ctx,'600',14); dSpacing(ctx,2);
-  ctx.fillText(dateTxt,PW/2+1,dateY); dSpacing(ctx,0);
-  dFont(ctx,'800',15); dSpacing(ctx,1.5);
+  ctx.fillStyle=INK; ctx.textAlign='center'; dFont(ctx,'600',15); dSpacing(ctx,2);
+  ctx.fillText(dateTxt,PW/2+1,DATE_Y); dSpacing(ctx,0);
+  dFont(ctx,'800',16); dSpacing(ctx,1.5);
   const nm='매일유업 대표이사', nw=ctx.measureText(nm).width, cx=PW/2-26;
-  ctx.fillText(nm,cx,signY); dSpacing(ctx,0); ctx.textAlign='left';
-  const sx=cx+nw/2+12, sy=signY-24;
+  ctx.fillText(nm,cx,SIGN_Y); dSpacing(ctx,0); ctx.textAlign='left';
+  const sx=cx+nw/2+12, sy=SIGN_Y-25;
   ctx.setLineDash([2.5,2.5]); ctx.strokeStyle='#9A9A94'; ctx.lineWidth=.8; dRoundRect(ctx,sx,sy,40,40,5); ctx.stroke(); ctx.setLineDash([]);
   ctx.fillStyle='#8A8A84'; dFont(ctx,'600',9.5); ctx.textAlign='center'; ctx.fillText('직 인',sx+20,sy+17); ctx.fillText('생 략',sx+20,sy+30); ctx.textAlign='left';
+  makeDesignationPagePng.lastScale=k;
   return cv.toDataURL('image/png');
 }
 async function createDesignationPdfBlob(r,site){
