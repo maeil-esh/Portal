@@ -1732,22 +1732,28 @@ function toggleTraining(id){
 function addRow(){
   requireAuth(()=>{
     const d = sd();
+    // 고유 id: 기존 행의 최대 id보다 큰 값을 보장하여 로드 후 id 충돌 방지
+    const maxId = d.rows.reduce((m,r)=>Math.max(m,r.id||0),0);
+    if(d.nextId <= maxId) d.nextId = maxId + 1;
     const row = { id:d.nextId++, team:'', process:'', position:'', empno:'', name:'',
       machines:Object.fromEntries(MACHINES.map(m=>[m.id,false])), designationDate:'', regularTraining:false, bigo:'', date:today() };
     d.rows.push(row);
+    // triggerAutoSave를 renderTable 이전에 호출하여 editVersion을 먼저 올림
+    // → 로드 콜백이 도착해도 editVersion 불일치가 감지되어 덮어쓰기 방지
+    triggerAutoSave();
     renderTable();
     document.getElementById('workSiteBadge').textContent = `총 ${d.rows.length}명`;
-    triggerAutoSave();
     setTimeout(()=>{ const c=document.querySelector(`tr[data-id="${row.id}"] td[data-col="team"]`); if(c) focusCell(c); },50);
   });
 }
 
 function deleteRow(id){
   requireAuth(()=>{
-    sd().rows = sd().rows.filter(r=>r.id!==id);
+    const d = sd();
+    d.rows = d.rows.filter(r=>r.id!==id);
+    triggerAutoSave();  // editVersion 선증가
     renderTable();
-    document.getElementById('workSiteBadge').textContent = `총 ${sd().rows.length}명`;
-    triggerAutoSave();
+    document.getElementById('workSiteBadge').textContent = `총 ${d.rows.length}명`;
   });
 }
 
@@ -1759,8 +1765,8 @@ function moveRow(id, dir){
     const to = idx+dir;
     if(to<0||to>=rows.length) return;
     [rows[idx],rows[to]] = [rows[to],rows[idx]];
+    triggerAutoSave();  // editVersion 선증가
     renderTable();
-    triggerAutoSave();
   });
 }
 
@@ -1939,9 +1945,9 @@ function saveMobileEdit(){
   r.name     = document.getElementById('mobileEditName').value.trim();
   r.designationDate = normalizeDateInput(document.getElementById('mobileEditDesignationDate').value) || '';
   r.date     = today();
+  triggerAutoSave();  // editVersion 선증가
   closeMobileEdit();
   renderTable();
-  triggerAutoSave();
   toast('✅ 기본정보를 저장했습니다','ok');
 }
 
@@ -1961,9 +1967,9 @@ function buildMasterSelectOptions(list, current, placeholder){
   ).join('');
 }
 
-function setF(id,f,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r[f]=f==='empno'?empnoText(v):v; r.date=today(); if(['name','empno','team','process'].includes(f))renderTableSoon(); triggerAutoSave(); }
-function setDesignationDate(id,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r.designationDate=normalizeDateInput(v)||''; r.date=today(); renderTableSoon(); triggerAutoSave(); }
-function toggleCheck(id,mid){ if(!isUnlocked()){ requireAuth(()=>{ const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }); return; } const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); renderTable(); triggerAutoSave(); }
+function setF(id,f,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r[f]=f==='empno'?empnoText(v):v; r.date=today(); triggerAutoSave(); if(['name','empno','team','process'].includes(f))renderTableSoon(); }
+function setDesignationDate(id,v){ if(!isUnlocked()) return; const r=sd().rows.find(r=>r.id===id); if(!r)return; r.designationDate=normalizeDateInput(v)||''; r.date=today(); triggerAutoSave(); renderTableSoon(); }
+function toggleCheck(id,mid){ if(!isUnlocked()){ requireAuth(()=>{ const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); triggerAutoSave(); renderTable(); }); return; } const r=sd().rows.find(r=>r.id===id); if(!r)return; r.machines[mid]=!r.machines[mid]; r.date=today(); triggerAutoSave(); renderTable(); }
 
 /* ════ 행 순서 변경 ════ */
 let rowDragId = null;
@@ -2025,8 +2031,8 @@ function moveRowOrder(sourceId,targetId,insertAfter){
   rows.splice(to,0,moved);
   sortState = { key:null, dir:0 };
   updateSortIndicators();
+  triggerAutoSave();  // editVersion 선증가
   renderTable();
-  triggerAutoSave();
   toast('✅ 행 순서를 변경했습니다','ok');
 }
 
@@ -2764,11 +2770,21 @@ function appendLoadedRows(rows){
     ensureSite(row.site);
     const d=siteData[row.site];
     if(!d) return;
-    d.rows.push({ id:d.nextId++, team:row.team||'', process:row.process||'', position:row.position||'',
+    // 서버에서 받은 행에 명시적 id가 있으면 그대로 사용하고, nextId는 항상 max+1로 유지
+    const serverId = (row.id && Number(row.id) > 0) ? Number(row.id) : d.nextId;
+    if(d.nextId <= serverId) d.nextId = serverId + 1;
+    d.rows.push({ id:serverId, team:row.team||'', process:row.process||'', position:row.position||'',
       empno:empnoText(row.empno), name:row.name||'', regularTraining:isTrainingCompleted(row.regularTraining), bigo:row.bigo||'',
       // 구버전 테스트 데이터가 비고에 날짜를 넣었던 경우에만 1회 호환합니다.
       designationDate:normalizeDateInput(row.designationDate)||normalizeDateInput(row.bigo)||'', date:normalizeDateInput(row.date)||'',
       machines:Object.fromEntries(MACHINES.map(m=>[m.id,row[m.id]==='O'])) });
+  });
+  // 모든 행을 삽입한 뒤, 사업장별로 nextId가 실제 max(id)+1 이상임을 보장
+  Object.keys(siteData).forEach(site=>{
+    const d=siteData[site];
+    if(!d||!d.rows.length) return;
+    const maxId=d.rows.reduce((m,r)=>Math.max(m,r.id||0),0);
+    if(d.nextId<=maxId) d.nextId=maxId+1;
   });
 }
 
@@ -3036,7 +3052,8 @@ function replaceSiteRowsFromExcel(site,rows){
     designationDate:normalizeDateInput(r.designationDate)||'', regularTraining:isTrainingCompleted(r.regularTraining), bigo:r.bigo||'', date:today(),
     machines:Object.fromEntries(MACHINES.map(m=>[m.id,!!(r.machines&&r.machines[m.id])]))
   }));
-  d.nextId=d.rows.length+1;
+  // length+1 대신 max(id)+1을 사용하여 비순차 id에서도 충돌 방지
+  d.nextId = d.rows.reduce((m,r)=>Math.max(m,r.id||0), 0) + 1;
 }
 function applyExcelUpload(){
   const target=uploadTargetSite();
@@ -4199,8 +4216,8 @@ function reloadAllFromGAS(options){
 
   requestBootstrapData(res=>{
     bootstrapLoading = false;
-    if(res?.result==='success' && Array.isArray(res.data) && !options.manual && dataLoadedOnce && (editVersion !== reloadStartVer || reloadBusy())){
-      // 불러오는 동안 사용자가 수정했거나 입력 중이면 이 응답은 버립니다(입력 내용 보호).
+    if(res?.result==='success' && Array.isArray(res.data) && !options.manual && dataLoadedOnce && (editVersion !== reloadStartVer || reloadBusy() || hasPendingLocalChanges())){
+      // 불러오는 동안 사용자가 수정했거나 저장 대기 중이면 이 응답을 버립니다(입력 내용 보호).
       setSyncMsg('● 입력 중 — 최신화 보류', 'var(--orange500)');
       deferReload(10000);
       return;
